@@ -1,0 +1,134 @@
+/* 1. IMPORTACIÓN DE FUENTES E ÍCONOS */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+/* 2. VARIABLES GLOBALES */
+
+:root {
+  --bg-fondo: #05080d;
+  --bg-dark: #0a0c10;
+  --bg-card-dark: #12151c;
+  --gold-main: #e5a93c;
+  --gold-hover: #d4982b;
+  --text-white: #ffffff;
+  --text-muted: #8a8f99;
+  --border-dark: #1f2430;
+  --font-main: 'Poppins', sans-serif;
+  --radius-lg: 16px;
+  --radius-btn: 24px;
+}
+
+/* 3. RESET GENERAL */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body.dark-theme {
+  font-family: var(--font-main);
+  background-color: var(--bg-fondo);
+  color: var(--text-white);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* 4. BARRA DE NAVEGACIÓN */
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 4rem;
+  background-color: transparent;
+  border-bottom: 1px solid var(--border-dark);
+  position: static;
+  top: 0;
+  z-index: 1000;
+}
+
+/* Estilos para el contenedor del SVG */
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo-svg {
+  height: 50px; /* Ajusta la altura según las proporciones de tu archivo SVG */
+  width: auto;
+  display: block;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 2.5rem;
+}
+
+.nav-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: var(--text-white);
+}
+
+.nav-links a.active {
+  color: var(--text-white);
+  border-bottom: 2px solid var(--text-white);
+}
+
+/* Botones genéricos reutilizables */
+.btn {
+  padding: 0.65rem 1.6rem;
+  border-radius: var(--radius-btn);
+  font-family: var(--font-main);
+  font-size: 0.88rem;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-register {
+  text-decoration: none;
+  color: var(--text-white);
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 8px 16px;
+  border: 1px solid var(--gold-main);
+  border-radius: 8px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-register:hover {
+  background-color: var(--gold-main);
+  color: var(--text-white);
+}
+
+.btn-login {
+  text-decoration: none;
+  background-color: var(--gold-main);
+  color: var(--text-white);
+  border: none;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-login:hover {
+  background-color: var(--gold-hover);
+}

@@ -5,86 +5,137 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finara Bank</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="Style/move.css">
+    <link rel="icon" type="image/png" sizes="32x32" href="Style/image/favicon.svg">
+    <link rel="stylesheet" href="Style/index.css">
 </head>
 
-<body>
-    <!-- ======= NAVBAR ======= -->
+<body class="dark-theme">
+    <!-- ======= Barra de navegación ======= -->
     <header class="navbar">
-        <div class="logo_container">
-            <i class="fa-solid fa-shield-halved logo-icon"></i>
-            <span class="logo-text">Finara <span>Bank</span></span>
+        <div class="logo-container">
+            <img src="Style/image/Logo_finara.svg" alt="Finara Bank Logo" class="logo-svg">
         </div>
 
+        <!-- MENÚ DE NAVEGACIÓN -->
         <nav class="nav-links">
-            <a href="#" id="nav-inicio" class="active">Inicio</a>
-            <a href="#" id="nav-servicios">Servicios</a>
-            <a href="#" id="nav-nosotros">Nosotros</a>
-            <a href="#" id="nav-contacto">Contacto</a>
+            <a href="index.html" class="active">Inicio</a>
+            <a href="#productos">Productos</a>
+            <a href="#beneficios">Beneficios</a>
+            <a href="#nosotros">Nosotros</a>
+            <a href="#contacto">Contacto</a>
         </nav>
+
+        <!-- ACCIONES DE USUARIO -->
         <div class="nav-actions">
-            <a href="#" id="nav-registro" class="btn-register">Registrarse</a>
-            <a href="#" id="nav-login">Iniciar Sesión</a>
+            <a href="pages/SignUp.html" class="btn-register">Registrarse</a>
+            <a href="pages/Login.html" class="btn-login">Iniciar sesión</a>
         </div>
     </header>
 
-    <!-- ======= CONTENEDOR PRINCIPAL ======= -->
-    <main class="main-container" id="main-content">
+    <!-- ======= HERO ======= -->
+    <section class="hero-container">
+        <div class="hero-content">
 
-        <!-- SECCIÓN HERO -->
-        <section class="hero">
-            <div class="hero-content">
-                <h1>Bienvenido a <span>Finara Bank</span></h1>
-                <p>El primer cajero web inteligente diseñado para proteger tu dinero, simular créditos transparentes y
-                    guiar tu salud financiera en tiempo real.</p>
+            <!-- LADO IZQUIERDO: TITULAR Y BOTONES DE ACCIÓN -->
+            <div class="hero-left">
+                <h1>Tu dinero,<br><span class="highlight-gold"> en buenas manos.</span></h1>
+
+                <p class="hero-subtitle">
+                    Abre tu cuenta, invierte y haz crecer tu futuro con una plataforma financiera segura, simple y
+                    cercana.
+                </p>
 
                 <div class="hero-buttons">
-                    <a href="registro.html" class="btn btn-primary">Abrir Cuenta</a>
-                    <a href="login.html" class="btn btn-outline">Acceder al Cajero</a>
+                    <a href="pages/signUp.html" class="btn btn-gold">
+                        Comienza ahora <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                    <a href="#productos" class="btn btn-secondary-dark">Conoce más</a>
                 </div>
             </div>
-        </section>
 
-        <!-- SECCIÓN DE PRODUCTOS BANCARIOS -->
-        <section class="products-section">
-            <h2>Nuestros productos Financieros</h2>
-            <div class="product-cards">
+            <!-- LADO DERECHO: DOS TARJETAS 3D -->
+            <div class="hero-right">
+                <div class="card-3d-wrapper">
 
-                <div class="card">
-                    <i class="fa-solid fa-piggy-bank card-icon"></i>
-                    <h3>Cuenta de Ahorros</h3>
-                    <p>Ahorro seguro con una tasa mensual del <strong>1.5%</strong> calculada al momento del retiro[cite: 2]. Proyecta y cumple tus metas.</p>
+                    <div class="finara-card credit-card">
+                        <div class="card-top">
+                            <img src="Style/image/Logo_finara.svg" alt="Finara Bank Logo" class="logo-svg">
+                            <i class="fa-solid fa-wifi card-contactless"></i>
+                        </div>
+                        <div class="card-chip-area">
+                            <div class="chip"></div>
+                            <span class="card-tag">Crédito</span>
+                        </div>
+                        <div class="card-bottom">
+                            <span class="card-number">**** **** **** 4821</span>
+                            <span class="card-type">VISA</span>
+                        </div>
+                    </div>
+
+                    <div class="finara-card debit-card">
+                        <div class="card-top">
+                            <img src="Style/image/Logo_finara_black.svg" alt="Finara Bank Logo" class="logo-svg">
+                            <i class="fa-solid fa-wifi card-contactless"></i>
+                        </div>
+                        <div class="card-chip-area">
+                            <div class="chip"></div>
+                            <span class="card-tag">Débito</span>
+                        </div>
+                        <div class="card-bottom">
+                            <span class="card-number">**** **** **** 1092</span>
+                            <span class="card-type">VISA</span>
+                        </div>
+                    </div>
+                    <!-- Resplandor dorado decorativo de fondo -->
+                    <div class="gold-glow"></div>
                 </div>
-
-                <div class="card">
-                    <i class="fa-solid fa-wallet card-icon"></i>
-                    <h3>Cuenta Corriente</h3>
-                    <p>Gestión diaria con sobregiro permitido del <strong>20%</strong> sobre tu saldo actual para mayor flexibilidad de liquidez[cite: 2].</p>
-                </div>
-
-                <div class="card">
-                    <i class="fa-solid fa-credit-card card-icon"></i>
-                    <h3>Tarjeta de Crédito</h3>
-                    <p>Financiamiento a cuotas transparente. Conoce el valor exacto de tus cuotas fijas e intereses antes de confirmar[cite: 2].</p>
-                </div>
-
-            </div>
-        </section>
-
-    </main>
-
-    <!-- ======= FOOTER ======= -->
-    <footer class="footer">
-        <div class="footer-content">
-            <p>&copy; 2024–2026 Finara Bank. Todos los derechos reservados.</p>
-            <div class="social-links">
-                <a href="#"><i class="fa-brands fa-facebook"></i></a>
-                <a href="#"><i class="fa-brands fa-instagram"></i></a>
-                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
             </div>
         </div>
-    </footer>
+    </section>
+
+    <!-- ======= CARACTERÍSTICAS/BENEFICIOS ======= -->
+    <section class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fa-regular fa-square-check"></i>
+            </div>
+            <div class="feature-text">
+                <h4>100% digital</h4>
+                <p>Sin filas, sin complicaciones.</p>
+            </div>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div class="feature-text">
+                <h4>Segura y confiable</h4>
+                <p>Tu dinero siempre protegido.</p>
+            </div>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fa-solid fa-wallet"></i>
+            </div>
+            <div class="feature-text">
+                <h4>Controla tus finanzas</h4>
+                <p>Tú decides, siempre.</p>
+            </div>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fa-solid fa-gift"></i>
+            </div>
+            <div class="feature-text">
+                <h4>Beneficios exclusivos</h4>
+                <p>Para ti, siempre.</p>
+            </div>
+        </div>
+    </section>
+
 </body>
 
 </html>
