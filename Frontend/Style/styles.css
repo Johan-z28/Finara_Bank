@@ -44,9 +44,9 @@ body.dark-theme {
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem 4rem;
-  background-color: transparent;
+  background-color: var(--bg-dark);
   border-bottom: 1px solid var(--border-dark);
-  position: static;
+  position: sticky;
   top: 0;
   z-index: 1000;
 }
