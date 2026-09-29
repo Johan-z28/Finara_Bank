@@ -1,9 +1,45 @@
 /* 1. IMPORTACIÓN DE FUENTES E ÍCONOS */
 @import url(styles.css);
 
-/* 2. ESTILOS EXCLUSIVOS DE INDEX.HTML (LANDING PAGE) */
+/* ==========================================
+   CONFIGURACIÓN GLOBAL Y SCROLL
+   ========================================== */
 
-/* Contenedor principal de la portada */
+html {
+    scroll-behavior: smooth;
+}
+
+html,
+body {
+    overflow-x: clip !important;
+    /* Evita que el overflow rompa la detección de scroll */
+}
+
+section[id] {
+    scroll-margin-top: 100px;
+    /* Compensación por la barra fija */
+}
+
+/* ==========================================
+   1. BARRA DE NAVEGACIÓN FIJA
+   ========================================== */
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 4rem;
+    background-color: var(--bg-dark);
+    border-bottom: 1px solid var(--border-dark);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* ==========================================
+   2. HERO (HERO SECTION)
+   ========================================== */
+
 .hero-container {
     width: 100%;
     max-width: 100%;
@@ -13,7 +49,6 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-
     background-image: url(image/banner.jpg);
     background-size: cover;
     background-position: center right;
@@ -22,13 +57,13 @@
 
 .hero-content {
     display: grid;
-    grid-template-columns: 1fr 1fr; 
-    align-items: center; /* Centra verticalmente hero-left y hero-right */
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
     gap: 4rem;
     width: 100%;
 }
 
-/* --- LADO IZQUIERDO: TEXTOS Y BOTONES --- */
+/* LADO IZQUIERDO: TEXTOS Y BOTONES */
 .hero-left {
     display: flex;
     flex-direction: column;
@@ -85,24 +120,22 @@
     background-color: #202634;
 }
 
-/* --- LADO DERECHO: TARJETAS EN PERSPECTIVA 3D --- */
+/* LADO DERECHO: TARJETAS EN PERSPECTIVA 3D */
 .hero-right {
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
-    /* Compensa exactamente el desfase vertical hacia abajo de la tarjeta de débito */
-    margin-top: -25px; 
+    margin-top: -25px;
 }
 
 .card-3d-wrapper {
     position: relative;
     width: 485px;
-    height: 305px; /* SINTAXIS CORREGIDA (agregado px) */
+    height: 305px;
     perspective: 1200px;
 }
 
-/* Base común para ambas tarjetas */
 .finara-card {
     width: 420px;
     height: 250px;
@@ -116,7 +149,6 @@
     transition: transform 0.5s ease, z-index 0.3s;
 }
 
-/* 1. Tarjeta de Crédito (Oscura / Atrás) */
 .finara-card.credit-card {
     background: linear-gradient(135deg, #1f2533 0%, #0d1017 100%);
     border: 1px solid #2d3548;
@@ -127,7 +159,6 @@
     filter: brightness(0.85);
 }
 
-/* 2. Tarjeta de Débito (Dorada / Adelante) */
 .finara-card.debit-card {
     background: linear-gradient(135deg, #e5a93c 0%, #9e6f1a 100%);
     border: 1px solid #fce09b;
@@ -137,7 +168,6 @@
     transform: rotateY(-14deg) rotateX(6deg) rotateZ(-2deg);
 }
 
-/* Efecto hover interactivo */
 .card-3d-wrapper:hover .credit-card {
     filter: brightness(1);
     transform: rotateY(-12deg) rotateX(4deg) translate(-15px, -15px);
@@ -147,7 +177,6 @@
     transform: rotateY(-8deg) rotateX(2deg) translate(10px, 10px);
 }
 
-/* Ajustes de elementos internos */
 .card-top {
     display: flex;
     justify-content: space-between;
@@ -165,35 +194,8 @@
     font-size: 1.2rem;
     color: var(--text-white);
     opacity: 0.8;
-}
-
-.card-chip-area {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-}
-
-.chip {
-    width: 48px;
-    height: 34px;
-    background: linear-gradient(135deg, #fce09b 0%, #8a6218 100%);
-    border-radius: 6px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.card-tag {
-    font-size: 0.9rem;
-    font-weight: 400;
-    letter-spacing: 0.5px;
-    color: var(--text-white);
-    text-transform: capitalize;
-    background-color: transparent;
-    padding: 0;
-    border-radius: 0;
-}
-
-.debit-card .card-tag {
-    background-color: transparent;
+    transform: rotate(90deg);
+    display: inline-block;
 }
 
 .card-bottom {
@@ -215,15 +217,6 @@
     color: var(--text-white);
 }
 
-.card-contactless {
-    font-size: 1.2rem;
-    color: var(--text-white);
-    opacity: 0.8;
-    transform: rotate(90deg);
-    display: inline-block; /* Necesario para que aplique la transformación */
-}
-
-/* Destello dorado flotante detrás de la tarjeta */
 .gold-glow {
     position: absolute;
     width: 280px;
@@ -235,13 +228,16 @@
     z-index: 1;
 }
 
-/* 3. BARRA INFERIOR DE BENEFICIOS Y CARACTERÍSTICAS */
+/* ==========================================
+   3. CARACTERÍSTICAS / BENEFICIOS
+   ========================================== */
+
 .features-grid {
     max-width: 1280px;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
-    margin: 2rem auto 0; /* SINTAXIS CORREGIDA */
+    margin: 2rem auto 0;
     padding: 2rem 1rem 0;
     border-top: 1px solid var(--border-dark);
 }
@@ -286,7 +282,479 @@
     margin-top: 0.1rem;
 }
 
-/* Adaptación responsiva para pantallas pequeñas */
+/* ==========================================
+   4. PRODUCTOS Y SECCIONES ESPECIALES
+   ========================================== */
+
+.seccion h2 {
+    text-align: center;
+    max-width: 1200px;
+    margin: 3rem auto 1.5rem;
+    padding: 0 20px;
+    font-size: 1.8rem;
+    color: var(--text-white);
+}
+
+.contenedor-productos {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.fila-tarjetas {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+.fila-especiales {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+}
+
+.tarjeta-producto {
+    background: #0f121a;
+    border: 1px solid #1a1f2c;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: left;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tarjeta-producto:hover {
+    border-color: var(--gold-main);
+    transform: translateY(-6px);
+    box-shadow: 0 10px 25px rgba(229, 169, 60, 0.15);
+}
+
+/* --- PLÁSTICO DE LA TARJETA (PROPORCIÓN BANCARIA REAL) --- */
+.tarjeta-plastico {
+    width: 100%;
+    max-width: 280px;          /* Ancho máximo proporcional */
+    aspect-ratio: 1.586 / 1;    /* Relación de aspecto estándar ISO/IEC 7810 */
+    height: auto;              /* El alto se ajusta automáticamente */
+    border-radius: 12px;
+    padding: 14px 18px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin: 0 auto 18px;       /* Centra la tarjeta horizontalmente */
+    transition: transform 0.3s ease;
+}
+
+.tarjeta-producto:hover .tarjeta-plastico {
+    transform: translateY(-2px) scale(1.02);
+}
+
+.head-tarjeta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.head-tarjeta .logo-svg {
+    height: 20px;
+    width: auto;
+}
+
+.head-tarjeta .card-contactless {
+    font-size: 0.95rem;
+    color: #ffffff;
+    opacity: 0.9;
+}
+
+.card-chip-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card-chip-area .chip {
+    width: 34px;
+    height: 24px;
+    background: linear-gradient(135deg, #fce09b 0%, #8a6218 100%);
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.card-tag {
+    font-size: 0.78rem;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+.foot-tarjeta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.foot-tarjeta .card-number {
+    font-size: 0.82rem;
+    letter-spacing: 1.5px;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+.foot-tarjeta .card-type {
+    font-size: 0.9rem;
+    font-weight: 800;
+    font-style: italic;
+    color: #ffffff;
+}
+
+/* GRADIENTES */
+.tarjeta-dorada {
+    background: linear-gradient(135deg, #e5a93c 0%, #9e6f1a 100%);
+    border: 1px solid #fce09b;
+}
+
+.tarjeta-dorada .card-number,
+.tarjeta-dorada .card-type,
+.tarjeta-dorada .card-tag,
+.tarjeta-dorada .card-contactless {
+    color: #000000 !important;
+}
+
+.tarjeta-platino {
+    background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%);
+    border: 1px solid #ffffff;
+}
+
+.tarjeta-platino .card-number,
+.tarjeta-platino .card-type,
+.tarjeta-platino .card-tag,
+.tarjeta-platino .card-contactless {
+    color: #0f172a;
+}
+
+.tarjeta-negra {
+    background: linear-gradient(135deg, #1f2533 0%, #0d1017 100%);
+    border: 1px solid #2d3548;
+}
+
+/* VISOR DE INVERSIÓN Y CONTENEDOR BOT (MISMA PROPORCIÓN QUE LAS TARJETAS) */
+.visor-inversion,
+.contenedor-bot-ia {
+    width: 100%;
+    max-width: 280px;
+    aspect-ratio: 1.586 / 1;
+    height: auto;
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin: 0 auto 18px;
+    box-sizing: border-box;
+}
+
+.visor-inversion {
+    background: linear-gradient(135deg, #064e3b 0%, #022c22 100%);
+    border: 1px solid #10b981;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.inversion-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.badge-growth {
+    background-color: #10b981;
+    color: #022c22;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+}
+
+.inversion-title {
+    font-size: 0.78rem;
+    color: #a7f3d0;
+    font-weight: 500;
+}
+
+.grafica-simulada {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 55px;
+    padding-top: 5px;
+}
+
+.grafica-simulada .barra {
+    width: 15%;
+    background: linear-gradient(to top, #059669, #34d399);
+    border-radius: 4px;
+    transition: height 0.3s ease;
+}
+
+.grafica-simulada .b1 { height: 30%; }
+.grafica-simulada .b2 { height: 50%; }
+.grafica-simulada .b3 { height: 45%; }
+.grafica-simulada .b4 { height: 75%; }
+.grafica-simulada .b5 { height: 95%; }
+
+.tarjeta-producto:hover .grafica-simulada .barra {
+    filter: brightness(1.25);
+}
+
+/* MÓDULO DEL BOT DE IA */
+.tarjeta-destacada-bot {
+    border-color: rgba(229, 169, 60, 0.4);
+    background: linear-gradient(180deg, #161a23 0%, #0d1017 100%);
+}
+
+.contenedor-bot-ia {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle, rgba(229, 169, 60, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+}
+
+.bot-img {
+    height: 110px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.5));
+    animation: flotarBot 3s ease-in-out infinite;
+}
+
+@keyframes flotarBot {
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+.bot-status {
+    position: absolute;
+    bottom: -4px;
+    font-size: 0.7rem;
+    color: #e5a93c;
+    background-color: rgba(15, 18, 26, 0.9);
+    border: 1px solid #e5a93c;
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+
+.bot-status i {
+    color: #22c55e;
+    font-size: 0.48rem;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+/* TEXTOS E INFORMACIÓN DE PRODUCTOS */
+.info-producto h3 {
+    color: var(--text-white);
+    font-size: 1.12rem;
+    margin-bottom: 8px;
+}
+
+.info-producto p {
+    color: var(--text-muted);
+    font-size: 0.84rem;
+    line-height: 1.4;
+    margin-bottom: 12px;
+}
+
+.info-producto ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 20px;
+}
+
+.info-producto li {
+    color: #d1d5db;
+    font-size: 0.8rem;
+    margin-bottom: 4px;
+}
+
+.info-producto li i {
+    color: var(--gold-main);
+    font-size: 0.72rem;
+    margin-right: 6px;
+}
+
+.btn-link {
+    color: var(--gold-main);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.88rem;
+    transition: color 0.2s ease, transform 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-link:hover {
+    color: var(--gold-hover);
+    transform: translateX(3px);
+}
+
+/* BOTÓN DESTACADO DORADO TIPO CTA PARA EL BOT */
+.btn-bot-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--gold-main);
+    color: #000000 !important;
+    font-weight: 600;
+    font-size: 0.88rem;
+    padding: 10px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    margin-top: 4px;
+}
+
+.btn-bot-action:hover {
+    background-color: var(--gold-hover);
+    transform: translateY(-2px) !important;
+}
+
+/* ==========================================
+   5. SECCIÓN BENEFICIOS Y RECOMPENSAS (CLUB REWARDS)
+   ========================================== */
+
+.seccion-beneficios {
+    max-width: 1200px;
+    margin: 4rem auto 3rem;
+    padding: 0 20px;
+}
+
+.beneficios-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.badge-subtitulo {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: rgba(229, 169, 60, 0.12);
+    color: var(--gold-main);
+    border: 1px solid rgba(229, 169, 60, 0.3);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.beneficios-header h2 {
+    font-size: 2.1rem;
+    color: var(--text-white);
+    margin-bottom: 0.5rem;
+}
+
+.beneficios-header p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    max-width: 620px;
+    margin: 0 auto;
+}
+
+/* GRID DE 2 COLUMNAS PARA MÁS ESPACIO Y PRESENCIA */
+.grid-recompensas {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+}
+
+/* TARJETA DE RECOMPENSA */
+.card-recompensa {
+    position: relative;
+    background: #0d1017;
+    border: 1px solid #1a202c;
+    border-radius: 18px;
+    padding: 26px 24px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    transition: all 0.3s ease;
+}
+
+.card-recompensa:hover {
+    border-color: rgba(229, 169, 60, 0.5);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* DESTACADA DORADA (Cashback) */
+.recompensa-gold {
+    background: linear-gradient(135deg, #141923 0%, #0d1017 100%);
+    border-color: rgba(229, 169, 60, 0.3);
+}
+
+.recompensa-badge-porcentaje {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    background-color: var(--gold-main);
+    color: #000000;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 12px;
+}
+
+.recompensa-icon {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    background: rgba(229, 169, 60, 0.1);
+    border: 1px solid rgba(229, 169, 60, 0.25);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: var(--gold-main);
+}
+
+.recompensa-info h4 {
+    color: var(--text-white);
+    font-size: 1.15rem;
+    margin-bottom: 6px;
+    padding-right: 70px; /* Para no chocar con el badge del porcentaje */
+}
+
+.recompensa-info p {
+    color: var(--text-muted);
+    font-size: 0.86rem;
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+
+.recompensa-foot {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    color: var(--gold-main);
+    font-weight: 500;
+}
+
+/* ==========================================
+   6. RESPONSIVE Y PANTALLAS PEQUEÑAS
+   ========================================== */
+
 @media (max-width: 992px) {
     .hero-content {
         grid-template-columns: 1fr;
@@ -307,6 +775,11 @@
 
     .features-grid {
         grid-template-columns: repeat(2, 1fr);
+    }
+
+    .fila-tarjetas,
+    .fila-especiales {
+        grid-template-columns: 1fr;
     }
 }
 
