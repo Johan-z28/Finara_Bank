@@ -37,17 +37,21 @@ body.dark-theme {
   overflow-x: hidden;
 }
 
-/* 4. BARRA DE NAVEGACIÓN */
+/* 4. BARRA DE NAVEGACIÓN FIJA */
 
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 4rem;
-  background-color: var(--bg-dark);
+  padding: 1.2rem 4rem;
+  background-color: rgba(10, 12, 16, 0.9);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-dark);
   position: sticky;
   top: 0;
+  left: 0;
+  width: 100%;
   z-index: 1000;
 }
 
@@ -58,7 +62,7 @@ body.dark-theme {
 }
 
 .logo-svg {
-  height: 50px; /* Ajusta la altura según las proporciones de tu archivo SVG */
+  height: 50px;
   width: auto;
   display: block;
 }
