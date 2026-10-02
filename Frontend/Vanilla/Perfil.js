@@ -183,44 +183,76 @@ function getCampoId(row) {
     return '';
 }
 
-// Configurar los botones de configuración de cuenta
+// Configurar los botones de configuración de cuenta con SweetAlert2
 function configurarBotonesConfiguracion() {
     const settingRows = document.querySelectorAll('.profile-card')[1]?.querySelectorAll('.setting-row');
     if (!settingRows || settingRows.length === 0) return;
 
     settingRows.forEach((row, index) => {
-        row.style.cursor = 'pointer'; // Para que parezca un botón interactivo
+        row.style.cursor = 'pointer';
         row.addEventListener('click', async () => {
             switch (index) {
                 case 0: // Cambiar contraseña
                     await cambiarContraseñaFácil();
                     break;
                 case 1: // Notificaciones
-                    alert("¡Pronto estará disponible la gestión de notificaciones!");
+                    Swal.fire({
+                        title: 'Notificaciones',
+                        text: '¡Pronto estará disponible la gestión de notificaciones!',
+                        icon: 'info',
+                        background: '#12151c',
+                        color: '#ffffff',
+                        confirmButtonColor: '#e5a93c'
+                    });
                     break;
                 case 2: // Métodos de autenticación
-                    alert("¡Pronto estará disponible la configuración de métodos de autenticación!");
+                    Swal.fire({
+                        title: 'Autenticación',
+                        text: '¡Pronto estará disponible la configuración de métodos de autenticación!',
+                        icon: 'info',
+                        background: '#12151c',
+                        color: '#ffffff',
+                        confirmButtonColor: '#e5a93c'
+                    });
                     break;
                 case 3: // Privacidad y datos
-                    alert("¡Pronto estará disponible la sección de privacidad y datos!");
+                    Swal.fire({
+                        title: 'Privacidad y Datos',
+                        text: '¡Pronto estará disponible la sección de privacidad y datos!',
+                        icon: 'info',
+                        background: '#12151c',
+                        color: '#ffffff',
+                        confirmButtonColor: '#e5a93c'
+                    });
                     break;
                 default:
-                    alert("Función próximamente disponible.");
+                    break;
             }
         });
     });
 }
 
-// Función para cambiar contraseña con validación de clave actual (Backend o LocalStorage)
+// Función para cambiar contraseña con SweetAlert2 y validación real
 async function cambiarContraseñaFácil() {
-    const passwordActual = prompt("Ingresa tu contraseña actual:");
+    // 1. Pedir contraseña actual
+    const { value: passwordActual } = await Swal.fire({
+        title: 'Cambiar contraseña',
+        text: 'Ingresa tu contraseña actual:',
+        input: 'password',
+        inputAttributes: { autocapitalize: 'off', autocorrect: 'off' },
+        background: '#12151c',
+        color: '#ffffff',
+        confirmButtonColor: '#e5a93c',
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar'
+    });
+
     if (!passwordActual) return;
 
-    // 1. Obtener la contraseña almacenada actualmente para comparar
+    // Obtener datos guardados para validar localmente si el backend no responde
     let userData = JSON.parse(localStorage.getItem('userProfile')) || {};
     let passwordRegistrada = userData.password;
 
-    // Si no está en userProfile, buscar en finara_usuarios_local
     if (!passwordRegistrada) {
         const localUsers = JSON.parse(localStorage.getItem('finara_usuarios_local')) || [];
         if (localUsers.length > 0) {
@@ -228,59 +260,78 @@ async function cambiarContraseñaFácil() {
         }
     }
 
-    // 2. Validar contra el backend o localmente
     try {
-        // Intento de validación y cambio con el backend
+        // Intento con Backend (Try-Catch)
         const response = await fetch('/api/user/change-password', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ passwordActual, nuevaPassword: "" }) // Solo prueba o validación inicial si gustas, o haz el flujo completo
+            body: JSON.stringify({ passwordActual })
         });
 
-        // Si el backend responde, dejamos que él maneje la lógica completa
-        if (response.ok) {
-            const nuevaPassword = prompt("Ingresa tu nueva contraseña (mínimo 8 caracteres):");
-            if (!nuevaPassword) return;
-            if (nuevaPassword.length < 8) {
-                alert("La contraseña debe tener al menos 8 caracteres.");
-                return;
-            }
+        if (!response.ok) throw new Error('Backend no disponible');
 
-            const responseChange = await fetch('/api/user/change-password', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ passwordActual, nuevaPassword })
-            });
-            if (!responseChange.ok) throw new Error('Error al actualizar en el servidor');
-            const data = await responseChange.json();
-            alert(data.mensaje || "¡Contraseña actualizada exitosamente en el servidor!");
+        // Si responde el backend, pedir la nueva contraseña
+        const { value: nuevaPassword } = await Swal.fire({
+            title: 'Nueva contraseña',
+            text: 'Ingresa tu nueva contraseña (mínimo 8 caracteres):',
+            input: 'password',
+            background: '#12151c',
+            color: '#ffffff',
+            confirmButtonColor: '#e5a93c',
+            showCancelButton: true,
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (!nuevaPassword) return;
+        if (nuevaPassword.length < 8) {
+            Swal.fire({ title: 'Error', text: 'La contraseña debe tener al menos 8 caracteres.', icon: 'error', background: '#12151c', color: '#ffffff', confirmButtonColor: '#e5a93c' });
             return;
         }
-        throw new Error('Backend no disponible para validación');
+
+        const responseChange = await fetch('/api/user/change-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ passwordActual, nuevaPassword })
+        });
+
+        if (!responseChange.ok) throw new Error('Error al actualizar en el servidor');
+
+        Swal.fire({ title: '¡Éxito!', text: 'Contraseña actualizada exitosamente en el servidor.', icon: 'success', background: '#12151c', color: '#ffffff', confirmButtonColor: '#e5a93c' });
 
     } catch (error) {
-        console.warn('Usando validación local en localStorage...');
+        console.warn('Validando contraseña en localStorage...');
 
-        // Si hay una contraseña registrada y no coincide, bloqueamos el cambio
+        // Validar si la contraseña actual coincide con la almacenada
         if (passwordRegistrada && passwordActual !== passwordRegistrada) {
-            alert("Error: La contraseña actual es incorrecta.");
+            Swal.fire({ title: 'Contraseña incorrecta', text: 'La contraseña actual no coincide con nuestros registros.', icon: 'error', background: '#12151c', color: '#ffffff', confirmButtonColor: '#e5a93c' });
             return;
         }
 
-        const nuevaPassword = prompt("Ingresa tu nueva contraseña (mínimo 8 caracteres):");
+        // Pedir nueva contraseña
+        const { value: nuevaPassword } = await Swal.fire({
+            title: 'Nueva contraseña',
+            text: 'Ingresa tu nueva contraseña (mínimo 8 caracteres):',
+            input: 'password',
+            background: '#12151c',
+            color: '#ffffff',
+            confirmButtonColor: '#e5a93c',
+            showCancelButton: true,
+            cancelButtonText: 'Cancelar'
+        });
+
         if (!nuevaPassword) return;
 
         if (nuevaPassword.length < 8) {
-            alert("La contraseña debe tener al menos 8 caracteres.");
+            Swal.fire({ title: 'Atención', text: 'La contraseña debe tener al menos 8 caracteres.', icon: 'warning', background: '#12151c', color: '#ffffff', confirmButtonColor: '#e5a93c' });
             return;
         }
 
         if (nuevaPassword === passwordActual) {
-            alert("La nueva contraseña no puede ser igual a la actual.");
+            Swal.fire({ title: 'Atención', text: 'La nueva contraseña no puede ser igual a la actual.', icon: 'warning', background: '#12151c', color: '#ffffff', confirmButtonColor: '#e5a93c' });
             return;
         }
 
-        // Guardar nueva contraseña en localStorage
+        // Guardar cambios en localStorage
         userData.password = nuevaPassword;
         localStorage.setItem('userProfile', JSON.stringify(userData));
 
@@ -290,6 +341,13 @@ async function cambiarContraseñaFácil() {
             localStorage.setItem('finara_usuarios_local', JSON.stringify(localUsers));
         }
 
-        alert("¡Contraseña actualizada correctamente en el almacenamiento local!");
+        Swal.fire({
+            title: '¡Actualizado!',
+            text: 'Tu contraseña ha sido actualizada correctamente en el almacenamiento local.',
+            icon: 'success',
+            background: '#12151c',
+            color: '#ffffff',
+            confirmButtonColor: '#e5a93c'
+        });
     }
 }
