@@ -39,6 +39,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            // Validación de formato de correo electrónico usando regex
+            const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!regexCorreo.test(correo)) {
+                alert("Por favor, ingresa un correo electrónico válido.");
+                return;
+            }
+
+            // Validación de Términos y Condiciones
+            const termsCheckbox = document.querySelector('input[type="checkbox"]');
+            if (termsCheckbox && !termsCheckbox.checked) {
+                alert("Debes aceptar los términos y condiciones para continuar.");
+                return;
+            }
+
             // Construir el objeto con los datos del usuario
             const userData = {
                 nombre,
