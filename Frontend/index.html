@@ -1,90 +1,464 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finara Bank</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="Style/move.css">
+    <link rel="icon" type="image/png" sizes="32x32" href="Style/image/favicon.svg">
+    <link rel="stylesheet" href="Style/index.css">
 </head>
 
-<body>
-    <!-- ======= NAVBAR ======= -->
+<body class="dark-theme">
+    <!-- ======= Barra de navegación ======= -->
     <header class="navbar">
-        <div class="logo_container">
-            <i class="fa-solid fa-shield-halved logo-icon"></i>
-            <span class="logo-text">Finara <span>Bank</span></span>
+        <div class="logo-container">
+            <img src="Style/image/Logo_finara.svg" alt="Finara Bank Logo" class="logo-svg">
         </div>
 
-        <nav class="nav-links">
-            <a href="#" id="nav-inicio" class="active">Inicio</a>
-            <a href="#" id="nav-servicios">Servicios</a>
-            <a href="#" id="nav-nosotros">Nosotros</a>
-            <a href="#" id="nav-contacto">Contacto</a>
+        <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <nav class="nav-links" id="navLinks">
+            <a href="#hero">Inicio</a>
+            <a href="#productos">Productos</a>
+            <a href="#beneficios">Beneficios</a>
+            <a href="#nosotros">Nosotros</a>
+            <a href="#contacto">Contacto</a>
+
+            <div class="nav-actions-mobile">
+                <a href="pages/SignUp.html" class="btn-register">Registrarse</a>
+                <a href="pages/Login.html" class="btn-login">Iniciar sesión</a>
+            </div>
         </nav>
+
         <div class="nav-actions">
-            <a href="#" id="nav-registro" class="btn-register">Registrarse</a>
-            <a href="#" id="nav-login">Iniciar Sesión</a>
+            <a href="pages/SignUp.html" class="btn-register">Registrarse</a>
+            <a href="pages/Login.html" class="btn-login">Iniciar sesión</a>
         </div>
     </header>
 
-    <!-- ======= CONTENEDOR PRINCIPAL ======= -->
-    <main class="main-container" id="main-content">
-
-        <!-- SECCIÓN HERO -->
-        <section class="hero">
-            <div class="hero-content">
-                <h1>Bienvenido a <span>Finara Bank</span></h1>
-                <p>El primer cajero web inteligente diseñado para proteger tu dinero, simular créditos transparentes y
-                    guiar tu salud financiera en tiempo real.</p>
-
+    <!-- ======= HERO ======= -->
+    <section id="hero" class="hero-container">
+        <div class="hero-content">
+            <div class="hero-left">
+                <h1>Tu dinero,<br><span class="highlight-gold">en buenas manos.</span></h1>
+                <p class="hero-subtitle">
+                    Abre tu cuenta, invierte y haz crecer tu futuro con una plataforma financiera segura, simple y cercana.
+                </p>
                 <div class="hero-buttons">
-                    <a href="registro.html" class="btn btn-primary">Abrir Cuenta</a>
-                    <a href="login.html" class="btn btn-outline">Acceder al Cajero</a>
+                    <a href="pages/SignUp.html" class="btn btn-gold">
+                        Comienza ahora <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                    <a href="#productos" class="btn btn-secondary-dark">Conoce más</a>
                 </div>
             </div>
-        </section>
 
-        <!-- SECCIÓN DE PRODUCTOS BANCARIOS -->
-        <section class="products-section">
-            <h2>Nuestros productos Financieros</h2>
-            <div class="product-cards">
+            <div class="hero-right">
+                <div class="card-3d-wrapper">
+                    <div class="finara-card credit-card">
+                        <div class="card-top">
+                            <img src="Style/image/Logo_finara.svg" alt="Finara Bank Logo" class="logo-svg">
+                            <i class="fa-solid fa-wifi card-contactless"></i>
+                        </div>
+                        <div class="card-chip-area">
+                            <div class="chip"></div>
+                            <span class="card-tag">Crédito</span>
+                        </div>
+                        <div class="card-bottom">
+                            <span class="card-number">**** **** **** 4821</span>
+                            <span class="card-type">VISA</span>
+                        </div>
+                    </div>
 
-                <div class="card">
-                    <i class="fa-solid fa-piggy-bank card-icon"></i>
-                    <h3>Cuenta de Ahorros</h3>
-                    <p>Ahorro seguro con una tasa mensual del <strong>1.5%</strong> calculada al momento del retiro[cite: 2]. Proyecta y cumple tus metas.</p>
+                    <div class="finara-card debit-card">
+                        <div class="card-top">
+                            <img src="Style/image/Logo_finara_black.svg" alt="Finara Bank Logo" class="logo-svg">
+                            <i class="fa-solid fa-wifi card-contactless"></i>
+                        </div>
+                        <div class="card-chip-area">
+                            <div class="chip"></div>
+                            <span class="card-tag">Débito</span>
+                        </div>
+                        <div class="card-bottom">
+                            <span class="card-number">**** **** **** 1092</span>
+                            <span class="card-type">VISA</span>
+                        </div>
+                    </div>
+                    <div class="gold-glow"></div>
                 </div>
-
-                <div class="card">
-                    <i class="fa-solid fa-wallet card-icon"></i>
-                    <h3>Cuenta Corriente</h3>
-                    <p>Gestión diaria con sobregiro permitido del <strong>20%</strong> sobre tu saldo actual para mayor flexibilidad de liquidez[cite: 2].</p>
-                </div>
-
-                <div class="card">
-                    <i class="fa-solid fa-credit-card card-icon"></i>
-                    <h3>Tarjeta de Crédito</h3>
-                    <p>Financiamiento a cuotas transparente. Conoce el valor exacto de tus cuotas fijas e intereses antes de confirmar[cite: 2].</p>
-                </div>
-
-            </div>
-        </section>
-
-    </main>
-
-    <!-- ======= FOOTER ======= -->
-    <footer class="footer">
-        <div class="footer-content">
-            <p>&copy; 2024–2026 Finara Bank. Todos los derechos reservados.</p>
-            <div class="social-links">
-                <a href="#"><i class="fa-brands fa-facebook"></i></a>
-                <a href="#"><i class="fa-brands fa-instagram"></i></a>
-                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
             </div>
         </div>
+    </section>
+
+    <!-- ======= CARACTERÍSTICAS ======= -->
+    <section id="caracteristicas" class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fa-regular fa-square-check"></i></div>
+            <div class="feature-text">
+                <h4>100% digital</h4>
+                <p>Sin filas, sin complicaciones.</p>
+            </div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
+            <div class="feature-text">
+                <h4>Segura y confiable</h4>
+                <p>Tu dinero siempre protegido.</p>
+            </div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fa-solid fa-wallet"></i></div>
+            <div class="feature-text">
+                <h4>Controla tus finanzas</h4>
+                <p>Tú decides, siempre.</p>
+            </div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fa-solid fa-gift"></i></div>
+            <div class="feature-text">
+                <h4>Beneficios exclusivos</h4>
+                <p>Para ti, siempre.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======= PRODUCTOS ======= -->
+    <section id="productos" class="seccion">
+        <h2>Nuestros Productos</h2>
+        <div class="contenedor-productos">
+            <div class="fila-tarjetas">
+                <div class="tarjeta-producto">
+                    <div class="tarjeta-plastico tarjeta-dorada">
+                        <div class="head-tarjeta">
+                            <img src="Style/image/Logo_finara_black.svg" alt="Finara Logo" class="logo-svg">
+                            <i class="fa-solid fa-wifi card-contactless"></i>
+                        </div>
+                        <div class="card-chip-area">
+                            <div class="chip"></div>
+                            <span class="card-tag">Ahorros</span>
+                        </div>
+                        <div class="foot-tarjeta">
+                            <span class="card-number">**** **** **** 1092</span>
+                            <span class="card-type">VISA</span>
+                        </div>
+                    </div>
+                    <div class="info-producto">
+                        <h3>Cuenta de Ahorros</h3>
+                        <p>Manejo 100% digital, rentabilidad diaria sobre tu saldo y transferencias a cero costo.</p>
+                        <ul>
+                            <li><i class="fa-solid fa-star"></i> Sin cuota de manejo</li>
+                            <li><i class="fa-solid fa-star"></i> Transacciones 24/7</li>
+                        </ul>
+                        <a href="#contacto" class="btn-link">Solicitar Cuenta <i class="fa-solid fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <div class="tarjeta-producto">
+                    <div class="tarjeta-plastico tarjeta-platino">
+                        <div class="head-tarjeta">
+                            <img src="Style/image/Logo_finara_black.svg" alt="Finara Logo" class="logo-svg">
+                            <i class="fa-solid fa-wifi card-contactless"></i>
+                        </div>
+                        <div class="card-chip-area">
+                            <div class="chip"></div>
+                            <span class="card-tag">Corriente</span>
+                        </div>
+                        <div class="foot-tarjeta">
+                            <span class="card-number">**** **** **** 5541</span>
+                            <span class="card-type">VISA</span>
+                        </div>
+                    </div>
+                    <div class="info-producto">
+                        <h3>Cuenta Corriente</h3>
+                        <p>Diseñada para tu flujo de dinero, cheques digitales y cupo de sobregiro preferencial.</p>
+                        <ul>
+                            <li><i class="fa-solid fa-star"></i> Chequera digital activa</li>
+                            <li><i class="fa-solid fa-star"></i> Sobregiro preaprobado</li>
+                        </ul>
+                        <a href="#contacto" class="btn-link">Solicitar Corriente <i class="fa-solid fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <div class="tarjeta-producto">
+                    <div class="tarjeta-plastico tarjeta-negra">
+                        <div class="head-tarjeta">
+                            <img src="Style/image/Logo_finara.svg" alt="Finara Logo" class="logo-svg">
+                            <i class="fa-solid fa-wifi card-contactless"></i>
+                        </div>
+                        <div class="card-chip-area">
+                            <div class="chip"></div>
+                            <span class="card-tag">Crédito</span>
+                        </div>
+                        <div class="foot-tarjeta">
+                            <span class="card-number">**** **** **** 8821</span>
+                            <span class="card-type">VISA</span>
+                        </div>
+                    </div>
+                    <div class="info-producto">
+                        <h3>Tarjeta de Crédito</h3>
+                        <p>Préstamos de libre inversión con aprobación en minutos y tasas preferenciales.</p>
+                        <ul>
+                            <li><i class="fa-solid fa-star"></i> Desembolso inmediato</li>
+                            <li><i class="fa-solid fa-star"></i> Plazos hasta 60 meses</li>
+                        </ul>
+                        <a href="#contacto" class="btn-link">Simular Crédito <i class="fa-solid fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fila-especiales">
+                <div class="tarjeta-producto">
+                    <div class="visor-inversion">
+                        <div class="inversion-head">
+                            <span class="badge-growth"><i class="fa-solid fa-arrow-trend-up"></i> +14.8% EA</span>
+                            <span class="inversion-title">Portafolio Rentable</span>
+                        </div>
+                        <div class="grafica-simulada">
+                            <div class="barra b1"></div>
+                            <div class="barra b2"></div>
+                            <div class="barra b3"></div>
+                            <div class="barra b4"></div>
+                            <div class="barra b5"></div>
+                        </div>
+                    </div>
+                    <div class="info-producto">
+                        <h3>Inversión Inteligente</h3>
+                        <p>Pon a trabajar tu dinero en portafolios diversificados de alto rendimiento de forma automatizada.</p>
+                        <ul>
+                            <li><i class="fa-solid fa-star"></i> Inversión desde $100.000</li>
+                            <li><i class="fa-solid fa-star"></i> Sin cláusula de permanencia</li>
+                        </ul>
+                        <a href="#contacto" class="btn-link">Empezar a Invertir <i class="fa-solid fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <div class="tarjeta-producto tarjeta-destacada-bot">
+                    <div class="contenedor-bot-ia">
+                        <img src="Style/image/bot_finara.png" alt="Finara AI Bot" class="bot-img">
+                        <span class="bot-status"><i class="fa-solid fa-circle"></i> Asesor IA Online</span>
+                    </div>
+                    <div class="info-producto">
+                        <h3>Finara Assistant Bot</h3>
+                        <p>Tu asesor financiero 24/7 personal. Resuelve dudas sobre tus finanzas, presupuestos y metas con IA.</p>
+                        <ul>
+                            <li><i class="fa-solid fa-star"></i> Diagnóstico financiero 1 a 1</li>
+                            <li><i class="fa-solid fa-star"></i> Respuestas inmediatas</li>
+                        </ul>
+                        <a href="#contacto" class="btn-link btn-bot-action">Consultar con Finara Bot <i class="fa-solid fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======= BENEFICIOS ======= -->
+    <section id="beneficios" class="seccion-beneficios">
+        <div class="beneficios-header">
+            <h2>Beneficios que Devuelven Dinero a tu Bolsillo</h2>
+            <p>Usa tus tarjetas Finara y disfruta de devoluciones automáticas, alianzas comerciales y accesos VIP.</p>
+        </div>
+
+        <div class="grid-recompensas">
+            <div class="card-recompensa recompensa-gold">
+                <div class="recompensa-badge-porcentaje">Hasta 5%</div>
+                <div class="recompensa-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+                <div class="recompensa-info">
+                    <h4>Devolución de IVA y Cashback</h4>
+                    <p>Reembolso automático del IVA y cashback directo en tu cuenta al comprar en supermercados, restaurantes y tiendas aliadas.</p>
+                    <span class="recompensa-foot"><i class="fa-solid fa-circle-check"></i> Reembolso inmediato en saldo</span>
+                </div>
+            </div>
+
+            <div class="card-recompensa">
+                <div class="recompensa-badge-porcentaje">Hasta 30% OFF</div>
+                <div class="recompensa-icon"><i class="fa-solid fa-store"></i></div>
+                <div class="recompensa-info">
+                    <h4>Alianzas y Descuentos Exclusivos</h4>
+                    <p>Descuentos directos en tus marcas favoritas de moda, viajes, gastronomía y streaming pagando con Finara.</p>
+                    <span class="recompensa-foot"><i class="fa-solid fa-circle-check"></i> Más de 150 marcas aliadas</span>
+                </div>
+            </div>
+
+            <div class="card-recompensa">
+                <div class="recompensa-badge-porcentaje">x2 Puntos</div>
+                <div class="recompensa-icon"><i class="fa-solid fa-coins"></i></div>
+                <div class="recompensa-info">
+                    <h4>Programa Finara Points</h4>
+                    <p>Acumula puntos en cada transacción nacional e internacional y redímelos por saldo real a favor o millas aéreas.</p>
+                    <span class="recompensa-foot"><i class="fa-solid fa-circle-check"></i> Sin vencimiento de puntos</span>
+                </div>
+            </div>
+
+            <div class="card-recompensa">
+                <div class="recompensa-badge-porcentaje">Acceso VIP</div>
+                <div class="recompensa-icon"><i class="fa-solid fa-ticket"></i></div>
+                <div class="recompensa-info">
+                    <h4>Preventas y Boletas Preferenciales</h4>
+                    <p>Sé el primero en comprar entradas para los mejores conciertos, eventos deportivos y festivales antes de la venta general.</p>
+                    <span class="recompensa-foot"><i class="fa-solid fa-circle-check"></i> Filas de ingreso preferencial</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======= NOSOTROS ======= -->
+    <section id="nosotros" class="seccion-nosotros">
+        <div class="contenedor-nosotros">
+            <div class="nosotros-info">
+                <span class="badge-subtitulo"><i class="fa-solid fa-building-columns"></i> Sobre Finara Bank</span>
+                <h2>Redefiniendo la relación con tu dinero</h2>
+                <p class="nosotros-descripcion">
+                    Nacimos con una visión clara: eliminar la burocracia, las comisiones injustas y las filas interminables de la banca tradicional. En <strong>Finara Bank</strong> combinamos la máxima seguridad financiera con tecnología de vanguardia.
+                </p>
+
+                <div class="pilares-grid">
+                    <div class="pilar-item">
+                        <i class="fa-solid fa-lock"></i>
+                        <div>
+                            <h4>Seguridad Garantizada</h4>
+                            <p>Respaldados por los más altos estándares de protección de datos y regulación bancaria.</p>
+                        </div>
+                    </div>
+                    <div class="pilar-item">
+                        <i class="fa-solid fa-bolt"></i>
+                        <div>
+                            <h4>Innovación Continua</h4>
+                            <p>Herramientas inteligentes de inversión y asistentes de IA diseñados para tu día a día.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nosotros-stats">
+                <div class="stat-card">
+                    <span class="stat-numero">+500K</span>
+                    <span class="stat-label">Clientes Activos</span>
+                    <p class="stat-sub">Confían su futuro financiero con nosotros</p>
+                </div>
+                <div class="stat-card stat-destacada">
+                    <span class="stat-numero">99.9%</span>
+                    <span class="stat-label">Disponibilidad del Servicio</span>
+                    <p class="stat-sub">Transacciones instantáneas 24/7</p>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-numero">$2.5B+</span>
+                    <span class="stat-label">Transacciones Procesadas</span>
+                    <p class="stat-sub">Movidos con total transparencia y 0 fallas</p>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-numero">4.9 / 5</span>
+                    <span class="stat-label">Satisfacción de Usuarios</span>
+                    <p class="stat-sub">Calificación destacada en Stores</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======= CONTACTO Y FOOTER ======= -->
+    <footer id="contacto" class="footer-seccion">
+        <div class="contenedor-contacto">
+            <div class="contacto-info">
+                <span class="badge-subtitulo"><i class="fa-solid fa-headset"></i> Atención 24/7</span>
+                <h2>¿Tienes dudas? Estamos para ayudarte.</h2>
+                <p>Nuestros asesores y el asistente virtual Finara Bot están disponibles en todo momento para resolver tus inquietudes.</p>
+
+                <div class="canales-contacto">
+                    <div class="canal-item">
+                        <i class="fa-solid fa-envelope"></i>
+                        <div>
+                            <span>Correo electrónico</span>
+                            <strong>soporte@finarabank.com</strong>
+                        </div>
+                    </div>
+                    <div class="canal-item">
+                        <i class="fa-solid fa-phone"></i>
+                        <div>
+                            <span>Línea de atención</span>
+                            <strong>01 8000 910 200</strong>
+                        </div>
+                    </div>
+                    <div class="canal-item">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <div>
+                            <span>Oficina Central</span>
+                            <strong>Centro Financiero Finara, Piso 18</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form class="formulario-contacto" onsubmit="event.preventDefault();">
+                <h3>Envíanos un mensaje</h3>
+                <div class="campo-grupo">
+                    <label for="nombre">Nombre completo</label>
+                    <input type="text" id="nombre" placeholder="Tu nombre" required>
+                </div>
+                <div class="campo-grupo">
+                    <label for="email">Correo electrónico</label>
+                    <input type="email" id="email" placeholder="ejemplo@correo.com" required>
+                </div>
+                <div class="campo-grupo">
+                    <label for="mensaje">Mensaje</label>
+                    <textarea id="mensaje" rows="4" placeholder="¿En qué podemos ayudarte?" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-gold btn-enviar">
+                    Enviar mensaje <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+
+        <hr class="divisor-footer">
+
+        <div class="contenedor-footer">
+            <div class="footer-brand">
+                <img src="Style/image/Logo_finara.svg" alt="Finara Bank Logo" class="logo-svg">
+                <div class="redes-sociales">
+                    <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                    <a href="#" aria-label="X / Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-links-grid">
+                <div class="footer-col">
+                    <h4>Navegación</h4>
+                    <ul>
+                        <li><a href="#hero">Inicio</a></li>
+                        <li><a href="#productos">Productos</a></li>
+                        <li><a href="#beneficios">Beneficios</a></li>
+                        <li><a href="#nosotros">Nosotros</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Productos</h4>
+                    <ul>
+                        <li><a href="#productos">Cuenta de Ahorros</a></li>
+                        <li><a href="#productos">Cuenta Corriente</a></li>
+                        <li><a href="#productos">Tarjeta de Crédito</a></li>
+                        <li><a href="#productos">Inversión Inteligente</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Legales</h4>
+                    <ul>
+                        <li><a href="#">Términos y Condiciones</a></li>
+                        <li><a href="#">Política de Privacidad</a></li>
+                        <li><a href="#">Seguridad Bancaria</a></li>
+                        <li><a href="#">Defensoría del Consumidor</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 Finara Bank S.A. Todos los derechos reservados.</p>
+        </div>
     </footer>
+
+    <script src="Vanilla/index.js"></script>
 </body>
 
 </html>

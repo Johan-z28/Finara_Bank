@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finara Bank - ChatBot</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="../Style/image/favicon.svg">
+    <link rel="stylesheet" href="../Style/ChatBot.css">
+</head>
+
+<body class="general-body">
+
+    <!-- ======= SIDEBAR DE NAVEGACIÓN ======= -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <img src="../Style/image/Logo_finara.svg" alt="Finara Logo" class="sidebar-logo">
+        </div>
+
+        <nav class="sidebar-nav">
+            <ul>
+                <li class="nav-item">
+                    <a href="Dashboard.html" class="nav-link">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Transferencias.html" class="nav-link">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <span>Transferencias</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Movimientos.html" class="nav-link">
+                        <i class="fa-solid fa-list-ul"></i>
+                        <span>Movimientos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Retiros.html" class="nav-link">
+                        <i class="fa-solid fa-money-bill-transfer"></i>
+                        <span>Retiros</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Saldos.html" class="nav-link">
+                        <i class="fa-regular fa-credit-card"></i>
+                        <span>Saldos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Creditos.html" class="nav-link">
+                        <i class="fa-solid fa-hand-holding-dollar"></i>
+                        <span>Solicitud de Créditos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="ChatBot.html" class="nav-link active">
+                        <i class="fa-regular fa-comment-dots"></i>
+                        <span>ChatBot</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Beneficios.html" class="nav-link">
+                        <i class="fa-regular fa-star"></i>
+                        <span>Beneficios</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- ======= CONTENEDOR PRINCIPAL DERECHA ======= -->
+    <div class="main-wrapper">
+        <header class="dashboard-navbar">
+            <div style="display: flex; align-items: center;">
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menú">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="user-greeting">
+                    <h2>Hola, <span id="greetingName">Usuario</span></h2>
+                </div>
+            </div>
+
+            <div class="navbar-actions">
+                <button class="icon-btn" aria-label="Notificaciones">
+                    <i class="fa-regular fa-bell"></i>
+                </button>
+
+                <div class="profile-menu-container">
+                    <button class="profile-btn" id="profileMenuBtn">
+                        <div class="avatar-placeholder" id="avatarContainer">
+                            <img src="" alt="Foto de perfil" id="userAvatarImg" class="profile-img hidden">
+                            <i class="fa-solid fa-user profile-icon" id="userAvatarIcon"></i>
+                        </div>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="dropdown-header">
+                            <strong id="dropdownUserName">Usuario</strong>
+                        </div>
+                        <hr>
+                        <a href="Perfil.html" class="dropdown-item">
+                            <i class="fa-regular fa-user"></i> Ver Perfil
+                        </a>
+                        <a href="../index.html" class="dropdown-item logout-item">
+                            <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <h1>Finara Assistant Bot</h1>
+            <!-- Aquí irá la interfaz de chat interactiva -->
+        </main>
+    </div>
+
+    <!-- Solo necesitas una línea de script -->
+    <script type="module" src="../Vanilla/ChatBot.js"></script>
+</body>
+
+</html>
