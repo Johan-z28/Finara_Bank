@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (btnEditar) {
         btnEditar.addEventListener('click', toggleModoEdicion);
     }
+    // <-- AGREGAR ESTA LÍNEA AQUÍ -->
+    configurarBotonesConfiguracion();
 });
 
 async function cargarDatosPerfil() {
@@ -179,4 +181,115 @@ function getCampoId(row) {
     if (label.includes('teléfono')) return 'telefono';
     if (label.includes('dirección')) return 'direccion';
     return '';
+}
+
+// Configurar los botones de configuración de cuenta
+function configurarBotonesConfiguracion() {
+    const settingRows = document.querySelectorAll('.profile-card')[1]?.querySelectorAll('.setting-row');
+    if (!settingRows || settingRows.length === 0) return;
+
+    settingRows.forEach((row, index) => {
+        row.style.cursor = 'pointer'; // Para que parezca un botón interactivo
+        row.addEventListener('click', async () => {
+            switch (index) {
+                case 0: // Cambiar contraseña
+                    await cambiarContraseñaFácil();
+                    break;
+                case 1: // Notificaciones
+                    alert("¡Pronto estará disponible la gestión de notificaciones!");
+                    break;
+                case 2: // Métodos de autenticación
+                    alert("¡Pronto estará disponible la configuración de métodos de autenticación!");
+                    break;
+                case 3: // Privacidad y datos
+                    alert("¡Pronto estará disponible la sección de privacidad y datos!");
+                    break;
+                default:
+                    alert("Función próximamente disponible.");
+            }
+        });
+    });
+}
+
+// Función para cambiar contraseña con validación de clave actual (Backend o LocalStorage)
+async function cambiarContraseñaFácil() {
+    const passwordActual = prompt("Ingresa tu contraseña actual:");
+    if (!passwordActual) return;
+
+    // 1. Obtener la contraseña almacenada actualmente para comparar
+    let userData = JSON.parse(localStorage.getItem('userProfile')) || {};
+    let passwordRegistrada = userData.password;
+
+    // Si no está en userProfile, buscar en finara_usuarios_local
+    if (!passwordRegistrada) {
+        const localUsers = JSON.parse(localStorage.getItem('finara_usuarios_local')) || [];
+        if (localUsers.length > 0) {
+            passwordRegistrada = localUsers[localUsers.length - 1].password;
+        }
+    }
+
+    // 2. Validar contra el backend o localmente
+    try {
+        // Intento de validación y cambio con el backend
+        const response = await fetch('/api/user/change-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ passwordActual, nuevaPassword: "" }) // Solo prueba o validación inicial si gustas, o haz el flujo completo
+        });
+
+        // Si el backend responde, dejamos que él maneje la lógica completa
+        if (response.ok) {
+            const nuevaPassword = prompt("Ingresa tu nueva contraseña (mínimo 8 caracteres):");
+            if (!nuevaPassword) return;
+            if (nuevaPassword.length < 8) {
+                alert("La contraseña debe tener al menos 8 caracteres.");
+                return;
+            }
+
+            const responseChange = await fetch('/api/user/change-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ passwordActual, nuevaPassword })
+            });
+            if (!responseChange.ok) throw new Error('Error al actualizar en el servidor');
+            const data = await responseChange.json();
+            alert(data.mensaje || "¡Contraseña actualizada exitosamente en el servidor!");
+            return;
+        }
+        throw new Error('Backend no disponible para validación');
+
+    } catch (error) {
+        console.warn('Usando validación local en localStorage...');
+
+        // Si hay una contraseña registrada y no coincide, bloqueamos el cambio
+        if (passwordRegistrada && passwordActual !== passwordRegistrada) {
+            alert("Error: La contraseña actual es incorrecta.");
+            return;
+        }
+
+        const nuevaPassword = prompt("Ingresa tu nueva contraseña (mínimo 8 caracteres):");
+        if (!nuevaPassword) return;
+
+        if (nuevaPassword.length < 8) {
+            alert("La contraseña debe tener al menos 8 caracteres.");
+            return;
+        }
+
+        if (nuevaPassword === passwordActual) {
+            alert("La nueva contraseña no puede ser igual a la actual.");
+            return;
+        }
+
+        // Guardar nueva contraseña en localStorage
+        userData.password = nuevaPassword;
+        localStorage.setItem('userProfile', JSON.stringify(userData));
+
+        const localUsers = JSON.parse(localStorage.getItem('finara_usuarios_local')) || [];
+        if (localUsers.length > 0) {
+            localUsers[localUsers.length - 1].password = nuevaPassword;
+            localStorage.setItem('finara_usuarios_local', JSON.stringify(localUsers));
+        }
+
+        alert("¡Contraseña actualizada correctamente en el almacenamiento local!");
+    }
 }
