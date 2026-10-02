@@ -2,7 +2,7 @@
 
 export function initGlobalComponents() {
     // 1. CARGA GLOBAL DE USUARIO EN NAVBAR
-    const storedUserName = localStorage.getItem('userName') || 'Johan';
+    const storedUserName = localStorage.getItem('userName') || 'yull';
     const storedUserAvatar = localStorage.getItem('userAvatar');
 
     const greetingName = document.getElementById('greetingName');
