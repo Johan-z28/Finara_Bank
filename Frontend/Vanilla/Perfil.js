@@ -1,8 +1,16 @@
 import { initGlobalComponents } from './app.js';
 
+let editando = false;
+
 document.addEventListener('DOMContentLoaded', async () => {
     initGlobalComponents();
     await cargarDatosPerfil();
+
+    // Configurar el evento del botón de editar perfil principal
+    const btnEditar = document.querySelector('.btn-edit-profile');
+    if (btnEditar) {
+        btnEditar.addEventListener('click', toggleModoEdicion);
+    }
 });
 
 async function cargarDatosPerfil() {
@@ -11,35 +19,27 @@ async function cargarDatosPerfil() {
     try {
         const response = await fetch('/api/user/profile', {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            }
+            headers: { 'Content-Type': 'application/json' }
         });
 
-        if (!response.ok) {
-            throw new Error('Error al conectar con el backend');
-        }
+        if (!response.ok) throw new Error('Error al conectar con el backend');
 
         userData = await response.json();
         localStorage.setItem('userProfile', JSON.stringify(userData));
 
     } catch (error) {
-        console.warn('Backend no disponible, cargando datos desde localStorage...', error);
+        console.warn('Backend no disponible, cargando datos desde localStorage...');
 
-        // Intentar obtener el perfil activo o el último usuario registrado en localStorage
         let storedData = localStorage.getItem('userProfile');
-
         if (storedData) {
             userData = JSON.parse(storedData);
         } else {
-            // Intentar buscar en la lista de usuarios locales si existe
             const localUsers = JSON.parse(localStorage.getItem('finara_usuarios_local'));
             if (localUsers && localUsers.length > 0) {
-                userData = localUsers[localUsers.length - 1]; // Tomar el último registrado
+                userData = localUsers[localUsers.length - 1];
             }
         }
 
-        // Si de plano no hay nada, usar valores por defecto
         if (!userData) {
             userData = {
                 nombre: "María Gómez",
@@ -55,7 +55,6 @@ async function cargarDatosPerfil() {
         }
     }
 
-    // Normalizar propiedades para evitar desfases entre 'correo' y 'email'
     const normalizedUser = {
         nombre: userData.nombre || "Usuario",
         rol: userData.rol || "Cliente",
@@ -72,13 +71,11 @@ async function cargarDatosPerfil() {
 }
 
 function renderizarPerfil(user) {
-    // 1. Saludo superior
     const greetingName = document.getElementById('greetingName');
     if (greetingName && user.nombre) {
         greetingName.textContent = user.nombre.split(' ')[0];
     }
 
-    // 2. Tarjeta Héroe del Perfil
     const profileHero = document.querySelector('.profile-hero');
     if (profileHero) {
         const nameH2 = profileHero.querySelector('.profile-data h2');
@@ -100,7 +97,6 @@ function renderizarPerfil(user) {
         }
     }
 
-    // 3. Sección de Información Personal
     const infoRows = document.querySelectorAll('.profile-card')[0]?.querySelectorAll('.info-row');
     if (infoRows && infoRows.length >= 4) {
         infoRows[0].querySelector('strong').textContent = user.nombre;
@@ -109,7 +105,6 @@ function renderizarPerfil(user) {
         infoRows[3].querySelector('strong').textContent = user.direccion;
     }
 
-    // 4. Resumen de cuenta
     const accountSummaryCard = document.querySelector('.profile-card.account-summary');
     if (accountSummaryCard) {
         const strongElements = accountSummaryCard.querySelectorAll('.summary-item strong');
@@ -119,4 +114,69 @@ function renderizarPerfil(user) {
             strongElements[2].textContent = user.ultimaActividad;
         }
     }
+}
+
+// Función para alternar el modo edición en la tarjeta de información personal
+function toggleModoEdicion() {
+    editando = !editando;
+    const btnEditar = document.querySelector('.btn-edit-profile');
+    const infoRows = document.querySelectorAll('.profile-card')[0]?.querySelectorAll('.info-row');
+
+    if (!infoRows) return;
+
+    if (editando) {
+        // Cambiar apariencia del botón principal
+        btnEditar.innerHTML = `<i class="fa-solid fa-check"></i> Guardar cambios`;
+        btnEditar.style.backgroundColor = '#10B981'; // Color verde de éxito opcional
+
+        // Convertir los strong en inputs editables
+        infoRows.forEach(row => {
+            const strong = row.querySelector('strong');
+            const textoActual = strong.textContent;
+            const campoId = getCampoId(row);
+
+            strong.innerHTML = `<input type="text" class="input-edit-perfil" data-campo="${campoId}" value="${textoActual}" style="background: #222; color: #fff; border: 1px solid #444; padding: 4px 8px; border-radius: 4px; width: 100%;">`;
+        });
+    } else {
+        // Guardar los nuevos valores
+        const nuevosDatos = {};
+        infoRows.forEach(row => {
+            const input = row.querySelector('input');
+            if (input) {
+                const campo = input.dataset.campo;
+                nuevosDatos[campo] = input.value.trim();
+            }
+        });
+
+        // Recuperar datos actuales del localStorage para conservar saldo, avatar, etc.
+        let userData = JSON.parse(localStorage.getItem('userProfile')) || {};
+
+        // Fusionar cambios
+        userData.nombre = nuevosDatos.nombre || userData.nombre;
+        userData.email = nuevosDatos.correo || userData.email;
+        userData.telefono = nuevosDatos.telefono || userData.telefono;
+        userData.direccion = nuevosDatos.direccion || userData.direccion;
+
+        // Guardar actualizado en localStorage
+        localStorage.setItem('userProfile', JSON.stringify(userData));
+
+        // Restaurar botón principal
+        btnEditar.innerHTML = `<i class="fa-solid fa-pen"></i> Editar perfil`;
+        btnEditar.style.backgroundColor = '';
+
+        alert("¡Datos actualizados correctamente en el almacenamiento local!");
+
+        // Volver a renderizar con la data fresca
+        cargarDatosPerfil();
+    }
+}
+
+// Identificar qué campo corresponde a cada fila de información personal
+function getCampoId(row) {
+    const label = row.querySelector('span').textContent.toLowerCase();
+    if (label.includes('nombre')) return 'nombre';
+    if (label.includes('correo')) return 'correo';
+    if (label.includes('teléfono')) return 'telefono';
+    if (label.includes('dirección')) return 'direccion';
+    return '';
 }
