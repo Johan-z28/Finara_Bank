@@ -118,39 +118,74 @@ function renderizarPerfil(user) {
     }
 }
 
-// Función para alternar el modo edición en la tarjeta de información personal
-function toggleModoEdicion() {
-    editando = !editando;
+// Función para alternar el modo edición con confirmación de SweetAlert2 y validación local
+async function toggleModoEdicion() {
     const btnEditar = document.querySelector('.btn-edit-profile');
     const infoRows = document.querySelectorAll('.profile-card')[0]?.querySelectorAll('.info-row');
-
     if (!infoRows) return;
 
-    if (editando) {
-        // Cambiar apariencia del botón principal
+    if (!editando) {
+        // Entrar en modo edición
+        editando = true;
         btnEditar.innerHTML = `<i class="fa-solid fa-check"></i> Guardar cambios`;
-        btnEditar.style.backgroundColor = '#10B981'; // Color verde de éxito opcional
+        btnEditar.style.backgroundColor = '#10B981'; // Color verde de éxito
 
-        // Convertir los strong en inputs editables
+        // Convertir los campos en inputs editables
         infoRows.forEach(row => {
             const strong = row.querySelector('strong');
             const textoActual = strong.textContent;
             const campoId = getCampoId(row);
-
             strong.innerHTML = `<input type="text" class="input-edit-perfil" data-campo="${campoId}" value="${textoActual}" style="background: #222; color: #fff; border: 1px solid #444; padding: 4px 8px; border-radius: 4px; width: 100%;">`;
         });
     } else {
-        // Guardar los nuevos valores
+        // 1. Modal de confirmación con SweetAlert2 antes de guardar
+        const confirmacion = await Swal.fire({
+            title: '¿Guardar cambios?',
+            text: '¿Estás seguro de actualizar tu información personal?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, guardar',
+            cancelButtonText: 'Cancelar',
+            background: '#12151c',
+            color: '#ffffff',
+            confirmButtonColor: '#e5a93c',
+            cancelButtonColor: '#d33'
+        });
+
+        // Si el usuario cancela, detenemos el proceso y se mantiene editando
+        if (!confirmacion.isConfirmed) {
+            return;
+        }
+
+        // 2. Recolectar nuevos valores y validar que no estén vacíos
         const nuevosDatos = {};
+        let hayCamposVacios = false;
+
         infoRows.forEach(row => {
             const input = row.querySelector('input');
             if (input) {
                 const campo = input.dataset.campo;
-                nuevosDatos[campo] = input.value.trim();
+                const valor = input.value.trim();
+                if (valor === '') {
+                    hayCamposVacios = true;
+                }
+                nuevosDatos[campo] = valor;
             }
         });
 
-        // Recuperar datos actuales del localStorage para conservar saldo, avatar, etc.
+        if (hayCamposVacios) {
+            Swal.fire({
+                title: 'Campos vacíos',
+                text: 'Por favor completa todos los campos antes de guardar.',
+                icon: 'warning',
+                background: '#12151c',
+                color: '#ffffff',
+                confirmButtonColor: '#e5a93c'
+            });
+            return; // No guardamos y permitimos corregir
+        }
+
+        // 3. Recuperar datos actuales del localStorage para conservar saldo, avatar, contraseña, etc.
         let userData = JSON.parse(localStorage.getItem('userProfile')) || {};
 
         // Fusionar cambios
@@ -159,16 +194,25 @@ function toggleModoEdicion() {
         userData.telefono = nuevosDatos.telefono || userData.telefono;
         userData.direccion = nuevosDatos.direccion || userData.direccion;
 
-        // Guardar actualizado en localStorage
+        // 4. Guardar actualizado en localStorage
         localStorage.setItem('userProfile', JSON.stringify(userData));
 
-        // Restaurar botón principal
+        // 5. Restaurar botón principal
         btnEditar.innerHTML = `<i class="fa-solid fa-pen"></i> Editar perfil`;
         btnEditar.style.backgroundColor = '';
+        editando = false;
 
-        alert("¡Datos actualizados correctamente en el almacenamiento local!");
+        // Alerta bonita de éxito con SweetAlert2
+        Swal.fire({
+            title: '¡Actualizado!',
+            text: 'Tus datos se han guardado correctamente.',
+            icon: 'success',
+            background: '#12151c',
+            color: '#ffffff',
+            confirmButtonColor: '#e5a93c'
+        });
 
-        // Volver a renderizar con la data fresca
+        // Volver a renderizar con la data fresca en pantalla
         cargarDatosPerfil();
     }
 }
