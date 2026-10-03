@@ -1,0 +1,13 @@
+@import url('Styles.css');
+
+/* ==========================================
+   ESTILOS ESPECÍFICOS DEL INTERIOR DEL DASHBOARD
+   ========================================== */
+
+/* Ejemplo: Títulos de sección */
+.main-content h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--text-white);
+}
