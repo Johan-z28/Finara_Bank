@@ -1,13 +1,74 @@
-@import url('Styles.css');
+@import url('styles.css');
 
 /* ==========================================
-   ESTILOS ESPECÍFICOS DEL INTERIOR DEL DASHBOARD
+   ESTILOS ESPECÍFICOS DEL INTERIOR DEL DASHBOARD (SALDOS)
    ========================================== */
 
-/* Ejemplo: Títulos de sección */
+/* Títulos de sección */
 .main-content h1 {
     font-size: 1.5rem;
     font-weight: 600;
     margin-bottom: 1.5rem;
-    color: var(--text-white);
+    color: var(--text-white, #ffffff);
+}
+
+/* Grilla de Cuentas */
+.grid-cuentas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+/* Tarjeta del Componente Visual */
+.tarjeta-cuenta {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    backdrop-filter: blur(10px);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tarjeta-cuenta:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.encabezado-cuenta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.tipo-cuenta {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-white, #ffffff);
+}
+
+.numero-parcial {
+    font-family: monospace;
+    font-size: 0.95rem;
+    color: #a0aec0;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+}
+
+.etiqueta-saldo {
+    font-size: 0.85rem;
+    color: #a0aec0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.monto-saldo {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #38a169; /* Verde para saldo positivo */
+    margin-top: 0.5rem;
 }

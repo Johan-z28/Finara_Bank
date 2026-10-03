@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finara Bank - Saldos</title>
     <link rel="icon" type="image/png" sizes="32x32" href="../Style/image/favicon.svg">
+    <!-- FontAwesome para los íconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../Style/Saldos.css">
 </head>
 
@@ -115,11 +117,15 @@
 
         <main class="main-content">
             <h1>Consulta de Saldos y Cuentas</h1>
-            <!-- Aquí irá el resumen detallado de cuentas -->
+            
+            <!-- Contenedor dinámico donde Saldos.js inyectará las tarjetas (Punto 1 de HU-04) -->
+            <div id="contenedor-cuentas" class="grid-cuentas">
+                <p style="color: var(--text-white, #fff);">Cargando cuentas y saldos...</p>
+            </div>
         </main>
     </div>
 
-    <!-- Solo necesitas una línea de script -->
+    <!-- Script del componente visual -->
     <script type="module" src="../Vanilla/Saldos.js"></script>
 </body>
 
