@@ -114,8 +114,18 @@
         </header>
 
         <main class="main-content">
-            <h1>Consulta de Saldos y Cuentas</h1>
-            <!-- Aquí irá el resumen detallado de cuentas -->
+            <div class="saldos-header">
+                <div>
+                    <h1>Consulta de Saldos y Cuentas</h1>
+                    <p class="saldos-subtitle">Tus productos bancarios y su saldo disponible.</p>
+                </div>
+                <button class="toggle-saldos" id="toggleSaldos" aria-pressed="false" aria-label="Ocultar saldos">
+                    <i class="fa-regular fa-eye"></i>
+                </button>
+            </div>
+
+            <section class="cuentas-grid" id="cuentasLista" aria-live="polite" aria-busy="true"></section>
+            <div class="cuentas-estado hidden" id="cuentasEstado" role="status"></div>
         </main>
     </div>
 
