@@ -9,6 +9,8 @@
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <!-- CSS -->
     <link rel="stylesheet" href="../Style/signup.css">
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 <!-- CONTENEDOR PRINCIPAL -->
@@ -39,7 +41,7 @@
             </div>
             <!-- FORMULARIO -->
             <form id="registroForm">
-                <!-- FILA 1 -->
+                <!-- FILA 1: Nombre completo y Correo -->
                 <div class="form-row">
                     <div class="input-group">
                         <label for="nombre">
@@ -70,19 +72,55 @@
                         </div>
                     </div>
                 </div>
-                <!-- FILA 2 -->
+
+                <!-- FILA 2: Tipo de documento y Número de identificación -->
                 <div class="form-row">
                     <div class="input-group">
-                        <label for="documento">
-                            Número de documento <span>*</span>
+                        <label for="tipoDocumento">
+                            Tipo de documento <span>*</span>
                         </label>
                         <div class="input-box">
                             <i class="fa-regular fa-id-card"></i>
+                            <select
+                                    id="tipoDocumento"
+                                    name="tipoDocumento"
+                                    required
+                                    style="width: 100%; height: 100%; border: none; outline: none; background: transparent; color: #ffffff; font-size: 15px; cursor: pointer;">
+                                <option value="" disabled selected style="background: #111419; color: #888c95;">Selecciona</option>
+                                <option value="CC" style="background: #111419; color: #ffffff;">Cédula de Ciudadanía</option>
+                                <option value="CE" style="background: #111419; color: #ffffff;">Cédula de Extranjería</option>
+                                <option value="PAS" style="background: #111419; color: #ffffff;">Pasaporte</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="documento">
+                            Número de identificación <span>*</span>
+                        </label>
+                        <div class="input-box">
+                            <i class="fa-solid fa-hashtag"></i>
                             <input
                                     type="text"
                                     id="documento"
                                     name="documento"
-                                    placeholder="Ej. 123456789"
+                                    placeholder="Ej. 1023456789"
+                                    required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FILA 3: Fecha de nacimiento y Teléfono -->
+                <div class="form-row">
+                    <div class="input-group">
+                        <label for="fecha">
+                            Fecha de nacimiento <span>*</span>
+                        </label>
+                        <div class="input-box">
+                            <i class="fa-regular fa-calendar"></i>
+                            <input
+                                    type="date"
+                                    id="fecha"
+                                    name="fecha"
                                     required>
                         </div>
                     </div>
@@ -101,20 +139,23 @@
                         </div>
                     </div>
                 </div>
-                <!-- FECHA -->
+
+                <!-- NOMBRE DE USUARIO (ÚNICO) -->
                 <div class="input-group full-width">
-                    <label for="fecha">
-                        Fecha de nacimiento <span>*</span>
+                    <label for="username">
+                        Nombre de usuario (único) <span>*</span>
                     </label>
                     <div class="input-box">
-                        <i class="fa-regular fa-calendar"></i>
+                        <i class="fa-solid fa-at"></i>
                         <input
-                                type="date"
-                                id="fecha"
-                                name="fecha"
+                                type="text"
+                                id="username"
+                                name="username"
+                                placeholder="Ej. yull_mesa"
                                 required>
                     </div>
                 </div>
+
                 <!-- CONTRASEÑAS -->
                 <div class="form-row">
                     <div class="input-group">
@@ -158,21 +199,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- DIRECCIÓN -->
-                <div class="input-group full-width">
-                    <label for="direccion">
-                        Dirección <span>*</span>
-                    </label>
-                    <div class="input-box">
-                        <i class="fa-solid fa-location-dot"></i>
-                        <input
-                                type="text"
-                                id="direccion"
-                                name="direccion"
-                                placeholder="Ingresa tu dirección completa"
-                                required>
-                    </div>
-                </div>
+
                 <!-- TÉRMINOS -->
                 <div class="terms">
                     <label class="checkbox-container">
@@ -182,13 +209,14 @@
                                 required>
                         <span class="checkmark"></span>
                         <span class="terms-text">
-                               Acepto los
-                               <a href="#">términos y condiciones</a>
-                               y la
-                               <a href="#">política de privacidad</a>.
-                           </span>
+                              Acepto los
+                              <a href="#">términos y condiciones</a>
+                              y la
+                              <a href="#">política de privacidad</a>.
+                          </span>
                     </label>
                 </div>
+
                 <!-- BOTÓN -->
                 <button
                         type="submit"
@@ -197,6 +225,7 @@
                     <span>Registrarse</span>
                     <i class="fa-solid fa-arrow-right"></i>
                 </button>
+
                 <!-- LOGIN -->
                 <div class="login-link">
                     <span></span>
@@ -213,7 +242,6 @@
         </div>
     </section>
 </main>
-
 <!-- JS Externo -->
 <script type="module" src="../Vanilla/formulario/signup.js"></script>
 </body>

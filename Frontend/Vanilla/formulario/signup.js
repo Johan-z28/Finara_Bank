@@ -1,3 +1,6 @@
+// Importar o asegurar que SweetAlert2 esté disponible globalmente (asumiendo que lo tienes enlazado en el HTML)
+// Si usas CDN en el HTML: <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 // Mostrar / ocultar contraseña (expuesta globalmente para que funcione el onclick del HTML)
 window.togglePassword = function(inputId, button) {
     const input = document.getElementById(inputId);
@@ -17,105 +20,161 @@ document.addEventListener("DOMContentLoaded", () => {
     const registroForm = document.getElementById("registroForm");
 
     if (registroForm) {
-        registroForm.addEventListener("submit", async function(event) {
+        registroForm.addEventListener("submit", function(event) {
             event.preventDefault();
 
+            // Capturar los valores de todos los campos
             const nombre = document.getElementById("nombre").value.trim();
             const correo = document.getElementById("correo").value.trim();
+            const tipoDocumento = document.getElementById("tipoDocumento").value;
             const documento = document.getElementById("documento").value.trim();
             const telefono = document.getElementById("telefono").value.trim();
             const fecha = document.getElementById("fecha").value;
+            const username = document.getElementById("username").value.trim();
             const password = document.getElementById("password").value;
             const confirmPassword = document.getElementById("confirmPassword").value;
-            const direccion = document.getElementById("direccion").value.trim();
 
-            // Validaciones básicas
+            // 1. Validar mayoría de edad (mínimo 18 años)
+            const fechaNacimiento = new Date(fecha);
+            const hoy = new Date();
+            let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
+            const mes = hoy.getMonth() - fechaNacimiento.getMonth();
+
+            if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNacimiento.getDate())) {
+                edad--;
+            }
+
+            if (edad < 18) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Acceso Denegado',
+                    text: 'Debes ser mayor de 18 años para registrarte en Finara Bank.',
+                    background: '#12151c',
+                    color: '#ffffff',
+                    confirmButtonColor: '#e5a93c'
+                });
+                return;
+            }
+
+            // 2. Validar longitud de contraseña
             if (password.length < 8) {
-                alert("La contraseña debe tener mínimo 8 caracteres.");
-                return;
-            }
-            if (password !== confirmPassword) {
-                alert("Las contraseñas no coinciden.");
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Contraseña muy corta',
+                    text: 'La contraseña debe tener mínimo 8 caracteres.',
+                    background: '#12151c',
+                    color: '#ffffff',
+                    confirmButtonColor: '#e5a93c'
+                });
                 return;
             }
 
-            // Validación de formato de correo electrónico usando regex
+            if (password !== confirmPassword) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error de coincidencia',
+                    text: 'Las contraseñas no coinciden.',
+                    background: '#12151c',
+                    color: '#ffffff',
+                    confirmButtonColor: '#e5a93c'
+                });
+                return;
+            }
+
+            // 3. Validación de formato de correo electrónico usando regex
             const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!regexCorreo.test(correo)) {
-                alert("Por favor, ingresa un correo electrónico válido.");
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Correo inválido',
+                    text: 'Por favor, ingresa un correo electrónico válido.',
+                    background: '#12151c',
+                    color: '#ffffff',
+                    confirmButtonColor: '#e5a93c'
+                });
                 return;
             }
 
-            // Validación de Términos y Condiciones
-            const termsCheckbox = document.querySelector('input[type="checkbox"]');
+            // 4. Validación de Términos y Condiciones
+            const termsCheckbox = document.getElementById("terminos");
             if (termsCheckbox && !termsCheckbox.checked) {
-                alert("Debes aceptar los términos y condiciones para continuar.");
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Términos y condiciones',
+                    text: 'Debes aceptar los términos y condiciones para continuar.',
+                    background: '#12151c',
+                    color: '#ffffff',
+                    confirmButtonColor: '#e5a93c'
+                });
                 return;
             }
 
-            // Construir el objeto con los datos del usuario
+            // Recuperar registros previos o inicializar arreglo vacío en localStorage
+            let usuariosLocales = JSON.parse(localStorage.getItem("finara_usuarios_local")) || [];
+
+            // 5. Verificar si ya existe el correo electrónico
+            const correoExiste = usuariosLocales.some(u => u.correo === correo);
+            if (correoExiste) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Correo ya registrado',
+                    text: 'Este correo electrónico ya se encuentra registrado.',
+                    background: '#12151c',
+                    color: '#ffffff',
+                    confirmButtonColor: '#e5a93c'
+                });
+                return;
+            }
+
+            // 6. Verificar si ya existe el nombre de usuario (único)
+            const usernameExiste = usuariosLocales.some(u => u.username === username);
+            if (usernameExiste) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Usuario no disponible',
+                    text: 'El nombre de usuario "@' + username + '" ya está en uso. Por favor elige otro.',
+                    background: '#12151c',
+                    color: '#ffffff',
+                    confirmButtonColor: '#e5a93c'
+                });
+                return;
+            }
+
+            // Construir el objeto con los datos completos del usuario
             const userData = {
                 nombre,
                 correo,
+                tipoDocumento,
                 documento,
                 telefono,
                 fecha,
-                password, // (Idealmente encriptado o manejado con seguridad en backend)
-                direccion,
+                username,
+                password,
                 rol: "Cliente",
                 productosActivos: 0,
                 saldoDisponible: "$ 0",
                 ultimaActividad: "Recién registrado",
-                avatar: "../Style/image/avatar-maria.png" // O un avatar genérico por defecto
+                avatar: "../Style/image/avatar-maria.png"
             };
 
-            let backendSuccess = false;
+            // Guardar en el arreglo local y actualizar localStorage
+            usuariosLocales.push(userData);
+            localStorage.setItem("finara_usuarios_local", JSON.stringify(usuariosLocales));
 
-            try {
-                // Intento 1: Enviar al Backend
-                const response = await fetch('/api/auth/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(userData)
-                });
+            // Guardar también como perfil activo actual para pruebas
+            localStorage.setItem("userProfile", JSON.stringify(userData));
 
-                if (response.ok) {
-                    backendSuccess = true;
-                    alert("¡Registro exitoso guardado en el servidor!");
-                    // Opcional: limpiar form o redirigir al login
-                    // window.location.href = "Login.html";
-                } else {
-                    throw new Error("El servidor respondió con un error");
-                }
-            } catch (error) {
-                console.warn("Backend no disponible. Guardando de forma local en localStorage...", error);
-            }
-
-            // Si el backend no está disponible o falló, guardamos en localStorage como respaldo
-            if (!backendSuccess) {
-                // Recuperar registros previos o inicializar arreglo vacío
-                let usuariosLocales = JSON.parse(localStorage.getItem("finara_usuarios_local")) || [];
-
-                // Verificar si ya existe el correo
-                const existe = usuariosLocales.some(u => u.correo === correo);
-                if (existe) {
-                    alert("Este correo ya se encuentra registrado localmente.");
-                    return;
-                }
-
-                usuariosLocales.push(userData);
-                localStorage.setItem("finara_usuarios_local", JSON.stringify(usuariosLocales));
-
-                // Guardar también como perfil activo actual para pruebas rápidas
-                localStorage.setItem("userProfile", JSON.stringify(userData));
-
-                alert("Backend no disponible: Tu cuenta ha sido registrada localmente en el navegador (localStorage).");
-
-                // Opcional: Redirigir al perfil o dashboard de prueba
-                // window.location.href = "Perfil.html";
-            }
+            // Alerta de éxito con SweetAlert2 y redirección al cerrar
+            Swal.fire({
+                icon: 'success',
+                title: '¡Registro exitoso!',
+                text: 'Tu cuenta ha sido creada correctamente.',
+                background: '#12151c',
+                color: '#ffffff',
+                confirmButtonColor: '#e5a93c'
+            }).then(() => {
+                window.location.href = "Login.html";
+            });
         });
     }
 });
