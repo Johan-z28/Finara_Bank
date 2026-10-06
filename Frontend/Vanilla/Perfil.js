@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (btnEditar) {
         btnEditar.addEventListener('click', toggleModoEdicion);
     }
+    // <-- AGREGAR ESTA LÍNEA AQUÍ -->
+    configurarBotonesConfiguracion();
 });
 
 async function cargarDatosPerfil() {
@@ -116,39 +118,74 @@ function renderizarPerfil(user) {
     }
 }
 
-// Función para alternar el modo edición en la tarjeta de información personal
-function toggleModoEdicion() {
-    editando = !editando;
+// Función para alternar el modo edición con confirmación de SweetAlert2 y validación local
+async function toggleModoEdicion() {
     const btnEditar = document.querySelector('.btn-edit-profile');
     const infoRows = document.querySelectorAll('.profile-card')[0]?.querySelectorAll('.info-row');
-
     if (!infoRows) return;
 
-    if (editando) {
-        // Cambiar apariencia del botón principal
+    if (!editando) {
+        // Entrar en modo edición
+        editando = true;
         btnEditar.innerHTML = `<i class="fa-solid fa-check"></i> Guardar cambios`;
-        btnEditar.style.backgroundColor = '#10B981'; // Color verde de éxito opcional
+        btnEditar.style.backgroundColor = '#10B981'; // Color verde de éxito
 
-        // Convertir los strong en inputs editables
+        // Convertir los campos en inputs editables
         infoRows.forEach(row => {
             const strong = row.querySelector('strong');
             const textoActual = strong.textContent;
             const campoId = getCampoId(row);
-
             strong.innerHTML = `<input type="text" class="input-edit-perfil" data-campo="${campoId}" value="${textoActual}" style="background: #222; color: #fff; border: 1px solid #444; padding: 4px 8px; border-radius: 4px; width: 100%;">`;
         });
     } else {
-        // Guardar los nuevos valores
+        // 1. Modal de confirmación con SweetAlert2 antes de guardar
+        const confirmacion = await Swal.fire({
+            title: '¿Guardar cambios?',
+            text: '¿Estás seguro de actualizar tu información personal?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, guardar',
+            cancelButtonText: 'Cancelar',
+            background: '#12151c',
+            color: '#ffffff',
+            confirmButtonColor: '#e5a93c',
+            cancelButtonColor: '#d33'
+        });
+
+        // Si el usuario cancela, detenemos el proceso y se mantiene editando
+        if (!confirmacion.isConfirmed) {
+            return;
+        }
+
+        // 2. Recolectar nuevos valores y validar que no estén vacíos
         const nuevosDatos = {};
+        let hayCamposVacios = false;
+
         infoRows.forEach(row => {
             const input = row.querySelector('input');
             if (input) {
                 const campo = input.dataset.campo;
-                nuevosDatos[campo] = input.value.trim();
+                const valor = input.value.trim();
+                if (valor === '') {
+                    hayCamposVacios = true;
+                }
+                nuevosDatos[campo] = valor;
             }
         });
 
-        // Recuperar datos actuales del localStorage para conservar saldo, avatar, etc.
+        if (hayCamposVacios) {
+            Swal.fire({
+                title: 'Campos vacíos',
+                text: 'Por favor completa todos los campos antes de guardar.',
+                icon: 'warning',
+                background: '#12151c',
+                color: '#ffffff',
+                confirmButtonColor: '#e5a93c'
+            });
+            return; // No guardamos y permitimos corregir
+        }
+
+        // 3. Recuperar datos actuales del localStorage para conservar saldo, avatar, contraseña, etc.
         let userData = JSON.parse(localStorage.getItem('userProfile')) || {};
 
         // Fusionar cambios
@@ -157,16 +194,25 @@ function toggleModoEdicion() {
         userData.telefono = nuevosDatos.telefono || userData.telefono;
         userData.direccion = nuevosDatos.direccion || userData.direccion;
 
-        // Guardar actualizado en localStorage
+        // 4. Guardar actualizado en localStorage
         localStorage.setItem('userProfile', JSON.stringify(userData));
 
-        // Restaurar botón principal
+        // 5. Restaurar botón principal
         btnEditar.innerHTML = `<i class="fa-solid fa-pen"></i> Editar perfil`;
         btnEditar.style.backgroundColor = '';
+        editando = false;
 
-        alert("¡Datos actualizados correctamente en el almacenamiento local!");
+        // Alerta bonita de éxito con SweetAlert2
+        Swal.fire({
+            title: '¡Actualizado!',
+            text: 'Tus datos se han guardado correctamente.',
+            icon: 'success',
+            background: '#12151c',
+            color: '#ffffff',
+            confirmButtonColor: '#e5a93c'
+        });
 
-        // Volver a renderizar con la data fresca
+        // Volver a renderizar con la data fresca en pantalla
         cargarDatosPerfil();
     }
 }
@@ -179,4 +225,173 @@ function getCampoId(row) {
     if (label.includes('teléfono')) return 'telefono';
     if (label.includes('dirección')) return 'direccion';
     return '';
+}
+
+// Configurar los botones de configuración de cuenta con SweetAlert2
+function configurarBotonesConfiguracion() {
+    const settingRows = document.querySelectorAll('.profile-card')[1]?.querySelectorAll('.setting-row');
+    if (!settingRows || settingRows.length === 0) return;
+
+    settingRows.forEach((row, index) => {
+        row.style.cursor = 'pointer';
+        row.addEventListener('click', async () => {
+            switch (index) {
+                case 0: // Cambiar contraseña
+                    await cambiarContraseñaFácil();
+                    break;
+                case 1: // Notificaciones
+                    Swal.fire({
+                        title: 'Notificaciones',
+                        text: '¡Pronto estará disponible la gestión de notificaciones!',
+                        icon: 'info',
+                        background: '#12151c',
+                        color: '#ffffff',
+                        confirmButtonColor: '#e5a93c'
+                    });
+                    break;
+                case 2: // Métodos de autenticación
+                    Swal.fire({
+                        title: 'Autenticación',
+                        text: '¡Pronto estará disponible la configuración de métodos de autenticación!',
+                        icon: 'info',
+                        background: '#12151c',
+                        color: '#ffffff',
+                        confirmButtonColor: '#e5a93c'
+                    });
+                    break;
+                case 3: // Privacidad y datos
+                    Swal.fire({
+                        title: 'Privacidad y Datos',
+                        text: '¡Pronto estará disponible la sección de privacidad y datos!',
+                        icon: 'info',
+                        background: '#12151c',
+                        color: '#ffffff',
+                        confirmButtonColor: '#e5a93c'
+                    });
+                    break;
+                default:
+                    break;
+            }
+        });
+    });
+}
+
+// Función para cambiar contraseña con SweetAlert2 y validación real
+async function cambiarContraseñaFácil() {
+    // 1. Pedir contraseña actual
+    const { value: passwordActual } = await Swal.fire({
+        title: 'Cambiar contraseña',
+        text: 'Ingresa tu contraseña actual:',
+        input: 'password',
+        inputAttributes: { autocapitalize: 'off', autocorrect: 'off' },
+        background: '#12151c',
+        color: '#ffffff',
+        confirmButtonColor: '#e5a93c',
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar'
+    });
+
+    if (!passwordActual) return;
+
+    // Obtener datos guardados para validar localmente si el backend no responde
+    let userData = JSON.parse(localStorage.getItem('userProfile')) || {};
+    let passwordRegistrada = userData.password;
+
+    if (!passwordRegistrada) {
+        const localUsers = JSON.parse(localStorage.getItem('finara_usuarios_local')) || [];
+        if (localUsers.length > 0) {
+            passwordRegistrada = localUsers[localUsers.length - 1].password;
+        }
+    }
+
+    try {
+        // Intento con Backend (Try-Catch)
+        const response = await fetch('/api/user/change-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ passwordActual })
+        });
+
+        if (!response.ok) throw new Error('Backend no disponible');
+
+        // Si responde el backend, pedir la nueva contraseña
+        const { value: nuevaPassword } = await Swal.fire({
+            title: 'Nueva contraseña',
+            text: 'Ingresa tu nueva contraseña (mínimo 8 caracteres):',
+            input: 'password',
+            background: '#12151c',
+            color: '#ffffff',
+            confirmButtonColor: '#e5a93c',
+            showCancelButton: true,
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (!nuevaPassword) return;
+        if (nuevaPassword.length < 8) {
+            Swal.fire({ title: 'Error', text: 'La contraseña debe tener al menos 8 caracteres.', icon: 'error', background: '#12151c', color: '#ffffff', confirmButtonColor: '#e5a93c' });
+            return;
+        }
+
+        const responseChange = await fetch('/api/user/change-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ passwordActual, nuevaPassword })
+        });
+
+        if (!responseChange.ok) throw new Error('Error al actualizar en el servidor');
+
+        Swal.fire({ title: '¡Éxito!', text: 'Contraseña actualizada exitosamente en el servidor.', icon: 'success', background: '#12151c', color: '#ffffff', confirmButtonColor: '#e5a93c' });
+
+    } catch (error) {
+        console.warn('Validando contraseña en localStorage...');
+
+        // Validar si la contraseña actual coincide con la almacenada
+        if (passwordRegistrada && passwordActual !== passwordRegistrada) {
+            Swal.fire({ title: 'Contraseña incorrecta', text: 'La contraseña actual no coincide con nuestros registros.', icon: 'error', background: '#12151c', color: '#ffffff', confirmButtonColor: '#e5a93c' });
+            return;
+        }
+
+        // Pedir nueva contraseña
+        const { value: nuevaPassword } = await Swal.fire({
+            title: 'Nueva contraseña',
+            text: 'Ingresa tu nueva contraseña (mínimo 8 caracteres):',
+            input: 'password',
+            background: '#12151c',
+            color: '#ffffff',
+            confirmButtonColor: '#e5a93c',
+            showCancelButton: true,
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (!nuevaPassword) return;
+
+        if (nuevaPassword.length < 8) {
+            Swal.fire({ title: 'Atención', text: 'La contraseña debe tener al menos 8 caracteres.', icon: 'warning', background: '#12151c', color: '#ffffff', confirmButtonColor: '#e5a93c' });
+            return;
+        }
+
+        if (nuevaPassword === passwordActual) {
+            Swal.fire({ title: 'Atención', text: 'La nueva contraseña no puede ser igual a la actual.', icon: 'warning', background: '#12151c', color: '#ffffff', confirmButtonColor: '#e5a93c' });
+            return;
+        }
+
+        // Guardar cambios en localStorage
+        userData.password = nuevaPassword;
+        localStorage.setItem('userProfile', JSON.stringify(userData));
+
+        const localUsers = JSON.parse(localStorage.getItem('finara_usuarios_local')) || [];
+        if (localUsers.length > 0) {
+            localUsers[localUsers.length - 1].password = nuevaPassword;
+            localStorage.setItem('finara_usuarios_local', JSON.stringify(localUsers));
+        }
+
+        Swal.fire({
+            title: '¡Actualizado!',
+            text: 'Tu contraseña ha sido actualizada correctamente en el almacenamiento local.',
+            icon: 'success',
+            background: '#12151c',
+            color: '#ffffff',
+            confirmButtonColor: '#e5a93c'
+        });
+    }
 }

@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Backend/finara/finara.iml" filepath="$PROJECT_DIR$/Backend/finara/finara.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Backend/Terminal/Terminal.iml" filepath="$PROJECT_DIR$/Backend/Terminal/Terminal.iml" />
     </modules>
   </component>
 </project>
