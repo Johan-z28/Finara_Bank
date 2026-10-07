@@ -1,4 +1,4 @@
-import { initGlobalComponents } from './app.js';
+import { initGlobalComponents } from './Global/app.js';
 
 let editando = false;
 
@@ -6,12 +6,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     initGlobalComponents();
     await cargarDatosPerfil();
 
-    // Configurar el evento del botón de editar perfil principal
     const btnEditar = document.querySelector('.btn-edit-profile');
     if (btnEditar) {
         btnEditar.addEventListener('click', toggleModoEdicion);
     }
-    // <-- AGREGAR ESTA LÍNEA AQUÍ -->
+
+    // <-- NUEVA LÍNEA: Activar los botones de lápiz individuales -->
+    configurarBotonesEditarIndividuales();
+
     configurarBotonesConfiguracion();
 });
 
@@ -225,6 +227,96 @@ function getCampoId(row) {
     if (label.includes('teléfono')) return 'telefono';
     if (label.includes('dirección')) return 'direccion';
     return '';
+}
+
+// Configurar los botones de lápiz individuales en cada fila de información personal
+function configurarBotonesEditarIndividuales() {
+    const infoRows = document.querySelectorAll('.profile-card')[0]?.querySelectorAll('.info-row');
+    if (!infoRows) return;
+
+    infoRows.forEach(row => {
+        const btnEditRow = row.querySelector('button');
+        if (!btnEditRow) return;
+
+        btnEditRow.addEventListener('click', async () => {
+            const spanLabel = row.querySelector('span').textContent;
+            const strongVal = row.querySelector('strong');
+            const valorActual = strongVal.textContent.trim();
+            const campoId = getCampoId(row);
+
+            if (!campoId) return;
+
+            const titulosModal = {
+                'nombre': 'Editar Nombre Completo',
+                'correo': 'Editar Correo Electrónico',
+                'telefono': 'Editar Teléfono',
+                'direccion': 'Editar Dirección'
+            };
+
+            // Mostrar modal de SweetAlert2 con input prellenado
+            const { value: nuevoValor } = await Swal.fire({
+                title: titulosModal[campoId] || 'Editar campo',
+                input: 'text',
+                inputValue: valorActual,
+                inputAttributes: {
+                    autocapitalize: 'off'
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Guardar',
+                cancelButtonText: 'Cancelar',
+                background: '#12151c',
+                color: '#ffffff',
+                confirmButtonColor: '#e5a93c',
+                cancelButtonColor: '#d33',
+                inputValidator: (value) => {
+                    if (!value || value.trim() === '') {
+                        return '¡El campo no puede estar vacío!';
+                    }
+                    if (campoId === 'correo') {
+                        const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                        if (!regexCorreo.test(value.trim())) {
+                            return 'Por favor ingresa un correo electrónico válido.';
+                        }
+                    }
+                }
+            });
+
+            if (nuevoValor) {
+                const valorLimpio = nuevoValor.trim();
+
+                // Recuperar y actualizar el perfil en localStorage
+                let userData = JSON.parse(localStorage.getItem('userProfile')) || {};
+
+                if (campoId === 'correo') {
+                    userData.email = valorLimpio;
+                } else {
+                    userData[campoId] = valorLimpio;
+                }
+
+                localStorage.setItem('userProfile', JSON.stringify(userData));
+
+                // Actualizar también en el registro local general si aplica
+                const localUsers = JSON.parse(localStorage.getItem('finara_usuarios_local')) || [];
+                if (localUsers.length > 0) {
+                    localUsers[localUsers.length - 1][campoId === 'correo' ? 'email' : campoId] = valorLimpio;
+                    localUsers[localUsers.length - 1][campoId] = valorLimpio;
+                    localStorage.setItem('finara_usuarios_local', JSON.stringify(localUsers));
+                }
+
+                // Notificación de éxito y actualización de la interfaz
+                await Swal.fire({
+                    title: '¡Actualizado!',
+                    text: `El campo "${spanLabel}" se ha actualizado correctamente.`,
+                    icon: 'success',
+                    background: '#12151c',
+                    color: '#ffffff',
+                    confirmButtonColor: '#e5a93c'
+                });
+
+                cargarDatosPerfil();
+            }
+        });
+    });
 }
 
 // Configurar los botones de configuración de cuenta con SweetAlert2

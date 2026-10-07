@@ -28,14 +28,14 @@
             <a href="#contacto">Contacto</a>
 
             <div class="nav-actions-mobile">
-                <a href="pages/SignUp.html" class="btn-register">Registrarse</a>
-                <a href="pages/Login.html" class="btn-login">Iniciar sesión</a>
+                <a href="Pages/formulario/signup.html" class="btn-register">Registrarse</a>
+                <a href="pages/formulario/Login.html" class="btn-login">Iniciar sesión</a>
             </div>
         </nav>
 
         <div class="nav-actions">
-            <a href="pages/SignUp.html" class="btn-register">Registrarse</a>
-            <a href="pages/Login.html" class="btn-login">Iniciar sesión</a>
+            <a href="pages/formulario/signup.html" class="btn-register">Registrarse</a>
+            <a href="pages/formulario/Login.html" class="btn-login">Iniciar sesión</a>
         </div>
     </header>
 
@@ -48,7 +48,7 @@
                     Abre tu cuenta, invierte y haz crecer tu futuro con una plataforma financiera segura, simple y cercana.
                 </p>
                 <div class="hero-buttons">
-                    <a href="pages/SignUp.html" class="btn btn-gold">
+                    <a href="pages/formulario/signup.html" class="btn btn-gold">
                         Comienza ahora <i class="fa-solid fa-arrow-right"></i>
                     </a>
                     <a href="#productos" class="btn btn-secondary-dark">Conoce más</a>
@@ -389,7 +389,7 @@
                 </div>
             </div>
 
-            <form class="formulario-contacto" onsubmit="event.preventDefault();">
+            <form class="formulario-contacto">
                 <h3>Envíanos un mensaje</h3>
                 <div class="campo-grupo">
                     <label for="nombre">Nombre completo</label>
@@ -404,7 +404,7 @@
                     <textarea id="mensaje" rows="4" placeholder="¿En qué podemos ayudarte?" required></textarea>
                 </div>
                 <button type="submit" class="btn btn-gold btn-enviar">
-                    Enviar mensaje <i class="fa-solid fa-paper-plane"></i>
+                    <i class="fa-solid fa-paper-plane"></i> Enviar mensaje
                 </button>
             </form>
         </div>
@@ -457,6 +457,41 @@
             <p>&copy; 2026 Finara Bank S.A. Todos los derechos reservados.</p>
         </div>
     </footer>
+
+    <!-- ======= WIDGET CHATBOT FLOTANTE ======= -->
+    <div id="chatWidgetContainer">
+        <div class="chatbot-window hidden" id="chatbotWindow">
+            <div class="chatbot-header">
+                <div class="chatbot-info">
+                    <div class="bot-avatar-container">
+                        <img src="Style/image/bot_finara.png" alt="Finara AI" class="bot-avatar-img">
+                    </div>
+                    <div>
+                        <h6>Finara Assistant</h6>
+                        <span class="status-online"><i class="fa-solid fa-circle" style="font-size:0.48rem;"></i> En línea</span>
+                    </div>
+                </div>
+                <button class="close-chat-btn" id="closeChatBtn" aria-label="Cerrar chat">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="chatbot-body" id="chatbotBody">
+                <div class="chat-bubble">
+                    ¡Hola! 👋 Soy <strong>Finara Assistant</strong>. ¿En qué puedo ayudarte hoy?
+                </div>
+            </div>
+            <div class="chatbot-footer" id="chatbotFooter">
+                <button class="option-btn" data-faq="cuentas">Cuentas y Tasas</button>
+                <button class="option-btn" data-faq="creditos">Créditos</button>
+                <button class="option-btn" data-faq="inversion">Inversión</button>
+                <button class="option-btn" data-faq="soporte">Contacto</button>
+            </div>
+        </div>
+
+        <button class="chatbot-float-btn" id="chatFloatBtn" aria-label="Abrir asistente inteligente">
+            <img src="Style/image/bot_finara.png" alt="Bot Finara" class="float-btn-img">
+        </button>
+    </div>
 
     <script src="Vanilla/index.js"></script>
 </body>
