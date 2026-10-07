@@ -1,4 +1,4 @@
-import { initGlobalComponents } from './app.js';
+import { initGlobalComponents } from './Global/app.js';
 import { PERIODOS, obtenerCuentasFiltro, obtenerMovimientos, SesionExpiradaError } from './movimientosService.js';
 
 const TAMANO_PAGINA = 8;
