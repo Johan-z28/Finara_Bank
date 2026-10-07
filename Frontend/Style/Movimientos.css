@@ -1,13 +1,288 @@
-@import url('Styles.css');
+@import url('styles.css');
 
 /* ==========================================
-   ESTILOS ESPECÍFICOS DEL INTERIOR DEL DASHBOARD
+   HISTORIAL DE MOVIMIENTOS
    ========================================== */
 
-/* Ejemplo: Títulos de sección */
+:root {
+    --ingreso: #34d399;
+    --egreso: #f87171;
+}
+
 .main-content h1 {
     font-size: 1.5rem;
     font-weight: 600;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.3rem;
     color: var(--text-white);
+}
+
+.mov-header {
+    margin-bottom: 1.8rem;
+}
+
+.mov-subtitle {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+/* ----- Filtros ----- */
+.mov-filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.4rem;
+}
+
+.mov-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1 1 200px;
+    min-width: 0;
+}
+
+.mov-campo label {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
+.mov-campo select {
+    background: var(--bg-card-dark);
+    color: var(--text-white);
+    border: 1px solid var(--border-dark);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.mov-campo select:hover,
+.mov-campo select:focus {
+    border-color: var(--gold-main);
+    outline: none;
+}
+
+/* ----- Resumen del periodo (mismo patrón que las tarjetas de Saldos) ----- */
+.mov-resumen {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 1.2rem;
+    margin-bottom: 1.4rem;
+}
+
+.mov-total {
+    --acento: var(--gold-main);
+    background: var(--bg-card-dark);
+    border: 1px solid var(--border-dark);
+    border-top: 3px solid var(--acento);
+    border-radius: var(--radius-lg);
+    padding: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.mov-total:hover {
+    transform: translateY(-3px);
+    border-color: var(--acento);
+}
+
+.mov-total--ingreso { --acento: var(--ingreso); }
+.mov-total--egreso { --acento: var(--egreso); }
+
+.mov-total__head {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+}
+
+.mov-total__icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--acento);
+    background: color-mix(in srgb, var(--acento) 14%, transparent);
+    font-size: 1.1rem;
+}
+
+.mov-total__titulo {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.mov-total__saldo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.mov-total__label {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
+.mov-total__valor {
+    font-size: 1.6rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+}
+
+/* ----- Tabla ----- */
+.mov-tabla-wrap {
+    background: var(--bg-card-dark);
+    border: 1px solid var(--border-dark);
+    border-top: 3px solid var(--gold-main);
+    border-radius: var(--radius-lg);
+    overflow-x: auto;
+}
+
+.mov-tabla {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 560px;
+}
+
+.mov-tabla th {
+    text-align: left;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border-dark);
+}
+
+.mov-tabla th:last-child,
+.mov-valor-celda { text-align: right; }
+
+.mov-tabla td {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border-dark);
+    font-size: 0.85rem;
+    vertical-align: middle;
+}
+
+.mov-fila { transition: background 0.15s ease; }
+.mov-fila:hover { background: rgba(255, 255, 255, 0.03); }
+.mov-tabla tbody tr:last-child td { border-bottom: none; }
+
+.mov-fecha, .mov-desc { display: block; }
+.mov-hora { display: block; color: var(--text-muted); font-size: 0.72rem; }
+
+.mov-categoria {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 0.68rem;
+    color: var(--gold-main);
+    background: rgba(229, 169, 60, 0.12);
+    padding: 2px 9px;
+    border-radius: 20px;
+}
+
+/* Ingreso vs egreso: color + icono + signo (no depende solo del color) */
+.mov-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+.mov-badge--ingreso { color: var(--ingreso); background: rgba(52, 211, 153, 0.12); }
+.mov-badge--egreso { color: var(--egreso); background: rgba(248, 113, 113, 0.12); }
+
+.mov-valor {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.mov-valor--ingreso { color: var(--ingreso); }
+.mov-valor--egreso { color: var(--egreso); }
+
+/* ----- Carga / vacío / error ----- */
+.mov-skeleton td {
+    height: 56px;
+    animation: pulso 1.2s ease-in-out infinite;
+}
+
+@keyframes pulso { 50% { opacity: 0.4; } }
+
+.mov-estado {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 2.5rem 1rem;
+    border: 1px dashed var(--border-dark);
+    border-radius: var(--radius-lg);
+}
+
+.btn-reintentar {
+    margin-top: 1rem;
+    background: var(--gold-main);
+    color: #07090e;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-reintentar:hover { background: var(--gold-hover); }
+
+/* ----- Paginación ----- */
+.mov-paginacion {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    margin-top: 1.1rem;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.mov-pag-botones { display: flex; align-items: center; gap: 0.8rem; }
+
+.mov-pag-btn {
+    background: var(--bg-card-dark);
+    color: var(--text-white);
+    border: 1px solid var(--border-dark);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.mov-pag-btn:hover:not(:disabled) { border-color: var(--gold-main); color: var(--gold-main); }
+.mov-pag-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+@media (prefers-reduced-motion: reduce) {
+    .mov-total, .mov-fila, .mov-pag-btn { transition: none; }
+    .mov-skeleton td { animation: none; }
+}
+
+/* ----- Móvil: cada fila pasa a ser una tarjeta ----- */
+@media (max-width: 576px) {
+    .mov-total__valor { font-size: 1.4rem; }
+    .mov-tabla { min-width: 0; }
+    .mov-tabla thead { display: none; }
+    .mov-tabla, .mov-tabla tbody, .mov-tabla tr, .mov-tabla td { display: block; width: 100%; }
+
+    .mov-fila { padding: 12px 6px; border-bottom: 1px solid var(--border-dark); }
+    .mov-tabla td { border: none; padding: 5px 12px; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+    .mov-tabla td::before { content: attr(data-label); color: var(--text-muted); font-size: 0.72rem; }
+    .mov-valor-celda { text-align: right; }
+    .mov-skeleton td { display: block; }
 }
