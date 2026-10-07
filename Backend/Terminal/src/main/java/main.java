@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+import form.ProfileManager;
 import form.signUp; // O el nombre exacto de tu clase de registro
 
 public class main {
@@ -49,9 +50,13 @@ public class main {
                             String passLogin = scanner.nextLine().trim();
 
                             Map<String, String> datosUsuario = baseDatosUsuarios.get(correoLogin);
+                            // ... dentro del inicio de sesión exitoso:
                             if (datosUsuario.get("password").equals(passLogin)) {
                                 System.out.println("¡Inicio de sesión exitoso! Bienvenido de nuevo, " + datosUsuario.get("nombre"));
-                            } else {
+
+                                // <-- LLAMAR AL GESTOR DE PERFIL AQUí -->
+                                ProfileManager.gestionarPerfil(scanner, datosUsuario);
+                            }else {
                                 System.out.println("Error: Contraseña incorrecta.");
                             }
                         } else {
