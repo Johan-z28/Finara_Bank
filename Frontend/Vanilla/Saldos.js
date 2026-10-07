@@ -1,10 +1,11 @@
-import { initGlobalComponents } from './app.js';
-import { obtenerCuentas, SesionExpiradaError } from './cuentasService.js';
+import { initGlobalComponents } from './Global/app.js';
+import { obtenerCuentas, SesionExpiradaError } from './CuentasService.js';
 import { crearCuentaCard } from './CuentaCard.js';
+
 const CLAVE_PRIVACIDAD = 'saldosOcultos';
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Inicializa la hamburguesa, el menú de perfil y los datos compartidos
+    // Inicializa componentes globales (menú, perfil, etc.)
     initGlobalComponents();
 
     const lista = document.getElementById('cuentasLista');

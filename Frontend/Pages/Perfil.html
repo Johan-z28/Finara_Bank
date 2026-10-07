@@ -20,49 +20,49 @@
         <nav class="sidebar-nav">
             <ul>
                 <li class="nav-item">
-                    <a href="Dashboard.html" class="nav-link">
+                    <a href="Dashboard.html" class="nav-link" data-route="dashboard" title="Dashboard">
                         <i class="fa-solid fa-house"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="Transferencias.html" class="nav-link">
-                        <i class="fa-solid fa-arrows-rotate"></i>
-                        <span>Transferencias</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="Movimientos.html" class="nav-link">
-                        <i class="fa-solid fa-list-ul"></i>
-                        <span>Movimientos</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="Retiros.html" class="nav-link">
-                        <i class="fa-solid fa-money-bill-transfer"></i>
-                        <span>Retiros</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="Saldos.html" class="nav-link">
+                    <a href="Saldos.html" class="nav-link" data-route="saldos" title="Saldos">
                         <i class="fa-regular fa-credit-card"></i>
                         <span>Saldos</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="Creditos.html" class="nav-link">
+                    <a href="Transferencias.html" class="nav-link" data-route="transferencias" title="Transferencias">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <span>Transferencias</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Consignar.html" class="nav-link" data-route="consignar" title="Consignar">
+                        <i class="fa-solid fa-wallet"></i>
+                        <span>Consignar</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Retiros.html" class="nav-link" data-route="retiros" title="Retiros">
+                        <i class="fa-solid fa-money-bill-transfer"></i>
+                        <span>Retiros</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Movimientos.html" class="nav-link" data-route="movimientos" title="Movimientos">
+                        <i class="fa-solid fa-list-ul"></i>
+                        <span>Movimientos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Creditos.html" class="nav-link" data-route="creditos" title="Solicitud de Créditos">
                         <i class="fa-solid fa-hand-holding-dollar"></i>
                         <span>Solicitud de Créditos</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="ChatBot.html" class="nav-link">
-                        <i class="fa-regular fa-comment-dots"></i>
-                        <span>ChatBot</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="Beneficios.html" class="nav-link">
+                    <a href="Beneficios.html" class="nav-link" data-route="beneficios" title="Beneficios">
                         <i class="fa-regular fa-star"></i>
                         <span>Beneficios</span>
                     </a>
@@ -114,12 +114,271 @@
         </header>
 
         <main class="main-content">
-            <h1>Configuración de Perfil</h1>
-            <!-- Aquí irá la información del usuario y la opción para cambiar foto/datos -->
+
+            <!-- Encabezado -->
+            <div class="profile-page-header">
+                <div>
+                    <h1>Mi perfil</h1>
+                    <p>Administra tu información personal y mantén tu cuenta segura.</p>
+                </div>
+
+                <button class="btn-edit-profile">
+                    <i class="fa-solid fa-pen"></i>
+                    Editar perfil
+                </button>
+            </div>
+
+
+            <!-- TARJETA PRINCIPAL DEL PERFIL -->
+            <section class="profile-hero">
+
+                <div class="profile-user">
+
+                    <div class="profile-avatar">
+                        <img src="../Style/image/avatar-maria.png" alt="María Gómez">
+                        <button class="change-photo">
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
+                    </div>
+
+                    <div class="profile-data">
+
+                        <div class="profile-name">
+                            <h2>María Gómez</h2>
+                            <span>Cliente</span>
+                        </div>
+
+                        <div class="profile-contact">
+                            <p>
+                                <i class="fa-regular fa-envelope"></i>
+                                maria.gomez@email.com
+                            </p>
+
+                            <p>
+                                <i class="fa-solid fa-phone"></i>
+                                +57 300 123 4567
+                            </p>
+
+                            <p>
+                                <i class="fa-solid fa-location-dot"></i>
+                                Bogotá, Colombia
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- Decoración derecha -->
+                <div class="profile-security">
+
+                    <div class="gold-plant">
+                        <i class="fa-solid fa-seedling"></i>
+                    </div>
+
+                    <div class="security-shield">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- CONTENEDORES INFERIORES -->
+            <section class="profile-grid">
+
+                <!-- Información personal -->
+                <div class="profile-card">
+
+                    <div class="card-title">
+                        <div class="card-icon">
+                            <i class="fa-regular fa-user"></i>
+                        </div>
+
+                        <h3>Información personal</h3>
+                    </div>
+
+                    <div class="info-row">
+                        <span>Nombre completo</span>
+                        <strong>María Gómez</strong>
+                        <button>
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                    </div>
+
+                    <div class="info-row">
+                        <span>Correo electrónico</span>
+                        <strong>maria.gomez@email.com</strong>
+                        <button>
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                    </div>
+
+                    <div class="info-row">
+                        <span>Teléfono</span>
+                        <strong>+57 300 123 4567</strong>
+                        <button>
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                    </div>
+
+                    <div class="info-row">
+                        <span>Dirección</span>
+                        <strong>Cra 45 # 12-34, Bogotá</strong>
+                        <button>
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                    </div>
+
+                </div>
+
+
+                <!-- Configuración -->
+                <div class="profile-card">
+
+                    <div class="card-title">
+                        <div class="card-icon">
+                            <i class="fa-solid fa-gear"></i>
+                        </div>
+
+                        <h3>Configuración de cuenta</h3>
+                    </div>
+
+                    <div class="setting-row">
+                        <i class="fa-solid fa-lock"></i>
+                        <span>Cambiar contraseña</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+
+                    <div class="setting-row">
+                        <i class="fa-regular fa-bell"></i>
+                        <span>Notificaciones</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+
+                    <div class="setting-row">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span>Métodos de autenticación</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+
+                    <div class="setting-row">
+                        <i class="fa-solid fa-database"></i>
+                        <span>Privacidad y datos</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+
+                </div>
+
+
+                <!-- Resumen -->
+                <div class="profile-card account-summary">
+
+                    <div class="card-title">
+                        <div class="card-icon">
+                            <i class="fa-solid fa-chart-column"></i>
+                        </div>
+
+                        <h3>Resumen de tu cuenta</h3>
+                    </div>
+
+                    <div class="summary-item">
+                        <div class="summary-icon green">
+                            <i class="fa-regular fa-credit-card"></i>
+                        </div>
+
+                        <div>
+                            <small>Productos activos</small>
+                            <strong>3</strong>
+                        </div>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+
+                    <div class="summary-item gold">
+                        <div class="summary-icon">
+                            <i class="fa-solid fa-coins"></i>
+                        </div>
+
+                        <div>
+                            <small>Saldo disponible</small>
+                            <strong>$ 2.450.000</strong>
+                        </div>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+
+                    <div class="summary-item">
+                        <div class="summary-icon green">
+                            <i class="fa-solid fa-arrow-trend-up"></i>
+                        </div>
+
+                        <div>
+                            <small>Última actividad</small>
+                            <strong>Hoy, 10:24 a. m.</strong>
+                        </div>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- PARTE INFERIOR -->
+            <section class="profile-bottom">
+
+                <div class="bottom-card">
+
+                    <div class="bottom-icon">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+
+                    <div>
+                        <h3>Límites y seguridad</h3>
+                        <p>
+                            Configura tus límites de transacción y mantén
+                            tu cuenta protegida.
+                        </p>
+                    </div>
+
+                    <button>
+                        Ver detalles
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+
+                </div>
+
+
+                <div class="bottom-card">
+
+                    <div class="bottom-icon">
+                        <i class="fa-solid fa-headset"></i>
+                    </div>
+
+                    <div>
+                        <h3>¿Necesitas ayuda?</h3>
+                        <p>
+                            Contáctanos si tienes alguna duda o problema.
+                        </p>
+                    </div>
+
+                    <button>
+                        Ir al soporte
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+
+                </div>
+
+            </section>
+
         </main>
     </div>
 
-    <!-- Solo necesitas una línea de script -->
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="module" src="../Vanilla/Perfil.js"></script>
 </body>
 
