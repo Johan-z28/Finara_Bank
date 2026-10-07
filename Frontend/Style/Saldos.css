@@ -1,13 +1,182 @@
-@import url('Styles.css');
+@import url('global/styles.css');
 
 /* ==========================================
-   ESTILOS ESPECÍFICOS DEL INTERIOR DEL DASHBOARD
+   SALDOS Y CUENTAS ASOCIADAS
    ========================================== */
 
-/* Ejemplo: Títulos de sección */
 .main-content h1 {
     font-size: 1.5rem;
     font-weight: 600;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.3rem;
     color: var(--text-white);
+}
+
+.saldos-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.8rem;
+}
+
+.saldos-subtitle {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.toggle-saldos {
+    background: #07090e;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-muted);
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.toggle-saldos:hover {
+    color: var(--gold-main);
+    border-color: rgba(229, 169, 60, 0.4);
+}
+
+/* ----- Grilla ----- */
+.cuentas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 1.2rem;
+}
+
+/* ----- Card ----- */
+.cuenta-card {
+    --acento: var(--gold-main);
+    background: var(--bg-card-dark);
+    border: 1px solid var(--border-dark);
+    border-top: 3px solid var(--acento);
+    border-radius: var(--radius-lg);
+    padding: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.cuenta-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--acento);
+}
+
+.cuenta-card--ahorros { --acento: #34d399; }
+.cuenta-card--corriente { --acento: #60a5fa; }
+.cuenta-card--tarjeta { --acento: #a78bfa; }
+
+.cuenta-card__head {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+}
+
+.cuenta-card__icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--acento);
+    background: color-mix(in srgb, var(--acento) 14%, transparent);
+    font-size: 1.1rem;
+}
+
+.cuenta-card__titles {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+
+.cuenta-card__tipo {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.cuenta-card__numero {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    font-variant-numeric: tabular-nums;
+}
+
+.cuenta-card__estado {
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 20px;
+    color: #34d399;
+    background: rgba(52, 211, 153, 0.12);
+}
+
+.cuenta-card__estado--inactiva {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.12);
+}
+
+.cuenta-card__saldo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.cuenta-card__saldo-label {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
+.cuenta-card__valor {
+    font-size: 1.6rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+}
+
+/* ----- Estados: carga / vacío / error ----- */
+.cuenta-card--skeleton {
+    min-height: 150px;
+    border-top-color: var(--border-dark);
+    animation: pulso 1.2s ease-in-out infinite;
+}
+
+@keyframes pulso {
+    50% { opacity: 0.45; }
+}
+
+.cuentas-estado {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 2.5rem 1rem;
+    border: 1px dashed var(--border-dark);
+    border-radius: var(--radius-lg);
+}
+
+.btn-reintentar {
+    margin-top: 1rem;
+    background: var(--gold-main);
+    color: #07090e;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-reintentar:hover { background: var(--gold-hover); }
+
+@media (prefers-reduced-motion: reduce) {
+    .cuenta-card, .cuenta-card--skeleton { transition: none; animation: none; }
+}
+
+@media (max-width: 576px) {
+    .cuenta-card__valor { font-size: 1.4rem; }
 }
