@@ -6,10 +6,12 @@
       <list>
         <option value="$PROJECT_DIR$/Backend/src/pom.xml" />
         <option value="$PROJECT_DIR$/Backend/finara/pom.xml" />
+        <option value="$PROJECT_DIR$/Backend/Terminal/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
       <set>
+        <option value="$PROJECT_DIR$/Backend/finara/pom.xml" />
         <option value="$PROJECT_DIR$/Backend/src/pom.xml" />
       </set>
     </option>
