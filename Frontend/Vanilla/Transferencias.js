@@ -1,4 +1,4 @@
-import { initGlobalComponents } from './app.js';
+import { initGlobalComponents } from './Global/app.js';
 import { initCampanaNotificaciones, actualizarCampana } from './notificaciones.js';
 import {
     TIPOS, formatoCOP, calcularDisponible, obtenerCuentasOrigen, buscarCuentaDestino,
