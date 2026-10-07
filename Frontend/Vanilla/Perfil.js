@@ -1,4 +1,4 @@
-import { initGlobalComponents } from './app.js';
+import { initGlobalComponents } from './Global/app.js';
 
 let editando = false;
 
