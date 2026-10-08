@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Estilos específicos del Admin -->
     <link rel="stylesheet" href="../../Style/admin.css">
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="general-body">
 
@@ -250,6 +252,64 @@
                 <div class="placeholder-detalle">
                     <i class="fa-solid fa-id-card"></i>
                     <p>Selecciona un usuario de la lista para ver sus datos y opciones de gestión.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- =======================================
+    MODAL DE ACTUALIZACIÓN DE USUARIOS (UPDATE)
+    ======================================= -->
+<div class="admin-modal-overlay" id="adminUpdateModal">
+    <div class="admin-modal-container" style="max-width: 950px;">
+        <!-- Cabecera del Modal -->
+        <div class="admin-modal-header">
+            <h3><i class="fa-solid fa-user-pen"></i> Gestión y Actualización de Usuarios (Update)</h3>
+            <button class="modal-close-btn" id="closeAdminUpdateModal"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <!-- Cuerpo del Modal con Dos Columnas -->
+        <div class="admin-modal-body">
+            <!-- Columna Izquierda: Listado enviado por Read -->
+            <div class="modal-col-left">
+                <h4>Seleccionar Usuario</h4>
+                <div class="usuarios-list-container" id="usuariosUpdateList">
+                    <p class="empty-list-text">No hay usuarios disponibles para actualizar.</p>
+                </div>
+            </div>
+            <!-- Columna Derecha: Tarjeta Estilo Perfil con Lápices de Edición -->
+            <div class="modal-col-right" id="detalleUpdateContainer" style="align-items: stretch; text-align: left;">
+                <div class="placeholder-detalle" style="text-align: center; margin: auto;">
+                    <i class="fa-solid fa-user-pen"></i>
+                    <p>Selecciona un usuario de la izquierda para modificar su información personal.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- =======================================
+    MODAL DE BORRADO SEGURO DE USUARIOS (DELETE)
+    ======================================= -->
+<div class="admin-modal-overlay" id="adminDeleteModal">
+    <div class="admin-modal-container" style="max-width: 950px;">
+        <!-- Cabecera del Modal -->
+        <div class="admin-modal-header">
+            <h3><i class="fa-solid fa-user-xmark" style="color: #ef4444;"></i> Depuración y Eliminación de Usuarios (Delete)</h3>
+            <button class="modal-close-btn" id="closeAdminDeleteModal"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <!-- Cuerpo del Modal con Dos Columnas -->
+        <div class="admin-modal-body">
+            <!-- Columna Izquierda: Listado de Usuarios -->
+            <div class="modal-col-left">
+                <h4>Seleccionar para Depurar</h4>
+                <div class="usuarios-list-container" id="usuariosDeleteList">
+                    <p class="empty-list-text">No hay usuarios disponibles para eliminar.</p>
+                </div>
+            </div>
+            <!-- Columna Derecha: Tarjeta de Advertencia y Depuración -->
+            <div class="modal-col-right" id="detalleDeleteContainer" style="align-items: stretch; text-align: left;">
+                <div class="placeholder-detalle" style="text-align: center; margin: auto;">
+                    <i class="fa-solid fa-user-shield" style="font-size: 2.5rem; color: #ef4444; margin-bottom: 1rem;"></i>
+                    <p>Selecciona un usuario de la izquierda para iniciar el protocolo de borrado seguro.</p>
                 </div>
             </div>
         </div>

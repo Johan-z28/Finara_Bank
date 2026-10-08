@@ -456,6 +456,160 @@
     color: #ef4444;
     background: rgba(239, 68, 68, 0.1);
 }
+/* Tarjeta de Información Personal en Update */
+.update-info-card {
+    background: #12161f;
+    border: 1px solid var(--border-dark);
+    border-radius: 12px;
+    padding: 1.5rem;
+    width: 100%;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}
+
+.update-info-header {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1.2rem;
+    border-bottom: 1px solid var(--border-dark);
+    padding-bottom: 0.8rem;
+}
+
+.update-info-header i {
+    background: rgba(212, 175, 55, 0.1);
+    color: var(--gold-main);
+    padding: 0.5rem;
+    border-radius: 50%;
+    font-size: 1rem;
+}
+
+.update-info-header h4 {
+    color: var(--text-white);
+    font-size: 1rem;
+    margin: 0;
+}
+
+.update-row-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.update-row-item:last-child {
+    border-bottom: none;
+}
+
+.update-row-label {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.update-row-value-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.update-row-value {
+    color: var(--text-white);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.btn-edit-pencil {
+    background: rgba(212, 175, 55, 0.1);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    color: var(--gold-main);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-edit-pencil:hover {
+    background: var(--gold-main);
+    color: #12161f;
+}
+
+/* Tarjeta de Advertencia en Delete */
+.delete-info-card {
+    background: #12161f;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 12px;
+    padding: 1.5rem;
+    width: 100%;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}
+
+.delete-info-header {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1.2rem;
+    border-bottom: 1px solid rgba(239, 68, 68, 0.2);
+    padding-bottom: 0.8rem;
+}
+
+.delete-info-header i {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    padding: 0.5rem;
+    border-radius: 50%;
+    font-size: 1rem;
+}
+
+.delete-info-header h4 {
+    color: var(--text-white);
+    font-size: 1rem;
+    margin: 0;
+}
+
+.delete-row-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.delete-row-label {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.delete-row-value {
+    color: var(--text-white);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.btn-danger-action {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: #ef4444;
+    width: 100%;
+    padding: 0.8rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+}
+
+.btn-danger-action:hover {
+    background: #ef4444;
+    color: #fff;
+}
 /* Responsive para pantallas medianas y pequeñas */
 @media (max-width: 1024px) {
     .admin-grid-container {
