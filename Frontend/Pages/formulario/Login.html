@@ -1,98 +1,105 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finara - Iniciar sesión</title>
+    <title>Iniciar Sesión | Finara Bank</title>
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="../../Style/Login.css">
 </head>
-
 <body>
+<!-- CONTENEDOR PRINCIPAL -->
+<main class="register-container">
+    <!-- =====================================================
+     CONTENEDOR IZQUIERDO - IMAGEN (CORREGIDA Y AJUSTADA)
+====================================================== -->
+    <section class="register-image">
+        <img src="../../Style/image/formulario.png" alt="Finara Bank">
+    </section>
 
-    <div class="login-container">
-
-        <!-- BANNER -->
-        <div class="banner">
-
-            <img src="../../Style/image/banner.jpg" alt="Finara Bank">
-
-        </div>
-
-
-        <!-- LOGIN -->
-        <div class="login">
-
-            <!-- CUADRO DEL LOGIN -->
-            <div class="login-box">
-
-                <!-- LOGO -->
-                <img src="../../Style/image/Logo_finara.svg" alt="Logo Finara" class="logo">
-
-
-                <!-- TÍTULO -->
-                <h1>Bienvenido de nuevo</h1>
-
-                <p>
-                    Inicia sesión para acceder a tu cuenta
-                </p>
-
-
-                <!-- FORMULARIO -->
-                <form>
-
-                    <!-- CORREO -->
-                    <label for="email">
-                        Correo electrónico
-                    </label>
-
-                    <div class="input-box">
-
-                        <i class="fa-regular fa-envelope"></i>
-
-                        <input type="email" id="email" placeholder="Ingresa tu correo electrónico" required>
-
-                    </div>
-
-
-                    <!-- CONTRASEÑA -->
-                    <label for="password">
-                        Contraseña
-                    </label>
-
-                    <div class="input-box">
-
-                        <i class="fa-solid fa-lock"></i>
-
-                        <input type="password" id="password" placeholder="Ingresa tu contraseña" required>
-
-                    </div>
-
-
-                    <!-- CONTRASEÑA OLVIDADA -->
-                    <a href="#" class="forgot">
-                        ¿Olvidaste tu contraseña?
-                    </a>
-
-                    <!-- BOTÓN -->
-                    <button type="submit">
-
-                        Iniciar sesión
-
-                        <i class="fa-solid fa-arrow-right"></i>
-
-                    </button>
-
-                </form>
-
+    <!-- =====================================================
+     CONTENEDOR DERECHO - FORMULARIO DE LOGIN
+====================================================== -->
+    <section class="register-form-container">
+        <div class="register-form">
+            <!-- ANCLA DE RETORNO AL INDEX -->
+            <div class="form-back-wrapper">
+                <a href="../../index.html" class="back-home-link">
+                    <i class="fa-solid fa-arrow-left"></i> Volver al inicio
+                </a>
             </div>
 
+            <!-- LOGO Y ENCABEZADO -->
+            <div class="form-header" style="flex-direction: column; align-items: center; text-align: center;">
+                <img src="../../Style/image/Logo_finara.svg" alt="Logo Finara" class="logo" style="width: 200px; margin-bottom: 15px;">
+                <div>
+                    <h1>Bienvenido de nuevo</h1>
+                    <p>Inicia sesión para acceder a tu cuenta bancaria.</p>
+                </div>
+            </div>
+
+            <!-- FORMULARIO DE ACCESO -->
+            <form id="loginForm">
+                <!-- CORREO O USERNAME -->
+                <div class="input-group">
+                    <label for="correo">
+                        Correo electrónico o usuario <span>*</span>
+                    </label>
+                    <div class="input-box">
+                        <i class="fa-regular fa-envelope"></i>
+                        <input type="text" id="correo" name="correo" placeholder="tu@correo.com o usuario" required>
+                    </div>
+                </div>
+
+                <!-- CONTRASEÑA -->
+                <div class="input-group">
+                    <label for="password">
+                        Contraseña <span>*</span>
+                    </label>
+                    <div class="input-box">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="password" name="password" placeholder="Ingresa tu contraseña" required>
+                        <button type="button" class="show-password" onclick="togglePassword('password', this)">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CONTRASEÑA OLVIDADA -->
+                <div style="text-align: right; margin-bottom: 25px;">
+                    <a href="#" class="forgot" style="color: #e5a93c; font-size: 12px; text-decoration: none;">¿Olvidaste tu contraseña?</a>
+                </div>
+
+                <!-- BOTÓN DE INICIO DE SESIÓN -->
+                <button type="submit" class="register-button">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span>Iniciar sesión</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+
+                <!-- ENLACE A REGISTRO -->
+                <div class="login-link" style="margin-top: 30px;">
+                    <span></span>
+                    <p>
+                        ¿No tienes una cuenta?
+                        <a href="signup.html">
+                            Regístrate aquí
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </p>
+                    <span></span>
+                </div>
+            </form>
         </div>
+    </section>
+</main>
 
-    </div>
-
-    </div>
-
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- JS Externo de Login -->
+<script type="module" src="../../Vanilla/formulario/login.js"></script>
 </body>
-
 </html>

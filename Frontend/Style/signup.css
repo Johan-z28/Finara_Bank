@@ -415,3 +415,30 @@ body {
         display: none;
     }
 }
+/* =========================================================
+ SELECTOR COMBINADO TIPO Y NÚMERO DE DOCUMENTO
+========================================================= */
+.input-box-grouped {
+    display: flex;
+    gap: 10px;
+    height: 57px;
+}
+.select-document {
+    height: 100%;
+    background: #111419;
+    border: 1px solid #5b606a;
+    border-radius: 11px;
+    color: #ffffff;
+    padding: 0 12px;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+.select-document:hover {
+    border-color: #817047;
+}
+.select-document:focus {
+    border-color: #dca52c;
+    box-shadow: 0 0 0 2px rgba(220, 165, 44, .10);
+}
