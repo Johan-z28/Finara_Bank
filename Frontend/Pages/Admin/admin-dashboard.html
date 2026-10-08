@@ -100,11 +100,21 @@
         </div>
         <div class="navbar-actions">
             <div class="profile-menu-container">
-                <button class="profile-btn" id="profileBtn">
+                <button class="profile-btn" id="profileBtn" aria-label="Menú de usuario">
                     <div class="avatar-placeholder">
                         <i class="fa-solid fa-user-shield profile-icon"></i>
                     </div>
                 </button>
+                <!-- Menú desplegable oculto por defecto -->
+                <div class="profile-dropdown-menu" id="profileDropdown">
+                    <a href="../Perfil.html" class="dropdown-item" id="verPerfilBtn">
+                        <i class="fa-solid fa-user"></i> Ver perfil
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item logout-item" id="cerrarSesionBtn">
+                        <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+                    </button>
+                </div>
             </div>
         </div>
     </header>
@@ -180,7 +190,71 @@
         </div>
     </main>
 </div>
+<!-- =======================================
+     MODAL DE GESTIÓN DE USUARIOS PENDIENTES (CREATE)
+     ======================================= -->
+<div class="admin-modal-overlay" id="adminModal">
+    <div class="admin-modal-container">
+        <!-- Cabecera del Modal -->
+        <div class="admin-modal-header">
+            <h3><i class="fa-solid fa-user-plus"></i> Gestión de Usuarios Pendientes (Create)</h3>
+            <button class="modal-close-btn" id="closeAdminModal"><i class="fa-solid fa-xmark"></i></button>
+        </div>
 
+        <!-- Cuerpo del Modal con Dos Columnas -->
+        <div class="admin-modal-body">
+            <!-- Columna Izquierda: Listado de pendientes -->
+            <div class="modal-col-left">
+                <h4>Solicitudes de Registro</h4>
+                <div class="usuarios-list-container" id="usuariosPendientesList">
+                    <!-- Se inyectará dinámicamente con JS -->
+                    <p class="empty-list-text">No hay usuarios pendientes por validar.</p>
+                </div>
+            </div>
+
+            <!-- Columna Derecha: Detalle y Botones de Acción -->
+            <div class="modal-col-right" id="detalleUsuarioContainer">
+                <div class="placeholder-detalle">
+                    <i class="fa-solid fa-hand-pointer"></i>
+                    <p>Selecciona un usuario de la izquierda para gestionar su verificación.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =======================================
+     MODAL DE CONSULTA GENERAL DE USUARIOS (READ)
+     ======================================= -->
+<div class="admin-modal-overlay" id="adminReadModal">
+    <div class="admin-modal-container">
+        <!-- Cabecera del Modal -->
+        <div class="admin-modal-header">
+            <h3><i class="fa-solid fa-address-book"></i> Consulta General de Usuarios (Read)</h3>
+            <button class="modal-close-btn" id="closeAdminReadModal"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <!-- Cuerpo del Modal con Dos Columnas -->
+        <div class="admin-modal-body">
+            <!-- Columna Izquierda: Listado general de todos los usuarios -->
+            <div class="modal-col-left">
+                <h4>Listado de Registros</h4>
+                <div class="usuarios-list-container" id="usuariosReadList">
+                    <!-- Se inyectará dinámicamente con JS -->
+                    <p class="empty-list-text">No hay usuarios registrados en el sistema.</p>
+                </div>
+            </div>
+
+            <!-- Columna Derecha: Datos del usuario y acciones/derivaciones -->
+            <div class="modal-col-right" id="detalleReadContainer">
+                <div class="placeholder-detalle">
+                    <i class="fa-solid fa-id-card"></i>
+                    <p>Selecciona un usuario de la lista para ver sus datos y opciones de gestión.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- Script enlazado en su carpeta correspondiente -->
 <script src="../../Vanilla/AdminCall/Admin.js"></script>
 </body>
