@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración de Usuarios | Finara Bank</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="../../Style/image/favicon.svg">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Estilos específicos del Admin -->
+    <link rel="stylesheet" href="../../Style/admin.css">
+</head>
+<body class="general-body">
+
+<!-- =======================================
+     SIDEBAR DE NAVEGACIÓN
+     ======================================= -->
+<aside class="sidebar" id="sidebar">
+    <button class="sidebar-edge-toggle" id="sidebarCollapseBtn" aria-label="Colapsar menú" title="Colapsar menú">
+        <i class="fa-solid fa-chevron-left"></i>
+    </button>
+
+    <div class="sidebar-header">
+        <img src="../../Style/image/Logo_finara.svg" alt="Finara Logo" class="sidebar-logo">
+        <img src="../../Style/image/favicon.svg" alt="Finara Icon" class="sidebar-logo-small">
+    </div>
+
+    <nav class="sidebar-nav">
+        <ul>
+            <li class="nav-item">
+                <a href="../Dashboard.html" class="nav-link" title="Dashboard">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="../Saldos.html" class="nav-link" title="Saldos">
+                    <i class="fa-regular fa-credit-card"></i>
+                    <span>Saldos</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="../Transferencias.html" class="nav-link" title="Transferencias">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                    <span>Transferencias</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="../Consignar.html" class="nav-link" title="Consignar">
+                    <i class="fa-solid fa-wallet"></i>
+                    <span>Consignar</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="../Retiros.html" class="nav-link" title="Retiros">
+                    <i class="fa-solid fa-money-bill-transfer"></i>
+                    <span>Retiros</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="../Movimientos.html" class="nav-link" title="Movimientos">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>Movimientos</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="../Creditos.html" class="nav-link" title="Créditos">
+                    <i class="fa-solid fa-hand-holding-dollar"></i>
+                    <span>Solicitud de Créditos</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="../Beneficios.html" class="nav-link" title="Beneficios">
+                    <i class="fa-solid fa-gift"></i>
+                    <span>Beneficios</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="admin-dashboard.html" class="nav-link active" title="Administración">
+                    <i class="fa-solid fa-users-gear"></i>
+                    <span>Administración</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</aside>
+
+<!-- =======================================
+     CONTENEDOR PRINCIPAL
+     ======================================= -->
+<div class="main-wrapper" id="mainWrapper">
+
+    <header class="dashboard-navbar">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+        <div class="user-greeting">
+            <h2>Panel de Control, <span>Administrador</span></h2>
+        </div>
+        <div class="navbar-actions">
+            <div class="profile-menu-container">
+                <button class="profile-btn" id="profileBtn">
+                    <div class="avatar-placeholder">
+                        <i class="fa-solid fa-user-shield profile-icon"></i>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL CON GRID -->
+    <main class="main-content">
+
+        <!-- RECTÁNGULO GRANDE: BIENVENIDA ADMINISTRADOR -->
+        <section class="admin-hero-banner">
+            <div class="admin-hero-content">
+                <span class="admin-badge"><i class="fa-solid fa-shield-halved"></i> Módulo Seguro</span>
+                <h1>Panel de Gestión y Control Admin</h1>
+                <p>Bienvenido al núcleo de administración de Finara Bank. Desde este espacio estructurado puedes gestionar de forma segura los registros, validar credenciales, auditar saldos y configurar respuestas del sistema.</p>
+            </div>
+            <div class="admin-hero-icon">
+                <i class="fa-solid fa-user-gear"></i>
+            </div>
+        </section>
+
+        <!-- GRID DE 5 TARJETAS (CRUD + CHATBOT) -->
+        <div class="admin-grid-container">
+
+            <!-- 1. CREATE -->
+            <div class="admin-card">
+                <div class="card-icon-container create-color">
+                    <i class="fa-solid fa-user-plus"></i>
+                </div>
+                <h3>Create (Crear & Validar)</h3>
+                <p>Agrega nuevos usuarios al sistema validando previamente formatos de correo y campos requeridos antes de guardar.</p>
+                <button class="btn-admin-action" data-accion="Create">Gestionar Alta</button>
+            </div>
+
+            <!-- 2. READ -->
+            <div class="admin-card">
+                <div class="card-icon-container read-color">
+                    <i class="fa-solid fa-address-book"></i>
+                </div>
+                <h3>Read (Consultar Listado)</h3>
+                <p>Visualiza el volumen total de usuarios registrados, audita sus datos generales y monitorea la base actual.</p>
+                <button class="btn-admin-action" data-accion="Read">Ver Registros</button>
+            </div>
+
+            <!-- 3. UPDATE -->
+            <div class="admin-card">
+                <div class="card-icon-container update-color">
+                    <i class="fa-solid fa-user-pen"></i>
+                </div>
+                <h3>Update (Actualizar Datos)</h3>
+                <p>Adapta y modifica credenciales del titular, datos de perfil o ajusta saldos derivados de movimientos recientes.</p>
+                <button class="btn-admin-action" data-accion="Update">Modificar Datos</button>
+            </div>
+
+            <!-- 4. DELETE -->
+            <div class="admin-card">
+                <div class="card-icon-container delete-color">
+                    <i class="fa-solid fa-user-xmark"></i>
+                </div>
+                <h3>Delete (Depuración Segura)</h3>
+                <p>Zona protegida con confirmación previa para eliminar registros de usuarios de manera definitiva del almacenamiento.</p>
+                <button class="btn-admin-action danger-btn" data-accion="Delete">Depurar Registros</button>
+            </div>
+
+            <!-- 5. CHATBOT OPCIONES PRESTABLECIDAS -->
+            <div class="admin-card chatbot-card">
+                <div class="card-icon-container chat-color">
+                    <i class="fa-solid fa-comments"></i>
+                </div>
+                <h3>Chatbot (Respuestas Auto)</h3>
+                <p>Configura y administra las opciones de respuesta preestablecidas del asistente virtual para futuras interacciones.</p>
+                <button class="btn-admin-action" data-accion="Chatbot">Configurar Bot</button>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<!-- Script enlazado en su carpeta correspondiente -->
+<script src="../../Vanilla/AdminCall/Admin.js"></script>
+</body>
+</html>

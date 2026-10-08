@@ -1,0 +1,150 @@
+/* =================================================
+   ESTILOS ESPECÍFICOS - PANEL DE ADMINISTRACIÓN (GRID)
+   ================================================= */
+@import url('global/styles.css');
+
+/* Banner Superior de Bienvenida */
+.admin-hero-banner {
+    background: var(--bg-card-dark);
+    border: 1px solid var(--border-dark);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.admin-hero-content h1 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0.5rem 0 1rem 0;
+}
+
+.admin-hero-content p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    max-width: 800px;
+    line-height: 1.5;
+}
+
+.admin-badge {
+    background: rgba(212, 175, 55, 0.1);
+    color: var(--gold-main);
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.admin-hero-icon {
+    font-size: 4rem;
+    color: var(--gold-main);
+    opacity: 0.8;
+}
+
+/* Grid Principal de Tarjetas con FR */
+.admin-grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 columnas flexibles */
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* Tarjeta individual */
+.admin-card {
+    background: var(--bg-card-dark);
+    border: 1px solid var(--border-dark);
+    border-radius: var(--radius-lg);
+    padding: 1.8rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.admin-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(212, 175, 55, 0.4);
+}
+
+/* Hacer que la tarjeta del Chatbot ocupe espacio o se ajuste armónicamente */
+.chatbot-card {
+    grid-column: span 1;
+}
+
+.card-icon-container {
+    width: 45px;
+    height: 45px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 1.2rem;
+}
+
+/* Colores distintivos temáticos por tarjeta */
+.create-color { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+.read-color { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+.update-color { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+.delete-color { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+.chat-color { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+
+.admin-card h3 {
+    font-size: 1.1rem;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.admin-card p {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    line-height: 1.4;
+    margin-bottom: 1.5rem;
+}
+
+/* Botón interno de la tarjeta */
+.btn-admin-action {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-dark);
+    color: #ffffff;
+    padding: 0.6rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    width: 100%;
+}
+
+.btn-admin-action:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.danger-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: #ef4444;
+}
+
+/* Responsive para pantallas medianas y pequeñas */
+@media (max-width: 1024px) {
+    .admin-grid-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-grid-container {
+        grid-template-columns: 1fr;
+    }
+    .admin-hero-banner {
+        flex-direction: column;
+        text-align: center;
+    }
+}
