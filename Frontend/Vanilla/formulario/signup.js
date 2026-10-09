@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const documento = document.getElementById("documento").value.trim();
             const telefono = document.getElementById("telefono").value.trim();
             const fecha = document.getElementById("fecha").value;
-            const username = document.getElementById("username").value.trim();
+            const username = document.getElementById("userName").value.trim();
             const password = document.getElementById("password").value;
             const confirmPassword = document.getElementById("confirmPassword").value;
 

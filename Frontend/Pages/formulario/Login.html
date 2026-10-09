@@ -1,59 +1,33 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finara - Iniciar sesión</title>
-    <link rel="stylesheet" href="../Style/Login.css">
-
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
-
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <script src="../Vanilla/Login.js" defer></script>
+    <title>Iniciar sesión | Finara Bank</title>   
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../Style/Login.css"> 
 </head>
-<body>
-<!-- CONTENEDOR PRINCIPAL -->
-<main class="register-container">
-    <!-- =====================================================
-     CONTENEDOR IZQUIERDO - IMAGEN (CORREGIDA Y AJUSTADA)
-====================================================== -->
-    <section class="register-image">
-        <img src="../../Style/image/formulario.png" alt="Finara Bank">
-    </section>
 
-    <!-- =====================================================
-     CONTENEDOR DERECHO - FORMULARIO DE LOGIN
-====================================================== -->
-    <section class="register-form-container">
-        <div class="register-form">
-            <!-- ANCLA DE RETORNO AL INDEX -->
-            <div class="form-back-wrapper">
-                <a href="../../index.html" class="back-home-link">
-                    <i class="fa-solid fa-arrow-left"></i> Volver al inicio
-                </a>
-            </div>
+<body>
 
     <div class="login-container">
 
         <div class="banner">
-            <img src="../Style/image/banner.jpg" alt="Finara Bank">
+            <img src="../../Style/image/login.png" alt="Finara Bank">
         </div>
 
         <div class="login">
 
             <div class="login-box">
 
-                <a href="../index.html" class="back">
-                 <i class="fa-solid fa-arrow-left"></i>
-                  Volver al inicio
+                <a href="../../index.html" class="back">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Volver al inicio
                 </a>
 
-                <img src="../Style/image/Logo_finara.svg"
-                    alt="Logo Finara"
-                    class="logo">
+                <img src="../../Style/image/Logo_finara.svg" alt="Logo Finara" class="logo">
 
                 <h1>Bienvenido de nuevo</h1>
 
@@ -66,35 +40,28 @@
                     <label for="usuario">
                         Usuario
                     </label>
+
                     <div class="input-box">
                         <i class="fa-solid fa-user"></i>
 
-                        <input
-                            type="text"
-                            id="usuario"
-                            placeholder="Ingresa tu usuario"
-                            required>
+                        <input type="text" id="usuario" placeholder="Ingresa tu usuario" required>
                     </div>
-                </div>
 
                     <label for="password">
-                        Contraseña <span>*</span>
+                        Contraseña
                     </label>
+
                     <div class="input-box">
 
-                    <i class="fa-solid fa-lock"></i>
+                        <i class="fa-solid fa-lock"></i>
 
-                    <input
-                        type="password"
-                        id="password"
-                        placeholder="Ingresa tu contraseña"
-                        required>
+                        <input type="password" id="password" placeholder="Ingresa tu contraseña" required>
 
-                    <button type="button" id="showPassword">
-                        <i class="fa-regular fa-eye"></i>
-                    </button>
+                        <button type="button" id="showPassword">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
 
-                </div>
+                    </div>
 
                     <div id="attempts">
                         Intentos restantes: 3
@@ -113,17 +80,18 @@
 
                 <div class="register">
                     ¿No tienes una cuenta?
-                    <a href="Registro.html">Crear cuenta</a>
+                    <a href="signup.html">Crear cuenta</a>
                 </div>
+
             </div>
 
         </div>
-    </section>
-</main>
 
-<!-- SweetAlert2 JS -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<!-- JS Externo de Login -->
-<script type="module" src="../../Vanilla/formulario/login.js"></script>
+    </div>
+
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../../Vanilla/formulario/Login.js" defer></script>
 </body>
+
 </html>

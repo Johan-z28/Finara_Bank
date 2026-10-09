@@ -1,63 +1,62 @@
-window.togglePassword = function(inputId, button) {
-    const input = document.getElementById(inputId);
-    const icon = button.querySelector("i");
-    if (input.type === "password") {
-        input.type = "text";
-        icon.classList.remove("fa-eye");
-        icon.classList.add("fa-eye-slash");
+const form = document.querySelector("form");
+const usuario = document.getElementById("usuario");
+const password = document.getElementById("password");
+const attempts = document.getElementById("attempts");
+const showPassword = document.getElementById("showPassword");
+
+let intentos = 0;
+
+form.addEventListener("submit", function(event) {
+
+    event.preventDefault();
+
+    const usuarioCorrecto = "maria17";
+    const contraseña = "12345";
+
+if (usuario.value === usuarioCorrecto && password.value === contraseña) {
+
+        alert("Inicio de sesión exitoso");
+
+        window.location.href = "../../pages/Dashboard.html";
+
     } else {
-        input.type = "password";
-        icon.classList.remove("fa-eye-slash");
-        icon.classList.add("fa-eye");
+
+        intentos++;
+
+        if (intentos < 3) {
+
+            attempts.textContent =
+                "Intentos restantes: " + (3 - intentos);
+
+            alert("Usuario o contraseña incorrectos");
+
+        } else {
+
+            attempts.textContent = "Cuenta bloqueada";
+
+            alert("Has superado los 3 intentos. La cuenta está bloqueada.");
+
+            usuario.disabled = true;
+            password.disabled = true;
+        }
     }
-};
+});
 
-document.addEventListener("DOMContentLoaded", () => {
-    const loginForm = document.getElementById("loginForm");
 
-    if (loginForm) {
-        loginForm.addEventListener("submit", function(event) {
-            event.preventDefault();
+showPassword.addEventListener("click", function() {
 
-            const inputCorreo = document.getElementById("correo").value.trim();
-            const password = document.getElementById("password").value;
+    if (password.type === "password") {
 
-            // Obtener usuarios almacenados localmente
-            const usuariosLocales = JSON.parse(localStorage.getItem("finara_usuarios_local")) || [];
+        password.type = "text";
 
-            // Buscar coincidencia por correo o nombre de usuario
-            const usuarioEncontrado = usuariosLocales.find(u =>
-                (u.correo.toLowerCase() === inputCorreo.toLowerCase() || u.username.toLowerCase() === inputCorreo.toLowerCase()) &&
-                u.password === password
-            );
+        showPassword.innerHTML =
+            '<i class="fa-regular fa-eye-slash"></i>';
 
-            if (usuarioEncontrado) {
-                // Guardar la sesión activa actual
-                localStorage.setItem("userProfile", JSON.stringify(usuarioEncontrado));
+    } else {
 
-                Swal.fire({
-                    icon: 'success',
-                    title: '¡Bienvenido de nuevo!',
-                    text: 'Accediendo a tu panel de control...',
-                    background: '#12151c',
-                    color: '#ffffff',
-                    confirmButtonColor: '#e5a93c',
-                    timer: 1500,
-                    showConfirmButton: false
-                }).then(() => {
-                    // Redirección un nivel arriba hacia Pages/Dashboard.html
-                    window.location.href = "../Dashboard.html";
-                });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Credenciales incorrectas',
-                    text: 'El correo/usuario o la contraseña son inválidos. Por favor, verifica tus datos.',
-                    background: '#12151c',
-                    color: '#ffffff',
-                    confirmButtonColor: '#e5a93c'
-                });
-            }
-        });
+        password.type = "password";
+
+        showPassword.innerHTML =
+            '<i class="fa-regular fa-eye"></i>';
     }
 });
