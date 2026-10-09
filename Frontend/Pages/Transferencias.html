@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finara Bank - Transferencias</title>
+    <title>Transferencias | Finara Bank</title>
     <link rel="icon" type="image/png" sizes="32x32" href="../Style/image/favicon.svg">
     <link rel="stylesheet" href="../Style/Transferencias.css">
 </head>
@@ -13,56 +13,64 @@
 
     <!-- ======= SIDEBAR DE NAVEGACIÓN ======= -->
     <aside class="sidebar">
+        <!-- BOTÓN CÍRCULO FLOTANTE EN EL BORDE DERECHO (ESCRITORIO) -->
+        <button class="sidebar-edge-toggle" id="sidebarCollapseBtn" aria-label="Colapsar menú" title="Alternar menú">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
         <div class="sidebar-header">
+            <!-- Logo completo en modo expandido -->
             <img src="../Style/image/Logo_finara.svg" alt="Finara Logo" class="sidebar-logo">
+            <!-- Isotipo favicon.svg al colapsar a 70px -->
+            <img src="../Style/image/favicon.svg" alt="Finara Icon" class="sidebar-logo-small">
         </div>
 
         <nav class="sidebar-nav">
             <ul>
                 <li class="nav-item">
-                    <a href="Dashboard.html" class="nav-link">
+                    <a href="Dashboard.html" class="nav-link" data-route="dashboard" title="Dashboard">
                         <i class="fa-solid fa-house"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="Transferencias.html" class="nav-link active">
-                        <i class="fa-solid fa-arrows-rotate"></i>
-                        <span>Transferencias</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="Movimientos.html" class="nav-link">
-                        <i class="fa-solid fa-list-ul"></i>
-                        <span>Movimientos</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="Retiros.html" class="nav-link">
-                        <i class="fa-solid fa-money-bill-transfer"></i>
-                        <span>Retiros</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="Saldos.html" class="nav-link">
+                    <a href="Saldos.html" class="nav-link" data-route="saldos" title="Saldos">
                         <i class="fa-regular fa-credit-card"></i>
                         <span>Saldos</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="Creditos.html" class="nav-link">
+                    <a href="Transferencias.html" class="nav-link active" data-route="transferencias" title="Transferencias">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <span>Transferencias</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Consignar.html" class="nav-link" data-route="consignar" title="Consignar">
+                        <i class="fa-solid fa-wallet"></i>
+                        <span>Consignar</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Retiros.html" class="nav-link" data-route="retiros" title="Retiros">
+                        <i class="fa-solid fa-money-bill-transfer"></i>
+                        <span>Retiros</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Movimientos.html" class="nav-link" data-route="movimientos" title="Movimientos">
+                        <i class="fa-solid fa-list-ul"></i>
+                        <span>Movimientos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Creditos.html" class="nav-link" data-route="creditos" title="Solicitud de Créditos">
                         <i class="fa-solid fa-hand-holding-dollar"></i>
                         <span>Solicitud de Créditos</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="ChatBot.html" class="nav-link">
-                        <i class="fa-regular fa-comment-dots"></i>
-                        <span>ChatBot</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="Beneficios.html" class="nav-link">
+                    <a href="Beneficios.html" class="nav-link" data-route="beneficios" title="Beneficios">
                         <i class="fa-regular fa-star"></i>
                         <span>Beneficios</span>
                     </a>
@@ -71,23 +79,34 @@
         </nav>
     </aside>
 
-    <!-- ======= CONTENEDOR PRINCIPAL DERECHA ======= -->
+    <!-- ======= PRINCIPAL ======= -->
     <div class="main-wrapper">
+
+        <!-- ======= NAVBAR SUPERIOR ======= -->
         <header class="dashboard-navbar">
-            <div style="display: flex; align-items: center;">
-                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menú">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <!-- BOTÓN DE MENÚ PARA MÓVILES (VISIBLE SOLO <= 992px) -->
+                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menú navegación">
                     <i class="fa-solid fa-bars"></i>
                 </button>
+
                 <div class="user-greeting">
                     <h2>Hola, <span id="greetingName">Usuario</span></h2>
                 </div>
             </div>
 
             <div class="navbar-actions">
+                <!-- BOTÓN CHATBOT EN NAVBAR -->
+                <button class="navbar-chatbot-btn" id="openChatbotNavBtn">
+                    <i class="fa-solid fa-comment-dots"></i>
+                    <span>Asesoría Financiera</span>
+                </button>
+
                 <button class="icon-btn" aria-label="Notificaciones">
                     <i class="fa-regular fa-bell"></i>
                 </button>
 
+                <!-- Menú Perfil desplegable -->
                 <div class="profile-menu-container">
                     <button class="profile-btn" id="profileMenuBtn">
                         <div class="avatar-placeholder" id="avatarContainer">
@@ -102,7 +121,7 @@
                             <strong id="dropdownUserName">Usuario</strong>
                         </div>
                         <hr>
-                        <a href="Perfil.html" class="dropdown-item">
+                        <a href="Perfil.html" class="dropdown-item" data-route="perfil">
                             <i class="fa-regular fa-user"></i> Ver Perfil
                         </a>
                         <a href="../index.html" class="dropdown-item logout-item">
@@ -114,12 +133,116 @@
         </header>
 
         <main class="main-content">
-            <h1>Transferencias</h1>
-            <!-- Aquí irá el módulo de transferencias -->
+            <div class="tr-header">
+                <h1>Transferencias</h1>
+                <p class="tr-subtitle">Envía dinero a cuentas Finara de forma rápida y segura.</p>
+            </div>
+
+            <!-- Indicador de pasos -->
+            <ol class="tr-pasos" aria-label="Progreso de la transferencia">
+                <li class="tr-paso activo" data-paso="1" aria-current="step"><span>1</span> Datos</li>
+                <li class="tr-paso" data-paso="2"><span>2</span> Confirmar</li>
+                <li class="tr-paso" data-paso="3"><span>3</span> Listo</li>
+            </ol>
+
+            <div class="tr-estado hidden" id="trEstado" role="status"></div>
+
+            <div class="tr-layout">
+                <!-- PASO 1: formulario -->
+                <section class="tr-card" id="vistaForm">
+                    <h2>Datos de la transferencia</h2>
+                    <form id="formTransferencia" novalidate>
+                        <div class="tr-campo">
+                            <label for="trOrigen">Cuenta de origen</label>
+                            <select id="trOrigen"></select>
+                            <p class="tr-hint" id="trOrigenHint"></p>
+                            <p class="tr-error" id="errOrigen" role="alert"></p>
+                        </div>
+
+                        <div class="tr-fila-campos">
+                            <div class="tr-campo">
+                                <label for="trTipoDestino">Tipo de cuenta destino</label>
+                                <select id="trTipoDestino">
+                                    <option value="AHORROS">Cuenta de Ahorros</option>
+                                    <option value="CORRIENTE">Cuenta Corriente</option>
+                                </select>
+                            </div>
+                            <div class="tr-campo">
+                                <label for="trNumeroDestino">Número de cuenta destino</label>
+                                <input id="trNumeroDestino" type="text" inputmode="numeric" autocomplete="off"
+                                    maxlength="16" placeholder="Ej: 4021599900111">
+                            </div>
+                        </div>
+                        <div class="tr-destino hidden" id="trDestino" role="status" aria-live="polite"></div>
+                        <p class="tr-error" id="errDestino" role="alert"></p>
+
+                        <div class="tr-campo" style="margin-top: 1.1rem;">
+                            <label for="trMonto">Monto</label>
+                            <div class="tr-monto">
+                                <span>$</span>
+                                <input id="trMonto" type="text" inputmode="numeric" autocomplete="off" placeholder="0">
+                            </div>
+                            <p class="tr-error" id="errMonto" role="alert"></p>
+                        </div>
+
+                        <div class="tr-campo">
+                            <label for="trConcepto">Concepto (opcional)</label>
+                            <input id="trConcepto" type="text" maxlength="60" placeholder="Ej: Pago de arriendo">
+                        </div>
+
+                        <div class="tr-acciones">
+                            <button type="submit" class="tr-btn tr-btn--primary">
+                                Continuar <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- PASO 2: resumen y confirmación -->
+                <section class="tr-card hidden" id="vistaResumen">
+                    <h2>Revisa y confirma</h2>
+                    <dl class="tr-lista" id="resumenLista"></dl>
+                    <p class="tr-aviso hidden" id="resumenAlerta" role="alert"></p>
+                    <p class="tr-alerta-error hidden" id="resumenError" role="alert"></p>
+                    <div class="tr-acciones">
+                        <button type="button" class="tr-btn tr-btn--ghost" id="btnEditar">
+                            <i class="fa-solid fa-arrow-left"></i> Editar
+                        </button>
+                        <button type="button" class="tr-btn tr-btn--primary" id="btnConfirmar">Confirmar transferencia</button>
+                    </div>
+                </section>
+
+                <!-- PASO 3: comprobante -->
+                <section class="tr-card hidden" id="vistaExito">
+                    <div class="tr-exito-icono"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
+                    <h2 class="tr-exito-titulo">¡Transferencia exitosa!</h2>
+                    <p class="tr-exito-sub">Guardamos el movimiento y te enviamos una notificación.</p>
+                    <dl class="tr-lista" id="exitoLista"></dl>
+                    <div class="tr-acciones">
+                        <a href="Movimientos.html" class="tr-btn tr-btn--ghost">Ver movimientos</a>
+                        <button type="button" class="tr-btn tr-btn--primary" id="btnNueva">Nueva transferencia</button>
+                    </div>
+                </section>
+
+                <!-- Panel informativo (como en el diseño) -->
+                <aside class="tr-info" aria-label="Información">
+                    <h3>Transfiere sin complicaciones</h3>
+                    <ul>
+                        <li><i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                            <div><strong>Seguro</strong><span>Revisas el resumen antes de enviar.</span></div></li>
+                        <li><i class="fa-solid fa-bolt" aria-hidden="true"></i>
+                            <div><strong>Rápido</strong><span>En minutos, sin filas.</span></div></li>
+                        <li><i class="fa-solid fa-tags" aria-hidden="true"></i>
+                            <div><strong>Sin costos</strong><span>Entre cuentas Finara.</span></div></li>
+                    </ul>
+                </aside>
+            </div>
+
+            <div class="tr-toast" id="trToast" role="status" aria-live="polite"></div>
         </main>
     </div>
 
-    <!-- Solo necesitas una línea de script -->
+    <!-- Módulo JS principal -->
     <script type="module" src="../Vanilla/Transferencias.js"></script>
 </body>
 
