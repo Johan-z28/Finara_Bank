@@ -147,7 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 saldoDisponible: "$ 0",
                 ultimaActividad: "Recién registrado",
                 avatar: "../../Style/image/avatar-maria.png",
-                verificado: false,
+                verificado: true,
             };
 
             usuariosLocales.push(userData);
