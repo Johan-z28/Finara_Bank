@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitud de Tarjeta | Finara Bank</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="../Style/image/favicon.svg">
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Estilos globales y específicos -->
+    <link rel="stylesheet" href="../Style/global/styles.css">
+    <link rel="stylesheet" href="../Style/Dashboard.css">
+    <link rel="stylesheet" href="../Style/solicitudTarjeta.css">
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="general-body">
+
+<!-- ======= SIDEBAR DE NAVEGACIÓN ======= -->
+<aside class="sidebar">
+    <button class="sidebar-edge-toggle" id="sidebarCollapseBtn" aria-label="Colapsar menú" title="Alternar menú">
+        <i class="fa-solid fa-chevron-left"></i>
+    </button>
+    <div class="sidebar-header">
+        <img src="../Style/image/Logo_finara.svg" alt="Finara Logo" class="sidebar-logo">
+        <img src="../Style/image/favicon.svg" alt="Finara Icon" class="sidebar-logo-small">
+    </div>
+    <nav class="sidebar-nav">
+        <ul>
+            <li class="nav-item">
+                <a href="Dashboard.html" class="nav-link" data-route="dashboard" title="Dashboard">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="solicitudTarjeta.html" class="nav-link active" data-route="saldos" title="Solicitar Tarjeta">
+                    <i class="fa-regular fa-credit-card"></i>
+                    <span>Solcitar Tarjeta</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="Saldos.html" class="nav-link" data-route="saldos" title="Saldos">
+                    <i class="fa-regular fa-credit-card"></i>
+                    <span>Saldos</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="Transferencias.html" class="nav-link" data-route="transferencias" title="Transferencias">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                    <span>Transferencias</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="Consignar.html" class="nav-link" data-route="consignar" title="Consignar">
+                    <i class="fa-solid fa-wallet"></i>
+                    <span>Consignar</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="Retiros.html" class="nav-link" data-route="retiros" title="Retiros">
+                    <i class="fa-solid fa-money-bill-transfer"></i>
+                    <span>Retiros</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="Movimientos.html" class="nav-link" data-route="movimientos" title="Movimientos">
+                    <i class="fa-solid fa-list-ul"></i>
+                    <span>Movimientos</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="Creditos.html" class="nav-link" data-route="creditos" title="Solicitud de Créditos">
+                    <i class="fa-solid fa-hand-holding-dollar"></i>
+                    <span>Solicitud de Créditos</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="Beneficios.html" class="nav-link" data-route="beneficios" title="Beneficios">
+                    <i class="fa-regular fa-star"></i>
+                    <span>Beneficios</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</aside>
+
+<!-- ======= PRINCIPAL ======= -->
+<div class="main-wrapper">
+    <!-- ======= NAVBAR SUPERIOR ======= -->
+    <header class="dashboard-navbar">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menú navegación">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <div class="user-greeting">
+                <h2>Hola, <span id="greetingName">Usuario</span></h2>
+            </div>
+        </div>
+        <div class="navbar-actions">
+            <button class="navbar-chatbot-btn" id="openChatbotNavBtn">
+                <i class="fa-solid fa-comment-dots"></i>
+                <span>Asesoría Financiera</span>
+            </button>
+            <button class="icon-btn" aria-label="Notificaciones">
+                <i class="fa-regular fa-bell"></i>
+            </button>
+            <div class="profile-menu-container">
+                <button class="profile-btn" id="profileMenuBtn">
+                    <div class="avatar-placeholder" id="avatarContainer">
+                        <img src="" alt="Foto de perfil" id="userAvatarImg" class="profile-img hidden">
+                        <i class="fa-solid fa-user profile-icon" id="userAvatarIcon"></i>
+                    </div>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="dropdown-header">
+                        <strong id="dropdownUserName">Usuario</strong>
+                    </div>
+                    <hr>
+                    <a href="Perfil.html" class="dropdown-item" data-route="perfil">
+                        <i class="fa-regular fa-user"></i> Ver Perfil
+                    </a>
+                    <a href="../index.html" class="dropdown-item logout-item">
+                        <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENIDO: 3 TARJETAS EN GRID -->
+    <main class="card-request-container">
+        <div class="request-header">
+            <h1>Catálogo de Tarjetas</h1>
+            <p>Selecciona el tipo de producto que deseas solicitar. Recuerda que tu cuenta debe estar verificada.</p>
+        </div>
+
+        <div class="catalog-grid">
+            <!-- Tarjeta 1: Débito -->
+            <div class="card-option-box" data-card="debito">
+                <div class="card-content-top">
+                    <span class="card-type-tag">Débito</span>
+                    <h3>Tarjeta Débito Finara</h3>
+                    <p>Ideal para el manejo diario de tu dinero con acceso directo a tu cuenta de ahorros.</p>
+                    <ul class="card-benefits">
+                        <li><i class="fa-solid fa-check"></i> Cero cuota de manejo</li>
+                        <li><i class="fa-solid fa-check"></i> Retiros gratis en red propia</li>
+                        <li><i class="fa-solid fa-check"></i> Compras seguras en línea</li>
+                    </ul>
+                </div>
+                <button class="request-card-btn" data-action="solicitar-debito">Solicitar Débito</button>
+            </div>
+
+            <!-- Tarjeta 2: Crédito -->
+            <div class="card-option-box" data-card="credito">
+                <div class="card-content-top">
+                    <span class="card-type-tag">Crédito</span>
+                    <h3>Tarjeta de Crédito Gold</h3>
+                    <p>Financia tus proyectos y compras con líneas de crédito flexibles y acumulación de puntos.</p>
+                    <ul class="card-benefits">
+                        <li><i class="fa-solid fa-check"></i> Cupo preaprobado dinámico</li>
+                        <li><i class="fa-solid fa-check"></i> Asistencia en viajes internacional</li>
+                        <li><i class="fa-solid fa-check"></i> 2% de cashback en compras</li>
+                    </ul>
+                </div>
+                <button class="request-card-btn" data-action="solicitar-credito">Solicitar Crédito</button>
+            </div>
+
+            <!-- Tarjeta 3: Cuenta Corriente -->
+            <div class="card-option-box" data-card="corriente">
+                <div class="card-content-top">
+                    <span class="card-type-tag">Corriente</span>
+                    <h3>Tarjeta Cuenta Corriente</h3>
+                    <p>Diseñada para profesionales y comerciantes con respaldo de sobregiro y chequera digital.</p>
+                    <ul class="card-benefits">
+                        <li><i class="fa-solid fa-check"></i> Cupo de sobregiro autorizado</li>
+                        <li><i class="fa-solid fa-check"></i> Transferencias ilimitadas</li>
+                        <li><i class="fa-solid fa-check"></i> Extractos detallados</li>
+                    </ul>
+                </div>
+                <button class="request-card-btn" data-action="solicitar-corriente">Solicitar Corriente</button>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Módulo JS principal -->
+<script type="module" src="../Vanilla/newCard.js"></script>
+</body>
+</html>
