@@ -132,8 +132,85 @@
             </div>
         </header>
 
-        <!-- CONTENIDO PRINCIPAL -->
-        
+        <main class="main-content">
+            <div class="mov-header">
+                <h1>Historial de Movimientos</h1>
+                <p class="mov-subtitle">Consulta y controla todos los movimientos de tus cuentas.</p>
+            </div>
+
+            <!-- Filtros -->
+            <section class="mov-filtros" aria-label="Filtros de movimientos">
+                <div class="mov-campo">
+                    <label for="filtroCuenta">Cuenta</label>
+                    <select id="filtroCuenta"></select>
+                </div>
+                <div class="mov-campo">
+                    <label for="filtroPeriodo">Periodo</label>
+                    <select id="filtroPeriodo"></select>
+                </div>
+                <div class="mov-campo">
+                    <label for="filtroOrden">Orden</label>
+                    <select id="filtroOrden">
+                        <option value="desc">Más recientes primero</option>
+                        <option value="asc">Más antiguos primero</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- Totales del periodo -->
+            <section class="mov-resumen" aria-label="Resumen del periodo">
+                <article class="mov-total mov-total--ingreso">
+                    <div class="mov-total__head">
+                        <div class="mov-total__icon"><i class="fa-solid fa-arrow-down" aria-hidden="true"></i></div>
+                        <h3 class="mov-total__titulo">Total ingresos</h3>
+                    </div>
+                    <div class="mov-total__saldo">
+                        <span class="mov-total__label">En el periodo seleccionado</span>
+                        <strong class="mov-total__valor" id="totIngresos">$ 0</strong>
+                    </div>
+                </article>
+                <article class="mov-total mov-total--egreso">
+                    <div class="mov-total__head">
+                        <div class="mov-total__icon"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></div>
+                        <h3 class="mov-total__titulo">Total egresos</h3>
+                    </div>
+                    <div class="mov-total__saldo">
+                        <span class="mov-total__label">En el periodo seleccionado</span>
+                        <strong class="mov-total__valor" id="totEgresos">$ 0</strong>
+                    </div>
+                </article>
+            </section>
+
+            <!-- Tabla -->
+            <div class="mov-tabla-wrap" id="movTablaWrap" aria-live="polite" aria-busy="true">
+                <table class="mov-tabla">
+                    <thead>
+                        <tr>
+                            <th scope="col">Fecha</th>
+                            <th scope="col">Descripción</th>
+                            <th scope="col">Tipo</th>
+                            <th scope="col">Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody id="movCuerpo"></tbody>
+                </table>
+            </div>
+            <div class="mov-estado hidden" id="movEstado" role="status"></div>
+
+            <!-- Paginación -->
+            <nav class="mov-paginacion" aria-label="Paginación de movimientos">
+                <span id="pagResumen"></span>
+                <div class="mov-pag-botones">
+                    <button class="mov-pag-btn" id="pagPrev" disabled>
+                        <i class="fa-solid fa-chevron-left"></i> Anterior
+                    </button>
+                    <span id="pagInfo"></span>
+                    <button class="mov-pag-btn" id="pagNext" disabled>
+                        Siguiente <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+            </nav>
+        </main>
     </div>
 
     <!-- Módulo JS principal -->

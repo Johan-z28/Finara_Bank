@@ -1,0 +1,147 @@
+/* ======= VISTA DE SOLICITUD DE TARJETA - FINARA BANK ======= */
+
+.card-request-container {
+    padding: 2.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    color: var(--text-white);
+    font-family: var(--font-main);
+}
+
+.request-header {
+    margin-bottom: 2.5rem;
+    text-align: left;
+}
+
+.request-header h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--text-white);
+    margin-bottom: 0.5rem;
+}
+
+.request-header p {
+    color: var(--text-muted);
+    font-size: 1rem;
+}
+
+/* ======= GRID DE 3 TARJETAS EN UNA SOLA FILA ======= */
+.catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    width: 100%;
+}
+.profile-dropdown {
+    display: none; /* Oculto por defecto */
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 0.5rem;
+    /* Añade aquí tus estilos de fondo, bordes, sombras y z-index */
+}
+@media (max-width: 1024px) {
+    .catalog-grid {
+        grid-template-columns: 1fr; /* Se apilan en pantallas pequeñas */
+    }
+}
+
+.card-option-box {
+    background-color: var(--bg-card-dark);
+    border: 1px solid var(--border-dark);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem 2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-option-box:hover {
+    border-color: var(--gold-main);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px -5px rgba(229, 163, 60, 0.15);
+}
+
+.card-option-box.selected {
+    border-color: var(--gold-main);
+    background: linear-gradient(145deg, var(--bg-card-dark), #181d24);
+}
+
+.card-content-top {
+    margin-bottom: 1.5rem;
+}
+
+.card-type-tag {
+    display: inline-block;
+    padding: 0.35rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    border-radius: 20px;
+    background-color: rgba(229, 163, 60, 0.1);
+    color: var(--gold-main);
+    margin-bottom: 1.25rem;
+    letter-spacing: 0.5px;
+}
+
+.card-option-box h3 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--text-white);
+}
+
+.card-option-box p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.card-benefits {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2rem 0;
+    font-size: 0.9rem;
+    color: var(--text-white);
+    border-top: 1px solid var(--border-dark);
+    padding-top: 1.5rem;
+}
+
+.card-benefits li {
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-muted);
+}
+
+.card-benefits li i {
+    color: var(--gold-main);
+}
+
+.request-card-btn {
+    background-color: var(--gold-main);
+    color: var(--bg-dark);
+    border: none;
+    border-radius: var(--radius-btn);
+    padding: 0.85rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    width: 100%;
+    text-align: center;
+}
+
+.request-card-btn:hover {
+    background-color: var(--gold-hover);
+}
+
+.request-card-btn:active {
+    transform: scale(0.98);
+}

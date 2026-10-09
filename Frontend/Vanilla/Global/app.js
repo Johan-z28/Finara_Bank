@@ -1,5 +1,3 @@
-// Vanilla/app.js
-
 let isGlobalListenersInitialized = false;
 
 export function initGlobalComponents() {

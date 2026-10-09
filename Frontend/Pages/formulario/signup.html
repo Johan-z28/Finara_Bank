@@ -5,23 +5,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrarse | Finara Bank</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="Style/image/favicon.svg">
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="../../Style/signup.css">
 </head>
 
 <body>
     <!-- CONTENEDOR PRINCIPAL -->
     <main class="register-container">
-        <!-- =====================================================
-         CONTENEDOR IZQUIERDO - IMAGEN
-    ====================================================== -->
+
+<!-- =====================================================
+     CONTENEDOR IZQUIERDO - IMAGEN
+====================================================== -->
+
         <section class="register-image">
-            <img src="../../Style/image/formulario.png" alt="Finara Bank">
+            <img src="../../Style/image/signUp.png" alt="Finara Bank">
         </section>
-        <!-- =====================================================
-         CONTENEDOR DERECHO - FORMULARIO
-    ====================================================== -->
+
+<!-- =====================================================
+     CONTENEDOR DERECHO - FORMULARIO
+====================================================== -->
         <section class="register-form-container">
             <div class="register-form">
+                <!-- ANCLA DE RETORNO AL INDEX -->
+                <div class="form-back-wrapper">
+                    <a href="../../index.html" class="back-home-link">
+                        <i class="fa-solid fa-arrow-left"></i> Volver al inicio
+                    </a>
+                </div>
+
                 <!-- Encabezado -->
                 <div class="form-header">
                     <div class="form-icon">
@@ -58,15 +71,23 @@
                             </div>
                         </div>
                     </div>
-                    <!-- FILA 2 -->
+
+                    <!-- FILA 2: TIPO Y NÚMERO DE DOCUMENTO -->
                     <div class="form-row">
                         <div class="input-group">
-                            <label for="documento">
-                                Número de documento <span>*</span>
+                            <label for="tipoDocumento">
+                                Tipo y N° de documento <span>*</span>
                             </label>
-                            <div class="input-box">
-                                <i class="fa-regular fa-id-card"></i>
-                                <input type="text" id="documento" name="documento" placeholder="Ej. 123456789" required>
+                            <div class="input-box-grouped">
+                                <select id="tipoDocumento" name="tipoDocumento" class="select-document">
+                                    <option value="cedula">Cédula</option>
+                                    <option value="tarjeta">T. Identidad</option>
+                                    <option value="pasaporte">Pasaporte</option>
+                                </select>
+                                <div class="input-box" style="flex: 1; height: 100%;">
+                                    <input type="text" id="documento" name="documento" placeholder="Ej. 123456789"
+                                        required>
+                                </div>
                             </div>
                         </div>
                         <div class="input-group">
@@ -79,16 +100,29 @@
                             </div>
                         </div>
                     </div>
-                    <!-- FECHA -->
-                    <div class="input-group full-width">
-                        <label for="fecha">
-                            Fecha de nacimiento <span>*</span>
-                        </label>
-                        <div class="input-box">
-                            <i class="fa-regular fa-calendar"></i>
-                            <input type="date" id="fecha" name="fecha" required>
+
+                    <!-- FILA 3: USERNAME Y FECHA DE NACIMIENTO -->
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="username">
+                                Nombre de usuario <span>*</span>
+                            </label>
+                            <div class="input-box">
+                                <i class="fa-solid fa-at"></i>
+                                <input type="text" id="username" name="username" placeholder="Ej. mgomez2026" required>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="fecha">
+                                Fecha de nacimiento <span>*</span>
+                            </label>
+                            <div class="input-box">
+                                <i class="fa-regular fa-calendar"></i>
+                                <input type="date" id="fecha" name="fecha" required>
+                            </div>
                         </div>
                     </div>
+
                     <!-- CONTRASEÑAS -->
                     <div class="form-row">
                         <div class="input-group">
@@ -119,36 +153,28 @@
                             </div>
                         </div>
                     </div>
-                    <!-- DIRECCIÓN -->
-                    <div class="input-group full-width">
-                        <label for="direccion">
-                            Dirección <span>*</span>
-                        </label>
-                        <div class="input-box">
-                            <i class="fa-solid fa-location-dot"></i>
-                            <input type="text" id="direccion" name="direccion"
-                                placeholder="Ingresa tu dirección completa" required>
-                        </div>
-                    </div>
-                    <!-- TÉRMINOS -->
+
+                    <!-- TÉRMINOS Y CONDICIONES -->
                     <div class="terms">
                         <label class="checkbox-container">
                             <input type="checkbox" id="terminos" required>
                             <span class="checkmark"></span>
                             <span class="terms-text">
                                 Acepto los
-                                <a href="#">términos y condiciones</a>
+                                <a href="#" id="btnTerminos">términos y condiciones</a>
                                 y la
-                                <a href="#">política de privacidad</a>.
+                                <a href="#" id="btnPrivacidad">política de privacidad</a>.
                             </span>
                         </label>
                     </div>
+
                     <!-- BOTÓN -->
                     <button type="submit" class="register-button">
                         <i class="fa-solid fa-user-plus"></i>
                         <span>Registrarse</span>
                         <i class="fa-solid fa-arrow-right"></i>
                     </button>
+
                     <!-- LOGIN -->
                     <div class="login-link">
                         <span></span>
@@ -166,6 +192,8 @@
         </section>
     </main>
 
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- JS Externo -->
     <script type="module" src="../../Vanilla/formulario/signup.js"></script>
 </body>

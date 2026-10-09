@@ -6,109 +6,87 @@
 
 body {
     font-family: 'Poppins', sans-serif;
-    color: white;
     background: #05080d;
+    color: white;
 }
-
-/*   CONTENEDOR PRINCIPAL  */
 
 .login-container {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
+    display: flex;
 }
 
-/* BANNER */
-
 .banner {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+    width: 41%;
 }
 
 .banner img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center;
-    transform: translateX(-22%);
-    
 }
-
-/* SECCIÓN LOGIN */
 
 .login {
-    position: relative;
-    width: 100%;
-    height: 100vh;
+    width: 59%;
+    min-height: 100vh;
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     align-items: center;
-    padding: 40px 6%;
+    padding: 30px;
 }
 
-/* LOGO */
-
-.logo {
-    width: 240px;
-    display: block;
-    margin: 0 auto 25px;
-}
-
-/* TÍTULO */
-
-.login h1 {
-    text-align: center;
-    font-size: 20px;
-    margin-bottom: 8px;
-}
-
-/* Texto debajo del título */
-
-.login-box > p {
-    text-align: center;
-    color: #8a8f99;
-    font-size: 13px;
-    margin-bottom: 30px;
-}
-
-/* FORMULARIO */
-
-form {
-    width: 100%;
-}
-
-/* Etiquetas */
-
-form label {
-    display: block;
-    font-size: 13px;
-    margin-bottom: 7px;
-}
-
-/* CAMPOS DE TEXTO */
-
-.input-box {
-    height: 50px;
-    display: flex;
-    align-items: center;
+.login-box {
+    width: 460px;
+    padding: 30px;
     background: #12151c;
     border: 1px solid #1f2430;
-    border-radius: 8px;
-    margin-bottom: 20px;
+    border-radius: 16px;
 }
 
-/* Iconos */
+.back {
+    color: #8a8f99;
+    font-size: 10px;
+    text-decoration: none;
+}
+
+.logo {
+    width: 130px;
+    display: block;
+    margin: 20px auto;
+}
+
+h1 {
+    text-align: center;
+    font-size: 22px;
+}
+
+.description,
+.register {
+    text-align: center;
+    color: #8a8f99;
+    font-size: 11px;
+    margin: 8px 0 25px;
+}
+
+label {
+    display: block;
+    font-size: 11px;
+    margin-bottom: 6px;
+}
+
+.input-box {
+    display: flex;
+    align-items: center;
+    height: 46px;
+    background: #0f1218;
+    border: 1px solid #303640;
+    border-radius: 7px;
+    margin-bottom: 15px;
+}
 
 .input-box i {
     color: #e5a93c;
-    margin: 0 10px 0 15px;
+    margin: 0 12px;
 }
-
-/* Inputs */
 
 .input-box input {
     width: 100%;
@@ -117,79 +95,66 @@ form label {
     outline: 0;
     background: transparent;
     color: white;
-    font-family: 'Poppins', sans-serif;
 }
-
-/* Texto del placeholder */
 
 .input-box input::placeholder {
     color: #8a8f99;
 }
 
-/* Efecto al seleccionar */
-
-.input-box:focus-within {
-    border-color: #e5a93c;
+#showPassword {
+    border: 0;
+    background: none;
+    color: #8a8f99;
+    cursor: pointer;
 }
 
-/* OLVIDASTE CONTRASEÑA */
+#attempts {
+    color: #8a8f99;
+    font-size: 10px;
+    margin-bottom: 10px;
+}
 
 .forgot {
     display: block;
     text-align: right;
     color: #e5a93c;
-    font-size: 12px;
-    text-decoration: none;
-    margin-bottom: 25px;
+    font-size: 10px;
+    margin-bottom: 18px;
 }
 
-/* BOTÓN */
-
-button {
+.login-button {
     width: 100%;
-    height: 50px;
+    height: 46px;
     border: 0;
-    border-radius: 25px;
+    border-radius: 24px;
     background: #e5a93c;
-    color: #111;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
+    font-weight: bold;
     cursor: pointer;
 }
 
-/* Hover del botón */
-
-button:hover {
+.login-button:hover {
     background: #d4982b;
-}
-
-/* Icono del botón */
-
-button i {
-    margin-left: 8px;
-}
-
-/* CREAR CUENTA */
-
-.register {
-    text-align: center;
-    color: #8a8f99;
-    font-size: 12px;
-    margin-top: 25px;
 }
 
 .register a {
     color: #e5a93c;
-    text-decoration: none;
 }
 
-/* CUADRO DEL LOGIN */
+@media (max-width: 700px) {
+    .login-container {
+        display: block;
+    }
 
-.login-box {
-    width: 460px;
-    max-width: 100%;
-    background: #12151c;
-    border: 1px solid #1f2430;
-    border-radius: 16px;
-    padding: 40px;
+    .banner,
+    .login {
+        width: 100%;
+    }
+
+    .banner {
+        height: 220px;
+    }
+
+    .login {
+        min-height: auto;
+    }
 }

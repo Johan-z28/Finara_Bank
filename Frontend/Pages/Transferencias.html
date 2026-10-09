@@ -132,8 +132,114 @@
             </div>
         </header>
 
-        <!-- CONTENIDO PRINCIPAL -->
-        
+        <main class="main-content">
+            <div class="tr-header">
+                <h1>Transferencias</h1>
+                <p class="tr-subtitle">Envía dinero a cuentas Finara de forma rápida y segura.</p>
+            </div>
+
+            <!-- Indicador de pasos -->
+            <ol class="tr-pasos" aria-label="Progreso de la transferencia">
+                <li class="tr-paso activo" data-paso="1" aria-current="step"><span>1</span> Datos</li>
+                <li class="tr-paso" data-paso="2"><span>2</span> Confirmar</li>
+                <li class="tr-paso" data-paso="3"><span>3</span> Listo</li>
+            </ol>
+
+            <div class="tr-estado hidden" id="trEstado" role="status"></div>
+
+            <div class="tr-layout">
+                <!-- PASO 1: formulario -->
+                <section class="tr-card" id="vistaForm">
+                    <h2>Datos de la transferencia</h2>
+                    <form id="formTransferencia" novalidate>
+                        <div class="tr-campo">
+                            <label for="trOrigen">Cuenta de origen</label>
+                            <select id="trOrigen"></select>
+                            <p class="tr-hint" id="trOrigenHint"></p>
+                            <p class="tr-error" id="errOrigen" role="alert"></p>
+                        </div>
+
+                        <div class="tr-fila-campos">
+                            <div class="tr-campo">
+                                <label for="trTipoDestino">Tipo de cuenta destino</label>
+                                <select id="trTipoDestino">
+                                    <option value="AHORROS">Cuenta de Ahorros</option>
+                                    <option value="CORRIENTE">Cuenta Corriente</option>
+                                </select>
+                            </div>
+                            <div class="tr-campo">
+                                <label for="trNumeroDestino">Número de cuenta destino</label>
+                                <input id="trNumeroDestino" type="text" inputmode="numeric" autocomplete="off"
+                                    maxlength="16" placeholder="Ej: 4021599900111">
+                            </div>
+                        </div>
+                        <div class="tr-destino hidden" id="trDestino" role="status" aria-live="polite"></div>
+                        <p class="tr-error" id="errDestino" role="alert"></p>
+
+                        <div class="tr-campo" style="margin-top: 1.1rem;">
+                            <label for="trMonto">Monto</label>
+                            <div class="tr-monto">
+                                <span>$</span>
+                                <input id="trMonto" type="text" inputmode="numeric" autocomplete="off" placeholder="0">
+                            </div>
+                            <p class="tr-error" id="errMonto" role="alert"></p>
+                        </div>
+
+                        <div class="tr-campo">
+                            <label for="trConcepto">Concepto (opcional)</label>
+                            <input id="trConcepto" type="text" maxlength="60" placeholder="Ej: Pago de arriendo">
+                        </div>
+
+                        <div class="tr-acciones">
+                            <button type="submit" class="tr-btn tr-btn--primary">
+                                Continuar <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- PASO 2: resumen y confirmación -->
+                <section class="tr-card hidden" id="vistaResumen">
+                    <h2>Revisa y confirma</h2>
+                    <dl class="tr-lista" id="resumenLista"></dl>
+                    <p class="tr-aviso hidden" id="resumenAlerta" role="alert"></p>
+                    <p class="tr-alerta-error hidden" id="resumenError" role="alert"></p>
+                    <div class="tr-acciones">
+                        <button type="button" class="tr-btn tr-btn--ghost" id="btnEditar">
+                            <i class="fa-solid fa-arrow-left"></i> Editar
+                        </button>
+                        <button type="button" class="tr-btn tr-btn--primary" id="btnConfirmar">Confirmar transferencia</button>
+                    </div>
+                </section>
+
+                <!-- PASO 3: comprobante -->
+                <section class="tr-card hidden" id="vistaExito">
+                    <div class="tr-exito-icono"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
+                    <h2 class="tr-exito-titulo">¡Transferencia exitosa!</h2>
+                    <p class="tr-exito-sub">Guardamos el movimiento y te enviamos una notificación.</p>
+                    <dl class="tr-lista" id="exitoLista"></dl>
+                    <div class="tr-acciones">
+                        <a href="Movimientos.html" class="tr-btn tr-btn--ghost">Ver movimientos</a>
+                        <button type="button" class="tr-btn tr-btn--primary" id="btnNueva">Nueva transferencia</button>
+                    </div>
+                </section>
+
+                <!-- Panel informativo (como en el diseño) -->
+                <aside class="tr-info" aria-label="Información">
+                    <h3>Transfiere sin complicaciones</h3>
+                    <ul>
+                        <li><i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                            <div><strong>Seguro</strong><span>Revisas el resumen antes de enviar.</span></div></li>
+                        <li><i class="fa-solid fa-bolt" aria-hidden="true"></i>
+                            <div><strong>Rápido</strong><span>En minutos, sin filas.</span></div></li>
+                        <li><i class="fa-solid fa-tags" aria-hidden="true"></i>
+                            <div><strong>Sin costos</strong><span>Entre cuentas Finara.</span></div></li>
+                    </ul>
+                </aside>
+            </div>
+
+            <div class="tr-toast" id="trToast" role="status" aria-live="polite"></div>
+        </main>
     </div>
 
     <!-- Módulo JS principal -->
