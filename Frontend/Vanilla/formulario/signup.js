@@ -154,7 +154,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 productosActivos: 0,
                 saldoDisponible: "$ 0",
                 ultimaActividad: "Recién registrado",
-                avatar: "../Style/image/avatar-maria.png"
+                avatar: "../Style/image/avatar-maria.png",
+                verificado: false // <-- Propiedad añadida para controlar el estado de verificación
             };
 
             // Guardar en el arreglo local y actualizar localStorage
