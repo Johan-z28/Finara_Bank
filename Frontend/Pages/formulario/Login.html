@@ -3,12 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión | Finara Bank</title>
-    <!-- FontAwesome para iconos -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SweetAlert2 CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <link rel="stylesheet" href="../../Style/Login.css">
+    <title>Finara - Iniciar sesión</title>
+    <link rel="stylesheet" href="../Style/Login.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="../Vanilla/Login.js" defer></script>
 </head>
 <body>
 <!-- CONTENEDOR PRINCIPAL -->
@@ -32,67 +36,87 @@
                 </a>
             </div>
 
-            <!-- LOGO Y ENCABEZADO -->
-            <div class="form-header" style="flex-direction: column; align-items: center; text-align: center;">
-                <img src="../../Style/image/Logo_finara.svg" alt="Logo Finara" class="logo" style="width: 200px; margin-bottom: 15px;">
-                <div>
-                    <h1>Bienvenido de nuevo</h1>
-                    <p>Inicia sesión para acceder a tu cuenta bancaria.</p>
-                </div>
-            </div>
+    <div class="login-container">
 
-            <!-- FORMULARIO DE ACCESO -->
-            <form id="loginForm">
-                <!-- CORREO O USERNAME -->
-                <div class="input-group">
-                    <label for="correo">
-                        Correo electrónico o usuario <span>*</span>
+        <div class="banner">
+            <img src="../Style/image/banner.jpg" alt="Finara Bank">
+        </div>
+
+        <div class="login">
+
+            <div class="login-box">
+
+                <a href="../index.html" class="back">
+                 <i class="fa-solid fa-arrow-left"></i>
+                  Volver al inicio
+                </a>
+
+                <img src="../Style/image/Logo_finara.svg"
+                    alt="Logo Finara"
+                    class="logo">
+
+                <h1>Bienvenido de nuevo</h1>
+
+                <p class="description">
+                    Inicia sesión para acceder a tu cuenta
+                </p>
+
+                <form id="loginForm">
+
+                    <label for="usuario">
+                        Usuario
                     </label>
                     <div class="input-box">
-                        <i class="fa-regular fa-envelope"></i>
-                        <input type="text" id="correo" name="correo" placeholder="tu@correo.com o usuario" required>
+                        <i class="fa-solid fa-user"></i>
+
+                        <input
+                            type="text"
+                            id="usuario"
+                            placeholder="Ingresa tu usuario"
+                            required>
                     </div>
                 </div>
 
-                <!-- CONTRASEÑA -->
-                <div class="input-group">
                     <label for="password">
                         Contraseña <span>*</span>
                     </label>
                     <div class="input-box">
-                        <i class="fa-solid fa-lock"></i>
-                        <input type="password" id="password" name="password" placeholder="Ingresa tu contraseña" required>
-                        <button type="button" class="show-password" onclick="togglePassword('password', this)">
-                            <i class="fa-regular fa-eye"></i>
-                        </button>
+
+                    <i class="fa-solid fa-lock"></i>
+
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="Ingresa tu contraseña"
+                        required>
+
+                    <button type="button" id="showPassword">
+                        <i class="fa-regular fa-eye"></i>
+                    </button>
+
+                </div>
+
+                    <div id="attempts">
+                        Intentos restantes: 3
                     </div>
-                </div>
 
-                <!-- CONTRASEÑA OLVIDADA -->
-                <div style="text-align: right; margin-bottom: 25px;">
-                    <a href="#" class="forgot" style="color: #e5a93c; font-size: 12px; text-decoration: none;">¿Olvidaste tu contraseña?</a>
-                </div>
+                    <a href="#" class="forgot" id="forgotPassword">
+                        ¿Olvidaste tu contraseña?
+                    </a>
 
-                <!-- BOTÓN DE INICIO DE SESIÓN -->
-                <button type="submit" class="register-button">
-                    <i class="fa-solid fa-right-to-bracket"></i>
-                    <span>Iniciar sesión</span>
-                    <i class="fa-solid fa-arrow-right"></i>
-                </button>
+                    <button type="submit" class="login-button">
+                        Iniciar sesión
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
 
-                <!-- ENLACE A REGISTRO -->
-                <div class="login-link" style="margin-top: 30px;">
-                    <span></span>
-                    <p>
-                        ¿No tienes una cuenta?
-                        <a href="signup.html">
-                            Regístrate aquí
-                            <i class="fa-solid fa-arrow-right"></i>
-                        </a>
-                    </p>
-                    <span></span>
+                </form>
+
+                <div class="register">
+                    ¿No tienes una cuenta?
+                    <a href="Registro.html">Crear cuenta</a>
                 </div>
-            </form>
+            </div>
+
         </div>
     </section>
 </main>
