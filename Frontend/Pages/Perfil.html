@@ -131,57 +131,37 @@
 
             <!-- TARJETA PRINCIPAL DEL PERFIL -->
             <section class="profile-hero">
-
                 <div class="profile-user">
-
                     <div class="profile-avatar">
-                        <img src="../Style/image/avatar-maria.png" alt="María Gómez">
-                        <button class="change-photo">
+                        <img src="../Style/image/profile/avatar-maria.png" alt="Foto de perfil" id="profileAvatarImg">
+                        <!-- Input oculto para cambiar la foto al hacer clic en la cámara -->
+                        <input type="file" id="inputCambiarFoto" accept="image/*" style="display: none;">
+                        <button class="change-photo" id="btnCambiarFoto" title="Cambiar foto de perfil">
                             <i class="fa-solid fa-camera"></i>
                         </button>
                     </div>
-
                     <div class="profile-data">
-
                         <div class="profile-name">
-                            <h2>María Gómez</h2>
-                            <span>Cliente</span>
+                            <h2 id="profileHeroName">María Gómez</h2>
+                            <span id="profileHeroRole">Cliente</span>
                         </div>
-
-                        <div class="profile-contact">
-                            <p>
-                                <i class="fa-regular fa-envelope"></i>
-                                maria.gomez@email.com
-                            </p>
-
-                            <p>
-                                <i class="fa-solid fa-phone"></i>
-                                +57 300 123 4567
-                            </p>
-
-                            <p>
-                                <i class="fa-solid fa-location-dot"></i>
-                                Bogotá, Colombia
-                            </p>
+                        <!-- Badge de Verificación Dinámico -->
+                        <div class="verification-badge-container" style="margin-top: 12px;">
+                           <span id="verificationStatusBadge" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500;">
+                               <i class="fa-solid fa-circle-check"></i> Cuenta Verificada
+                           </span>
                         </div>
-
                     </div>
                 </div>
-
-
                 <!-- Decoración derecha -->
                 <div class="profile-security">
-
                     <div class="gold-plant">
                         <i class="fa-solid fa-seedling"></i>
                     </div>
-
                     <div class="security-shield">
                         <i class="fa-solid fa-check"></i>
                     </div>
-
                 </div>
-
             </section>
 
 
