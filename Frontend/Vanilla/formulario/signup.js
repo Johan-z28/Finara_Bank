@@ -142,11 +142,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 fecha,
                 username,
                 password,
+                direccion: "Por definir",
                 rol: "Cliente",
                 productosActivos: 0,
                 saldoDisponible: "$ 0",
                 ultimaActividad: "Recién registrado",
-                avatar: "../../Style/image/avatar-maria.png",
+                avatar: "../../Style/image/profile/avatar_maria.png",
                 verificado: true,
             };
 

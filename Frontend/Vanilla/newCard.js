@@ -1,3 +1,115 @@
+// ==========================================
+// MODELO POO: CLASES DE TARJETAS BANCARIAS
+// ==========================================
+
+// Clase Padre (Superclase)
+class TarjetaBancaria {
+    constructor(tipo, titulo, proposito, operaciones, intereses, condicion) {
+        this.tipo = tipo;
+        this.titulo = titulo;
+        this.proposito = proposito;
+        this.operaciones = operaciones;
+        this.intereses = intereses;
+        this.condicion = condicion;
+    }
+
+    // Método genérico de evaluación (a sobreescribir en las hijas)
+    validarRequisitos(ingresos, estrato) {
+        return { aprobado: true, motivo: "" };
+    }
+
+    // Método para generar un número único de tarjeta aleatorio tipo bancario
+    generarNumeroUnico() {
+        const bloque1 = Math.floor(1000 + Math.random() * 9000);
+        const bloque2 = Math.floor(1000 + Math.random() * 9000);
+        const bloque3 = Math.floor(1000 + Math.random() * 9000);
+        const bloque4 = Math.floor(1000 + Math.random() * 9000);
+        return `4532 ${bloque1} ${bloque2} ${bloque4}`; // Prefijo simulado Visa/Finara
+    }
+}
+
+// Clase Hija 1: Tarjeta Débito
+class TarjetaDebito extends TarjetaBancaria {
+    constructor() {
+        super(
+            "debito",
+            "Tarjeta Débito Finara",
+            "Guardar dinero a mediano y largo plazo.",
+            "Consignación y retiro de dinero de forma segura.",
+            "Tasa mensual del 1.5%, calculada y aplicada al momento del retiro.",
+            "El monto a retirar no puede superar el saldo disponible."
+        );
+    }
+
+    validarRequisitos(ingresos, estrato) {
+        return { aprobado: true, motivo: "" };
+    }
+}
+
+// Clase Hija 2: Tarjeta de Crédito Gold
+class TarjetaCredito extends TarjetaBancaria {
+    constructor() {
+        super(
+            "credito",
+            "Tarjeta de Crédito Gold",
+            "Medio de pago para financiar compras a cuotas con intereses según el plazo.",
+            "El banco asigna un cupo de crédito; cada compra genera deuda a pagar.",
+            "Se calcula según el valor del pago mensual resultante.",
+            "Requiere ingresos mínimos anuales y validación de estrato socioeconómico."
+        );
+    }
+
+    validarRequisitos(ingresos, estrato) {
+        if (ingresos < 20000000 || estrato < 2) {
+            return {
+                aprobado: false,
+                motivo: "Para la Tarjeta de Crédito Gold se requiere un ingreso anual superior a $20,000,000 y estrato mínimo de 2."
+            };
+        }
+        return { aprobado: true, motivo: "" };
+    }
+}
+
+// Clase Hija 3: Tarjeta Cuenta Corriente
+class TarjetaCorriente extends TarjetaBancaria {
+    constructor() {
+        super(
+            "corriente",
+            "Tarjeta Cuenta Corriente",
+            "Gestión diaria del dinero con mayor flexibilidad y sobregiro.",
+            "Recibir nómina, pagar facturas y transferencias frecuentes.",
+            "No genera intereses convencionales.",
+            "Sobregiro permitido de hasta 20% adicional sobre el saldo actual."
+        );
+    }
+
+    validarRequisitos(ingresos, estrato) {
+        if (ingresos < 12000000) {
+            return {
+                aprobado: false,
+                motivo: "Para la Cuenta Corriente se requiere un ingreso anual mínimo de $12,000,000."
+            };
+        }
+        return { aprobado: true, motivo: "" };
+    }
+}
+
+// Fábrica (Factory) para instanciar la tarjeta correcta según el tipo
+function obtenerInstanciaTarjeta(tipo) {
+    switch (tipo) {
+        case "credito": return new TarjetaCredito();
+        case "corriente": return new TarjetaCorriente();
+        case "debito":
+        default:
+            return new TarjetaDebito();
+    }
+}
+
+
+// ==========================================
+// LÓGICA DE INTERFAZ Y EVENTOS DOM
+// ==========================================
+
 document.addEventListener("DOMContentLoaded", () => {
     const botonesSolicitar = document.querySelectorAll(".request-card-btn");
     const profileBtn = document.getElementById("profileMenuBtn");
@@ -13,7 +125,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (usuarioActivo) {
         if (greetingName) greetingName.textContent = usuarioActivo.nombre || "Usuario";
         if (dropdownUserName) dropdownUserName.textContent = usuarioActivo.nombre || "Usuario";
-
         if (usuarioActivo.avatar && userAvatarImg) {
             userAvatarImg.src = usuarioActivo.avatar;
             userAvatarImg.classList.remove("hidden");
@@ -28,7 +139,6 @@ document.addEventListener("DOMContentLoaded", () => {
             profileDropdown.classList.toggle("show");
             profileDropdown.style.display = profileDropdown.style.display === "block" ? "none" : "block";
         });
-
         document.addEventListener("click", (e) => {
             if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
                 profileDropdown.style.display = "none";
@@ -51,7 +161,6 @@ document.addEventListener("DOMContentLoaded", () => {
     botonesSolicitar.forEach(boton => {
         boton.addEventListener("click", (e) => {
             const usuarioActual = obtenerUsuarioActivo();
-
             if (!usuarioActual) {
                 Swal.fire({
                     icon: 'warning',
@@ -64,7 +173,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            // Opcional: si deseas permitir pruebas inmediatas sin cuenta verificada, puedes comentar este bloque
             if (usuarioActual.verificado !== true) {
                 Swal.fire({
                     icon: 'info',
@@ -79,61 +187,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const tarjetaBox = e.target.closest(".card-option-box");
             const tipoTarjeta = tarjetaBox.getAttribute("data-card");
-            mostrarModalSolicitud(tipoTarjeta, usuarioActual);
+
+            // Instanciamos el objeto usando POO
+            const tarjetaObj = obtenerInstanciaTarjeta(tipoTarjeta);
+            mostrarModalSolicitud(tarjetaObj, usuarioActual);
         });
     });
 });
 
 // Función unificada para recuperar correctamente el usuario activo desde localStorage
 function obtenerUsuarioActivo() {
-    // 1. Verificar perfil activo directo (guardado por el login moderno)
     const perfilDirecto = JSON.parse(localStorage.getItem("userProfile"));
     if (perfilDirecto) return perfilDirecto;
 
-    // 2. Métodos alternativos por compatibilidad
     const emailLogueado = localStorage.getItem("usuarioLogueado") || localStorage.getItem("emailSesion");
     const listaUsuarios = JSON.parse(localStorage.getItem("finara_usuarios_local")) || [];
-
     if (emailLogueado) {
         const encontrado = listaUsuarios.find(u => u.correo === emailLogueado || u.username === emailLogueado);
         if (encontrado) return encontrado;
     }
-
     const userDirecto = JSON.parse(localStorage.getItem("usuarioActivo"));
     if (userDirecto) return userDirecto;
-
     return null;
 }
 
-function mostrarModalSolicitud(tipo, usuarioActivo) {
+function mostrarModalSolicitud(tarjetaObj, usuarioActivo) {
     const modalExistente = document.getElementById("modalFinaraCompleto");
     if (modalExistente) modalExistente.remove();
 
-    const infoTarjetas = {
-        "debito": {
-            titulo: "Tarjeta Débito Finara",
-            proposito: "Guardar dinero a mediano y largo plazo.",
-            operaciones: "Consignación y retiro de dinero de forma segura.",
-            intereses: "Tasa mensual del 1.5%, calculada y aplicada al momento del retiro.",
-            restriccion: "El monto a retirar no puede superar el saldo disponible."
-        },
-        "credito": {
-            titulo: "Tarjeta de Crédito Gold",
-            proposito: "Medio de pago para financiar compras a cuotas con intereses según el plazo.",
-            operaciones: "El banco asigna un cupo de crédito; cada compra genera deuda a pagar.",
-            intereses: "Se calcula según el valor del pago mensual resultante.",
-            restriccion: "Requiere ingresos mínimos anuales y validación de estrato socioeconómico."
-        },
-        "corriente": {
-            titulo: "Tarjeta Cuenta Corriente",
-            proposito: "Gestión diaria del dinero con mayor flexibilidad y sobregiro.",
-            operaciones: "Recibir nómina, pagar facturas y transferencias frecuentes.",
-            intereses: "No genera intereses convencionales.",
-            restriccion: "Sobregiro permitido de hasta 20% adicional sobre el saldo actual."
-        }
-    };
-
-    const datos = infoTarjetas[tipo] || infoTarjetas["debito"];
     const overlay = document.createElement("div");
     overlay.id = "modalFinaraCompleto";
     overlay.style.cssText = `
@@ -143,7 +224,6 @@ function mostrarModalSolicitud(tipo, usuarioActivo) {
        display: flex; justify-content: center; align-items: center;
        z-index: 9999; font-family: 'Poppins', sans-serif; padding: 1rem;
    `;
-
     overlay.innerHTML = `
        <div style="
            background-color: #12151c; border: 1px solid #1f2430; border-radius: 16px;
@@ -151,30 +231,30 @@ function mostrarModalSolicitud(tipo, usuarioActivo) {
            gap: 1.5rem; padding: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
            position: relative; max-height: 90vh; overflow-y: auto;
        " class="modal-grid-content">
-          
-           <!-- Columna Izquierda -->
+         
+           <!-- Columna Izquierda (Datos de la Tarjeta usando POO) -->
            <div style="background: linear-gradient(145deg, rgba(229, 163, 60, 0.08), rgba(18, 21, 28, 0.5)); border: 1px solid rgba(229, 163, 60, 0.25); border-radius: 12px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;">
                <div>
-                   <span style="color: #e5a93c; font-size: 0.75rem; text-transform: uppercase; font-weight: 600; letter-spacing: 1px;">Detalles del Producto</span>
-                   <h3 style="color: #fff; font-size: 1.2rem; margin: 0.5rem 0 1rem 0;">${datos.titulo}</h3>
+                   <span style="color: #e5a93c; font-size: 0.75rem; text-transform: uppercase; font-weight: 600; letter-spacing: 1px;">Detalles del Producto (POO)</span>
+                   <h3 style="color: #fff; font-size: 1.2rem; margin: 0.5rem 0 1rem 0;">${tarjetaObj.titulo}</h3>
                    <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.85rem; color: #8a8f99; display: flex; flex-direction: column; gap: 0.75rem;">
-                       <li><strong style="color: #fff;">Propósito:</strong> ${datos.proposito}</li>
-                       <li><strong style="color: #fff;">Operación:</strong> ${datos.operaciones}</li>
-                       <li><strong style="color: #fff;">Intereses:</strong> ${datos.intereses}</li>
-                       <li><strong style="color: #fff;">Condición:</strong> ${datos.restriccion}</li>
+                       <li><strong style="color: #fff;">Propósito:</strong> ${tarjetaObj.proposito}</li>
+                       <li><strong style="color: #fff;">Operación:</strong> ${tarjetaObj.operaciones}</li>
+                       <li><strong style="color: #fff;">Intereses:</strong> ${tarjetaObj.intereses}</li>
+                       <li><strong style="color: #fff;">Condición:</strong> ${tarjetaObj.condicion}</li>
                    </ul>
                </div>
                <div style="margin-top: 1rem; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05);">
                    <i class="fa-solid fa-shield-halved" style="font-size: 1.8rem; color: #e5a93c;"></i>
-                   <p style="font-size: 0.7rem; color: #8a8f99; margin-top: 0.3rem;">Finara Bank - Usuario: ${usuarioActivo.nombre}</p>
+                   <p style="font-size: 0.7rem; color: #8a8f99; margin-top: 0.3rem;">Titular: ${usuarioActivo.nombre}</p>
                </div>
            </div>
 
-           <!-- Columna Central -->
+           <!-- Columna Central (Formulario de Evaluación + Dirección de Envío) -->
            <div style="background-color: rgba(14, 116, 144, 0.07); border: 1px solid rgba(14, 116, 144, 0.25); border-radius: 12px; padding: 1.5rem;">
                <span style="color: #38bdf8; font-size: 0.75rem; text-transform: uppercase; font-weight: 600; letter-spacing: 1px;">Evaluación de Solicitud</span>
                <h3 style="color: #fff; font-size: 1.2rem; margin: 0.5rem 0 1.2rem 0;">Datos del Solicitante</h3>
-              
+             
                <form id="formSolicitudCard" style="display: flex; flex-direction: column; gap: 0.85rem;">
                    <div>
                        <label style="display: block; font-size: 0.8rem; color: #8a8f99; margin-bottom: 0.3rem;">Nacionalidad</label>
@@ -208,6 +288,11 @@ function mostrarModalSolicitud(tipo, usuarioActivo) {
                            </select>
                        </div>
                    </div>
+                   <!-- CAMPO NUEVO: Dirección de Envío -->
+                   <div>
+                       <label style="display: block; font-size: 0.8rem; color: #8a8f99; margin-bottom: 0.3rem;">Dirección de envío (Para entrega física)</label>
+                       <input type="text" id="direccionEnvio" value="${usuarioActivo.direccion || ''}" placeholder="Ej. Calle 50 # 45-20" required style="width: 100%; padding: 0.6rem; border-radius: 8px; background: #0a0c10; border: 1px solid #1f2430; color: #fff; font-size: 0.85rem;">
+                   </div>
                </form>
            </div>
 
@@ -223,6 +308,7 @@ function mostrarModalSolicitud(tipo, usuarioActivo) {
            </div>
        </div>
    `;
+
     document.body.appendChild(overlay);
 
     document.getElementById("btnEnviarSolicitud").addEventListener("click", () => {
@@ -230,28 +316,38 @@ function mostrarModalSolicitud(tipo, usuarioActivo) {
         const estrato = parseInt(document.getElementById("estrato").value) || 1;
         const moneda = document.getElementById("tipoMoneda").value;
         const nacionalidad = document.getElementById("nacionalidad").value;
+        const direccionEnvio = document.getElementById("direccionEnvio").value.trim();
 
-        let aprobado = true;
-        let mensajeMotivo = "";
-
-        if (tipo === "credito" && (ingresos < 20000000 || estrato < 2)) {
-            aprobado = false;
-            mensajeMotivo = "Para la Tarjeta de Crédito Gold se requiere un ingreso anual superior a 20,000,000 y estrato mínimo de 2.";
-        } else if (tipo === "corriente" && ingresos < 12000000) {
-            aprobado = false;
-            mensajeMotivo = "Para la Cuenta Corriente se requiere un ingreso anual mínimo de 12,000,000.";
+        if (!direccionEnvio) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Dirección requerida',
+                text: 'Por favor ingresa una dirección de envío válida para mandar la tarjeta.',
+                background: '#12151c',
+                color: '#ffffff',
+                confirmButtonColor: '#e5a93c'
+            });
+            return;
         }
+
+        // Polimorfismo / Herencia: Ejecutamos el validador de la clase hija
+        const resultadoValidacion = tarjetaObj.validarRequisitos(ingresos, estrato);
+        const aprobado = resultadoValidacion.aprobado;
+        const mensajeMotivo = resultadoValidacion.motivo;
 
         if (aprobado) {
             const datosTarjetaAprobada = {
-                tipo: tipo,
-                titulo: datos.titulo,
+                tipo: tarjetaObj.tipo,
+                titulo: tarjetaObj.titulo,
+                numeroTarjeta: tarjetaObj.generarNumeroUnico(), // Número único generado
                 ingresos: ingresos,
                 moneda: moneda,
                 nacionalidad: nacionalidad,
+                direccionEnvio: direccionEnvio, // Guardamos la dirección de envío
                 fechaAprobacion: new Date().toISOString()
             };
 
+            // Actualizar lista global de usuarios en localStorage
             let listaUsuarios = JSON.parse(localStorage.getItem("finara_usuarios_local")) || [];
             listaUsuarios = listaUsuarios.map(u => {
                 if (u.correo === usuarioActivo.correo || u.username === usuarioActivo.username) {
@@ -263,13 +359,14 @@ function mostrarModalSolicitud(tipo, usuarioActivo) {
             });
             localStorage.setItem("finara_usuarios_local", JSON.stringify(listaUsuarios));
 
+            // Actualizar usuario activo local
             usuarioActivo.tarjetasAprobadas = usuarioActivo.tarjetasAprobadas || [];
             usuarioActivo.tarjetasAprobadas.push(datosTarjetaAprobada);
             usuarioActivo.productosActivos = (usuarioActivo.productosActivos || 0) + 1;
-
             localStorage.setItem("userProfile", JSON.stringify(usuarioActivo));
         }
-        mostrarResultadoEvaluacion(aprobado, datos.titulo, mensajeMotivo);
+
+        mostrarResultadoEvaluacion(aprobado, tarjetaObj.titulo, mensajeMotivo, aprobado ? tarjetaObj.generarNumeroUnico() : null, direccionEnvio);
     });
 
     const cerrarModal = () => overlay.remove();
@@ -279,15 +376,15 @@ function mostrarModalSolicitud(tipo, usuarioActivo) {
     });
 }
 
-function mostrarResultadoEvaluacion(aprobado, nombreTarjeta, motivo) {
+function mostrarResultadoEvaluacion(aprobado, nombreTarjeta, motivo, numeroTarjeta, direccionEnvio) {
     const modalActual = document.getElementById("modalFinaraCompleto");
     if (modalActual) modalActual.remove();
 
-    const colorIcono = aprobado ? "#22c55e" : "#dc2626";
-    const iconoClase = aprobado ? "fa-circle-check" : "fa-triangle-exclamation";
     const tituloRes = aprobado ? "¡Solicitud Aprobada!" : "Solicitud Denegada";
     const textoRes = aprobado
-        ? `¡Felicitaciones! Cumples con todos los requisitos del banco para la <strong>${nombreTarjeta}</strong>. Tu producto ha sido pre-aprobado.`
+        ? `¡Felicitaciones! Cumples con todos los requisitos para la <strong>${nombreTarjeta}</strong>.<br><br>` +
+        `💳 <strong>N° de Tarjeta Asignado:</strong> <span style="color: #38bdf8; font-family: monospace;">${numeroTarjeta}</span><br>` +
+        `📦 Tu tarjeta física será enviada a la dirección <strong>${direccionEnvio}</strong> y tardará <strong>hasta una semana</strong> en llegar a tu domicilio.`
         : `Lo sentimos, la solicitud para la <strong>${nombreTarjeta}</strong> ha sido rechazada.<br><br><span style="font-size: 0.85rem; color: #f87171;">${motivo}</span>`;
 
     Swal.fire({
