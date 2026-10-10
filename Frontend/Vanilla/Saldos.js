@@ -1,5 +1,5 @@
 import { initGlobalComponents } from './Global/app.js';
-import { obtenerCuentas, SesionExpiradaError } from './CuentasService.js';
+import { obtenerCuentas, SesionExpiradaError } from './cuentasService.js';
 import { crearCuentaCard } from './CuentaCard.js';
 
 const CLAVE_PRIVACIDAD = 'saldosOcultos';
