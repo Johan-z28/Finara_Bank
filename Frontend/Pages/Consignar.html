@@ -1,149 +1,224 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consignar | Finara Bank</title>
+    <title>Consignar Fondos | Finara Bank</title>
     <link rel="icon" type="image/png" sizes="32x32" href="../Style/image/favicon.svg">
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Estilos globales y específicos -->
+    <link rel="stylesheet" href="../Style/global/styles.css">
+    <link rel="stylesheet" href="../Style/Dashboard.css">
     <link rel="stylesheet" href="../Style/Consignar.css">
+    <!-- SweetAlert2 CSS y JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-
 <body class="general-body">
 
-    <!-- ======= SIDEBAR DE NAVEGACIÓN ======= -->
-    <aside class="sidebar">
-        <!-- BOTÓN CÍRCULO FLOTANTE EN EL BORDE DERECHO (ESCRITORIO) -->
-        <button class="sidebar-edge-toggle" id="sidebarCollapseBtn" aria-label="Colapsar menú" title="Alternar menú">
-            <i class="fa-solid fa-chevron-left"></i>
-        </button>
+<!-- ======= SIDEBAR DE NAVEGACIÓN ======= -->
+<aside class="sidebar">
+    <button class="sidebar-edge-toggle" id="sidebarCollapseBtn" aria-label="Colapsar menú" title="Alternar menú">
+        <i class="fa-solid fa-chevron-left"></i>
+    </button>
+    <div class="sidebar-header">
+        <img src="../Style/image/Logo_finara.svg" alt="Finara Logo" class="sidebar-logo">
+        <img src="../Style/image/favicon.svg" alt="Finara Icon" class="sidebar-logo-small">
+    </div>
+    <nav class="sidebar-nav">
+        <ul>
+            <li class="nav-item">
+                <a href="Dashboard.html" class="nav-link" title="Dashboard">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="solicitudTarjeta.html" class="nav-link" title="Solicitar Tarjeta">
+                    <i class="fa-regular fa-credit-card"></i>
+                    <span>Solicitar Tarjeta</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="Saldos.html" class="nav-link" title="Saldos">
+                    <i class="fa-regular fa-credit-card"></i>
+                    <span>Saldos</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="Transferencias.html" class="nav-link" title="Transferencias">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                    <span>Transferencias</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="Consignar.html" class="nav-link active" title="Consignar">
+                    <i class="fa-solid fa-wallet"></i>
+                    <span>Consignar</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="Retiros.html" class="nav-link" title="Retiros">
+                    <i class="fa-solid fa-money-bill-transfer"></i>
+                    <span>Retiros</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="Movimientos.html" class="nav-link" title="Movimientos">
+                    <i class="fa-solid fa-list-ul"></i>
+                    <span>Movimientos</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="Creditos.html" class="nav-link" title="Solicitud de Créditos">
+                    <i class="fa-solid fa-hand-holding-dollar"></i>
+                    <span>Solicitud de Créditos</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="Beneficios.html" class="nav-link" title="Beneficios">
+                    <i class="fa-regular fa-star"></i>
+                    <span>Beneficios</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</aside>
 
-        <div class="sidebar-header">
-            <!-- Logo completo en modo expandido -->
-            <img src="../Style/image/Logo_finara.svg" alt="Finara Logo" class="sidebar-logo">
-            <!-- Isotipo favicon.svg al colapsar a 70px -->
-            <img src="../Style/image/favicon.svg" alt="Finara Icon" class="sidebar-logo-small">
+<!-- ======= CONTENEDOR PRINCIPAL ======= -->
+<div class="main-wrapper">
+    <!-- ======= NAVBAR SUPERIOR ======= -->
+    <header class="dashboard-navbar">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menú">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <div class="user-greeting">
+                <h2>Hola, <span id="greetingName">Usuario</span></h2>
+            </div>
+        </div>
+        <div class="navbar-actions">
+            <button class="navbar-chatbot-btn" id="openChatbotNavBtn">
+                <i class="fa-solid fa-comment-dots"></i>
+                <span>Asesoría Financiera</span>
+            </button>
+            <button class="icon-btn" aria-label="Notificaciones">
+                <i class="fa-regular fa-bell"></i>
+            </button>
+            <div class="profile-menu-container">
+                <button class="profile-btn" id="profileMenuBtn">
+                    <div class="avatar-placeholder">
+                        <img src="" alt="Perfil" id="userAvatarImg" class="profile-img hidden">
+                        <i class="fa-solid fa-user profile-icon" id="userAvatarIcon"></i>
+                    </div>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="dropdown-header">
+                        <strong id="dropdownUserName">Usuario</strong>
+                    </div>
+                    <hr>
+                    <a href="Perfil.html" class="dropdown-item">
+                        <i class="fa-regular fa-user"></i> Ver Perfil
+                    </a>
+                    <a href="../index.html" class="dropdown-item logout-item">
+                        <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL: CONSIGNACIÓN DIGITAL -->
+    <main class="main-content">
+        <div class="deposit-page-header">
+            <h1>Depósito Digital</h1>
+            <p>Ingresa fondos a tu cuenta de manera rápida, segura y sin comisiones ocultas.</p>
         </div>
 
-        <nav class="sidebar-nav">
-            <ul>
-                <li class="nav-item">
-                    <a href="Dashboard.html" class="nav-link" data-route="dashboard" title="Dashboard">
-                        <i class="fa-solid fa-house"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="solicitudTarjeta.html" class="nav-link active" data-route="saldos" title="Solicitar Tarjeta">
+        <!-- Formulario de Consignación -->
+        <form id="formConsignacion" class="deposit-form">
+            <div class="form-group">
+                <label for="cuentaOrigen">Selecciona tu Tarjeta / Cuenta Origen</label>
+                <select id="cuentaOrigen" required>
+                    <option value="" disabled selected>Cargando tus tarjetas...</option>
+                </select>
+            </div>
+
+            <!-- NUEVO: Campo para consignar a otra cuenta o usuario -->
+            <div class="form-group">
+                <label for="cuentaDestino">Cuenta o Correo Destino (Beneficiario)</label>
+                <input type="text" id="cuentaDestino" placeholder="Ej. usuario@admin.com o N° de tarjeta" required>
+            </div>
+
+            <div class="form-group">
+                <label for="metodoPago">Método de Consignación</label>
+                <div class="payment-methods-grid">
+                    <label class="method-option active">
+                        <input type="radio" name="metodo" value="pse" checked>
+                        <i class="fa-solid fa-building-columns"></i>
+                        <span>PSE / Banco</span>
+                    </label>
+                    <label class="method-option">
+                        <input type="radio" name="metodo" value="tarjeta">
                         <i class="fa-regular fa-credit-card"></i>
-                        <span>Solcitar Tarjeta</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="Saldos.html" class="nav-link" data-route="saldos" title="Saldos">
-                        <i class="fa-regular fa-credit-card"></i>
-                        <span>Saldos</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="Transferencias.html" class="nav-link" data-route="transferencias" title="Transferencias">
-                        <i class="fa-solid fa-arrows-rotate"></i>
-                        <span>Transferencias</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="Consignar.html" class="nav-link active" data-route="consignar" title="Consignar">
-                        <i class="fa-solid fa-wallet"></i>
-                        <span>Consignar</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="Retiros.html" class="nav-link" data-route="retiros" title="Retiros">
-                        <i class="fa-solid fa-money-bill-transfer"></i>
-                        <span>Retiros</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="Movimientos.html" class="nav-link" data-route="movimientos" title="Movimientos">
-                        <i class="fa-solid fa-list-ul"></i>
-                        <span>Movimientos</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="Creditos.html" class="nav-link" data-route="creditos" title="Solicitud de Créditos">
-                        <i class="fa-solid fa-hand-holding-dollar"></i>
-                        <span>Solicitud de Créditos</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="Beneficios.html" class="nav-link" data-route="beneficios" title="Beneficios">
-                        <i class="fa-regular fa-star"></i>
-                        <span>Beneficios</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </aside>
-
-    <!-- ======= PRINCIPAL ======= -->
-    <div class="main-wrapper">
-
-        <!-- ======= NAVBAR SUPERIOR ======= -->
-        <header class="dashboard-navbar">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <!-- BOTÓN DE MENÚ PARA MÓVILES (VISIBLE SOLO <= 992px) -->
-                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menú navegación">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
-
-                <div class="user-greeting">
-                    <h2>Hola, <span id="greetingName">Usuario</span></h2>
+                        <span>Tarjeta Débito</span>
+                    </label>
+                    <label class="method-option">
+                        <input type="radio" name="metodo" value="efectivo">
+                        <i class="fa-solid fa-store"></i>
+                        <span>Punto Efectivo</span>
+                    </label>
                 </div>
             </div>
 
-            <div class="navbar-actions">
-                <!-- BOTÓN CHATBOT EN NAVBAR -->
-                <button class="navbar-chatbot-btn" id="openChatbotNavBtn">
-                    <i class="fa-solid fa-comment-dots"></i>
-                    <span>Asesoría Financiera</span>
-                </button>
+            <div class="form-group">
+                <label for="montoConsignar">Monto a Consignar ($ COP)</label>
+                <div class="amount-input-wrapper">
+                    <span>$</span>
+                    <input type="number" id="montoConsignar" placeholder="Ej. 150000" min="1000" required>
+                </div>
+                <small class="helper-text">Monto mínimo: $ 10.000 COP</small>
+            </div>
 
-                <button class="icon-btn" aria-label="Notificaciones">
-                    <i class="fa-regular fa-bell"></i>
-                </button>
+            <div class="form-group">
+                <label for="descripcionConsignacion">Descripción o Motivo (Opcional)</label>
+                <input type="text" id="descripcionConsignacion" placeholder="Ej. Pago de servicios, transferencia...">
+            </div>
 
-                <!-- Menú Perfil desplegable -->
-                <div class="profile-menu-container">
-                    <button class="profile-btn" id="profileMenuBtn">
-                        <div class="avatar-placeholder" id="avatarContainer">
-                            <img src="" alt="Foto de perfil" id="userAvatarImg" class="profile-img hidden">
-                            <i class="fa-solid fa-user profile-icon" id="userAvatarIcon"></i>
-                        </div>
-                        <i class="fa-solid fa-chevron-down"></i>
-                    </button>
+            <button type="submit" class="btn-submit-deposit">
+                <i class="fa-solid fa-circle-check"></i> Procesar Consignación
+            </button>
+        </form>
 
-                    <div class="profile-dropdown" id="profileDropdown">
-                        <div class="dropdown-header">
-                            <strong id="dropdownUserName">Usuario</strong>
-                        </div>
-                        <hr>
-                        <a href="Perfil.html" class="dropdown-item" data-route="perfil">
-                            <i class="fa-regular fa-user"></i> Ver Perfil
-                        </a>
-                        <a href="../index.html" class="dropdown-item logout-item">
-                            <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
-                        </a>
+            <!-- Columna Derecha: Resumen y Consejos -->
+            <div class="deposit-sidebar-info">
+                <div class="info-widget summary-widget">
+                    <div class="widget-header">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <h4>Garantía Finara Bank</h4>
                     </div>
+                    <p>Tus consignaciones digitales se procesan de forma inmediata mediante protocolos de encriptación bancaria de alta seguridad.</p>
+                    <ul class="security-benefits">
+                        <li><i class="fa-solid fa-check"></i> Acreditación en tiempo real</li>
+                        <li><i class="fa-solid fa-check"></i> Sin cobro de cuota de manejo</li>
+                        <li><i class="fa-solid fa-check"></i> Soporte 24/7 disponible</li>
+                    </ul>
+                </div>
+
+                <div class="info-widget help-widget">
+                    <div class="widget-header">
+                        <i class="fa-solid fa-headset"></i>
+                        <h4>¿Necesitas asistencia?</h4>
+                    </div>
+                    <p>Si tienes inconvenientes con el reflejo de tu dinero, contacta a nuestro asesor virtual o comunícate a la línea dorada.</p>
+                    <button type="button" class="btn-support">Contactar Asesor</button>
                 </div>
             </div>
-        </header>
+        </div>
+    </main>
+</div>
 
-        <!-- CONTENIDO PRINCIPAL -->
-        
-    </div>
-
-    <!-- Módulo JS principal -->
-    <script type="module" src="../Vanilla/Consignar.js"></script>
 </body>
-
 </html>
