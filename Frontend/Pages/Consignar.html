@@ -98,29 +98,55 @@
                 <h2>Hola, <span id="greetingName">Usuario</span></h2>
             </div>
         </div>
-        <div class="navbar-actions">
-            <button class="navbar-chatbot-btn" id="openChatbotNavBtn">
-                <i class="fa-solid fa-comment-dots"></i>
-                <span>Asesoría Financiera</span>
-            </button>
-            <button class="icon-btn" aria-label="Notificaciones">
-                <i class="fa-regular fa-bell"></i>
-            </button>
-            <div class="profile-menu-container">
-                <button class="profile-btn" id="profileMenuBtn">
-                    <div class="avatar-placeholder">
-                        <img src="" alt="Perfil" id="userAvatarImg" class="profile-img hidden">
-                        <i class="fa-solid fa-user profile-icon" id="userAvatarIcon"></i>
-                    </div>
-                    <i class="fa-solid fa-chevron-down"></i>
-                </button>
-                <div class="profile-dropdown" id="profileDropdown">
-                    <div class="dropdown-header">
-                        <strong id="dropdownUserName">Usuario</strong>
-                    </div>
-                    <hr>
-                    <a href="Perfil.html" class="dropdown-item">
-                        <i class="fa-regular fa-user"></i> Ver Perfil
+
+        <nav class="sidebar-nav">
+            <ul>
+                <li class="nav-item">
+                    <a href="Dashboard.html" class="nav-link" data-route="dashboard" title="Dashboard">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="solicitudTarjeta.html" class="nav-link active" data-route="saldos" title="Solicitar Tarjeta">
+                        <i class="fa-regular fa-credit-card"></i>
+                        <span>Solcitar Tarjeta</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Saldos.html" class="nav-link" data-route="saldos" title="Saldos">
+                        <i class="fa-regular fa-credit-card"></i>
+                        <span>Saldos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Transferencias.html" class="nav-link" data-route="transferencias" title="Transferencias">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <span>Transferencias</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Consignar.html" class="nav-link active" data-route="consignar" title="Consignar">
+                        <i class="fa-solid fa-wallet"></i>
+                        <span>Consignar</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Retiros.html" class="nav-link" data-route="retiros" title="Retiros">
+                        <i class="fa-solid fa-money-bill-transfer"></i>
+                        <span>Retiros</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Movimientos.html" class="nav-link" data-route="movimientos" title="Movimientos">
+                        <i class="fa-solid fa-list-ul"></i>
+                        <span>Movimientos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Creditos.html" class="nav-link" data-route="creditos" title="Solicitud de Créditos">
+                        <i class="fa-solid fa-hand-holding-dollar"></i>
+                        <span>Solicitud de Créditos</span>
                     </a>
                     <a href="../index.html" class="dropdown-item logout-item" id="logoutBtn">
                         <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
