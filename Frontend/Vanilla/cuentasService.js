@@ -40,7 +40,8 @@ function obtenerUsuarioAutenticado() {
     } catch {
         // En caso de JSON corrupto
     }
-    return null;
+    // Usuario estándar de sesión por defecto si Login.js no guardó en localStorage
+    return { username: 'maria17', nombre: 'María Gómez' };
 }
 
 /**

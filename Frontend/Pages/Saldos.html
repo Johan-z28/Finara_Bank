@@ -152,6 +152,86 @@
 
             <section class="cuentas-grid" id="cuentasLista" aria-live="polite" aria-busy="true"></section>
             <div class="cuentas-estado hidden" id="cuentasEstado" role="status"></div>
+
+            <!-- SECCIÓN PREMIUM: RESUMEN FINANCIERO Y DISTRIBUCIÓN DE SALDOS -->
+            <section class="saldos-analitica-grid">
+                <!-- Gráfico de distribución de saldo -->
+                <div class="analitica-card">
+                    <div class="analitica-card__header">
+                        <div>
+                            <h2 class="analitica-card__title">Distribución de Liquidez</h2>
+                            <p class="analitica-card__subtitle">Proporción de saldo entre tus productos activos</p>
+                        </div>
+                        <span class="badge-gold"><i class="fa-solid fa-chart-pie"></i> Balance Activo</span>
+                    </div>
+
+                    <div class="analitica-card__body">
+                        <div class="distribucion-visual">
+                            <div class="barra-distribucion">
+                                <div class="barra-segmento barra-segmento--ahorros" id="segAhorros" style="width: 64%;" title="Cuenta de Ahorros"></div>
+                                <div class="barra-segmento barra-segmento--corriente" id="segCorriente" style="width: 36%;" title="Cuenta Corriente"></div>
+                            </div>
+
+                            <div class="distribucion-leyenda">
+                                <div class="leyenda-item">
+                                    <span class="leyenda-dot leyenda-dot--ahorros"></span>
+                                    <div class="leyenda-info">
+                                        <span class="leyenda-nombre">Cuenta de Ahorros</span>
+                                        <strong class="leyenda-monto" id="montoAhorrosTotal">$ 1.248.767</strong>
+                                        <small class="leyenda-porcentaje" id="porcentajeAhorros">64%</small>
+                                    </div>
+                                </div>
+
+                                <div class="leyenda-item">
+                                    <span class="leyenda-dot leyenda-dot--corriente"></span>
+                                    <div class="leyenda-info">
+                                        <span class="leyenda-nombre">Cuenta Corriente</span>
+                                        <strong class="leyenda-monto" id="montoCorrienteTotal">$ 699.236</strong>
+                                        <small class="leyenda-porcentaje" id="porcentajeCorriente">36%</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resumen consolidado y acciones rápidas -->
+                <div class="analitica-card analitica-card--resumen">
+                    <div class="analitica-card__header">
+                        <div>
+                            <h2 class="analitica-card__title">Patrimonio Disponible</h2>
+                            <p class="analitica-card__subtitle">Suma total de tus cuentas activas</p>
+                        </div>
+                        <div class="icono-oro-circulo">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                    </div>
+
+                    <div class="patrimonio-monto-box">
+                        <span class="patrimonio-label">Saldo Total Consolidado</span>
+                        <h2 class="patrimonio-valor" id="saldoTotalConsolidado">$ 1.948.003</h2>
+                        <span class="patrimonio-badge"><i class="fa-solid fa-arrow-trend-up"></i> Fondos disponibles para operaciones</span>
+                    </div>
+
+                    <div class="saldos-accesos-rapidos">
+                        <span class="accesos-label">Operaciones frecuentes:</span>
+                        <div class="accesos-botones">
+                            <a href="Transferencias.html" class="btn-acceso-rapido">
+                                <i class="fa-solid fa-paper-plane"></i>
+                                <span>Transferir</span>
+                            </a>
+                            <a href="Consignar.html" class="btn-acceso-rapido">
+                                <i class="fa-solid fa-wallet"></i>
+                                <span>Consignar</span>
+                            </a>
+                            <a href="Movimientos.html" class="btn-acceso-rapido">
+                                <i class="fa-solid fa-receipt"></i>
+                                <span>Ver Movimientos</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </main> 
     </div>
 
