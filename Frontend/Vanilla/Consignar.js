@@ -1,9 +1,13 @@
 import { initGlobalComponents } from './Global/app.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    initGlobalComponents();
+    try {
+        initGlobalComponents();
+    } catch (e) {
+        console.warn("Componentes globales omitidos:", e);
+    }
 
-    // 1. Obtener el usuario activo de forma infalible
+    // 1. Recuperar usuario activo desde localStorage
     const usuarioActivo = obtenerUsuarioActivoReal();
 
     if (!usuarioActivo) {
@@ -28,38 +32,87 @@ document.addEventListener('DOMContentLoaded', () => {
     if (greetingName) greetingName.textContent = nombreReal;
     if (dropdownUserName) dropdownUserName.textContent = nombreReal;
 
-    // 3. Poblar el select de origen con las tarjetas aprobadas reales
+    // 3. Activar manualmente el menú desplegable del perfil
+    configurarMenuPerfilManual();
+
+    // 4. Poblar el selector de origen con las tarjetas reales
     poblarSelectorTarjetas(usuarioActivo);
 
-    // 4. Manejar el formulario de consignación
+    // 5. Manejar el formulario de consignación con validación de tarjeta de crédito
     const formConsignacion = document.getElementById('formConsignacion');
     if (formConsignacion) {
         formConsignacion.addEventListener('submit', (e) => {
             e.preventDefault();
+
+            const selectOrigen = document.getElementById('cuentaOrigen');
+            const tarjetaSeleccionadaTexto = selectOrigen.options[selectOrigen.selectedIndex].text.toLowerCase();
+
+            // REGLA DE NEGOCIO: No se puede consignar desde una Tarjeta de Crédito
+            if (tarjetaSeleccionadaTexto.includes('crédito') || tarjetaSeleccionadaTexto.includes('credito')) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Operación no permitida',
+                    text: 'Las Tarjetas de Crédito son medios de pago y financiamiento de compras, por lo que no pueden utilizarse como origen para realizar consignaciones.',
+                    background: '#12151c',
+                    color: '#ffffff',
+                    confirmButtonColor: '#e5a93c'
+                });
+                return;
+            }
+
             procesarConsignacionFinal(usuarioActivo);
         });
     }
 });
 
-// Función idéntica a la que usa tu app para recuperar el usuario logueado
 function obtenerUsuarioActivoReal() {
-    const perfilDirecto = JSON.parse(localStorage.getItem("userProfile"));
-    if (perfilDirecto) return perfilDirecto;
+    try {
+        const perfilDirecto = JSON.parse(localStorage.getItem("userProfile"));
+        if (perfilDirecto) return perfilDirecto;
 
-    const emailLogueado = localStorage.getItem("usuarioLogueado") || localStorage.getItem("emailSesion");
-    const listaUsuarios = JSON.parse(localStorage.getItem("finara_usuarios_local")) || [];
-    if (emailLogueado) {
-        const encontrado = listaUsuarios.find(u => u.correo === emailLogueado || u.username === emailLogueado);
-        if (encontrado) return encontrado;
-    }
+        const emailLogueado = localStorage.getItem("usuarioLogueado") || localStorage.getItem("emailSesion");
+        const listaUsuarios = JSON.parse(localStorage.getItem("finara_usuarios_local")) || [];
+        if (emailLogueado) {
+            const encontrado = listaUsuarios.find(u => u.correo === emailLogueado || u.username === emailLogueado);
+            if (encontrado) return encontrado;
+        }
 
-    const userDirecto = JSON.parse(localStorage.getItem("usuarioActivo"));
-    if (userDirecto) return userDirecto;
+        const userDirecto = JSON.parse(localStorage.getItem("usuarioActivo"));
+        if (userDirecto) return userDirecto;
 
-    if (listaUsuarios.length > 0) {
-        return listaUsuarios[listaUsuarios.length - 1];
+        if (listaUsuarios.length > 0) {
+            return listaUsuarios[listaUsuarios.length - 1];
+        }
+    } catch (e) {
+        console.error("Error al obtener usuario:", e);
     }
     return null;
+}
+
+function configurarMenuPerfilManual() {
+    const profileBtn = document.getElementById("profileMenuBtn");
+    const profileDropdown = document.getElementById("profileDropdown");
+
+    if (profileBtn && profileDropdown) {
+        profileBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const isActive = profileDropdown.classList.contains("active") || profileDropdown.style.display === "block";
+            if (isActive) {
+                profileDropdown.classList.remove("active");
+                profileDropdown.style.display = "none";
+            } else {
+                profileDropdown.classList.add("active");
+                profileDropdown.style.display = "block";
+            }
+        });
+
+        document.addEventListener("click", (e) => {
+            if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+                profileDropdown.classList.remove("active");
+                profileDropdown.style.display = "none";
+            }
+        });
+    }
 }
 
 function poblarSelectorTarjetas(usuario) {
@@ -68,8 +121,16 @@ function poblarSelectorTarjetas(usuario) {
 
     selectOrigen.innerHTML = '';
 
-    // Extraer el array de tarjetas aprobadas según la estructura real de cart.docx
-    const tarjetas = usuario.tarjetasAprobadas || [];
+    let tarjetasBrutas = usuario.tarjetasAprobadas;
+    let tarjetas = [];
+
+    if (tarjetasBrutas) {
+        if (Array.isArray(tarjetasBrutas)) {
+            tarjetas = tarjetasBrutas;
+        } else if (typeof tarjetasBrutas === 'object') {
+            tarjetas = Object.values(tarjetasBrutas);
+        }
+    }
 
     if (tarjetas.length > 0) {
         tarjetas.forEach((tarjeta, index) => {
@@ -77,10 +138,10 @@ function poblarSelectorTarjetas(usuario) {
             option.value = index;
 
             const titulo = tarjeta.titulo || "Tarjeta Finara";
-            const tipo = tarjeta.tipo ? `(${tarjeta.tipo.toUpperCase()})` : "";
+            const numeroTarjeta = tarjeta.numeroTarjeta || tarjeta.tipo || "Plástico digital";
             const saldoMostrado = usuario.saldoDisponible || "$ 0";
 
-            option.textContent = `${titulo} ${tipo} - Saldo: ${saldoMostrado}`;
+            option.textContent = `${titulo} - [${numeroTarjeta}] (Saldo: ${saldoMostrado})`;
             selectOrigen.appendChild(option);
         });
     } else {
@@ -120,7 +181,6 @@ function procesarConsignacionFinal(usuarioActivo) {
         return;
     }
 
-    // Calcular el nuevo saldo
     let saldoActualNum = 0;
     if (usuarioActivo.saldoDisponible) {
         saldoActualNum = parseFloat(usuarioActivo.saldoDisponible.replace(/[^0-9.-]+/g,"")) || 0;
@@ -130,7 +190,6 @@ function procesarConsignacionFinal(usuarioActivo) {
     usuarioActivo.saldoDisponible = `$ ${saldoActualNum.toLocaleString('es-CO')}`;
     usuarioActivo.ultimaActividad = "Hace un momento";
 
-    // Actualizar el perfil en localStorage y la lista global
     localStorage.setItem('userProfile', JSON.stringify(usuarioActivo));
 
     let listaUsuarios = JSON.parse(localStorage.getItem("finara_usuarios_local")) || [];
