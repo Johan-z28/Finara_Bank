@@ -181,15 +181,27 @@ function procesarConsignacionFinal(usuarioActivo) {
         return;
     }
 
+    // Extraer limpiamente el saldo actual evitando errores con puntos, comas o décimas fantasma
     let saldoActualNum = 0;
     if (usuarioActivo.saldoDisponible) {
-        saldoActualNum = parseFloat(usuarioActivo.saldoDisponible.replace(/[^0-9.-]+/g,"")) || 0;
+        // Reemplazar puntos de miles y limpiar formato monetario string a número flotante real
+        const limpioStr = usuarioActivo.saldoDisponible.toString()
+            .replace('$', '')
+            .trim()
+            .replaceAll('.', '')
+            .replace(',', '.');
+
+        saldoActualNum = parseFloat(limpioStr) || 0;
     }
+
+    // Sumar de forma exacta el monto ingresado
     saldoActualNum += monto;
 
-    usuarioActivo.saldoDisponible = `$ ${saldoActualNum.toLocaleString('es-CO')}`;
+    // Guardar el saldo formateado limpiamente sin decimales extraños en pesos colombianos
+    usuarioActivo.saldoDisponible = `$ ${Math.round(saldoActualNum).toLocaleString('es-CO')}`;
     usuarioActivo.ultimaActividad = "Hace un momento";
 
+    // Actualizar localStorage
     localStorage.setItem('userProfile', JSON.stringify(usuarioActivo));
 
     let listaUsuarios = JSON.parse(localStorage.getItem("finara_usuarios_local")) || [];
