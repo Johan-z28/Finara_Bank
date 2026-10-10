@@ -1,5 +1,4 @@
 import { initGlobalComponents } from './Global/app.js';
-
 let editando = false;
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -11,52 +10,70 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnEditar.addEventListener('click', toggleModoEdicion);
     }
 
-    // <-- NUEVA LÍNEA: Activar los botones de lápiz individuales -->
     configurarBotonesEditarIndividuales();
-
     configurarBotonesConfiguracion();
+    configurarCambioFotoAvatar();
+    configurarInteraccionActividad(); // <-- NUEVO: Activa el modal con calendario de actividad
 });
 
 async function cargarDatosPerfil() {
     let userData = null;
+    let storedData = localStorage.getItem('userProfile');
 
-    try {
-        const response = await fetch('/api/user/profile', {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
-        });
+    if (storedData) {
+        userData = JSON.parse(storedData);
+    } else {
+        const localUsers = JSON.parse(localStorage.getItem('finara_usuarios_local'));
+        if (localUsers && localUsers.length > 0) {
+            userData = localUsers[localUsers.length - 1];
+        }
+    }
 
-        if (!response.ok) throw new Error('Error al conectar con el backend');
+    if (!userData) {
+        userData = {
+            nombre: "María Gómez",
+            rol: "Cliente",
+            email: "maria.gomez@email.com",
+            telefono: "+57 300 123 4567",
+            direccion: "Por definir",
+            productosActivos: 3,
+            saldoDisponible: "$ 2.450.000",
+            fechaCreacion: new Date().toISOString(), // Guardamos fecha de creación para el cálculo de días
+            avatar: "../Style/image/profile/avatar-maria.png",
+            verificado: true
+        };
+    }
 
-        userData = await response.json();
-        localStorage.setItem('userProfile', JSON.stringify(userData));
+    // SINCRONIZACIÓN DE DIRECCIÓN: Si tiene tarjetas aprobadas con dirección de envío, usar esa
+    let direccionFinal = userData.direccion || "Por definir";
+    if (userData.tarjetasAprobadas && userData.tarjetasAprobadas.length > 0) {
+        const ultimaTarjeta = userData.tarjetasAprobadas[userData.tarjetasAprobadas.length - 1];
+        if (ultimaTarjeta.direccionEnvio) {
+            direccionFinal = ultimaTarjeta.direccionEnvio;
+            userData.direccion = direccionFinal;
+            localStorage.setItem('userProfile', JSON.stringify(userData));
+        }
+    }
 
-    } catch (error) {
-        console.warn('Backend no disponible, cargando datos desde localStorage...');
+    // CÁLCULO DE DÍAS EN TIEMPO REAL PARA LA ÚLTIMA ACTIVIDAD
+    let textoActividad = "Recién registrado";
+    if (userData.fechaCreacion) {
+        const fechaCreacion = new Date(userData.fechaCreacion);
+        const hoy = new Date();
+        const diferenciaTiempo = hoy - fechaCreacion;
+        const diferenciaDias = Math.floor(diferenciaTiempo / (1000 * 60 * 60 * 24));
 
-        let storedData = localStorage.getItem('userProfile');
-        if (storedData) {
-            userData = JSON.parse(storedData);
+        if (diferenciaDias === 0) {
+            textoActividad = "Recién registrado";
+        } else if (diferenciaDias === 1) {
+            textoActividad = "Creado hace 1 día";
         } else {
-            const localUsers = JSON.parse(localStorage.getItem('finara_usuarios_local'));
-            if (localUsers && localUsers.length > 0) {
-                userData = localUsers[localUsers.length - 1];
-            }
+            textoActividad = `Creado hace ${diferenciaDias} días`;
         }
-
-        if (!userData) {
-            userData = {
-                nombre: "María Gómez",
-                rol: "Cliente",
-                email: "maria.gomez@email.com",
-                telefono: "+57 300 123 4567",
-                direccion: "Cra 45 # 12-34, Bogotá",
-                productosActivos: 3,
-                saldoDisponible: "$ 2.450.000",
-                ultimaActividad: "Hoy, 10:24 a. m.",
-                avatar: "../Style/image/avatar-maria.png"
-            };
-        }
+    } else {
+        // Si es un usuario antiguo sin fecha de creación, se la asignamos hoy
+        userData.fechaCreacion = new Date().toISOString();
+        localStorage.setItem('userProfile', JSON.stringify(userData));
     }
 
     const normalizedUser = {
@@ -64,11 +81,13 @@ async function cargarDatosPerfil() {
         rol: userData.rol || "Cliente",
         email: userData.email || userData.correo || "No registrado",
         telefono: userData.telefono || "No registrado",
-        direccion: userData.direccion || "No registrada",
-        productosActivos: userData.productosActivos ?? 0,
+        direccion: direccionFinal,
+        productosActivos: userData.productosActivos ?? (userData.tarjetasAprobadas ? userData.tarjetasAprobadas.length : 0),
         saldoDisponible: userData.saldoDisponible ?? "$ 0",
-        ultimaActividad: userData.ultimaActividad ?? "Reciente",
-        avatar: userData.avatar || "../Style/image/avatar-maria.png"
+        ultimaActividad: textoActividad,
+        fechaCreacion: userData.fechaCreacion,
+        avatar: userData.avatar || "../Style/image/profile/avatar-maria.png",
+        verificado: userData.verificado ?? true
     };
 
     renderizarPerfil(normalizedUser);
@@ -82,22 +101,27 @@ function renderizarPerfil(user) {
 
     const profileHero = document.querySelector('.profile-hero');
     if (profileHero) {
-        const nameH2 = profileHero.querySelector('.profile-data h2');
-        const roleSpan = profileHero.querySelector('.profile-data span');
-        const contactPs = profileHero.querySelectorAll('.profile-contact p');
-        const avatarImg = profileHero.querySelector('.profile-avatar img');
+        const nameH2 = document.getElementById('profileHeroName');
+        const roleSpan = document.getElementById('profileHeroRole');
+        const avatarImg = document.getElementById('profileAvatarImg');
+        const verificationBadge = document.getElementById('verificationStatusBadge');
 
         if (nameH2) nameH2.textContent = user.nombre;
         if (roleSpan) roleSpan.textContent = user.rol;
+        if (avatarImg && user.avatar) avatarImg.src = user.avatar;
 
-        if (contactPs.length >= 3) {
-            contactPs[0].innerHTML = `<i class="fa-regular fa-envelope"></i> ${user.email}`;
-            contactPs[1].innerHTML = `<i class="fa-solid fa-phone"></i> ${user.telefono}`;
-            contactPs[2].innerHTML = `<i class="fa-solid fa-location-dot"></i> ${user.direccion}`;
-        }
-
-        if (avatarImg && user.avatar) {
-            avatarImg.src = user.avatar;
+        if (verificationBadge) {
+            if (user.verificado) {
+                verificationBadge.style.background = 'rgba(16, 185, 129, 0.15)';
+                verificationBadge.style.border = '1px solid #10B981';
+                verificationBadge.style.color = '#34D399';
+                verificationBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i> Cuenta Verificada`;
+            } else {
+                verificationBadge.style.background = 'rgba(239, 68, 68, 0.15)';
+                verificationBadge.style.border = '1px solid #EF4444';
+                verificationBadge.style.color = '#F87171';
+                verificationBadge.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Cuenta No Verificada`;
+            }
         }
     }
 
@@ -120,19 +144,122 @@ function renderizarPerfil(user) {
     }
 }
 
-// Función para alternar el modo edición con confirmación de SweetAlert2 y validación local
+// NUEVO: Modal emergente con Calendario de inicios de sesión al hacer clic en "Última actividad"
+function configurarInteraccionActividad() {
+    const accountSummaryCard = document.querySelector('.profile-card.account-summary');
+    if (!accountSummaryCard) return;
+
+    const itemsResumen = accountSummaryCard.querySelectorAll('.summary-item');
+    if (itemsResumen.length >= 3) {
+        const itemActividad = itemsResumen[2]; // El tercer item es Última Actividad
+        itemActividad.style.cursor = 'pointer';
+        itemActividad.title = 'Haz clic para ver el historial de actividad y calendario';
+
+        itemActividad.addEventListener('click', () => {
+            // Generar un calendario HTML simulado de los días del mes actual con accesos registrados
+            const fechaActual = new Date();
+            const mesAnio = fechaActual.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+            const diaHoy = fechaActual.getDate();
+
+            let diasHtml = '';
+            for (let i = 1; i <= 30; i++) {
+                let esHoy = i === diaHoy;
+                let conAcceso = i <= diaHoy; // Días pasados o el actual con inicio de sesión simulado
+                let estilos = `padding: 8px; text-align: center; border-radius: 8px; font-size: 12px;`;
+
+                if (esHoy) {
+                    estilos += ` background: #e5a93c; color: #000; font-weight: bold;`;
+                } else if (conAcceso) {
+                    estilos += ` background: rgba(16, 185, 129, 0.2); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.4);`;
+                } else {
+                    estilos += ` background: #1a1d24; color: #666;`;
+                }
+                diasHtml += `<div style="${estilos}">${i}</div>`;
+            }
+
+            Swal.fire({
+                title: `<strong style="color: #e5a93c; text-transform: capitalize;">Calendario de Sesiones (${mesAnio})</strong>`,
+                html: `
+                   <div style="text-align: left; color: #b3b3b3; font-size: 13px; margin-bottom: 15px;">
+                       <p>Historial de actividad y días con inicio de sesión verificado en la plataforma:</p>
+                   </div>
+                   <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; background: #0e1015; padding: 15px; border-radius: 12px; border: 1px solid #222630;">
+                       <div style="text-align:center; color:#e5a93c; font-weight:bold; font-size:11px;">Lu</div>
+                       <div style="text-align:center; color:#e5a93c; font-weight:bold; font-size:11px;">Ma</div>
+                       <div style="text-align:center; color:#e5a93c; font-weight:bold; font-size:11px;">Mi</div>
+                       <div style="text-align:center; color:#e5a93c; font-weight:bold; font-size:11px;">Ju</div>
+                       <div style="text-align:center; color:#e5a93c; font-weight:bold; font-size:11px;">Vi</div>
+                       <div style="text-align:center; color:#e5a93c; font-weight:bold; font-size:11px;">Sa</div>
+                       <div style="text-align:center; color:#e5a93c; font-weight:bold; font-size:11px;">Do</div>
+                       ${diasHtml}
+                   </div>
+                   <div style="margin-top: 15px; font-size: 11px; color: #888; display: flex; justify-content: space-around;">
+                       <span>🟢 Días con acceso</span>
+                       <span>🟡 Día actual</span>
+                   </div>
+               `,
+                background: '#12151c',
+                color: '#ffffff',
+                confirmButtonText: 'Cerrar',
+                confirmButtonColor: '#e5a93c',
+                width: '500px'
+            });
+        });
+    }
+}
+
+function configurarCambioFotoAvatar() {
+    const btnCambiarFoto = document.getElementById('btnCambiarFoto');
+    const inputCambiarFoto = document.getElementById('inputCambiarFoto');
+
+    if (!btnCambiarFoto || !inputCambiarFoto) return;
+
+    btnCambiarFoto.addEventListener('click', () => inputCambiarFoto.click());
+
+    inputCambiarFoto.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(uploadEvent) {
+            const base64Image = uploadEvent.target.result;
+
+            let userData = JSON.parse(localStorage.getItem('userProfile')) || {};
+            userData.avatar = base64Image;
+            localStorage.setItem('userProfile', JSON.stringify(userData));
+
+            const localUsers = JSON.parse(localStorage.getItem('finara_usuarios_local')) || [];
+            if (localUsers.length > 0) {
+                localUsers[localUsers.length - 1].avatar = base64Image;
+                localStorage.setItem('finara_usuarios_local', JSON.stringify(localUsers));
+            }
+
+            cargarDatosPerfil();
+
+            Swal.fire({
+                title: '¡Foto actualizada!',
+                text: 'Tu imagen de perfil se ha guardado correctamente.',
+                icon: 'success',
+                background: '#12151c',
+                color: '#ffffff',
+                confirmButtonColor: '#e5a93c'
+            });
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+// Funciones estándar de edición y contraseña (mantienen la estructura previa)
 async function toggleModoEdicion() {
     const btnEditar = document.querySelector('.btn-edit-profile');
     const infoRows = document.querySelectorAll('.profile-card')[0]?.querySelectorAll('.info-row');
     if (!infoRows) return;
 
     if (!editando) {
-        // Entrar en modo edición
         editando = true;
         btnEditar.innerHTML = `<i class="fa-solid fa-check"></i> Guardar cambios`;
-        btnEditar.style.backgroundColor = '#10B981'; // Color verde de éxito
+        btnEditar.style.backgroundColor = '#10B981';
 
-        // Convertir los campos en inputs editables
         infoRows.forEach(row => {
             const strong = row.querySelector('strong');
             const textoActual = strong.textContent;
@@ -140,7 +267,6 @@ async function toggleModoEdicion() {
             strong.innerHTML = `<input type="text" class="input-edit-perfil" data-campo="${campoId}" value="${textoActual}" style="background: #222; color: #fff; border: 1px solid #444; padding: 4px 8px; border-radius: 4px; width: 100%;">`;
         });
     } else {
-        // 1. Modal de confirmación con SweetAlert2 antes de guardar
         const confirmacion = await Swal.fire({
             title: '¿Guardar cambios?',
             text: '¿Estás seguro de actualizar tu información personal?',
@@ -154,12 +280,8 @@ async function toggleModoEdicion() {
             cancelButtonColor: '#d33'
         });
 
-        // Si el usuario cancela, detenemos el proceso y se mantiene editando
-        if (!confirmacion.isConfirmed) {
-            return;
-        }
+        if (!confirmacion.isConfirmed) return;
 
-        // 2. Recolectar nuevos valores y validar que no estén vacíos
         const nuevosDatos = {};
         let hayCamposVacios = false;
 
@@ -168,9 +290,7 @@ async function toggleModoEdicion() {
             if (input) {
                 const campo = input.dataset.campo;
                 const valor = input.value.trim();
-                if (valor === '') {
-                    hayCamposVacios = true;
-                }
+                if (valor === '') hayCamposVacios = true;
                 nuevosDatos[campo] = valor;
             }
         });
@@ -184,27 +304,21 @@ async function toggleModoEdicion() {
                 color: '#ffffff',
                 confirmButtonColor: '#e5a93c'
             });
-            return; // No guardamos y permitimos corregir
+            return;
         }
 
-        // 3. Recuperar datos actuales del localStorage para conservar saldo, avatar, contraseña, etc.
         let userData = JSON.parse(localStorage.getItem('userProfile')) || {};
-
-        // Fusionar cambios
         userData.nombre = nuevosDatos.nombre || userData.nombre;
         userData.email = nuevosDatos.correo || userData.email;
         userData.telefono = nuevosDatos.telefono || userData.telefono;
         userData.direccion = nuevosDatos.direccion || userData.direccion;
 
-        // 4. Guardar actualizado en localStorage
         localStorage.setItem('userProfile', JSON.stringify(userData));
 
-        // 5. Restaurar botón principal
         btnEditar.innerHTML = `<i class="fa-solid fa-pen"></i> Editar perfil`;
         btnEditar.style.backgroundColor = '';
         editando = false;
 
-        // Alerta bonita de éxito con SweetAlert2
         Swal.fire({
             title: '¡Actualizado!',
             text: 'Tus datos se han guardado correctamente.',
@@ -214,12 +328,10 @@ async function toggleModoEdicion() {
             confirmButtonColor: '#e5a93c'
         });
 
-        // Volver a renderizar con la data fresca en pantalla
         cargarDatosPerfil();
     }
 }
 
-// Identificar qué campo corresponde a cada fila de información personal
 function getCampoId(row) {
     const label = row.querySelector('span').textContent.toLowerCase();
     if (label.includes('nombre')) return 'nombre';
@@ -229,7 +341,6 @@ function getCampoId(row) {
     return '';
 }
 
-// Configurar los botones de lápiz individuales en cada fila de información personal
 function configurarBotonesEditarIndividuales() {
     const infoRows = document.querySelectorAll('.profile-card')[0]?.querySelectorAll('.info-row');
     if (!infoRows) return;
@@ -243,7 +354,6 @@ function configurarBotonesEditarIndividuales() {
             const strongVal = row.querySelector('strong');
             const valorActual = strongVal.textContent.trim();
             const campoId = getCampoId(row);
-
             if (!campoId) return;
 
             const titulosModal = {
@@ -253,14 +363,10 @@ function configurarBotonesEditarIndividuales() {
                 'direccion': 'Editar Dirección'
             };
 
-            // Mostrar modal de SweetAlert2 con input prellenado
             const { value: nuevoValor } = await Swal.fire({
                 title: titulosModal[campoId] || 'Editar campo',
                 input: 'text',
                 inputValue: valorActual,
-                inputAttributes: {
-                    autocapitalize: 'off'
-                },
                 showCancelButton: true,
                 confirmButtonText: 'Guardar',
                 cancelButtonText: 'Cancelar',
@@ -269,22 +375,16 @@ function configurarBotonesEditarIndividuales() {
                 confirmButtonColor: '#e5a93c',
                 cancelButtonColor: '#d33',
                 inputValidator: (value) => {
-                    if (!value || value.trim() === '') {
-                        return '¡El campo no puede estar vacío!';
-                    }
+                    if (!value || value.trim() === '') return '¡El campo no puede estar vacío!';
                     if (campoId === 'correo') {
                         const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                        if (!regexCorreo.test(value.trim())) {
-                            return 'Por favor ingresa un correo electrónico válido.';
-                        }
+                        if (!regexCorreo.test(value.trim())) return 'Por favor ingresa un correo electrónico válido.';
                     }
                 }
             });
 
             if (nuevoValor) {
                 const valorLimpio = nuevoValor.trim();
-
-                // Recuperar y actualizar el perfil en localStorage
                 let userData = JSON.parse(localStorage.getItem('userProfile')) || {};
 
                 if (campoId === 'correo') {
@@ -292,10 +392,8 @@ function configurarBotonesEditarIndividuales() {
                 } else {
                     userData[campoId] = valorLimpio;
                 }
-
                 localStorage.setItem('userProfile', JSON.stringify(userData));
 
-                // Actualizar también en el registro local general si aplica
                 const localUsers = JSON.parse(localStorage.getItem('finara_usuarios_local')) || [];
                 if (localUsers.length > 0) {
                     localUsers[localUsers.length - 1][campoId === 'correo' ? 'email' : campoId] = valorLimpio;
@@ -303,7 +401,6 @@ function configurarBotonesEditarIndividuales() {
                     localStorage.setItem('finara_usuarios_local', JSON.stringify(localUsers));
                 }
 
-                // Notificación de éxito y actualización de la interfaz
                 await Swal.fire({
                     title: '¡Actualizado!',
                     text: `El campo "${spanLabel}" se ha actualizado correctamente.`,
@@ -312,70 +409,64 @@ function configurarBotonesEditarIndividuales() {
                     color: '#ffffff',
                     confirmButtonColor: '#e5a93c'
                 });
-
                 cargarDatosPerfil();
             }
         });
     });
 }
 
-// Configurar los botones de configuración de cuenta con SweetAlert2
 function configurarBotonesConfiguracion() {
     const settingRows = document.querySelectorAll('.profile-card')[1]?.querySelectorAll('.setting-row');
-    if (!settingRows || settingRows.length === 0) return;
+    if (!settingRows) return;
 
     settingRows.forEach((row, index) => {
         row.style.cursor = 'pointer';
         row.addEventListener('click', async () => {
-            switch (index) {
-                case 0: // Cambiar contraseña
-                    await cambiarContraseñaFácil();
-                    break;
-                case 1: // Notificaciones
-                    Swal.fire({
-                        title: 'Notificaciones',
-                        text: '¡Pronto estará disponible la gestión de notificaciones!',
-                        icon: 'info',
-                        background: '#12151c',
-                        color: '#ffffff',
-                        confirmButtonColor: '#e5a93c'
-                    });
-                    break;
-                case 2: // Métodos de autenticación
-                    Swal.fire({
-                        title: 'Autenticación',
-                        text: '¡Pronto estará disponible la configuración de métodos de autenticación!',
-                        icon: 'info',
-                        background: '#12151c',
-                        color: '#ffffff',
-                        confirmButtonColor: '#e5a93c'
-                    });
-                    break;
-                case 3: // Privacidad y datos
-                    Swal.fire({
-                        title: 'Privacidad y Datos',
-                        text: '¡Pronto estará disponible la sección de privacidad y datos!',
-                        icon: 'info',
-                        background: '#12151c',
-                        color: '#ffffff',
-                        confirmButtonColor: '#e5a93c'
-                    });
-                    break;
-                default:
-                    break;
+            if (index === 0) {
+                await cambiarContraseñaFácil();
+            } else {
+                Swal.fire({
+                    title: 'Sección en desarrollo',
+                    text: 'Esta opción estará disponible próximamente.',
+                    icon: 'info',
+                    background: '#12151c',
+                    color: '#ffffff',
+                    confirmButtonColor: '#e5a93c'
+                });
             }
         });
     });
 }
 
-// Función para cambiar contraseña con SweetAlert2 y validación real
 async function cambiarContraseñaFácil() {
-    // 1. Pedir contraseña actual
     const { value: passwordActual } = await Swal.fire({
         title: 'Cambiar contraseña',
         text: 'Ingresa tu contraseña actual:',
         input: 'password',
-        inputAttributes: { autocapitalize: 'off', autocorrect: 'off' },
+        background: '#12151c',
+        color: '#ffffff',
+        confirmButtonColor: '#e5a93c',
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar'
+    });
+    if (!passwordActual) return;
+
+    let userData = JSON.parse(localStorage.getItem('userProfile')) || {};
+    let passwordRegistrada = userData.password;
+    if (!passwordRegistrada) {
+        const localUsers = JSON.parse(localStorage.getItem('finara_usuarios_local')) || [];
+        if (localUsers.length > 0) passwordRegistrada = localUsers[localUsers.length - 1].password;
+    }
+
+    if (passwordRegistrada && passwordActual !== passwordRegistrada) {
+        Swal.fire({ title: 'Contraseña incorrecta', text: 'La contraseña actual no coincide.', icon: 'error', background: '#12151c', color: '#ffffff', confirmButtonColor: '#e5a93c' });
+        return;
+    }
+
+    const { value: nuevaPassword } = await Swal.fire({
+        title: 'Nueva contraseña',
+        text: 'Ingresa tu nueva contraseña (mínimo 8 caracteres):',
+        input: 'password',
         background: '#12151c',
         color: '#ffffff',
         confirmButtonColor: '#e5a93c',
@@ -383,107 +474,27 @@ async function cambiarContraseñaFácil() {
         cancelButtonText: 'Cancelar'
     });
 
-    if (!passwordActual) return;
-
-    // Obtener datos guardados para validar localmente si el backend no responde
-    let userData = JSON.parse(localStorage.getItem('userProfile')) || {};
-    let passwordRegistrada = userData.password;
-
-    if (!passwordRegistrada) {
-        const localUsers = JSON.parse(localStorage.getItem('finara_usuarios_local')) || [];
-        if (localUsers.length > 0) {
-            passwordRegistrada = localUsers[localUsers.length - 1].password;
-        }
+    if (!nuevaPassword) return;
+    if (nuevaPassword.length < 8) {
+        Swal.fire({ title: 'Atención', text: 'La contraseña debe tener al menos 8 caracteres.', icon: 'warning', background: '#12151c', color: '#ffffff', confirmButtonColor: '#e5a93c' });
+        return;
     }
 
-    try {
-        // Intento con Backend (Try-Catch)
-        const response = await fetch('/api/user/change-password', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ passwordActual })
-        });
+    userData.password = nuevaPassword;
+    localStorage.setItem('userProfile', JSON.stringify(userData));
 
-        if (!response.ok) throw new Error('Backend no disponible');
-
-        // Si responde el backend, pedir la nueva contraseña
-        const { value: nuevaPassword } = await Swal.fire({
-            title: 'Nueva contraseña',
-            text: 'Ingresa tu nueva contraseña (mínimo 8 caracteres):',
-            input: 'password',
-            background: '#12151c',
-            color: '#ffffff',
-            confirmButtonColor: '#e5a93c',
-            showCancelButton: true,
-            cancelButtonText: 'Cancelar'
-        });
-
-        if (!nuevaPassword) return;
-        if (nuevaPassword.length < 8) {
-            Swal.fire({ title: 'Error', text: 'La contraseña debe tener al menos 8 caracteres.', icon: 'error', background: '#12151c', color: '#ffffff', confirmButtonColor: '#e5a93c' });
-            return;
-        }
-
-        const responseChange = await fetch('/api/user/change-password', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ passwordActual, nuevaPassword })
-        });
-
-        if (!responseChange.ok) throw new Error('Error al actualizar en el servidor');
-
-        Swal.fire({ title: '¡Éxito!', text: 'Contraseña actualizada exitosamente en el servidor.', icon: 'success', background: '#12151c', color: '#ffffff', confirmButtonColor: '#e5a93c' });
-
-    } catch (error) {
-        console.warn('Validando contraseña en localStorage...');
-
-        // Validar si la contraseña actual coincide con la almacenada
-        if (passwordRegistrada && passwordActual !== passwordRegistrada) {
-            Swal.fire({ title: 'Contraseña incorrecta', text: 'La contraseña actual no coincide con nuestros registros.', icon: 'error', background: '#12151c', color: '#ffffff', confirmButtonColor: '#e5a93c' });
-            return;
-        }
-
-        // Pedir nueva contraseña
-        const { value: nuevaPassword } = await Swal.fire({
-            title: 'Nueva contraseña',
-            text: 'Ingresa tu nueva contraseña (mínimo 8 caracteres):',
-            input: 'password',
-            background: '#12151c',
-            color: '#ffffff',
-            confirmButtonColor: '#e5a93c',
-            showCancelButton: true,
-            cancelButtonText: 'Cancelar'
-        });
-
-        if (!nuevaPassword) return;
-
-        if (nuevaPassword.length < 8) {
-            Swal.fire({ title: 'Atención', text: 'La contraseña debe tener al menos 8 caracteres.', icon: 'warning', background: '#12151c', color: '#ffffff', confirmButtonColor: '#e5a93c' });
-            return;
-        }
-
-        if (nuevaPassword === passwordActual) {
-            Swal.fire({ title: 'Atención', text: 'La nueva contraseña no puede ser igual a la actual.', icon: 'warning', background: '#12151c', color: '#ffffff', confirmButtonColor: '#e5a93c' });
-            return;
-        }
-
-        // Guardar cambios en localStorage
-        userData.password = nuevaPassword;
-        localStorage.setItem('userProfile', JSON.stringify(userData));
-
-        const localUsers = JSON.parse(localStorage.getItem('finara_usuarios_local')) || [];
-        if (localUsers.length > 0) {
-            localUsers[localUsers.length - 1].password = nuevaPassword;
-            localStorage.setItem('finara_usuarios_local', JSON.stringify(localUsers));
-        }
-
-        Swal.fire({
-            title: '¡Actualizado!',
-            text: 'Tu contraseña ha sido actualizada correctamente en el almacenamiento local.',
-            icon: 'success',
-            background: '#12151c',
-            color: '#ffffff',
-            confirmButtonColor: '#e5a93c'
-        });
+    const localUsers = JSON.parse(localStorage.getItem('finara_usuarios_local')) || [];
+    if (localUsers.length > 0) {
+        localUsers[localUsers.length - 1].password = nuevaPassword;
+        localStorage.setItem('finara_usuarios_local', JSON.stringify(localUsers));
     }
+
+    Swal.fire({
+        title: '¡Actualizado!',
+        text: 'Tu contraseña ha sido actualizada correctamente.',
+        icon: 'success',
+        background: '#12151c',
+        color: '#ffffff',
+        confirmButtonColor: '#e5a93c'
+    });
 }
