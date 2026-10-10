@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const documento = document.getElementById("documento").value.trim();
             const telefono = document.getElementById("telefono").value.trim();
             const fecha = document.getElementById("fecha").value;
-            const username = document.getElementById("userName").value.trim();
+            const username = document.getElementById("username").value.trim(); // Corregido a 'username' en minúscula
             const password = document.getElementById("password").value;
             const confirmPassword = document.getElementById("confirmPassword").value;
 
@@ -147,7 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 saldoDisponible: "$ 0",
                 ultimaActividad: "Recién registrado",
                 avatar: "../../Style/image/avatar-maria.png",
-                verificado: false,
+                verificado: true,
             };
 
             usuariosLocales.push(userData);
@@ -175,14 +175,14 @@ document.addEventListener("DOMContentLoaded", () => {
             Swal.fire({
                 title: '<strong style="color: #e5a93c;">Términos y Condiciones - Finara Bank</strong>',
                 html: `
-                  <div style="text-align: left; max-height: 320px; overflow-y: auto; padding-right: 12px; font-size: 13px; color: #b3b3b3; line-height: 1.6;">
-                      <p><strong style="color: #fff;">1. Marco de Operación Digital:</strong> Al aperturar su cuenta digital en Finara Bank, el usuario acepta operar bajo los estandares de seguridad bancaria estipulados para transacciones virtuales.</p>
-                      <br>
-                      <p><strong style="color: #fff;">2. Mayoría de Edad y Autenticidad:</strong> Los servicios están restringidos a mayores de 18 años. Toda la información suministrada (tipo y número de documento) tiene carácter de declaración jurada.</p>
-                      <br>
-                      <p><strong style="color: #fff;">3. Custodia de Claves:</strong> El titular es el único responsable de la seguridad de su contraseña y claves transaccionales frente a accesos de terceros.</p>
-                  </div>
-              `,
+                    <div style="text-align: left; max-height: 320px; overflow-y: auto; padding-right: 12px; font-size: 13px; color: #b3b3b3; line-height: 1.6;">
+                        <p><strong style="color: #fff;">1. Marco de Operación Digital:</strong> Al aperturar su cuenta digital en Finara Bank, el usuario acepta operar bajo los estándares de seguridad bancaria estipulados para transacciones virtuales.</p>
+                        <br>
+                        <p><strong style="color: #fff;">2. Mayoría de Edad y Autenticidad:</strong> Los servicios están restringidos a mayores de 18 años. Toda la información suministrada tiene carácter de declaración jurada.</p>
+                        <br>
+                        <p><strong style="color: #fff;">3. Custodia de Claves:</strong> El titular es el único responsable de la seguridad de su contraseña y claves transaccionales frente a accesos de terceros.</p>
+                    </div>
+                `,
                 icon: 'info',
                 background: '#12151c',
                 color: '#ffffff',
@@ -201,14 +201,14 @@ document.addEventListener("DOMContentLoaded", () => {
             Swal.fire({
                 title: '<strong style="color: #e5a93c;">Política de Privacidad y Habeas Data</strong>',
                 html: `
-                  <div style="text-align: left; max-height: 320px; overflow-y: auto; padding-right: 12px; font-size: 13px; color: #b3b3b3; line-height: 1.6;">
-                      <p><strong style="color: #fff;">1. Tratamiento de Datos Sensibles:</strong> En cumplimiento de las normativas de protección de datos, Finara Bank protege rigurosamente la información de identificación personal recaudada.</p>
-                      <br>
-                      <p><strong style="color: #fff;">2. Finalidad Financiera:</strong> Los datos son utilizados exclusivamente para la validación de perfiles, gestión de productos de crédito/débito y prevención de fraudes bancarios.</p>
-                      <br>
-                      <p><strong style="color: #fff;">3. Confidencialidad:</strong> Sus datos personales no serán comercializados ni compartidos con entidades ajenas a la red de servicios financieros de Finara.</p>
-                  </div>
-              `,
+                    <div style="text-align: left; max-height: 320px; overflow-y: auto; padding-right: 12px; font-size: 13px; color: #b3b3b3; line-height: 1.6;">
+                        <p><strong style="color: #fff;">1. Tratamiento de Datos:</strong> En cumplimiento de normativas simuladas de protección, Finara Bank protege rigurosamente la información personal recaudada.</p>
+                        <br>
+                        <p><strong style="color: #fff;">2. Finalidad Financiera:</strong> Los datos se emplean exclusivamente para la simulación de perfiles, gestión de saldos y demostración de software.</p>
+                        <br>
+                        <p><strong style="color: #fff;">3. Confidencialidad:</strong> Sus datos no serán comercializados con entidades ajenas a este entorno académico o de desarrollo.</p>
+                    </div>
+                `,
                 icon: 'success',
                 background: '#12151c',
                 color: '#ffffff',
