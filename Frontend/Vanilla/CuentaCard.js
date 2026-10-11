@@ -44,6 +44,11 @@ export function crearCuentaCard(cuenta, { ocultarSaldo = false } = {}) {
     const titulos = el('div', 'cuenta-card__titles');
     titulos.append(el('h3', 'cuenta-card__tipo', tipo.etiqueta), el('span', 'cuenta-card__numero', numeroTexto));
 
+    if (cuenta.tipo === 'TARJETA_CREDITO') {
+        const badgeCredito = el('span', 'cuenta-card__badge-credito', 'Crédito');
+        titulos.querySelector('.cuenta-card__tipo').appendChild(badgeCredito);
+    }
+
     const estado = el('span', `cuenta-card__estado${cuenta.estado === 'ACTIVA' ? '' : ' cuenta-card__estado--inactiva'}`,
         cuenta.estado === 'ACTIVA' ? 'Activa' : 'Inactiva');
 

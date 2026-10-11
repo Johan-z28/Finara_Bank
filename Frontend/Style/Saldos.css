@@ -101,6 +101,21 @@
 .cuenta-card__tipo {
     font-size: 0.95rem;
     font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.cuenta-card__badge-credito {
+    font-size: 0.65rem;
+    background: rgba(229, 169, 60, 0.2);
+    color: var(--gold-main);
+    border: 1px solid rgba(229, 169, 60, 0.4);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .cuenta-card__numero {
