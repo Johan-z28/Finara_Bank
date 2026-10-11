@@ -1,7 +1,7 @@
 // Vanilla/cuentasService.js
 // Capa de acceso a datos de cuentas para HU-04 (Consulta de saldo).
-// La UI nunca llama a fetch o manipula directamente el almacenamiento.
-// Cuando el backend REST esté disponible, USAR_API_BACKEND se activa y consulta el servidor.
+// Maneja la gestión de cuentas asociadas al usuario autenticado (Ahorros, Corriente y Tarjetas de Crédito).
+// Evita mezclar o duplicar cuentas entre diferentes usuarios.
 
 const USAR_API_BACKEND = false;
 const API_URL = 'http://localhost:8080/api/cuentas';
@@ -17,7 +17,7 @@ export class SesionExpiradaError extends Error {
  * Obtiene el usuario autenticado desde el almacenamiento local
  * usando las diferentes claves compatibles del proyecto.
  */
-function obtenerUsuarioAutenticado() {
+export function obtenerUsuarioAutenticado() {
     try {
         const perfil = JSON.parse(localStorage.getItem('userProfile'));
         if (perfil) return perfil;
@@ -45,6 +45,28 @@ function obtenerUsuarioAutenticado() {
 }
 
 /**
+ * Obtiene el identificador canónico único del usuario activo.
+ */
+export function obtenerUsernameActivo() {
+    const u = obtenerUsuarioAutenticado();
+    return u ? (u.username || u.correo || 'maria17') : 'maria17';
+}
+
+/**
+ * Consulta qué productos bancarios iniciales tiene activos el usuario actual:
+ * { tieneAhorros: boolean, tieneCorriente: boolean, tieneCredito: boolean, cuentas: Array }
+ */
+export async function consultarEstadoProductosUsuario() {
+    const cuentas = await obtenerCuentas();
+    return {
+        tieneAhorros: cuentas.some(c => c.tipo === 'AHORROS' && c.estado === 'ACTIVA'),
+        tieneCorriente: cuentas.some(c => c.tipo === 'CORRIENTE' && c.estado === 'ACTIVA'),
+        tieneCredito: cuentas.some(c => c.tipo === 'TARJETA_CREDITO' && c.estado === 'ACTIVA'),
+        cuentas
+    };
+}
+
+/**
  * Sincroniza y obtiene las cuentas del usuario autenticado sin datos falsos.
  * Conecta con los productos aprobados en solicitud de tarjetas (tarjetasAprobadas)
  * y con las cuentas persistentes en finara_cuentas (compartidas con transferencias y operaciones).
@@ -68,83 +90,120 @@ export async function obtenerCuentas() {
     }
 
     // Modo simulación local con persistencia real del usuario autenticado
-    await new Promise(r => setTimeout(r, 250)); // Simula latencia natural de red
+    await new Promise(r => setTimeout(r, 150)); // Latencia fluida de UI
 
     const usuario = obtenerUsuarioAutenticado();
     if (!usuario) {
         throw new SesionExpiradaError();
     }
 
+    const usernameActual = obtenerUsernameActivo();
+
     // Obtener cuentas existentes en el ecosistema local
-    let cuentasLocales = [];
+    let todasLasCuentas = [];
     try {
-        cuentasLocales = JSON.parse(localStorage.getItem('finara_cuentas')) || [];
-        if (!Array.isArray(cuentasLocales)) cuentasLocales = [];
+        todasLasCuentas = JSON.parse(localStorage.getItem('finara_cuentas')) || [];
+        if (!Array.isArray(todasLasCuentas)) todasLasCuentas = [];
     } catch {
-        cuentasLocales = [];
+        todasLasCuentas = [];
     }
 
-    // Si existen cuentas en finara_cuentas, filtrar las asociadas al usuario si tienen username
-    // o asociarlas al usuario activo actual
-    let cuentasUsuario = [];
-    if (cuentasLocales.length > 0) {
-        cuentasUsuario = cuentasLocales.filter(c => !c.username || c.username === usuario.username || c.username === usuario.correo);
-        // Si ninguna tiene username explícito, las cuentas iniciales pertenecen al usuario en sesión
-        if (cuentasUsuario.length === 0 && !cuentasLocales.some(c => c.username && c.username !== usuario.username)) {
-            cuentasUsuario = cuentasLocales;
+    // Filtrar estrictamente las cuentas del usuario actual
+    let cuentasUsuario = todasLasCuentas.filter(c => c && (c.username === usernameActual || (!c.username && usernameActual === 'maria17')));
+
+    // Si el usuario es nuevo y no tiene ninguna cuenta registrada en finara_cuentas,
+    // configurar sus cuentas iniciales según su perfil (Ahorros y Corriente por defecto para maria17)
+    let cambios = false;
+    if (cuentasUsuario.length === 0) {
+        if (usernameActual === 'maria17') {
+            const cuentasInicialesMaria = [
+                { id: 'CTA-AHO-01', tipo: 'AHORROS', numero: '4021587701234', saldo: 1248767, estado: 'ACTIVA', username: 'maria17', fechaCreacion: new Date().toISOString() },
+                { id: 'CTA-CORR-02', tipo: 'CORRIENTE', numero: '4021587705678', saldo: 699236, estado: 'ACTIVA', username: 'maria17', fechaCreacion: new Date().toISOString() }
+            ];
+            cuentasUsuario = cuentasInicialesMaria;
+            todasLasCuentas.push(...cuentasInicialesMaria);
+            cambios = true;
+        } else if (usuario.cuentaInicial) {
+            // Si el usuario se registró con una cuenta específica (ej: sólo Ahorros)
+            const nuevaCta = {
+                id: `CTA-${usuario.cuentaInicial.slice(0, 3).toUpperCase()}-${Date.now()}`,
+                tipo: usuario.cuentaInicial === 'corriente' ? 'CORRIENTE' : 'AHORROS',
+                numero: '4021' + String(Date.now()).slice(-8),
+                saldo: 0,
+                estado: 'ACTIVA',
+                username: usernameActual,
+                fechaCreacion: new Date().toISOString()
+            };
+            cuentasUsuario = [nuevaCta];
+            todasLasCuentas.push(nuevaCta);
+            cambios = true;
+        } else {
+            // Usuario estándar por defecto con Cuenta de Ahorros aperturada
+            const cuentaAhorrosDefault = {
+                id: `CTA-AHO-${Date.now()}`,
+                tipo: 'AHORROS',
+                numero: '4021' + String(Date.now()).slice(-8),
+                saldo: 0,
+                estado: 'ACTIVA',
+                username: usernameActual,
+                fechaCreacion: new Date().toISOString()
+            };
+            cuentasUsuario = [cuentaAhorrosDefault];
+            todasLasCuentas.push(cuentaAhorrosDefault);
+            cambios = true;
         }
     }
 
-    // Sincronizar también tarjetas aprobadas por el usuario en "Solicitud de Tarjeta" (newCard.js)
+    // Sincronizar tarjetas aprobadas por el usuario (newCard.js)
     const tarjetasAprobadas = usuario.tarjetasAprobadas || [];
-    let cambios = false;
-
     tarjetasAprobadas.forEach((tarjeta, index) => {
         let tipoCuenta = 'AHORROS';
         if (tarjeta.tipo === 'debito') tipoCuenta = 'AHORROS';
         else if (tarjeta.tipo === 'corriente') tipoCuenta = 'CORRIENTE';
         else if (tarjeta.tipo === 'credito') tipoCuenta = 'TARJETA_CREDITO';
 
-        const idGenerado = `T-${tarjeta.fechaAprobacion || index}`;
-        const yaExiste = cuentasUsuario.some(c => c.id === idGenerado || (c.tipo === tipoCuenta && c.fechaAprobacion === tarjeta.fechaAprobacion));
+        // Solo agregar al catálogo de cuentas si es tarjeta de crédito aprobada
+        // (ya que débito y corriente están vinculadas directamente a la cuenta de ahorros o corriente existente)
+        if (tipoCuenta === 'TARJETA_CREDITO') {
+            const idTarjeta = `TC-${tarjeta.numeroTarjeta || tarjeta.fechaAprobacion || index}`;
+            const yaExisteTC = cuentasUsuario.some(c => c.id === idTarjeta || c.numero === tarjeta.numeroTarjeta || (c.tipo === 'TARJETA_CREDITO' && c.fechaAprobacion === tarjeta.fechaAprobacion));
 
-        if (!yaExiste) {
-            const numeroCuenta = (tipoCuenta === 'TARJETA_CREDITO' ? '5412' : '4021') + String(Date.now()).slice(-8) + String(index);
-            const nuevaCuenta = {
-                id: idGenerado,
-                tipo: tipoCuenta,
-                numero: numeroCuenta,
-                saldo: tipoCuenta === 'TARJETA_CREDITO' ? (Math.round((Number(tarjeta.ingresos || 2000000) * 0.1) / 10000) * 10000) : 0,
-                estado: 'ACTIVA',
-                username: usuario.username || usuario.correo,
-                fechaAprobacion: tarjeta.fechaAprobacion
-            };
-            cuentasLocales.push(nuevaCuenta);
-            cuentasUsuario.push(nuevaCuenta);
-            cambios = true;
+            if (!yaExisteTC) {
+                const cupoCalculado = Math.min(20000000, Math.max(1000000, Math.round(((Number(tarjeta.ingresos) || 20000000) * 0.1) / 100000) * 100000));
+                const nuevaTC = {
+                    id: idTarjeta,
+                    tipo: 'TARJETA_CREDITO',
+                    numero: tarjeta.numeroTarjeta || ('5412' + String(Date.now()).slice(-12)),
+                    saldo: cupoCalculado, // Cupo disponible
+                    estado: 'ACTIVA',
+                    username: usernameActual,
+                    fechaAprobacion: tarjeta.fechaAprobacion || new Date().toISOString()
+                };
+                cuentasUsuario.push(nuevaTC);
+                todasLasCuentas.push(nuevaTC);
+                cambios = true;
+            }
         }
     });
 
-    // Si el usuario es nuevo y aún no tiene cuentas ni productos, verificar si es el usuario demo base
-    // o si el sistema tiene cuentas por defecto inicializadas para transferencias
-    if (cuentasUsuario.length === 0 && cuentasLocales.length === 0) {
-        // Inicializar cuentas base vinculadas al usuario
-        const cuentasPorDefecto = [
-            { id: 1, tipo: 'AHORROS', numero: '4021587701234', saldo: 1250000, estado: 'ACTIVA', username: usuario.username || usuario.correo },
-            { id: 2, tipo: 'CORRIENTE', numero: '4021587705678', saldo: 820450, estado: 'ACTIVA', username: usuario.username || usuario.correo }
-        ];
-        cuentasLocales = cuentasPorDefecto;
-        cuentasUsuario = cuentasPorDefecto;
-        cambios = true;
-    }
-
     if (cambios) {
         try {
-            localStorage.setItem('finara_cuentas', JSON.stringify(cuentasLocales));
+            localStorage.setItem('finara_cuentas', JSON.stringify(todasLasCuentas));
         } catch {
-            // Ignorar límite de almacenamiento
+            // Manejo de cuota de almacenamiento
         }
     }
 
-    return cuentasUsuario;
+    // Evitar duplicados por id o número en la vista del usuario
+    const cuentasUnicas = [];
+    const idsVistos = new Set();
+    for (const c of cuentasUsuario) {
+        const clave = `${c.tipo}_${c.numero}`;
+        if (!idsVistos.has(clave)) {
+            idsVistos.add(clave);
+            cuentasUnicas.push(c);
+        }
+    }
+
+    return cuentasUnicas;
 }
