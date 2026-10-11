@@ -168,26 +168,36 @@
                     <div class="analitica-card__body">
                         <div class="distribucion-visual">
                             <div class="barra-distribucion">
-                                <div class="barra-segmento barra-segmento--ahorros" id="segAhorros" style="width: 64%;" title="Cuenta de Ahorros"></div>
-                                <div class="barra-segmento barra-segmento--corriente" id="segCorriente" style="width: 36%;" title="Cuenta Corriente"></div>
+                                <div class="barra-segmento barra-segmento--ahorros" id="segAhorros" style="width: 50%;" title="Cuenta de Ahorros"></div>
+                                <div class="barra-segmento barra-segmento--corriente" id="segCorriente" style="width: 50%;" title="Cuenta Corriente"></div>
+                                <div class="barra-segmento barra-segmento--credito hidden" id="segCredito" style="width: 0%;" title="Tarjeta de Crédito"></div>
                             </div>
 
                             <div class="distribucion-leyenda">
-                                <div class="leyenda-item">
+                                <div class="leyenda-item" id="itemLeyendaAhorros">
                                     <span class="leyenda-dot leyenda-dot--ahorros"></span>
                                     <div class="leyenda-info">
                                         <span class="leyenda-nombre">Cuenta de Ahorros</span>
-                                        <strong class="leyenda-monto" id="montoAhorrosTotal">$ 1.248.767</strong>
-                                        <small class="leyenda-porcentaje" id="porcentajeAhorros">64%</small>
+                                        <strong class="leyenda-monto" id="montoAhorrosTotal">$ 0</strong>
+                                        <small class="leyenda-porcentaje" id="porcentajeAhorros">0%</small>
                                     </div>
                                 </div>
 
-                                <div class="leyenda-item">
+                                <div class="leyenda-item" id="itemLeyendaCorriente">
                                     <span class="leyenda-dot leyenda-dot--corriente"></span>
                                     <div class="leyenda-info">
                                         <span class="leyenda-nombre">Cuenta Corriente</span>
-                                        <strong class="leyenda-monto" id="montoCorrienteTotal">$ 699.236</strong>
-                                        <small class="leyenda-porcentaje" id="porcentajeCorriente">36%</small>
+                                        <strong class="leyenda-monto" id="montoCorrienteTotal">$ 0</strong>
+                                        <small class="leyenda-porcentaje" id="porcentajeCorriente">0%</small>
+                                    </div>
+                                </div>
+
+                                <div class="leyenda-item hidden" id="itemLeyendaCredito">
+                                    <span class="leyenda-dot leyenda-dot--credito"></span>
+                                    <div class="leyenda-info">
+                                        <span class="leyenda-nombre">Cupo Crédito Aprobado</span>
+                                        <strong class="leyenda-monto" id="montoCreditoTotal">$ 0</strong>
+                                        <small class="leyenda-porcentaje" id="porcentajeCredito">0%</small>
                                     </div>
                                 </div>
                             </div>
