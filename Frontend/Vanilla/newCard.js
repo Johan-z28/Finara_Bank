@@ -432,20 +432,88 @@ function mostrarModalSolicitud(tarjetaObj, usuarioActivo) {
             return;
         }
 
+        // Validación estricta de seguridad: Verificar prerrequisitos de cuentas bancarias antes de procesar
+        let todasLasCuentas = [];
+        try {
+            todasLasCuentas = JSON.parse(localStorage.getItem('finara_cuentas')) || [];
+        } catch {
+            todasLasCuentas = [];
+        }
+        const usernameActual = usuarioActivo.username || usuarioActivo.correo || 'maria17';
+        let cuentasUsuario = todasLasCuentas.filter(c => c && (c.username === usernameActual || (!c.username && usernameActual === 'maria17')));
+        if (cuentasUsuario.length === 0 && usernameActual === 'maria17') {
+            cuentasUsuario = [{ tipo: 'AHORROS', estado: 'ACTIVA' }, { tipo: 'CORRIENTE', estado: 'ACTIVA' }];
+        }
+
+        const tieneAhorros = cuentasUsuario.some(c => c.tipo === 'AHORROS' && c.estado === 'ACTIVA');
+        const tieneCorriente = cuentasUsuario.some(c => c.tipo === 'CORRIENTE' && c.estado === 'ACTIVA');
+
+        if (tarjetaObj.tipo === 'debito' && !tieneAhorros) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Operación no permitida',
+                text: 'No es posible solicitar una Tarjeta Débito sin una Cuenta de Ahorros activa.',
+                background: '#12151c',
+                color: '#ffffff',
+                confirmButtonColor: '#e5a93c'
+            });
+            return;
+        }
+
+        if (tarjetaObj.tipo === 'corriente' && !tieneCorriente) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Operación no permitida',
+                text: 'No es posible solicitar una Tarjeta de Cuenta Corriente sin una Cuenta Corriente activa.',
+                background: '#12151c',
+                color: '#ffffff',
+                confirmButtonColor: '#e5a93c'
+            });
+            return;
+        }
+
+        if (tarjetaObj.tipo === 'credito' && !tieneAhorros && !tieneCorriente) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Operación no permitida',
+                text: 'Para solicitar una Tarjeta de Crédito debes tener aperturada al menos una Cuenta de Ahorros o Corriente activa.',
+                background: '#12151c',
+                color: '#ffffff',
+                confirmButtonColor: '#e5a93c'
+            });
+            return;
+        }
+
+        // Evitar registros duplicados si el usuario ya cuenta con esta tarjeta
+        const yaTieneProducto = (usuarioActivo.tarjetasAprobadas || []).some(t => t.tipo === tarjetaObj.tipo);
+        if (yaTieneProducto) {
+            Swal.fire({
+                icon: 'info',
+                title: 'Producto ya activo',
+                text: 'Ya cuentas con este producto aprobado y asociado a tu cuenta.',
+                background: '#12151c',
+                color: '#ffffff',
+                confirmButtonColor: '#e5a93c'
+            });
+            cerrarModal();
+            return;
+        }
+
         // Polimorfismo / Herencia: Ejecutamos el validador de la clase hija
         const resultadoValidacion = tarjetaObj.validarRequisitos(ingresos, estrato);
         const aprobado = resultadoValidacion.aprobado;
         const mensajeMotivo = resultadoValidacion.motivo;
 
         if (aprobado) {
+            const numeroGenerado = tarjetaObj.generarNumeroUnico();
             const datosTarjetaAprobada = {
                 tipo: tarjetaObj.tipo,
                 titulo: tarjetaObj.titulo,
-                numeroTarjeta: tarjetaObj.generarNumeroUnico(), // Número único generado
+                numeroTarjeta: numeroGenerado,
                 ingresos: ingresos,
                 moneda: moneda,
                 nacionalidad: nacionalidad,
-                direccionEnvio: direccionEnvio, // Guardamos la dirección de envío
+                direccionEnvio: direccionEnvio,
                 fechaAprobacion: new Date().toISOString()
             };
 
@@ -467,11 +535,31 @@ function mostrarModalSolicitud(tarjetaObj, usuarioActivo) {
             usuarioActivo.productosActivos = (usuarioActivo.productosActivos || 0) + 1;
             localStorage.setItem("userProfile", JSON.stringify(usuarioActivo));
 
+            // Si es tarjeta de crédito aprobada, sincronizarla inmediatamente con finara_cuentas
+            if (tarjetaObj.tipo === 'credito') {
+                const cupoCalculado = Math.min(20000000, Math.max(1000000, Math.round(((ingresos || 20000000) * 0.1) / 100000) * 100000));
+                const nuevaTC = {
+                    id: `TC-${numeroGenerado}`,
+                    tipo: 'TARJETA_CREDITO',
+                    numero: numeroGenerado,
+                    saldo: cupoCalculado,
+                    estado: 'ACTIVA',
+                    username: usernameActual,
+                    fechaAprobacion: datosTarjetaAprobada.fechaAprobacion
+                };
+                todasLasCuentas.push(nuevaTC);
+                try {
+                    localStorage.setItem('finara_cuentas', JSON.stringify(todasLasCuentas));
+                } catch {
+                    // Ignorar cuota
+                }
+            }
+
             // Actualizar reactivamente la interfaz de las tarjetas
             actualizarDisponibilidadTarjetas(usuarioActivo);
         }
 
-        mostrarResultadoEvaluacion(aprobado, tarjetaObj.titulo, mensajeMotivo, aprobado ? tarjetaObj.generarNumeroUnico() : null, direccionEnvio);
+        mostrarResultadoEvaluacion(aprobado, tarjetaObj.titulo, mensajeMotivo, aprobado ? datosTarjetaAprobada?.numeroTarjeta : null, direccionEnvio);
     });
 
     const cerrarModal = () => overlay.remove();
