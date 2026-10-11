@@ -104,9 +104,9 @@ export async function obtenerCuentasFiltro() {
  * Obtiene los movimientos paginados y filtrados para la cuenta seleccionada,
  * unificando los movimientos de transferencias (finara_movimientos) con la cuenta.
  */
-export async function obtenerMovimientos({ cuentaId, periodo = '30d', orden = 'desc', pagina = 1, tamano = 8 }) {
+export async function obtenerMovimientos({ cuentaId, periodo = '30d', tipo = 'todos', orden = 'desc', pagina = 1, tamano = 8 }) {
     if (USAR_API_BACKEND) {
-        const qs = new URLSearchParams({ periodo, orden, pagina, tamano });
+        const qs = new URLSearchParams({ periodo, tipo, orden, pagina, tamano });
         return pedir(`${API_BASE}/cuentas/${encodeURIComponent(cuentaId)}/movimientos?${qs}`);
     }
 
@@ -139,15 +139,25 @@ export async function obtenerMovimientos({ cuentaId, periodo = '30d', orden = 'd
 
     // 3. Filtrar por período
     const desde = limiteInferior(periodo);
-    const filtrados = movimientosCuenta
-        .filter(m => !desde || new Date(m.fecha) >= desde)
-        .sort((a, b) => {
-            const fa = new Date(a.fecha).getTime();
-            const fb = new Date(b.fecha).getTime();
-            return orden === 'asc' ? fa - fb : fb - fa;
-        });
+    let filtrados = movimientosCuenta.filter(m => !desde || new Date(m.fecha) >= desde);
 
-    // 4. Paginación
+    // Calcular los totales del periodo antes del filtro de tipo (o según el filtro activo)
+    const ingresosPeriodo = filtrados.filter(m => m.tipo === 'INGRESO').reduce((s, m) => s + (Number(m.valor) || 0), 0);
+    const egresosPeriodo = filtrados.filter(m => m.tipo === 'EGRESO').reduce((s, m) => s + (Number(m.valor) || 0), 0);
+
+    // 4. Filtrar por tipo (INGRESO, EGRESO o todos)
+    if (tipo && tipo !== 'todos') {
+        filtrados = filtrados.filter(m => m.tipo === tipo);
+    }
+
+    // 5. Ordenamiento cronológico
+    filtrados.sort((a, b) => {
+        const fa = new Date(a.fecha).getTime();
+        const fb = new Date(b.fecha).getTime();
+        return orden === 'asc' ? fa - fb : fb - fa;
+    });
+
+    // 6. Paginación
     const total = filtrados.length;
     const totalPaginas = Math.max(1, Math.ceil(total / tamano));
     const paginaOk = Math.min(Math.max(1, pagina), totalPaginas);
@@ -159,8 +169,8 @@ export async function obtenerMovimientos({ cuentaId, periodo = '30d', orden = 'd
         pagina: paginaOk,
         totalPaginas,
         resumen: {
-            ingresos: filtrados.filter(m => m.tipo === 'INGRESO').reduce((s, m) => s + (Number(m.valor) || 0), 0),
-            egresos: filtrados.filter(m => m.tipo === 'EGRESO').reduce((s, m) => s + (Number(m.valor) || 0), 0)
+            ingresos: ingresosPeriodo,
+            egresos: egresosPeriodo
         }
     };
 }

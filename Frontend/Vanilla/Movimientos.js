@@ -5,7 +5,7 @@ const TAMANO_PAGINA = 8;
 
 const formatoCOP = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
 const formatoFecha = new Intl.DateTimeFormat('es-CO', { day: '2-digit', month: 'short', year: 'numeric' });
-const formatoHora = new Intl.DateTimeFormat('es-CO', { hour: '2-digit', minute: '2-digit' });
+const formatoHora = new Intl.DateTimeFormat('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true });
 
 function el(tag, clase, texto) {
     const nodo = document.createElement(tag);
@@ -20,13 +20,18 @@ function crearFila(mov) {
     const fila = el('tr', `mov-fila mov-fila--${esIngreso ? 'ingreso' : 'egreso'}`);
 
     const fecha = new Date(mov.fecha);
+    const fechaValida = !isNaN(fecha.getTime()) ? fecha : new Date();
+
     const tdFecha = el('td');
     tdFecha.dataset.label = 'Fecha';
-    tdFecha.append(el('span', 'mov-fecha', formatoFecha.format(fecha)), el('span', 'mov-hora', formatoHora.format(fecha)));
+    tdFecha.append(
+        el('span', 'mov-fecha', formatoFecha.format(fechaValida)),
+        el('span', 'mov-hora', formatoHora.format(fechaValida))
+    );
 
     const tdDesc = el('td');
     tdDesc.dataset.label = 'Descripción';
-    tdDesc.append(el('span', 'mov-desc', mov.descripcion));
+    tdDesc.append(el('span', 'mov-desc', mov.descripcion || 'Transacción bancaria'));
     if (mov.categoria) tdDesc.append(el('span', 'mov-categoria', mov.categoria));
 
     const tdTipo = el('td');
@@ -40,7 +45,7 @@ function crearFila(mov) {
     const tdValor = el('td', 'mov-valor-celda');
     tdValor.dataset.label = 'Valor';
     tdValor.append(el('strong', `mov-valor mov-valor--${esIngreso ? 'ingreso' : 'egreso'}`,
-        `${esIngreso ? '+' : '−'} ${formatoCOP.format(mov.valor)}`));
+        `${esIngreso ? '+' : '−'} ${formatoCOP.format(Number(mov.valor) || 0)}`));
 
     fila.append(tdFecha, tdDesc, tdTipo, tdValor);
     return fila;
@@ -51,12 +56,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     initGlobalComponents();
 
     const $ = id => document.getElementById(id);
-    const selCuenta = $('filtroCuenta'), selPeriodo = $('filtroPeriodo'), selOrden = $('filtroOrden');
+    const selCuenta = $('filtroCuenta'), selPeriodo = $('filtroPeriodo');
+    const selTipo = $('filtroTipo'), selOrden = $('filtroOrden');
     const cuerpo = $('movCuerpo'), estado = $('movEstado'), tablaWrap = $('movTablaWrap');
     const btnPrev = $('pagPrev'), btnNext = $('pagNext'), pagInfo = $('pagInfo'), pagResumen = $('pagResumen');
     const totIngresos = $('totIngresos'), totEgresos = $('totEgresos');
 
-    const filtros = { cuentaId: null, periodo: '30d', orden: 'desc', pagina: 1 };
+    const filtros = { cuentaId: null, periodo: '30d', tipo: 'todos', orden: 'desc', pagina: 1 };
     let peticion = 0; // descarta respuestas viejas si el usuario cambia filtros rápido
 
     PERIODOS.forEach(p => {
@@ -66,13 +72,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     selPeriodo.value = filtros.periodo;
 
-    const mostrarEstado = (mensaje, { reintentar = false } = {}) => {
-        estado.replaceChildren(el('p', '', mensaje));
-        if (reintentar) {
+    const mostrarEstado = (mensaje, { reintentar = false, restablecer = false } = {}) => {
+        estado.replaceChildren();
+        const p = el('p', '', mensaje);
+        estado.append(p);
+
+        if (restablecer) {
+            const btnReset = el('button', 'btn-reintentar', 'Ver todo el historial');
+            btnReset.addEventListener('click', () => {
+                selPeriodo.value = 'todo';
+                filtros.periodo = 'todo';
+                filtros.pagina = 1;
+                cargar();
+            });
+            estado.append(btnReset);
+        } else if (reintentar) {
             const b = el('button', 'btn-reintentar', 'Reintentar');
             b.addEventListener('click', cargar);
             estado.append(b);
         }
+
         estado.classList.remove('hidden');
         tablaWrap.classList.add('hidden');
     };
@@ -101,7 +120,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!r.items.length) {
                 pagResumen.textContent = '';
                 pagInfo.textContent = '';
-                mostrarEstado('No hay movimientos en este periodo.');
+                mostrarEstado('No hay movimientos registrados en este periodo.', { restablecer: filtros.periodo !== 'todo' });
                 return;
             }
 
@@ -124,11 +143,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const alCambiarFiltro = () => {
         filtros.cuentaId = selCuenta.value;
         filtros.periodo = selPeriodo.value;
+        filtros.tipo = selTipo ? selTipo.value : 'todos';
         filtros.orden = selOrden.value;
         filtros.pagina = 1;
         cargar();
     };
-    [selCuenta, selPeriodo, selOrden].forEach(s => s.addEventListener('change', alCambiarFiltro));
+    [selCuenta, selPeriodo, selTipo, selOrden].filter(Boolean).forEach(s => s.addEventListener('change', alCambiarFiltro));
     btnPrev.addEventListener('click', () => { filtros.pagina--; cargar(); });
     btnNext.addEventListener('click', () => { filtros.pagina++; cargar(); });
 
