@@ -158,6 +158,9 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // 4. Actualizar disponibilidad dinámica de tarjetas según las cuentas activas (Casos A, B y C)
+    actualizarDisponibilidadTarjetas(usuarioActivo);
+
     botonesSolicitar.forEach(boton => {
         boton.addEventListener("click", (e) => {
             const usuarioActual = obtenerUsuarioActivo();
@@ -194,6 +197,79 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+
+/**
+ * Evalúa y actualiza la disponibilidad de cada tarjeta según las cuentas que el usuario tenga aperturadas:
+ * Caso A: Solo Ahorros -> Habilita Débito (vinculada a Ahorros) y Crédito. Deshabilita Tarjeta Corriente.
+ * Caso B: Solo Corriente -> Habilita Tarjeta Corriente y Crédito. Deshabilita Débito.
+ * Caso C: Ambas cuentas -> Habilita las 3 tarjetas de forma independiente.
+ * Sin cuentas activas -> Deshabilita Débito, Corriente y Crédito.
+ */
+function actualizarDisponibilidadTarjetas(usuarioActivo) {
+    if (!usuarioActivo) return;
+
+    let todasLasCuentas = [];
+    try {
+        todasLasCuentas = JSON.parse(localStorage.getItem('finara_cuentas')) || [];
+    } catch {
+        todasLasCuentas = [];
+    }
+
+    const usernameActual = usuarioActivo.username || usuarioActivo.correo || 'maria17';
+    let cuentasUsuario = todasLasCuentas.filter(c => c && (c.username === usernameActual || (!c.username && usernameActual === 'maria17')));
+
+    // Si no tiene cuentas en finara_cuentas pero es maria17 por defecto
+    if (cuentasUsuario.length === 0 && usernameActual === 'maria17') {
+        cuentasUsuario = [
+            { tipo: 'AHORROS', estado: 'ACTIVA' },
+            { tipo: 'CORRIENTE', estado: 'ACTIVA' }
+        ];
+    }
+
+    const tieneAhorros = cuentasUsuario.some(c => c.tipo === 'AHORROS' && c.estado === 'ACTIVA');
+    const tieneCorriente = cuentasUsuario.some(c => c.tipo === 'CORRIENTE' && c.estado === 'ACTIVA');
+
+    const boxDebito = document.querySelector('.card-option-box[data-card="debito"]');
+    const boxCredito = document.querySelector('.card-option-box[data-card="credito"]');
+    const boxCorriente = document.querySelector('.card-option-box[data-card="corriente"]');
+
+    const configurarOpcion = (box, habilitado, motivoBloqueo) => {
+        if (!box) return;
+        const btn = box.querySelector('.request-card-btn');
+        let hint = box.querySelector('.card-prerequisito-hint');
+
+        if (!habilitado) {
+            if (btn) {
+                btn.disabled = true;
+                btn.classList.add('btn-disabled');
+                btn.title = motivoBloqueo;
+            }
+            if (!hint) {
+                hint = document.createElement('small');
+                hint.className = 'card-prerequisito-hint';
+                box.appendChild(hint);
+            }
+            hint.textContent = motivoBloqueo;
+        } else {
+            if (btn) {
+                btn.disabled = false;
+                btn.classList.remove('btn-disabled');
+                btn.title = '';
+            }
+            if (hint) hint.remove();
+        }
+    };
+
+    // 1. Tarjeta Débito: Requiere Cuenta de Ahorros activa
+    configurarOpcion(boxDebito, tieneAhorros, 'Requiere tener aperturada una Cuenta de Ahorros activa.');
+
+    // 2. Tarjeta Cuenta Corriente: Requiere Cuenta Corriente activa
+    configurarOpcion(boxCorriente, tieneCorriente, 'Requiere tener aperturada una Cuenta Corriente activa.');
+
+    // 3. Tarjeta de Crédito: Requiere al menos una cuenta (Ahorros o Corriente) activa
+    const tieneAlgunaCuenta = tieneAhorros || tieneCorriente;
+    configurarOpcion(boxCredito, tieneAlgunaCuenta, 'Disponible solo si tienes al menos una cuenta de ahorros o corriente activa.');
+}
 
 // Función unificada para recuperar correctamente el usuario activo desde localStorage
 function obtenerUsuarioActivo() {
