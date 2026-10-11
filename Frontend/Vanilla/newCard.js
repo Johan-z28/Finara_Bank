@@ -229,14 +229,40 @@ function actualizarDisponibilidadTarjetas(usuarioActivo) {
     const tieneAhorros = cuentasUsuario.some(c => c.tipo === 'AHORROS' && c.estado === 'ACTIVA');
     const tieneCorriente = cuentasUsuario.some(c => c.tipo === 'CORRIENTE' && c.estado === 'ACTIVA');
 
+    // Tarjetas ya aprobadas del usuario para evitar duplicación
+    const tarjetasAprobadas = usuarioActivo.tarjetasAprobadas || [];
+    const yaTieneDebito = tarjetasAprobadas.some(t => t.tipo === 'debito');
+    const yaTieneCredito = tarjetasAprobadas.some(t => t.tipo === 'credito');
+    const yaTieneCorriente = tarjetasAprobadas.some(t => t.tipo === 'corriente');
+
     const boxDebito = document.querySelector('.card-option-box[data-card="debito"]');
     const boxCredito = document.querySelector('.card-option-box[data-card="credito"]');
     const boxCorriente = document.querySelector('.card-option-box[data-card="corriente"]');
 
-    const configurarOpcion = (box, habilitado, motivoBloqueo) => {
+    const configurarOpcion = (box, habilitado, motivoBloqueo, yaAdquirida = false) => {
         if (!box) return;
         const btn = box.querySelector('.request-card-btn');
         let hint = box.querySelector('.card-prerequisito-hint');
+        let badge = box.querySelector('.card-aprobada-badge');
+
+        if (yaAdquirida) {
+            if (btn) {
+                btn.disabled = true;
+                btn.classList.add('btn-disabled');
+                btn.textContent = 'Producto activo';
+                btn.title = 'Ya tienes este producto activo en tu cuenta.';
+            }
+            if (hint) hint.remove();
+            if (!badge) {
+                badge = document.createElement('small');
+                badge.className = 'card-aprobada-badge';
+                box.appendChild(badge);
+            }
+            badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> Tarjeta activa y asociada';
+            return;
+        }
+
+        if (badge) badge.remove();
 
         if (!habilitado) {
             if (btn) {
@@ -260,15 +286,15 @@ function actualizarDisponibilidadTarjetas(usuarioActivo) {
         }
     };
 
-    // 1. Tarjeta Débito: Requiere Cuenta de Ahorros activa
-    configurarOpcion(boxDebito, tieneAhorros, 'Requiere tener aperturada una Cuenta de Ahorros activa.');
+    // 1. Tarjeta Débito: Requiere Cuenta de Ahorros activa y que no haya sido ya solicitada
+    configurarOpcion(boxDebito, tieneAhorros, 'Requiere tener aperturada una Cuenta de Ahorros activa.', yaTieneDebito);
 
-    // 2. Tarjeta Cuenta Corriente: Requiere Cuenta Corriente activa
-    configurarOpcion(boxCorriente, tieneCorriente, 'Requiere tener aperturada una Cuenta Corriente activa.');
+    // 2. Tarjeta Cuenta Corriente: Requiere Cuenta Corriente activa y que no haya sido ya solicitada
+    configurarOpcion(boxCorriente, tieneCorriente, 'Requiere tener aperturada una Cuenta Corriente activa.', yaTieneCorriente);
 
-    // 3. Tarjeta de Crédito: Requiere al menos una cuenta (Ahorros o Corriente) activa
+    // 3. Tarjeta de Crédito: Requiere al menos una cuenta (Ahorros o Corriente) activa y no tenerla ya activa
     const tieneAlgunaCuenta = tieneAhorros || tieneCorriente;
-    configurarOpcion(boxCredito, tieneAlgunaCuenta, 'Disponible solo si tienes al menos una cuenta de ahorros o corriente activa.');
+    configurarOpcion(boxCredito, tieneAlgunaCuenta, 'Disponible solo si tienes al menos una cuenta de ahorros o corriente activa.', yaTieneCredito);
 }
 
 // Función unificada para recuperar correctamente el usuario activo desde localStorage
@@ -440,6 +466,9 @@ function mostrarModalSolicitud(tarjetaObj, usuarioActivo) {
             usuarioActivo.tarjetasAprobadas.push(datosTarjetaAprobada);
             usuarioActivo.productosActivos = (usuarioActivo.productosActivos || 0) + 1;
             localStorage.setItem("userProfile", JSON.stringify(usuarioActivo));
+
+            // Actualizar reactivamente la interfaz de las tarjetas
+            actualizarDisponibilidadTarjetas(usuarioActivo);
         }
 
         mostrarResultadoEvaluacion(aprobado, tarjetaObj.titulo, mensajeMotivo, aprobado ? tarjetaObj.generarNumeroUnico() : null, direccionEnvio);
