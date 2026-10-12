@@ -67,6 +67,129 @@
     outline: none;
 }
 
+/* Métricas de Saldo e Indicadores (Cálculo Automático) */
+.pre-metricas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.4rem;
+    margin-bottom: 1.5rem;
+}
+
+.pre-metrica-card {
+    background: var(--bg-card-dark);
+    border: 1px solid rgba(229, 169, 60, 0.25);
+    border-radius: var(--radius-lg);
+    padding: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+    transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.pre-metrica-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--gold-main);
+}
+
+.pre-metrica-icono {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.bg-ingreso {
+    background: rgba(52, 211, 153, 0.15);
+    color: var(--color-ingreso);
+    border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.bg-gasto {
+    background: rgba(248, 113, 113, 0.15);
+    color: var(--color-gasto);
+    border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+.bg-balance {
+    background: rgba(56, 189, 248, 0.15);
+    color: var(--color-balance-positivo);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.bg-balance--superavit {
+    background: rgba(52, 211, 153, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.bg-balance--deficit {
+    background: rgba(248, 113, 113, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+.pre-metrica-info span {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    display: block;
+}
+
+.pre-metrica-info h3 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 4px 0 2px 0;
+    font-family: monospace;
+    letter-spacing: -0.02em;
+}
+
+.pre-metrica-info small {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}
+
+/* Barra de progreso de consumo de presupuesto */
+.pre-barra-progreso-card {
+    background: var(--bg-card-dark);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-md);
+    padding: 1.1rem 1.4rem;
+    margin-bottom: 1.8rem;
+}
+
+.pre-progreso-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.pre-progreso-info strong {
+    color: var(--text-white);
+    font-family: monospace;
+}
+
+.pre-progreso-track {
+    width: 100%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.pre-progreso-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #34d399 0%, #e5a93c 70%, #f87171 100%);
+    border-radius: 999px;
+    transition: width 0.5s ease-in-out;
+}
+
 /* Panel de Formulario de Registro */
 .pre-registro-card {
     background: var(--bg-card-dark);

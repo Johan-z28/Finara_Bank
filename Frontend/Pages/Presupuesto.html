@@ -154,6 +154,53 @@
                 </div>
             </div>
 
+            <!-- Panel de Indicadores y Cálculo Automático de Saldo -->
+            <section class="pre-metricas-grid">
+                <div class="pre-metrica-card">
+                    <div class="pre-metrica-icono bg-ingreso">
+                        <i class="fa-solid fa-arrow-trend-up"></i>
+                    </div>
+                    <div class="pre-metrica-info">
+                        <span>Ingresos Estimados</span>
+                        <h3 id="metricaIngresos" class="color-ingreso">$ 0</h3>
+                        <small>Total presupuestado</small>
+                    </div>
+                </div>
+
+                <div class="pre-metrica-card">
+                    <div class="pre-metrica-icono bg-gasto">
+                        <i class="fa-solid fa-arrow-trend-down"></i>
+                    </div>
+                    <div class="pre-metrica-info">
+                        <span>Gastos Planificados</span>
+                        <h3 id="metricaGastos" class="color-gasto">$ 0</h3>
+                        <small id="metricaPorcentajeGastado">0% de los ingresos</small>
+                    </div>
+                </div>
+
+                <div class="pre-metrica-card">
+                    <div class="pre-metrica-icono bg-balance" id="iconoBalanceBox">
+                        <i class="fa-solid fa-scale-balanced" id="iconoBalance"></i>
+                    </div>
+                    <div class="pre-metrica-info">
+                        <span>Saldo Neto (Ingresos vs Gastos)</span>
+                        <h3 id="metricaSaldoNeto">$ 0</h3>
+                        <small id="metricaEstadoBalance">Balance equilibrado</small>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Barra de Progreso Presupuestaria -->
+            <section class="pre-barra-progreso-card">
+                <div class="pre-progreso-info">
+                    <span>Uso del presupuesto mensual</span>
+                    <strong id="progresoTexto">0% consumido</strong>
+                </div>
+                <div class="pre-progreso-track">
+                    <div class="pre-progreso-fill" id="progresoFill" style="width: 0%;"></div>
+                </div>
+            </section>
+
             <!-- Panel de Creación / Registro de Ingreso y Gasto -->
             <section class="pre-registro-card">
                 <div class="pre-registro-head">

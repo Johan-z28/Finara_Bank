@@ -8,7 +8,8 @@ import {
     formatoCOP,
     obtenerPeriodoActual,
     obtenerPresupuestosUsuario,
-    crearItemPresupuesto
+    crearItemPresupuesto,
+    calcularResumenPresupuesto
 } from './presupuestoService.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -24,6 +25,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const listaGastos = document.getElementById('listaGastos');
     const totalColIngresos = document.getElementById('totalColIngresos');
     const totalColGastos = document.getElementById('totalColGastos');
+
+    // Elementos de métricas automáticas
+    const metricaIngresos = document.getElementById('metricaIngresos');
+    const metricaGastos = document.getElementById('metricaGastos');
+    const metricaSaldoNeto = document.getElementById('metricaSaldoNeto');
+    const metricaPorcentajeGastado = document.getElementById('metricaPorcentajeGastado');
+    const metricaEstadoBalance = document.getElementById('metricaEstadoBalance');
+    const iconoBalanceBox = document.getElementById('iconoBalanceBox');
+    const progresoTexto = document.getElementById('progresoTexto');
+    const progresoFill = document.getElementById('progresoFill');
 
     // Inicializar periodo por defecto (mes actual)
     const periodoActual = obtenerPeriodoActual();
@@ -48,19 +59,44 @@ document.addEventListener('DOMContentLoaded', () => {
         rubroMonto.value = digitos ? new Intl.NumberFormat('es-CO').format(Number(digitos)) : '';
     });
 
-    // Renderizar listado de ingresos y gastos
+    // Renderizar listado de ingresos y gastos con cálculo automático de balance
     function renderizarPresupuestos() {
         const periodo = selectPeriodo.value || periodoActual;
-        const items = obtenerPresupuestosUsuario(periodo);
+        const resumen = calcularResumenPresupuesto(periodo);
 
+        // Actualizar métricas automáticas (Ingresos vs Gastos)
+        metricaIngresos.textContent = formatoCOP.format(resumen.totalIngresos);
+        metricaGastos.textContent = formatoCOP.format(resumen.totalGastos);
+        metricaSaldoNeto.textContent = formatoCOP.format(resumen.saldoNeto);
+
+        totalColIngresos.textContent = formatoCOP.format(resumen.totalIngresos);
+        totalColGastos.textContent = formatoCOP.format(resumen.totalGastos);
+
+        // Indicador de uso y balance
+        metricaPorcentajeGastado.textContent = `${resumen.porcentajeGastado}% de los ingresos`;
+        progresoTexto.textContent = `${Math.min(resumen.porcentajeGastado, 100)}% consumido`;
+        progresoFill.style.width = `${Math.min(resumen.porcentajeGastado, 100)}%`;
+
+        if (resumen.esDeficit) {
+            metricaSaldoNeto.style.color = 'var(--color-gasto)';
+            metricaEstadoBalance.textContent = 'Déficit presupuestario (Gastos superan ingresos)';
+            metricaEstadoBalance.style.color = 'var(--color-gasto)';
+            iconoBalanceBox.className = 'pre-metrica-icono bg-balance--deficit';
+        } else if (resumen.esSuperavit) {
+            metricaSaldoNeto.style.color = 'var(--color-ingreso)';
+            metricaEstadoBalance.textContent = 'Superávit saludable (Ahorro potencial)';
+            metricaEstadoBalance.style.color = 'var(--color-ingreso)';
+            iconoBalanceBox.className = 'pre-metrica-icono bg-balance--superavit';
+        } else {
+            metricaSaldoNeto.style.color = 'var(--color-balance-positivo)';
+            metricaEstadoBalance.textContent = 'Presupuesto en equilibrio exacto';
+            metricaEstadoBalance.style.color = 'var(--text-muted)';
+            iconoBalanceBox.className = 'pre-metrica-icono bg-balance';
+        }
+
+        const items = resumen.items;
         const ingresos = items.filter(i => i.tipo === 'INGRESO');
         const gastos = items.filter(i => i.tipo === 'GASTO');
-
-        const sumIngresos = ingresos.reduce((acc, curr) => acc + curr.monto, 0);
-        const sumGastos = gastos.reduce((acc, curr) => acc + curr.monto, 0);
-
-        totalColIngresos.textContent = formatoCOP.format(sumIngresos);
-        totalColGastos.textContent = formatoCOP.format(sumGastos);
 
         const categoriasMap = [...CATEGORIAS_INGRESO, ...CATEGORIAS_GASTO].reduce((acc, c) => {
             acc[c.id] = c;

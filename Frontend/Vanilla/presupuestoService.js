@@ -52,9 +52,84 @@ export function obtenerPeriodoActual() {
     return `${d.getFullYear()}-${mes}`;
 }
 
+function generarRubrosInicialesDemo(username, periodo) {
+    return [
+        {
+            id: `PRE-DEMO-1`,
+            username,
+            tipo: 'INGRESO',
+            categoria: 'salario',
+            descripcion: 'Salario / Nómina principal',
+            monto: 3800000,
+            periodo,
+            fechaCreacion: new Date().toISOString()
+        },
+        {
+            id: `PRE-DEMO-2`,
+            username,
+            tipo: 'INGRESO',
+            categoria: 'honorarios',
+            descripcion: 'Ingresos freelance / Asesorías',
+            monto: 850000,
+            periodo,
+            fechaCreacion: new Date().toISOString()
+        },
+        {
+            id: `PRE-DEMO-3`,
+            username,
+            tipo: 'GASTO',
+            categoria: 'vivienda',
+            descripcion: 'Arriendo y servicios públicos',
+            monto: 1250000,
+            periodo,
+            fechaCreacion: new Date().toISOString()
+        },
+        {
+            id: `PRE-DEMO-4`,
+            username,
+            tipo: 'GASTO',
+            categoria: 'alimentacion',
+            descripcion: 'Supermercado y mercado del mes',
+            monto: 780000,
+            periodo,
+            fechaCreacion: new Date().toISOString()
+        },
+        {
+            id: `PRE-DEMO-5`,
+            username,
+            tipo: 'GASTO',
+            categoria: 'transporte',
+            descripcion: 'Transporte, gasolina y movilidad',
+            monto: 320000,
+            periodo,
+            fechaCreacion: new Date().toISOString()
+        },
+        {
+            id: `PRE-DEMO-6`,
+            username,
+            tipo: 'GASTO',
+            categoria: 'entretenimiento',
+            descripcion: 'Salidas y plataformas streaming',
+            monto: 190000,
+            periodo,
+            fechaCreacion: new Date().toISOString()
+        }
+    ];
+}
+
 export function obtenerPresupuestosUsuario(periodo = null) {
     const usuarioActivo = obtenerUsernameActivo();
-    const todos = leerTodos();
+    let todos = leerTodos();
+    const periodoActual = periodo || obtenerPeriodoActual();
+
+    // Si el usuario no tiene ningún rubro registrado para este periodo, generar presupuesto base
+    const tieneItems = todos.some(p => (p.username === usuarioActivo || (!p.username && usuarioActivo === 'maria17')) && p.periodo === periodoActual);
+    if (!tieneItems) {
+        const demo = generarRubrosInicialesDemo(usuarioActivo, periodoActual);
+        todos = [...demo, ...todos];
+        guardarTodos(todos);
+    }
+
     return todos.filter(p => {
         const matchUsuario = (p.username === usuarioActivo || (!p.username && usuarioActivo === 'maria17'));
         if (!periodo) return matchUsuario;
@@ -92,4 +167,25 @@ export function crearItemPresupuesto({ tipo, categoria, descripcion, monto, peri
     todos.unshift(nuevo);
     guardarTodos(todos);
     return nuevo;
+}
+
+export function calcularResumenPresupuesto(periodo = null) {
+    const items = obtenerPresupuestosUsuario(periodo);
+    const ingresos = items.filter(i => i.tipo === 'INGRESO');
+    const gastos = items.filter(i => i.tipo === 'GASTO');
+
+    const totalIngresos = ingresos.reduce((acc, curr) => acc + curr.monto, 0);
+    const totalGastos = gastos.reduce((acc, curr) => acc + curr.monto, 0);
+    const saldoNeto = totalIngresos - totalGastos;
+    const porcentajeGastado = totalIngresos > 0 ? Math.round((totalGastos / totalIngresos) * 100) : (totalGastos > 0 ? 100 : 0);
+
+    return {
+        totalIngresos,
+        totalGastos,
+        saldoNeto,
+        porcentajeGastado,
+        esDeficit: saldoNeto < 0,
+        esSuperavit: saldoNeto > 0,
+        items
+    };
 }
