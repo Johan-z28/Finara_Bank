@@ -133,10 +133,9 @@ export async function obtenerMetasUsuario() {
     const cuentas = await obtenerCuentas();
     const cuentasMonetarias = cuentas.filter(c => c.tipo === 'AHORROS' || c.tipo === 'CORRIENTE');
 
-    // Si el usuario no tiene metas, inicializamos una meta de bienvenida demostrativa
-    if (metasUsuario.length === 0) {
+    // Solo inicializamos la meta demostrativa la primera vez que la clave ni siquiera existe en localStorage
+    if (localStorage.getItem(CLAVE_METAS) === null) {
         const cuentaDefecto = cuentasMonetarias.find(c => c.tipo === 'AHORROS') || cuentasMonetarias[0] || null;
-        const saldoInicial = cuentaDefecto ? Number(cuentaDefecto.saldo) : 5000000;
 
         const metaInicial = {
             id: `META-${Date.now()}`,
