@@ -1,6 +1,8 @@
 // Vanilla/componentes/CuentaCard.js
 // Componente visual de una cuenta: tipo, número parcial y saldo.
 
+import { guardarNotificacion, actualizarCampana } from './notificaciones.js';
+
 const TIPOS = {
     AHORROS: { etiqueta: 'Cuenta de Ahorros', icono: 'fa-piggy-bank', clase: 'ahorros', saldoLabel: 'Saldo disponible' },
     CORRIENTE: { etiqueta: 'Cuenta Corriente', icono: 'fa-building-columns', clase: 'corriente', saldoLabel: 'Saldo disponible' },
@@ -401,8 +403,45 @@ function ejecutarCambioEstadoBloqueo(datosTarjeta) {
 }
 
 function notificarYConfirmarBloqueo(datosTarjeta, nuevoEstadoBloqueada) {
-    // Implementar en commit 4
-    window.location.reload();
+    const tituloTarjeta = datosTarjeta.titulo || 'Tarjeta Finara';
+    const terminacion = String(datosTarjeta.numero || '').replace(/\D/g, '').slice(-4);
+    const sufijoNumero = terminacion ? ` terminada en ••${terminacion}` : '';
+
+    const tituloNotif = nuevoEstadoBloqueada ? 'Tarjeta bloqueada temporalmente' : 'Tarjeta desbloqueada con éxito';
+    const mensajeNotif = nuevoEstadoBloqueada
+        ? `Has bloqueado temporalmente tu ${tituloTarjeta}${sufijoNumero}. Tus transacciones y retiros quedan protegidos.`
+        : `Has desbloqueado tu ${tituloTarjeta}${sufijoNumero}. Ya puedes utilizarla nuevamente para todas tus operaciones.`;
+
+    // 1. Guardar en finara_notificaciones (localStorage)
+    guardarNotificacion({
+        titulo: tituloNotif,
+        mensaje: mensajeNotif,
+        tipo: nuevoEstadoBloqueada ? 'alerta' : 'exito'
+    });
+
+    try {
+        actualizarCampana();
+    } catch {
+        // En caso de que no esté instanciada la campana
+    }
+
+    // 2. Confirmación en pantalla
+    if (window.Swal) {
+        Swal.fire({
+            icon: nuevoEstadoBloqueada ? 'warning' : 'success',
+            title: nuevoEstadoBloqueada ? 'Tarjeta Bloqueada' : 'Tarjeta Desbloqueada',
+            text: mensajeNotif,
+            background: '#12151c',
+            color: '#ffffff',
+            confirmButtonColor: '#e5a93c',
+            confirmButtonText: 'Aceptar'
+        }).then(() => {
+            window.location.reload();
+        });
+    } else {
+        alert(`${tituloNotif}\n\n${mensajeNotif}`);
+        window.location.reload();
+    }
 }
 
 function activarTarjetaDesdeSaldos(cuenta, tipoSlug) {
