@@ -82,6 +82,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function pintarHint() {
         const c = cuentaSeleccionada();
         if (!c) { hintOrigen.textContent = ''; return; }
+        if (c.tipo === 'TARJETA_CREDITO') {
+            hintOrigen.textContent = `Cupo Total: ${formatoCOP.format(c.saldo)} · Avance permitido (hasta 50%): ${formatoCOP.format(calcularDisponible(c))}`;
+            return;
+        }
         const extra = c.tipo === 'CORRIENTE' ? ' (incluye sobregiro del 20%)' : '';
         hintOrigen.textContent = `Saldo: ${formatoCOP.format(c.saldo)} · Disponible: ${formatoCOP.format(calcularDisponible(c))}${extra}`;
     }
@@ -199,20 +203,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ---------- Punto 4: resumen y confirmación ----------
     function pintarResumen() {
-        const { origen, destino: d, monto, concepto, usaSobregiro } = datos;
+        const { origen, destino: d, monto, concepto, usaSobregiro, esAvanceTC } = datos;
         const saldoFinal = origen.saldo - monto;
+        const labelSaldoFinal = origen.tipo === 'TARJETA_CREDITO' ? 'Cupo restante después del avance' : 'Saldo después de la operación';
         filas($('resumenLista'), [
-            { label: 'Cuenta de origen', valor: textoCuenta(origen) },
+            { label: 'Producto de origen', valor: textoCuenta(origen) },
             { label: 'Cuenta de destino', valor: d.titular, extra: `${TIPOS[d.tipo]} · •••• ${ultimos4(d.numero)}` },
-            { label: 'Monto a transferir', valor: formatoCOP.format(monto), destacado: true },
+            { label: esAvanceTC ? 'Monto del avance' : 'Monto a transferir', valor: formatoCOP.format(monto), destacado: true },
             { label: 'Concepto', valor: concepto || '—' },
-            { label: 'Saldo después de la operación', valor: formatoCOP.format(saldoFinal), negativo: saldoFinal < 0 },
+            { label: labelSaldoFinal, valor: formatoCOP.format(saldoFinal), negativo: saldoFinal < 0 },
             { label: 'Costo', valor: 'Sin costo' }
         ]);
         resumenError.classList.add('hidden');
-        resumenAlerta.classList.toggle('hidden', !usaSobregiro);
+        resumenAlerta.classList.toggle('hidden', !usaSobregiro && !esAvanceTC);
         if (usaSobregiro) {
             resumenAlerta.textContent = `Atención: esta transferencia usa ${formatoCOP.format(monto - origen.saldo)} de tu sobregiro (hasta 20% sobre el saldo). Úsalo con cuidado.`;
+        } else if (esAvanceTC) {
+            resumenAlerta.textContent = `Operación de Avance: Se desembolsará el monto de tu Tarjeta de Crédito y se acreditará inmediatamente a la cuenta de destino.`;
         }
     }
 

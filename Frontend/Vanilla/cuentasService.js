@@ -138,19 +138,8 @@ export async function obtenerCuentas() {
             todasLasCuentas.push(nuevaCta);
             cambios = true;
         } else {
-            // Usuario estándar por defecto con Cuenta de Ahorros aperturada
-            const cuentaAhorrosDefault = {
-                id: `CTA-AHO-${Date.now()}`,
-                tipo: 'AHORROS',
-                numero: '4021' + String(Date.now()).slice(-8),
-                saldo: 0,
-                estado: 'ACTIVA',
-                username: usernameActual,
-                fechaCreacion: new Date().toISOString()
-            };
-            cuentasUsuario = [cuentaAhorrosDefault];
-            todasLasCuentas.push(cuentaAhorrosDefault);
-            cambios = true;
+            // Usuario recién registrado sin productos solicitados aún: No forzar cuenta automática
+            cuentasUsuario = [];
         }
     }
 
@@ -162,20 +151,37 @@ export async function obtenerCuentas() {
         else if (tarjeta.tipo === 'corriente') tipoCuenta = 'CORRIENTE';
         else if (tarjeta.tipo === 'credito') tipoCuenta = 'TARJETA_CREDITO';
 
-        // Solo agregar al catálogo de cuentas si es tarjeta de crédito aprobada
-        // (ya que débito y corriente están vinculadas directamente a la cuenta de ahorros o corriente existente)
+        // Si es tarjeta débito o corriente, vincularla a la cuenta correspondiente para que se vea asociada en Saldos
+        if (tipoCuenta === 'AHORROS' || tipoCuenta === 'CORRIENTE') {
+            const ctaMatch = cuentasUsuario.find(c => c.tipo === tipoCuenta);
+            if (ctaMatch) {
+                ctaMatch.tarjetaAsociada = {
+                    tipo: tarjeta.tipo,
+                    titulo: tarjeta.titulo,
+                    numero: tarjeta.numeroTarjeta || ('4532' + String(Date.now()).slice(-12)),
+                    fechaVencimiento: tarjeta.fechaVencimiento || '09/29',
+                    cvv: tarjeta.cvv || '584',
+                    bloqueada: tarjeta.bloqueada || false
+                };
+            }
+        }
+
+        // Si es tarjeta de crédito aprobada, agregar como producto independiente
         if (tipoCuenta === 'TARJETA_CREDITO') {
             const idTarjeta = `TC-${tarjeta.numeroTarjeta || tarjeta.fechaAprobacion || index}`;
             const yaExisteTC = cuentasUsuario.some(c => c.id === idTarjeta || c.numero === tarjeta.numeroTarjeta || (c.tipo === 'TARJETA_CREDITO' && c.fechaAprobacion === tarjeta.fechaAprobacion));
 
             if (!yaExisteTC) {
-                const cupoCalculado = Math.min(20000000, Math.max(1000000, Math.round(((Number(tarjeta.ingresos) || 20000000) * 0.1) / 100000) * 100000));
+                const cupoCalculado = Math.min(20000000, Math.max(1000000, Math.round(((Number(tarjeta.ingresos) || 2000000) * 1.5) / 100000) * 100000));
                 const nuevaTC = {
                     id: idTarjeta,
                     tipo: 'TARJETA_CREDITO',
                     numero: tarjeta.numeroTarjeta || ('5412' + String(Date.now()).slice(-12)),
+                    fechaVencimiento: tarjeta.fechaVencimiento || '09/29',
+                    cvv: tarjeta.cvv || '584',
                     saldo: cupoCalculado, // Cupo disponible
                     estado: 'ACTIVA',
+                    bloqueada: tarjeta.bloqueada || false,
                     username: usernameActual,
                     fechaAprobacion: tarjeta.fechaAprobacion || new Date().toISOString()
                 };

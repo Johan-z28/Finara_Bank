@@ -73,6 +73,20 @@ document.addEventListener('DOMContentLoaded', () => {
             if (elSaldoConsolidado) elSaldoConsolidado.textContent = formatoCOP.format(total);
         }
 
+        const tieneAhorros = Boolean(cuentas.find(c => c.tipo === 'AHORROS'));
+        const tieneCorriente = Boolean(cuentas.find(c => c.tipo === 'CORRIENTE'));
+        const itemLeyendaAhorros = document.getElementById('itemLeyendaAhorros');
+        const itemLeyendaCorriente = document.getElementById('itemLeyendaCorriente');
+
+        if (itemLeyendaAhorros) {
+            if (tieneAhorros) itemLeyendaAhorros.classList.remove('hidden');
+            else itemLeyendaAhorros.classList.add('hidden');
+        }
+        if (itemLeyendaCorriente) {
+            if (tieneCorriente) itemLeyendaCorriente.classList.remove('hidden');
+            else itemLeyendaCorriente.classList.add('hidden');
+        }
+
         // Si existe tarjeta de crédito aprobada, mostrar su indicador en la analítica
         if (credito && itemLeyendaCredito) {
             itemLeyendaCredito.classList.remove('hidden');
@@ -87,8 +101,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (elPorcentajeAhorros) elPorcentajeAhorros.textContent = `${pctAhorros}%`;
                 if (elPorcentajeCorriente) elPorcentajeCorriente.textContent = `${pctCorriente}%`;
                 if (elPorcentajeCredito) elPorcentajeCredito.textContent = `${pctCredito}%`;
-                if (segAhorros) segAhorros.style.width = `${pctAhorros}%`;
-                if (segCorriente) segCorriente.style.width = `${pctCorriente}%`;
+                if (segAhorros) {
+                    segAhorros.style.width = tieneAhorros ? `${pctAhorros}%` : '0%';
+                    segAhorros.classList.toggle('hidden', !tieneAhorros);
+                }
+                if (segCorriente) {
+                    segCorriente.style.width = tieneCorriente ? `${pctCorriente}%` : '0%';
+                    segCorriente.classList.toggle('hidden', !tieneCorriente);
+                }
                 if (segCredito) segCredito.style.width = `${pctCredito}%`;
             }
         } else {
@@ -98,13 +118,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 segCredito.style.width = '0%';
             }
 
-            const pctAhorros = total > 0 ? Math.round((saldoAhorros / total) * 100) : 50;
-            const pctCorriente = total > 0 ? 100 - pctAhorros : 50;
+            if (segAhorros) {
+                segAhorros.classList.toggle('hidden', !tieneAhorros);
+                segAhorros.style.width = tieneAhorros && !tieneCorriente ? '100%' : (tieneAhorros && total > 0 ? `${Math.round((saldoAhorros / total) * 100)}%` : '0%');
+            }
+            if (segCorriente) {
+                segCorriente.classList.toggle('hidden', !tieneCorriente);
+                segCorriente.style.width = tieneCorriente && !tieneAhorros ? '100%' : (tieneCorriente && total > 0 ? `${Math.round((saldoCorriente / total) * 100)}%` : '0%');
+            }
+
+            const pctAhorros = tieneAhorros ? (total > 0 ? Math.round((saldoAhorros / total) * 100) : (tieneCorriente ? 50 : 100)) : 0;
+            const pctCorriente = tieneCorriente ? (total > 0 ? 100 - pctAhorros : (tieneAhorros ? 50 : 100)) : 0;
 
             if (elPorcentajeAhorros) elPorcentajeAhorros.textContent = `${pctAhorros}%`;
             if (elPorcentajeCorriente) elPorcentajeCorriente.textContent = `${pctCorriente}%`;
-            if (segAhorros) segAhorros.style.width = `${pctAhorros}%`;
-            if (segCorriente) segCorriente.style.width = `${pctCorriente}%`;
         }
     };
 
@@ -127,6 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!cuentas.length) {
                 lista.replaceChildren();
                 mostrarEstado('Aún no tienes cuentas asociadas.');
+                actualizarAnalitica();
             } else {
                 pintarCuentas();
             }

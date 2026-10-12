@@ -145,6 +145,95 @@
     gap: 2px;
 }
 
+.cuenta-card__tarjeta-vinculada {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 12px;
+    padding: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: -0.4rem;
+}
+
+.tarjeta-vinculada__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tarjeta-vinculada__info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tarjeta-vinculada__info i {
+    color: var(--gold-main);
+    font-size: 1.15rem;
+}
+
+.tarjeta-vinculada__titulo {
+    display: block;
+    font-size: 0.8rem;
+    color: #e2e8f0;
+}
+
+.tarjeta-vinculada__numero {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-family: monospace;
+    letter-spacing: 0.05em;
+}
+
+.tarjeta-vinculada__badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.badge--activa {
+    background: rgba(52, 211, 153, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.tarjeta-vinculada__acciones {
+    display: flex;
+    width: 100%;
+}
+
+.btn-tarjeta-accion {
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    border: none;
+    font-family: inherit;
+    width: 100%;
+}
+
+.btn-ver-detalles {
+    background: rgba(229, 169, 60, 0.12);
+    color: var(--gold-main);
+    border: 1px solid rgba(229, 169, 60, 0.35);
+}
+
+.btn-ver-detalles:hover {
+    background: var(--gold-main);
+    color: #07090e;
+}
+
 .cuenta-card__saldo-label {
     color: var(--text-muted);
     font-size: 0.75rem;
