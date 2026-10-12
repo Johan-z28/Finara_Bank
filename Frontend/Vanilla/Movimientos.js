@@ -223,6 +223,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const datosDoc = await obtenerDatosExtracto(cuentaId, mes, anio);
                 descargarExtractoPDF(datosDoc);
 
+                // Requisito 4: Notificación - Guardar en localStorage
+                guardarNotificacion({
+                    titulo: 'Extracto bancario generado',
+                    mensaje: `Se descargó exitosamente el extracto de ${datosDoc.cuenta.tipo} (terminada en ${String(datosDoc.cuenta.numero).slice(-4)}) para el periodo ${datosDoc.periodoTexto}. Folio: ${datosDoc.folioCertificado}.`,
+                    tipo: 'exito'
+                });
+
                 cerrarModal();
 
                 if (window.Swal) {
