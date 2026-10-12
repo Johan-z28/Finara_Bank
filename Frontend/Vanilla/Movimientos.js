@@ -246,7 +246,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                         `,
                         background: '#12151c',
                         color: '#ffffff',
-                        confirmButtonColor: '#e5a93c'
+                        confirmButtonColor: '#e5a93c',
+                        confirmButtonText: 'Aceptar',
+                        allowOutsideClick: true,
+                        allowEscapeKey: true
                     });
                 }
             } catch (err) {

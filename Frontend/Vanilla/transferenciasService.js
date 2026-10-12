@@ -4,6 +4,7 @@
 // opera en modo simulación local). Con false, se usa el API del Backend.
 
 import { guardarNotificacion } from './notificaciones.js';
+import { obtenerCuentas as obtenerCuentasUsuario, obtenerUsernameActivo } from './cuentasService.js';
 
 const USAR_DATOS_DE_PRUEBA = true;
 const API_BASE = 'http://localhost:8080/api';
@@ -95,14 +96,13 @@ function nombreUsuario() { return localStorage.getItem('userName') || 'Johan'; }
 
 function resolverDestinoMock(numero, tipo, cuentas, terceros) {
     const n = soloDigitos(numero);
-    const propia = cuentas.find(c => c.numero === n && c.tipo === tipo);
+    const tipoNormalizado = String(tipo || '').toUpperCase().trim();
+    const propia = cuentas.find(c => soloDigitos(c.numero) === n && String(c.tipo || '').toUpperCase().trim() === tipoNormalizado);
     if (propia) return { id: propia.id, titular: nombreUsuario(), tipo, numero: n, esPropia: true };
-    const t = terceros.find(c => c.numero === n && c.tipo === tipo);
+    const t = terceros.find(c => soloDigitos(c.numero) === n && String(c.tipo || '').toUpperCase().trim() === tipoNormalizado);
     if (t) return { id: t.id, titular: t.titular, tipo, numero: n, esPropia: false };
     return null;
 }
-
-import { obtenerCuentas as obtenerCuentasUsuario } from './cuentasService.js';
 
 // ================= API PÚBLICA =================
 export async function obtenerCuentasOrigen() {
@@ -139,8 +139,11 @@ export async function ejecutarTransferencia({ origenId, destinoNumero, destinoTi
     }
 
     await pausa(500);
-    // Se relee todo para trabajar con el estado real al momento de confirmar
-    let cuentas = leer(K.cuentas, CUENTAS_INICIALES);
+    // Se relee la fuente de cuentas del usuario para sincronizar con HU-04 y Movimientos
+    let cuentas = await obtenerCuentasUsuario();
+    if (!cuentas || !cuentas.length) {
+        cuentas = leer(K.cuentas, CUENTAS_INICIALES);
+    }
     const terceros = leer(K.terceros, TERCEROS_INICIALES);
     const movimientos = leer(K.movimientos, []);
 
@@ -173,7 +176,7 @@ export async function ejecutarTransferencia({ origenId, destinoNumero, destinoTi
         receptor.saldo = (Number(receptor.saldo) || 0) + monto;
     }
 
-    // Registrar movimientos (mismo formato que usa el historial)
+    // Registrar movimientos (mismo formato integral que usa el historial de movimientos)
     const fecha = new Date().toISOString();
     const referencia = `FIN-${Math.floor(100000 + Math.random() * 900000)}`;
     const nota = concepto ? ` · ${concepto}` : '';
@@ -181,8 +184,22 @@ export async function ejecutarTransferencia({ origenId, destinoNumero, destinoTi
         ? `Avance de Tarjeta de Crédito transferido a ${destino.titular}${nota}`
         : `Transferencia enviada a ${destino.titular}${nota}`;
 
+    const numOrigenLimpio = soloDigitos(origen.numero);
+    const numDestinoLimpio = soloDigitos(destino.numero);
+    const usuarioActivo = obtenerUsernameActivo();
+
     movimientos.push({
-        id: `${referencia}-E`, cuentaId: origen.id, fecha, referencia, categoria: null, tipo: 'EGRESO', valor: monto,
+        id: `${referencia}-E`,
+        cuentaId: String(origen.id),
+        cuentaNumero: numOrigenLimpio,
+        cuentaOrigen: numOrigenLimpio,
+        cuentaDestino: numDestinoLimpio,
+        username: origen.username || usuarioActivo,
+        fecha,
+        referencia,
+        categoria: origen.tipo === 'TARJETA_CREDITO' ? 'Avance' : 'Transferencia',
+        tipo: 'EGRESO',
+        valor: monto,
         descripcion: descEgreso
     });
 
@@ -192,12 +209,41 @@ export async function ejecutarTransferencia({ origenId, destinoNumero, destinoTi
             : `Transferencia recibida de ${TIPOS[origen.tipo]}${nota}`;
 
         movimientos.push({
-            id: `${referencia}-I`, cuentaId: destino.id, fecha, referencia, categoria: null, tipo: 'INGRESO', valor: monto,
+            id: `${referencia}-I`,
+            cuentaId: String(destino.id),
+            cuentaNumero: numDestinoLimpio,
+            cuentaOrigen: numOrigenLimpio,
+            cuentaDestino: numDestinoLimpio,
+            username: receptor ? (receptor.username || usuarioActivo) : usuarioActivo,
+            fecha,
+            referencia,
+            categoria: 'Transferencia',
+            tipo: 'INGRESO',
+            valor: monto,
             descripcion: descIngreso
         });
     }
 
-    guardar(K.cuentas, cuentas);
+    // Persistir cuentas actualizadas en finara_cuentas conservando posibles cuentas de otros perfiles
+    try {
+        let todasLasCuentas = JSON.parse(localStorage.getItem(K.cuentas)) || [];
+        if (Array.isArray(todasLasCuentas) && todasLasCuentas.length > 0) {
+            cuentas.forEach(ctaMod => {
+                const idx = todasLasCuentas.findIndex(c => String(c.id) === String(ctaMod.id));
+                if (idx !== -1) {
+                    todasLasCuentas[idx] = { ...todasLasCuentas[idx], ...ctaMod };
+                } else {
+                    todasLasCuentas.push(ctaMod);
+                }
+            });
+            guardar(K.cuentas, todasLasCuentas);
+        } else {
+            guardar(K.cuentas, cuentas);
+        }
+    } catch {
+        guardar(K.cuentas, cuentas);
+    }
+
     guardar(K.terceros, terceros);
     guardar(K.movimientos, movimientos);
     registrarNotificaciones(monto, destino.titular, referencia, v.usaSobregiro, v.esAvanceTC);

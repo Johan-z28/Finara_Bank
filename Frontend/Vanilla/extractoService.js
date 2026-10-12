@@ -2,7 +2,7 @@
 // Servicio generador de documentos oficiales (PDF / Extracto Bancario)
 // HU-19: Descargar extracto bancario con resumen de movimientos y datos de cuenta.
 
-import { obtenerUsuarioSesion, obtenerCuentasUsuario } from './cuentasService.js';
+import { obtenerUsuarioAutenticado, obtenerCuentas } from './cuentasService.js';
 import { guardarNotificacion } from './notificaciones.js';
 
 const MESES = [
@@ -22,12 +22,18 @@ const formatoFecha = new Intl.DateTimeFormat('es-CO', {
     year: 'numeric'
 });
 
+const formatoHora = new Intl.DateTimeFormat('es-CO', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+});
+
 /**
  * Obtiene los datos consolidados de la cuenta y sus movimientos para el periodo especificado.
  */
 export async function obtenerDatosExtracto(cuentaId, mes, anio) {
-    const usuario = obtenerUsuarioSesion() || { nombre: 'Cliente Finara', username: 'maria17', documento: '1020304050' };
-    const cuentas = await obtenerCuentasUsuario(usuario);
+    const usuario = obtenerUsuarioAutenticado() || { nombre: 'Cliente Finara', username: 'maria17', documento: '1020304050' };
+    const cuentas = await obtenerCuentas();
     const cuenta = cuentas.find(c => c.id === cuentaId || c.numero === cuentaId) || cuentas[0];
 
     if (!cuenta) {
@@ -42,20 +48,25 @@ export async function obtenerDatosExtracto(cuentaId, mes, anio) {
         movimientosTodos = [];
     }
 
-    const numCuenta = String(cuenta.numero).replace(/\s+/g, '');
+    const numCuentaLimpio = String(cuenta.numero).replace(/\D/g, '');
     const mNum = parseInt(mes, 10);
     const aNum = parseInt(anio, 10);
 
     let movimientosPeriodo = movimientosTodos.filter(m => {
-        const esDeCuenta = String(m.cuentaId) === cuenta.id || String(m.cuentaDestino) === numCuenta || String(m.cuentaOrigen) === numCuenta;
+        const mId = String(m.cuentaId || '');
+        const mNumCuenta = String(m.cuentaNumero || '').replace(/\D/g, '');
+        const esDeCuenta = (mId && mId === String(cuenta.id)) || (numCuentaLimpio && mNumCuenta && mNumCuenta === numCuentaLimpio);
         if (!esDeCuenta) return false;
         const f = new Date(m.fecha);
         return (f.getMonth() + 1) === mNum && f.getFullYear() === aNum;
     });
 
+    // Ordenar cronológicamente descendente: los movimientos más recientes primero
+    movimientosPeriodo.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
+
     // Si no tiene movimientos en ese mes, generar transacciones representativas del periodo
     if (movimientosPeriodo.length === 0) {
-        const dias = [3, 8, 15, 22, 28];
+        const dias = [28, 22, 15, 8, 3];
         const saldoActual = Number(cuenta.saldo) || 1500000;
         movimientosPeriodo = [
             {
@@ -140,9 +151,11 @@ export async function obtenerDatosExtracto(cuentaId, mes, anio) {
 export function generarHTMLDocumentoExtracto(datos) {
     const filasMovimientos = datos.movimientos.map(m => {
         const esIngreso = m.tipo === 'INGRESO';
+        const d = new Date(m.fecha);
+        const fStr = !isNaN(d.getTime()) ? `${formatoFecha.format(d)} <span style="display: block; font-size: 10px; color: #94a3b8;">${formatoHora.format(d)}</span>` : '—';
         return `
             <tr style="border-bottom: 1px solid #e2e8f0; font-size: 11px;">
-                <td style="padding: 8px 10px; color: #475569;">${formatoFecha.format(new Date(m.fecha))}</td>
+                <td style="padding: 8px 10px; color: #475569; white-space: nowrap;">${fStr}</td>
                 <td style="padding: 8px 10px; font-weight: 500; color: #1e293b;">${m.descripcion}</td>
                 <td style="padding: 8px 10px; color: #64748b;">${m.categoria || 'Operación'}</td>
                 <td style="padding: 8px 10px; text-align: right; font-weight: 600; color: ${esIngreso ? '#15803d' : '#b91c1c'};">

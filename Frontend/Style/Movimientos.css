@@ -60,8 +60,15 @@
     padding: 11px 14px;
     font-family: inherit;
     font-size: 0.85rem;
+    width: 100%;
     cursor: pointer;
     transition: all 0.2s ease;
+}
+
+.mov-campo select option {
+    background: #11141b;
+    color: #ffffff;
+    padding: 8px;
 }
 
 .mov-campo select:hover,
@@ -348,7 +355,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 9999;
+    z-index: 1050;
     padding: 1.2rem;
 }
 
@@ -507,5 +514,14 @@
 .btn-descargar-extracto:hover {
     background: var(--gold-hover);
     transform: translateY(-1px);
+}
+
+/* SweetAlert2 por encima de cualquier capa del modal */
+.swal2-container {
+    z-index: 100000 !important;
+}
+
+.swal2-popup {
+    z-index: 100001 !important;
 }
 

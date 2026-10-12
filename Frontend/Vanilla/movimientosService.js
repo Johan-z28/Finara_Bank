@@ -126,13 +126,18 @@ export async function obtenerMovimientos({ cuentaId, periodo = '30d', tipo = 'to
         movimientosLocales = [];
     }
 
-    // Filtrar los movimientos que pertenezcan a esta cuenta (por id o por número)
-    let movimientosCuenta = movimientosLocales.filter(m => 
-        String(m.cuentaId) === idEfectivo || 
-        (cuentaActiva && m.cuentaNumero && String(m.cuentaNumero) === String(cuentaActiva.numero))
-    );
+    // Filtrar los movimientos que pertenezcan estrictamente a esta cuenta seleccionada
+    const numLimpio = cuentaActiva ? String(cuentaActiva.numero || '').replace(/\D/g, '') : '';
+    let movimientosCuenta = movimientosLocales.filter(m => {
+        const mId = String(m.cuentaId || '');
+        const mNum = String(m.cuentaNumero || '').replace(/\D/g, '');
 
-    // Si aún no hay transacciones hechas por el usuario en esta cuenta, proveer movimientos base de cortesía
+        if (mId && mId === idEfectivo) return true;
+        if (numLimpio && mNum && mNum === numLimpio) return true;
+        return false;
+    });
+
+    // Si aún no hay transacciones hechas por el usuario en esta cuenta particular, proveer movimientos base de cortesía
     if (movimientosCuenta.length === 0) {
         movimientosCuenta = generarMovimientosBase(idEfectivo, cuentaActiva ? cuentaActiva.tipo : 'AHORROS');
     }
