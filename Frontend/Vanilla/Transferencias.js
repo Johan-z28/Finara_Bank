@@ -194,7 +194,35 @@ document.addEventListener('DOMContentLoaded', () => {
         const origen = cuentaSeleccionada();
         const monto = leerMonto();
         const v = validarTransferencia({ origen, destino, monto });
-        if (!v.ok) return mostrarErrorCampo(v.campo, v.mensaje);
+        if (!v.ok) {
+            const esPorBloqueo = origen && (origen.bloqueada || origen.estado === 'BLOQUEADA' || (origen.tarjetaAsociada && origen.tarjetaAsociada.bloqueada));
+            
+            if (esPorBloqueo) {
+                if (window.Swal) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Tarjeta o Producto Bloqueado',
+                        text: 'El producto o tarjeta seleccionada se encuentra bloqueada temporalmente. Desbloquéala desde Saldos para operar.',
+                        background: '#12151c',
+                        color: '#ffffff',
+                        showCancelButton: true,
+                        confirmButtonColor: '#e5a93c',
+                        cancelButtonColor: '#64748b',
+                        confirmButtonText: '<i class="fa-solid fa-arrow-right"></i> Ir a Saldos',
+                        cancelButtonText: 'Entendido'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = './Saldos.html';
+                        }
+                    });
+                } else {
+                    alert('El producto o tarjeta seleccionada se encuentra bloqueada temporalmente. Desbloquéala desde Saldos para operar.');
+                }
+            } else {
+                mostrarErrorCampo(v.campo, v.mensaje);
+            }
+            return;
+        }
 
         datos = { origen, destino, monto, concepto: inpConcepto.value.trim(), usaSobregiro: v.usaSobregiro };
         pintarResumen();

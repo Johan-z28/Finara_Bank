@@ -43,6 +43,13 @@ export function calcularDisponible(cuenta) {
 // ----- Validación (función pura: se usa antes de confirmar y otra vez al ejecutar) -----
 export function validarTransferencia({ origen, destino, monto }) {
     if (!origen) return { ok: false, campo: 'origen', mensaje: 'Selecciona la cuenta de origen.' };
+    if (origen.bloqueada || origen.estado === 'BLOQUEADA' || (origen.tarjetaAsociada && origen.tarjetaAsociada.bloqueada)) {
+        return {
+            ok: false,
+            campo: 'origen',
+            mensaje: 'El producto o tarjeta seleccionada se encuentra bloqueada temporalmente. Desbloquéala desde Saldos para operar.'
+        };
+    }
     if (!destino) return { ok: false, campo: 'destino', mensaje: 'Ingresa y valida la cuenta de destino antes de continuar.' };
     if (!Number.isFinite(monto) || monto <= 0) return { ok: false, campo: 'monto', mensaje: 'Ingresa un monto mayor a cero.' };
     if (destino.id === origen.id && destino.esPropia) {
@@ -112,8 +119,8 @@ export async function obtenerCuentasOrigen() {
 
     // Obtener estrictamente las cuentas y tarjetas activas del usuario autenticado
     const cuentasUsuario = await obtenerCuentasUsuario();
-    // Permitir Ahorros, Corriente y Tarjetas de Crédito activas para avances
-    return cuentasUsuario.filter(c => c && (c.tipo in TIPOS) && c.estado === 'ACTIVA');
+    // Permitir Ahorros, Corriente y Tarjetas de Crédito activas y NO bloqueadas para transferencias/avances
+    return cuentasUsuario.filter(c => c && (c.tipo in TIPOS) && c.estado === 'ACTIVA' && !c.bloqueada);
 }
 
 export async function buscarCuentaDestino(numero, tipo) {

@@ -346,7 +346,63 @@ function gestionarBloqueoTarjeta(datosTarjeta) {
 }
 
 function ejecutarCambioEstadoBloqueo(datosTarjeta) {
-    // Siguiente commit: persistencia en storage y bloqueo de transacciones
+    const nuevoEstadoBloqueada = !datosTarjeta.bloqueada;
+    const numLimpio = String(datosTarjeta.numero || '').replace(/\D/g, '');
+
+    // 1. Actualizar en userProfile
+    let usuarioActual = JSON.parse(localStorage.getItem('userProfile')) || {};
+    if (Array.isArray(usuarioActual.tarjetasAprobadas)) {
+        usuarioActual.tarjetasAprobadas.forEach(t => {
+            const numT = String(t.numeroTarjeta || '').replace(/\D/g, '');
+            if (numT === numLimpio || t.tipo === datosTarjeta.tipo) {
+                t.bloqueada = nuevoEstadoBloqueada;
+            }
+        });
+        localStorage.setItem('userProfile', JSON.stringify(usuarioActual));
+    }
+
+    // 2. Actualizar en finara_usuarios_local
+    let listaUsuarios = JSON.parse(localStorage.getItem('finara_usuarios_local')) || [];
+    listaUsuarios = listaUsuarios.map(u => {
+        if (Array.isArray(u.tarjetasAprobadas)) {
+            u.tarjetasAprobadas.forEach(t => {
+                const numT = String(t.numeroTarjeta || '').replace(/\D/g, '');
+                if (numT === numLimpio || t.tipo === datosTarjeta.tipo) {
+                    t.bloqueada = nuevoEstadoBloqueada;
+                }
+            });
+        }
+        return u;
+    });
+    localStorage.setItem('finara_usuarios_local', JSON.stringify(listaUsuarios));
+
+    // 3. Actualizar en finara_cuentas
+    let todasLasCuentas = JSON.parse(localStorage.getItem('finara_cuentas')) || [];
+    todasLasCuentas = todasLasCuentas.map(cta => {
+        if (cta.tarjetaAsociada) {
+            const numAsoc = String(cta.tarjetaAsociada.numero || '').replace(/\D/g, '');
+            if (numAsoc === numLimpio || cta.id === datosTarjeta.cuentaPadreId) {
+                cta.tarjetaAsociada.bloqueada = nuevoEstadoBloqueada;
+            }
+        }
+        if (cta.tipo === 'TARJETA_CREDITO') {
+            const numTC = String(cta.numero || '').replace(/\D/g, '');
+            if (numTC === numLimpio || cta.id === datosTarjeta.cuentaId) {
+                cta.bloqueada = nuevoEstadoBloqueada;
+                cta.estado = nuevoEstadoBloqueada ? 'BLOQUEADA' : 'ACTIVA';
+            }
+        }
+        return cta;
+    });
+    localStorage.setItem('finara_cuentas', JSON.stringify(todasLasCuentas));
+
+    // Notificación y alerta en pantalla en siguiente commit
+    notificarYConfirmarBloqueo(datosTarjeta, nuevoEstadoBloqueada);
+}
+
+function notificarYConfirmarBloqueo(datosTarjeta, nuevoEstadoBloqueada) {
+    // Implementar en commit 4
+    window.location.reload();
 }
 
 function activarTarjetaDesdeSaldos(cuenta, tipoSlug) {
