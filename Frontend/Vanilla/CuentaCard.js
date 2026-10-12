@@ -306,8 +306,47 @@ function mostrarModalDetallesTarjeta(cuenta, ocultarSaldo = false) {
     });
 }
 
+async function confirmarBloqueoTarjeta(datosTarjeta, onConfirmar) {
+    const accion = datosTarjeta.bloqueada ? 'desbloquear' : 'bloquear';
+    const tituloModal = datosTarjeta.bloqueada ? '¿Deseas desbloquear esta tarjeta?' : '¿Deseas bloquear esta tarjeta temporalmente?';
+    const textoModal = datosTarjeta.bloqueada
+        ? `Al desbloquear tu ${datosTarjeta.titulo || 'tarjeta'}, podrás volver a realizar transferencias, compras y avances con normalidad.`
+        : `Por tu seguridad, mientras la tarjeta esté bloqueada no se podrán realizar transferencias, avances ni pagos asociados a ella. Puedes reactivarla cuando quieras.`;
+
+    if (window.Swal) {
+        const result = await Swal.fire({
+            title: tituloModal,
+            text: textoModal,
+            icon: datosTarjeta.bloqueada ? 'question' : 'warning',
+            showCancelButton: true,
+            confirmButtonColor: datosTarjeta.bloqueada ? '#34d399' : '#f87171',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: datosTarjeta.bloqueada ? '<i class="fa-solid fa-lock-open"></i> Sí, desbloquear' : '<i class="fa-solid fa-lock"></i> Sí, bloquear tarjeta',
+            cancelButtonText: 'Cancelar',
+            background: '#12151c',
+            color: '#ffffff',
+            reverseButtons: true
+        });
+
+        if (result.isConfirmed) {
+            onConfirmar();
+        }
+    } else {
+        const confirma = confirm(`${tituloModal}\n\n${textoModal}`);
+        if (confirma) {
+            onConfirmar();
+        }
+    }
+}
+
 function gestionarBloqueoTarjeta(datosTarjeta) {
-    // Definida para ser implementada en siguientes commits de HU-12
+    confirmarBloqueoTarjeta(datosTarjeta, () => {
+        ejecutarCambioEstadoBloqueo(datosTarjeta);
+    });
+}
+
+function ejecutarCambioEstadoBloqueo(datosTarjeta) {
+    // Siguiente commit: persistencia en storage y bloqueo de transacciones
 }
 
 function activarTarjetaDesdeSaldos(cuenta, tipoSlug) {
