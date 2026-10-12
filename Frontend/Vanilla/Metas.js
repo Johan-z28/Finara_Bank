@@ -119,6 +119,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         cuotaMensualMonto.textContent = formatoCOP.format(proyeccion.ahorroMensualNecesario);
         cuotaQuincenalMonto.textContent = formatoCOP.format(proyeccion.ahorroQuincenalNecesario);
         cuotaSemanalMonto.textContent = formatoCOP.format(proyeccion.ahorroSemanalNecesario);
+        const cuotaDiarioMonto = document.getElementById('cuotaDiarioMonto');
+        if (cuotaDiarioMonto) cuotaDiarioMonto.textContent = formatoCOP.format(proyeccion.ahorroDiarioNecesario);
+
+        const consejoAsesoriaTexto = document.getElementById('consejoAsesoriaTexto');
+        if (consejoAsesoriaTexto) {
+            if (proyeccion.completada) {
+                consejoAsesoriaTexto.textContent = '¡Felicidades! Tu saldo cubre el 100% de esta meta. Considera asignarlo o definir un nuevo objetivo.';
+            } else if (proyeccion.ahorroMensualNecesario > 2000000) {
+                consejoAsesoriaTexto.textContent = `Ahorro mensual alto (${formatoCOP.format(proyeccion.ahorroMensualNecesario)}/mes). Puedes aumentar el plazo a más meses para pagar cuotas más cómodas.`;
+            } else {
+                consejoAsesoriaTexto.textContent = `Para cubrir la brecha de ${formatoCOP.format(proyeccion.brechaRestante)}, programa un ahorro automático de ${formatoCOP.format(proyeccion.ahorroMensualNecesario)} al inicio de cada mes.`;
+            }
+        }
+
         resFechaCumplimiento.textContent = proyeccion.fechaEstimadaFin;
 
         // Estado / Viabilidad

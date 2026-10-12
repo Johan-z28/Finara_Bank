@@ -33,6 +33,37 @@ export function guardarTodasMetas(lista) {
 }
 
 /**
+ * Calcula de forma específica la brecha restante y el desglose de ahorro periódico necesario:
+ * mensual, quincenal, semanal y diario con base en el saldo asignado de la cuenta conectada.
+ */
+export function calcularBrechaYAhorroPeriodico(montoObjetivo, saldoAsignado, plazoMeses) {
+    const meta = Math.max(0, Number(montoObjetivo) || 0);
+    const saldo = Math.max(0, Number(saldoAsignado) || 0);
+    const meses = Math.max(1, Math.min(120, Number(plazoMeses) || 1));
+
+    const brechaRestante = Math.max(0, meta - saldo);
+    const porcentajeCubierto = meta > 0 ? Number(((saldo / meta) * 100).toFixed(1)) : 0;
+
+    const cuotaMensual = Math.ceil(brechaRestante / meses);
+    const cuotaQuincenal = Math.ceil(brechaRestante / (meses * 2));
+    const cuotaSemanal = Math.ceil(brechaRestante / (meses * 4.33));
+    const cuotaDiaria = Math.ceil(brechaRestante / (meses * 30));
+
+    return {
+        montoObjetivo: meta,
+        saldoAsignado: saldo,
+        plazoMeses: meses,
+        brechaRestante,
+        porcentajeCubierto,
+        cuotaMensual,
+        cuotaQuincenal,
+        cuotaSemanal,
+        cuotaDiaria,
+        brechaCubierta: brechaRestante === 0 && meta > 0
+    };
+}
+
+/**
  * Calcula la proyección de una meta con plazo e importe:
  * - Brecha restante (monto meta - saldo actual asignado)
  * - Ahorro periódico necesario: mensual, quincenal y semanal
@@ -40,24 +71,19 @@ export function guardarTodasMetas(lista) {
  * - Estado de avance
  */
 export function proyectarMeta({ montoObjetivo, plazoMeses, saldoAsignado = 0, fechaInicio = new Date() }) {
-    const meta = Math.max(0, Number(montoObjetivo) || 0);
-    const saldo = Math.max(0, Number(saldoAsignado) || 0);
-    const meses = Math.max(1, Math.min(120, Number(plazoMeses) || 1));
-
-    const brechaRestante = Math.max(0, meta - saldo);
+    const desglose = calcularBrechaYAhorroPeriodico(montoObjetivo, saldoAsignado, plazoMeses);
+    const meta = desglose.montoObjetivo;
+    const saldo = desglose.saldoAsignado;
+    const meses = desglose.plazoMeses;
+    const brechaRestante = desglose.brechaRestante;
     const porcentajeAvance = meta > 0 ? Math.min(100, Math.round((saldo / meta) * 100)) : 0;
-    const porcentajeReal = meta > 0 ? Number(((saldo / meta) * 100).toFixed(1)) : 0;
-
-    // Cálculo de cuotas periódicas para cubrir la brecha en el plazo indicado
-    const ahorroMensualNecesario = Math.ceil(brechaRestante / meses);
-    const ahorroQuincenalNecesario = Math.ceil(brechaRestante / (meses * 2));
-    const ahorroSemanalNecesario = Math.ceil(brechaRestante / (meses * 4.33));
+    const porcentajeReal = desglose.porcentajeCubierto;
 
     // Fecha estimada de cumplimiento
     const fechaMeta = new Date(fechaInicio);
     fechaMeta.setMonth(fechaMeta.getMonth() + meses);
 
-    const completada = brechaRestante === 0 && meta > 0;
+    const completada = desglose.brechaCubierta;
 
     // Evaluación o recomendación de viabilidad
     let evaluacion = 'En planificación';
@@ -84,9 +110,10 @@ export function proyectarMeta({ montoObjetivo, plazoMeses, saldoAsignado = 0, fe
         brechaRestante,
         porcentajeAvance,
         porcentajeReal,
-        ahorroMensualNecesario,
-        ahorroQuincenalNecesario,
-        ahorroSemanalNecesario,
+        ahorroMensualNecesario: desglose.cuotaMensual,
+        ahorroQuincenalNecesario: desglose.cuotaQuincenal,
+        ahorroSemanalNecesario: desglose.cuotaSemanal,
+        ahorroDiarioNecesario: desglose.cuotaDiaria,
         fechaEstimadaFin: fechaMeta.toISOString().split('T')[0],
         completada,
         evaluacion,
