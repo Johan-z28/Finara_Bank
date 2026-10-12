@@ -122,12 +122,15 @@ export function obtenerPresupuestosUsuario(periodo = null) {
     let todos = leerTodos();
     const periodoActual = periodo || obtenerPeriodoActual();
 
-    // Si el usuario no tiene ningún rubro registrado para este periodo, generar presupuesto base
-    const tieneItems = todos.some(p => (p.username === usuarioActivo || (!p.username && usuarioActivo === 'maria17')) && p.periodo === periodoActual);
-    if (!tieneItems) {
+    // Solo generar presupuesto base la primera vez que el usuario abre el módulo (bandera por usuario y periodo)
+    const claveInit = `finara_pre_init_${usuarioActivo}_${periodoActual}`;
+    const yaInicializado = localStorage.getItem(claveInit) === 'true';
+
+    if (!yaInicializado && todos.length === 0) {
         const demo = generarRubrosInicialesDemo(usuarioActivo, periodoActual);
         todos = [...demo, ...todos];
         guardarTodos(todos);
+        localStorage.setItem(claveInit, 'true');
     }
 
     return todos.filter(p => {
@@ -188,4 +191,42 @@ export function calcularResumenPresupuesto(periodo = null) {
         esSuperavit: saldoNeto > 0,
         items
     };
+}
+
+export function actualizarItemPresupuesto(id, { tipo, categoria, descripcion, monto, periodo }) {
+    const todos = leerTodos();
+    const indice = todos.findIndex(p => p.id === id);
+    if (indice === -1) {
+        throw new Error('El rubro de presupuesto no existe.');
+    }
+
+    const montoNum = Number(monto);
+    if (!Number.isFinite(montoNum) || montoNum <= 0) {
+        throw new Error('El monto debe ser mayor a cero.');
+    }
+
+    todos[indice] = {
+        ...todos[indice],
+        tipo: tipo || todos[indice].tipo,
+        categoria: categoria || todos[indice].categoria,
+        descripcion: descripcion !== undefined ? descripcion.trim() : todos[indice].descripcion,
+        monto: montoNum,
+        periodo: periodo || todos[indice].periodo,
+        fechaModificacion: new Date().toISOString()
+    };
+
+    guardarTodos(todos);
+    return todos[indice];
+}
+
+export function eliminarItemPresupuesto(id) {
+    let todos = leerTodos();
+    const existe = todos.some(p => p.id === id);
+    if (!existe) {
+        throw new Error('El rubro de presupuesto no fue encontrado.');
+    }
+
+    todos = todos.filter(p => p.id !== id);
+    guardarTodos(todos);
+    return true;
 }

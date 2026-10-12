@@ -375,3 +375,43 @@
     font-weight: 600;
     text-align: right;
 }
+
+.pre-item-lateral {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pre-item-acciones {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-accion-pre {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+.btn-editar-pre {
+    color: #94a3b8;
+}
+
+.btn-editar-pre:hover {
+    color: var(--gold-main);
+    background: rgba(229, 169, 60, 0.15);
+}
+
+.btn-eliminar-pre {
+    color: #94a3b8;
+}
+
+.btn-eliminar-pre:hover {
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.15);
+}

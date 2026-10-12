@@ -9,7 +9,9 @@ import {
     obtenerPeriodoActual,
     obtenerPresupuestosUsuario,
     crearItemPresupuesto,
-    calcularResumenPresupuesto
+    calcularResumenPresupuesto,
+    actualizarItemPresupuesto,
+    eliminarItemPresupuesto
 } from './presupuestoService.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -122,8 +124,18 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <span>${cat.nombre}</span>
                             </div>
                         </div>
-                        <div class="pre-item-monto ${colorClase}">
-                            ${formatoCOP.format(item.monto)}
+                        <div class="pre-item-lateral">
+                            <div class="pre-item-monto ${colorClase}">
+                                ${formatoCOP.format(item.monto)}
+                            </div>
+                            <div class="pre-item-acciones">
+                                <button type="button" class="btn-accion-pre btn-editar-pre" title="Editar este rubro" data-id="${item.id}">
+                                    <i class="fa-solid fa-pen-to-square" style="pointer-events: none;"></i>
+                                </button>
+                                <button type="button" class="btn-accion-pre btn-eliminar-pre" title="Eliminar este rubro" data-id="${item.id}">
+                                    <i class="fa-solid fa-trash-can" style="pointer-events: none;"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -132,6 +144,145 @@ document.addEventListener('DOMContentLoaded', () => {
 
         renderLista(listaIngresos, ingresos, 'color-ingreso', 'No hay ingresos registrados en este mes.');
         renderLista(listaGastos, gastos, 'color-gasto', 'No hay gastos registrados en este mes.');
+    }
+
+    // Delegación de eventos global para clicks en Editar o Eliminar rubros
+    document.addEventListener('click', (e) => {
+        const btnEditar = e.target.closest('.btn-editar-pre');
+        if (btnEditar) {
+            e.preventDefault();
+            e.stopPropagation();
+            const id = btnEditar.getAttribute('data-id');
+            const periodo = selectPeriodo.value || periodoActual;
+            const items = obtenerPresupuestosUsuario(periodo);
+            const item = items.find(i => i.id === id);
+            if (item) abrirModalEditar(item);
+            return;
+        }
+
+        const btnEliminar = e.target.closest('.btn-eliminar-pre');
+        if (btnEliminar) {
+            e.preventDefault();
+            e.stopPropagation();
+            const id = btnEliminar.getAttribute('data-id');
+            const periodo = selectPeriodo.value || periodoActual;
+            const items = obtenerPresupuestosUsuario(periodo);
+            const item = items.find(i => i.id === id);
+            if (item) confirmarEliminar(item);
+            return;
+        }
+    });
+
+    // Modal para editar / ajustar rubro
+    async function abrirModalEditar(item) {
+        const categorias = item.tipo === 'INGRESO' ? CATEGORIAS_INGRESO : CATEGORIAS_GASTO;
+        const opcionesCat = categorias.map(c => `
+            <option value="${c.id}" ${c.id === item.categoria ? 'selected' : ''}>${c.nombre}</option>
+        `).join('');
+
+        if (window.Swal) {
+            const { value: formValues } = await Swal.fire({
+                title: 'Editar rubro del presupuesto',
+                background: '#12151c',
+                color: '#fff',
+                showCancelButton: true,
+                confirmButtonColor: '#e5a93c',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Guardar cambios',
+                cancelButtonText: 'Cancelar',
+                html: `
+                    <div style="display: flex; flex-direction: column; gap: 12px; text-align: left; font-size: 0.85rem; margin-top: 10px;">
+                        <div>
+                            <label style="color: #94a3b8; display: block; margin-bottom: 4px;">Categoría:</label>
+                            <select id="swalEditCat" style="width: 100%; background: #090c12; color: #fff; border: 1px solid rgba(229,169,60,0.3); border-radius: 8px; padding: 8px;">
+                                ${opcionesCat}
+                            </select>
+                        </div>
+                        <div>
+                            <label style="color: #94a3b8; display: block; margin-bottom: 4px;">Descripción / Concepto:</label>
+                            <input id="swalEditDesc" type="text" value="${item.descripcion || ''}" style="width: 100%; background: #090c12; color: #fff; border: 1px solid rgba(229,169,60,0.3); border-radius: 8px; padding: 8px;" placeholder="Descripción">
+                        </div>
+                        <div>
+                            <label style="color: #94a3b8; display: block; margin-bottom: 4px;">Monto presupuestado (COP):</label>
+                            <input id="swalEditMonto" type="number" value="${item.monto}" min="1" style="width: 100%; background: #090c12; color: #fff; border: 1px solid rgba(229,169,60,0.3); border-radius: 8px; padding: 8px;">
+                        </div>
+                    </div>
+                `,
+                preConfirm: () => {
+                    const cat = document.getElementById('swalEditCat').value;
+                    const desc = document.getElementById('swalEditDesc').value;
+                    const monto = Number(document.getElementById('swalEditMonto').value);
+
+                    if (!monto || monto <= 0) {
+                        Swal.showValidationMessage('El monto debe ser un valor válido mayor a 0');
+                        return false;
+                    }
+                    return { categoria: cat, descripcion: desc, monto };
+                }
+            });
+
+            if (formValues) {
+                try {
+                    actualizarItemPresupuesto(item.id, formValues);
+                    renderizarPresupuestos();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Rubro Actualizado',
+                        text: 'El ajuste se guardó correctamente.',
+                        timer: 1400,
+                        showConfirmButton: false,
+                        background: '#12151c',
+                        color: '#fff'
+                    });
+                } catch (e) {
+                    Swal.fire({ icon: 'error', title: 'Error', text: e.message, background: '#12151c', color: '#fff' });
+                }
+            }
+        } else {
+            const nuevaDesc = prompt('Descripción / Concepto:', item.descripcion || '');
+            if (nuevaDesc === null) return;
+            const nuevoMonto = prompt('Monto presupuestado (COP):', item.monto);
+            if (!nuevoMonto || isNaN(Number(nuevoMonto)) || Number(nuevoMonto) <= 0) return;
+            actualizarItemPresupuesto(item.id, { descripcion: nuevaDesc, monto: Number(nuevoMonto) });
+            renderizarPresupuestos();
+        }
+    }
+
+    // Modal para confirmar eliminación
+    async function confirmarEliminar(item) {
+        if (window.Swal) {
+            const res = await Swal.fire({
+                title: '¿Eliminar este rubro?',
+                text: `Se eliminará "${item.descripcion || item.categoria}" del presupuesto de este mes.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#f87171',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                background: '#12151c',
+                color: '#fff'
+            });
+
+            if (res.isConfirmed) {
+                eliminarItemPresupuesto(item.id);
+                renderizarPresupuestos();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Eliminado',
+                    text: 'El rubro fue removido de tu presupuesto.',
+                    timer: 1400,
+                    showConfirmButton: false,
+                    background: '#12151c',
+                    color: '#fff'
+                });
+            }
+        } else {
+            if (confirm(`¿Eliminar ${item.descripcion || item.categoria}?`)) {
+                eliminarItemPresupuesto(item.id);
+                renderizarPresupuestos();
+            }
+        }
     }
 
     // Evento de registrar rubro
