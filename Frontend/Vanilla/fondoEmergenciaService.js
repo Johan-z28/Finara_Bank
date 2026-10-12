@@ -56,10 +56,19 @@ export async function obtenerMetaFondoUsuario() {
     const fondos = leerTodosFondos();
     let meta = fondos.find(f => f.username === usuarioActivo || (!f.username && usuarioActivo === 'maria17'));
 
-    // Consultar cuentas activas del usuario para vincular su cuenta de Ahorros
+    // Consultar cuentas activas del usuario (filtrando cuentas de ahorro y corriente, excluyendo tarjetas)
     const cuentas = await obtenerCuentas();
-    const cuentaAhorros = cuentas.find(c => c.tipo === 'AHORROS') || cuentas[0] || null;
-    const saldoAhorros = cuentaAhorros ? (Number(cuentaAhorros.saldo) || 0) : 0;
+    const cuentasPermitidas = cuentas.filter(c => c.tipo === 'AHORROS' || c.tipo === 'CORRIENTE');
+
+    let cuentaVinculada = null;
+    if (meta && meta.cuentaVinculadaId) {
+        cuentaVinculada = cuentasPermitidas.find(c => String(c.id) === String(meta.cuentaVinculadaId)) || null;
+    }
+    if (!cuentaVinculada) {
+        cuentaVinculada = cuentasPermitidas.find(c => c.tipo === 'AHORROS') || cuentasPermitidas[0] || null;
+    }
+
+    const saldoVinculado = cuentaVinculada ? (Number(cuentaVinculada.saldo) || 0) : 0;
 
     if (!meta) {
         // Meta por defecto vinculada al saldo inicial de ahorro
@@ -69,8 +78,8 @@ export async function obtenerMetaFondoUsuario() {
             metaMonto: 10800000,
             gastosFijos: 1800000,
             mesesCobertura: 6,
-            cuentaVinculadaId: cuentaAhorros ? cuentaAhorros.id : null,
-            cuentaVinculadaNumero: cuentaAhorros ? cuentaAhorros.numero : '',
+            cuentaVinculadaId: cuentaVinculada ? cuentaVinculada.id : null,
+            cuentaVinculadaNumero: cuentaVinculada ? cuentaVinculada.numero : '',
             fechaCreacion: new Date().toISOString()
         };
         fondos.push(meta);
@@ -79,8 +88,8 @@ export async function obtenerMetaFondoUsuario() {
 
     return {
         ...meta,
-        saldoActualAhorro: saldoAhorros,
-        cuentaVinculada: cuentaAhorros
+        saldoActualAhorro: saldoVinculado,
+        cuentaVinculada: cuentaVinculada
     };
 }
 
@@ -98,7 +107,8 @@ export async function guardarMetaFondoUsuario({ metaMonto, gastosFijos, mesesCob
     }
 
     const cuentas = await obtenerCuentas();
-    const cta = cuentas.find(c => String(c.id) === String(cuentaId)) || cuentas.find(c => c.tipo === 'AHORROS') || null;
+    const cuentasPermitidas = cuentas.filter(c => c.tipo === 'AHORROS' || c.tipo === 'CORRIENTE');
+    const cta = cuentasPermitidas.find(c => String(c.id) === String(cuentaId)) || cuentasPermitidas[0] || null;
 
     const datosGuardar = {
         id: indice !== -1 ? fondos[indice].id : `FE-${Date.now()}`,
@@ -131,4 +141,45 @@ export async function guardarMetaFondoUsuario({ metaMonto, gastosFijos, mesesCob
     } catch { }
 
     return datosGuardar;
+}
+
+/**
+ * Calcula el indicador de avance hacia la meta del fondo de emergencia:
+ * porcentaje de cumplimiento, monto faltante, estado de cobertura y recomendaciones.
+ */
+export async function calcularAvanceFondo() {
+    const metaInfo = await obtenerMetaFondoUsuario();
+    const meta = Number(metaInfo.metaMonto) || 10800000;
+    const saldoActual = Number(metaInfo.saldoActualAhorro) || 0;
+
+    const porcentajeAvance = meta > 0 ? Math.min(100, Math.round((saldoActual / meta) * 100)) : 0;
+    const porcentajeReal = meta > 0 ? Math.round((saldoActual / meta) * 100) : 0;
+    const montoFaltante = Math.max(0, meta - saldoActual);
+
+    // Meses cubiertos según el saldo actual y sus gastos fijos
+    const gastosFijos = Number(metaInfo.gastosFijos) || 1800000;
+    const mesesCubiertos = gastosFijos > 0 ? (saldoActual / gastosFijos).toFixed(1) : 0;
+
+    let nivelSeguridad = 'En construcción';
+    let claseSeguridad = 'alerta';
+    if (porcentajeReal >= 100) {
+        nivelSeguridad = '¡Meta cumplida y protegida!';
+        claseSeguridad = 'exito';
+    } else if (porcentajeReal >= 50) {
+        nivelSeguridad = 'Buen camino (Más del 50%)';
+        claseSeguridad = 'progreso';
+    }
+
+    return {
+        ...metaInfo,
+        meta,
+        saldoActual,
+        porcentajeAvance,
+        porcentajeReal,
+        montoFaltante,
+        mesesCubiertos,
+        nivelSeguridad,
+        claseSeguridad,
+        metaCumplida: porcentajeReal >= 100
+    };
 }

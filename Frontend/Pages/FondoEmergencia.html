@@ -151,6 +151,50 @@
                 </div>
             </div>
 
+            <!-- Panel de Indicador de Avance hacia la Meta del Fondo -->
+            <section class="fe-avance-card" id="panelAvanceFondo">
+                <div class="fe-avance-head">
+                    <div>
+                        <span class="fe-etiqueta-avance">Tu Estado de Preparación</span>
+                        <h2 class="fe-avance-titulo" id="avanceTitulo">Monitoreo de Fondo de Emergencia</h2>
+                    </div>
+                    <div class="fe-badge-seguridad" id="badgeSeguridad">
+                        <i class="fa-solid fa-shield-halved"></i> <span id="textoSeguridad">En progreso</span>
+                    </div>
+                </div>
+
+                <div class="fe-avance-metricas-grid">
+                    <div class="fe-metrica-caja">
+                        <span class="fe-metrica-label">Ahorro Actual Acumulado</span>
+                        <h3 class="fe-metrica-valor color-verde" id="avanceSaldoActual">$ 0</h3>
+                        <small id="avanceCuentaDesc">Cuenta de ahorros</small>
+                    </div>
+
+                    <div class="fe-metrica-caja">
+                        <span class="fe-metrica-label">Meta Definida</span>
+                        <h3 class="fe-metrica-valor color-dorado" id="avanceMetaMonto">$ 0</h3>
+                        <small id="avanceCoberturaMeses">Meta para 6 meses</small>
+                    </div>
+
+                    <div class="fe-metrica-caja">
+                        <span class="fe-metrica-label">Faltante para la Meta</span>
+                        <h3 class="fe-metrica-valor" id="avanceMontoFaltante">$ 0</h3>
+                        <small id="avanceMesesCubiertos">0 meses cubiertos</small>
+                    </div>
+                </div>
+
+                <!-- Barra de Progreso Dinámica -->
+                <div class="fe-barra-progreso-box">
+                    <div class="fe-barra-info">
+                        <span>Porcentaje de avance hacia tu meta</span>
+                        <strong class="color-dorado" id="avancePorcentajeTexto">0% completado</strong>
+                    </div>
+                    <div class="fe-track-progreso">
+                        <div class="fe-fill-progreso" id="avanceFillProgreso" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Calculadora de Fondo de Emergencia basada en Gastos Fijos -->
             <section class="fe-calculadora-card">
                 <div class="fe-card-head">
@@ -223,7 +267,7 @@
                             <label for="inputMetaPersonalizada">Monto Objetivo / Meta (COP)</label>
                             <div class="fe-input-wrapper">
                                 <span class="fe-currency-prefix">$</span>
-                                <input type="text" id="inputMetaPersonalizada" placeholder="Ej. 10.800.000" required inputmode="numeric">
+                                <input type="text" id="inputMetaPersonalizada" placeholder="10.800.000" required inputmode="numeric">
                             </div>
                             <button type="button" class="btn-usar-sugerido" id="btnUsarSugerido">
                                 <i class="fa-solid fa-wand-magic-sparkles"></i> Usar monto de la calculadora
@@ -231,7 +275,7 @@
                         </div>
 
                         <div class="fe-campo">
-                            <label for="selectCuentaVinculada">Vincular a Cuenta de Ahorro</label>
+                            <label for="selectCuentaVinculada">Vincular a Cuenta (Ahorros o Corriente)</label>
                             <select id="selectCuentaVinculada" class="fe-select-cuenta" required>
                                 <!-- Opciones cargadas dinámicamente con cuentas del usuario -->
                             </select>
