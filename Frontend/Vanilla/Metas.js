@@ -116,28 +116,45 @@ document.addEventListener('DOMContentLoaded', async () => {
         fillMetaProgreso.style.width = `${proyeccion.porcentajeAvance}%`;
 
         // Cuotas de ahorro
-        cuotaMensualMonto.textContent = formatoCOP.format(proyeccion.ahorroMensualNecesario);
-        cuotaQuincenalMonto.textContent = formatoCOP.format(proyeccion.ahorroQuincenalNecesario);
-        cuotaSemanalMonto.textContent = formatoCOP.format(proyeccion.ahorroSemanalNecesario);
-        const cuotaDiarioMonto = document.getElementById('cuotaDiarioMonto');
-        if (cuotaDiarioMonto) cuotaDiarioMonto.textContent = formatoCOP.format(proyeccion.ahorroDiarioNecesario);
+        if (monto === 0) {
+            cuotaMensualMonto.textContent = '$ 0';
+            cuotaQuincenalMonto.textContent = '$ 0';
+            cuotaSemanalMonto.textContent = '$ 0';
+            const cuotaDiarioMonto = document.getElementById('cuotaDiarioMonto');
+            if (cuotaDiarioMonto) cuotaDiarioMonto.textContent = '$ 0';
 
-        const consejoAsesoriaTexto = document.getElementById('consejoAsesoriaTexto');
-        if (consejoAsesoriaTexto) {
-            if (proyeccion.completada) {
-                consejoAsesoriaTexto.textContent = '¡Felicidades! Tu saldo cubre el 100% de esta meta. Considera asignarlo o definir un nuevo objetivo.';
-            } else if (proyeccion.ahorroMensualNecesario > 2000000) {
-                consejoAsesoriaTexto.textContent = `Ahorro mensual alto (${formatoCOP.format(proyeccion.ahorroMensualNecesario)}/mes). Puedes aumentar el plazo a más meses para pagar cuotas más cómodas.`;
-            } else {
-                consejoAsesoriaTexto.textContent = `Para cubrir la brecha de ${formatoCOP.format(proyeccion.brechaRestante)}, programa un ahorro automático de ${formatoCOP.format(proyeccion.ahorroMensualNecesario)} al inicio de cada mes.`;
+            const consejoAsesoriaTexto = document.getElementById('consejoAsesoriaTexto');
+            if (consejoAsesoriaTexto) {
+                consejoAsesoriaTexto.textContent = 'Ingresa el nombre y el importe objetivo de tu meta para simular tu plan de ahorro personalizado.';
             }
+
+            resFechaCumplimiento.textContent = '--';
+            resTextoEstado.textContent = 'Pendiente de datos';
+            resBadgeEstado.className = 'badge-estado';
+        } else {
+            cuotaMensualMonto.textContent = formatoCOP.format(proyeccion.ahorroMensualNecesario);
+            cuotaQuincenalMonto.textContent = formatoCOP.format(proyeccion.ahorroQuincenalNecesario);
+            cuotaSemanalMonto.textContent = formatoCOP.format(proyeccion.ahorroSemanalNecesario);
+            const cuotaDiarioMonto = document.getElementById('cuotaDiarioMonto');
+            if (cuotaDiarioMonto) cuotaDiarioMonto.textContent = formatoCOP.format(proyeccion.ahorroDiarioNecesario);
+
+            const consejoAsesoriaTexto = document.getElementById('consejoAsesoriaTexto');
+            if (consejoAsesoriaTexto) {
+                if (proyeccion.completada) {
+                    consejoAsesoriaTexto.textContent = '¡Felicidades! Tu saldo cubre el 100% de esta meta. Considera asignarlo o definir un nuevo objetivo.';
+                } else if (proyeccion.ahorroMensualNecesario > 2000000) {
+                    consejoAsesoriaTexto.textContent = `Ahorro mensual alto (${formatoCOP.format(proyeccion.ahorroMensualNecesario)}/mes). Puedes aumentar el plazo a más meses para pagar cuotas más cómodas.`;
+                } else {
+                    consejoAsesoriaTexto.textContent = `Para cubrir la brecha de ${formatoCOP.format(proyeccion.brechaRestante)}, programa un ahorro automático de ${formatoCOP.format(proyeccion.ahorroMensualNecesario)} al inicio de cada mes.`;
+                }
+            }
+
+            resFechaCumplimiento.textContent = proyeccion.fechaEstimadaFin;
+
+            // Estado / Viabilidad
+            resTextoEstado.textContent = proyeccion.evaluacion;
+            resBadgeEstado.className = `badge-estado ${proyeccion.claseEvaluacion}`;
         }
-
-        resFechaCumplimiento.textContent = proyeccion.fechaEstimadaFin;
-
-        // Estado / Viabilidad
-        resTextoEstado.textContent = proyeccion.evaluacion;
-        resBadgeEstado.className = `badge-estado ${proyeccion.claseEvaluacion}`;
     }
 
     // Renderizar tarjetas de metas activas
@@ -330,6 +347,31 @@ document.addEventListener('DOMContentLoaded', async () => {
         const categoria = simCategoriaMeta.value;
         const cuentaId = simCuentaAsignada.value;
 
+        // Validación estricta: No permitir guardar si no tiene o no ha seleccionado una cuenta de ahorros o corriente
+        if (!cuentaId || cuentasDisponibles.length === 0) {
+            if (window.Swal) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Cuenta Requerida',
+                    text: 'Debes contar con al menos una Cuenta de Ahorros o Corriente activa para poder vincular y respaldar tu meta financiera.',
+                    showCancelButton: true,
+                    confirmButtonText: '<i class="fa-solid fa-credit-card"></i> Solicitar Cuenta',
+                    cancelButtonText: 'Entendido',
+                    background: '#12151c',
+                    color: '#fff',
+                    confirmButtonColor: '#e5a93c',
+                    cancelButtonColor: '#475569'
+                }).then((res) => {
+                    if (res.isConfirmed) {
+                        window.location.href = 'solicitudTarjeta.html';
+                    }
+                });
+            } else {
+                alert('Debes contar con una Cuenta de Ahorros o Corriente activa para guardar la meta.');
+            }
+            return;
+        }
+
         if (!monto || monto <= 0) {
             if (window.Swal) {
                 Swal.fire({
@@ -376,7 +418,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await cargarCuentas();
     await recargarDatos();
 
-    // Precargar primera meta en el simulador si existe
+    // Si el usuario tiene metas, precargar la primera; si no, dejar el formulario completamente limpio en blanco
     if (metasActuales.length > 0) {
         const primera = metasActuales[0];
         simNombreMeta.value = primera.nombreMeta;
@@ -387,7 +429,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             simCuentaAsignada.value = primera.cuentaAsignadaId;
         }
     } else {
-        simMontoObjetivo.value = '15.000.000';
+        simNombreMeta.value = '';
+        simMontoObjetivo.value = '';
     }
 
     actualizarProyeccionEnPantalla();
