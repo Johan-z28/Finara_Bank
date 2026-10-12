@@ -224,6 +224,16 @@ document.addEventListener("DOMContentLoaded", () => {
             emitirTarjetaDirecta(usuarioActual, tipoTarjeta);
         });
     });
+
+    // 7. Simular y Solicitar Crédito / Préstamos
+    const btnSolicitarPrestamo = document.getElementById("btnSolicitarPrestamo");
+    if (btnSolicitarPrestamo) {
+        btnSolicitarPrestamo.addEventListener("click", () => {
+            const usuarioActual = obtenerUsuarioActivo();
+            if (!usuarioActual) return;
+            mostrarModalSimuladorCredito(usuarioActual);
+        });
+    }
 });
 
 /**
@@ -788,3 +798,164 @@ function mostrarResultadoEvaluacion(aprobado, nombreTarjeta, motivo, numeroTarje
         location.reload();
     });
 }
+
+/**
+ * Modal interactivo para simular y solicitar Crédito de Libre Inversión
+ */
+function mostrarModalSimuladorCredito(usuarioActivo) {
+    let todasLasCuentas = [];
+    try {
+        todasLasCuentas = JSON.parse(localStorage.getItem('finara_cuentas')) || [];
+    } catch {
+        todasLasCuentas = [];
+    }
+    const usernameActual = usuarioActivo.username || usuarioActivo.correo || 'maria17';
+    const cuentasUsuario = todasLasCuentas.filter(c => c && (c.username === usernameActual || (!c.username && usernameActual === 'maria17')) && c.tipo !== 'TARJETA_CREDITO');
+
+    if (cuentasUsuario.length === 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Requiere cuenta activa',
+            text: 'Debes aperturar al menos una Cuenta de Ahorros o Corriente para recibir el desembolso de tu crédito.',
+            background: '#12151c',
+            color: '#ffffff',
+            confirmButtonColor: '#e5a93c'
+        });
+        return;
+    }
+
+    const opcionesCuentas = cuentasUsuario.map(c => `<option value="${c.numero}">${c.tipo === 'AHORROS' ? 'Cuenta de Ahorros' : 'Cuenta Corriente'} (**** ${String(c.numero).slice(-4)}) - Saldo: $ ${Number(c.saldo).toLocaleString('es-CO')}</option>`).join('');
+
+    const modalExistente = document.getElementById("modalSimuladorCreditoFinara");
+    if (modalExistente) modalExistente.remove();
+
+    const overlay = document.createElement("div");
+    overlay.id = "modalSimuladorCreditoFinara";
+    overlay.style.cssText = `
+        position: fixed; inset: 0; background: rgba(5, 7, 10, 0.85); backdrop-filter: blur(8px);
+        display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 1.5rem;
+    `;
+
+    overlay.innerHTML = `
+        <div style="background: #11141b; border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 16px; padding: 2rem; max-width: 480px; width: 100%; box-shadow: 0 20px 40px rgba(0,0,0,0.6); color: #fff;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
+                <h3 style="margin: 0; font-size: 1.2rem; color: #fff; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-hand-holding-dollar" style="color: #c084fc;"></i> Simulador de Crédito
+                </h3>
+                <button type="button" id="btnCerrarSimulador" style="background: none; border: none; color: #8a8f99; font-size: 1.2rem; cursor: pointer;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="formSimuladorCredito">
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 0.35rem;">Monto a solicitar (COP):</label>
+                    <input type="number" id="montoCreditoInput" min="500000" max="30000000" step="100000" value="5000000" required
+                           style="width: 100%; background: #1a1e29; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.65rem 0.9rem; color: #fff; font-size: 1rem;">
+                    <small style="color: #64748b; font-size: 0.75rem;">Mínimo $ 500.000 - Máximo $ 30.000.000</small>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 0.35rem;">Plazo en meses:</label>
+                    <select id="plazoCreditoSelect" style="width: 100%; background: #1a1e29; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.65rem 0.9rem; color: #fff; font-size: 0.95rem;">
+                        <option value="12">12 meses (1 año)</option>
+                        <option value="24" selected>24 meses (2 años)</option>
+                        <option value="36">36 meses (3 años)</option>
+                        <option value="48">48 meses (4 años)</option>
+                        <option value="60">60 meses (5 años)</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 0.35rem;">Cuenta para desembolso inmediato:</label>
+                    <select id="cuentaDesembolsoSelect" style="width: 100%; background: #1a1e29; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.65rem 0.9rem; color: #fff; font-size: 0.95rem;">
+                        ${opcionesCuentas}
+                    </select>
+                </div>
+
+                <div style="background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 10px; padding: 1rem; margin-bottom: 1.4rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem; font-size: 0.85rem; color: #94a3b8;">
+                        <span>Tasa E.A.:</span>
+                        <strong style="color: #fff;">18.5% E.A. (1.42% M.V.)</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.95rem;">
+                        <span style="color: #cbd5e1;">Cuota mensual estimada:</span>
+                        <strong id="cuotaEstimadaText" style="color: #c084fc; font-size: 1.1rem;">$ 247.380 / mes</strong>
+                    </div>
+                </div>
+
+                <button type="submit" style="width: 100%; background: #c084fc; color: #0a0c10; border: none; padding: 0.85rem; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fa-solid fa-check"></i> Solicitar y Desembolsar Crédito
+                </button>
+            </form>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const inputMonto = overlay.querySelector("#montoCreditoInput");
+    const selectPlazo = overlay.querySelector("#plazoCreditoSelect");
+    const textCuota = overlay.querySelector("#cuotaEstimadaText");
+
+    const recalcular = () => {
+        const monto = Number(inputMonto.value) || 0;
+        const meses = Number(selectPlazo.value) || 24;
+        const tasaMensual = 0.0142;
+        if (monto > 0 && meses > 0) {
+            const cuota = (monto * (tasaMensual * Math.pow(1 + tasaMensual, meses))) / (Math.pow(1 + tasaMensual, meses) - 1);
+            textCuota.textContent = `$ ${Math.round(cuota).toLocaleString('es-CO')} / mes`;
+        }
+    };
+
+    inputMonto.addEventListener("input", recalcular);
+    selectPlazo.addEventListener("change", recalcular);
+    recalcular();
+
+    const cerrar = () => overlay.remove();
+    overlay.querySelector("#btnCerrarSimulador").addEventListener("click", cerrar);
+    overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) cerrar();
+    });
+
+    overlay.querySelector("#formSimuladorCredito").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const monto = Number(inputMonto.value);
+        const numCuenta = overlay.querySelector("#cuentaDesembolsoSelect").value;
+
+        // Desembolsar directamente en la cuenta seleccionada
+        let cuentas = JSON.parse(localStorage.getItem('finara_cuentas')) || [];
+        const ctaIdx = cuentas.findIndex(c => String(c.numero) === String(numCuenta));
+        if (ctaIdx !== -1) {
+            cuentas[ctaIdx].saldo = (Number(cuentas[ctaIdx].saldo) || 0) + monto;
+            localStorage.setItem('finara_cuentas', JSON.stringify(cuentas));
+        }
+
+        // Registrar movimiento
+        let movs = JSON.parse(localStorage.getItem('finara_movimientos')) || [];
+        movs.unshift({
+            id: `MOV-CRED-${Date.now()}`,
+            tipo: 'CREDITO_DESEMBOLSO',
+            descripcion: 'Desembolso Crédito de Libre Destino',
+            cuentaOrigen: 'Finara Bank',
+            cuentaDestino: numCuenta,
+            monto: monto,
+            fecha: new Date().toISOString(),
+            estado: 'EXITOSA'
+        });
+        localStorage.setItem('finara_movimientos', JSON.stringify(movs));
+
+        cerrar();
+        Swal.fire({
+            icon: 'success',
+            title: '¡Crédito Aprobado y Desembolsado!',
+            html: `
+                <p>Se ha transferido exitosamente el monto de <strong style="color: #34d399;">$ ${monto.toLocaleString('es-CO')}</strong> a tu cuenta <strong>**** ${String(numCuenta).slice(-4)}</strong>.</p>
+                <p style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.5rem;">Ya tienes los fondos disponibles para transferir o retirar.</p>
+            `,
+            background: '#12151c',
+            color: '#ffffff',
+            confirmButtonColor: '#e5a93c'
+        });
+    });
+}
+

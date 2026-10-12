@@ -96,6 +96,34 @@ export function crearCuentaCard(cuenta, { ocultarSaldo = false } = {}) {
         });
 
         card.appendChild(tarjetaBox);
+    } else if (cuenta.tipo === 'AHORROS' || cuenta.tipo === 'CORRIENTE') {
+        const sinTarjetaBox = el('div', 'cuenta-card__tarjeta-vinculada');
+        const nombreTarjeta = cuenta.tipo === 'AHORROS' ? 'Tarjeta Débito Finara' : 'Tarjeta Débito Corriente';
+        const tipoSlug = cuenta.tipo === 'AHORROS' ? 'debito' : 'corriente';
+
+        sinTarjetaBox.innerHTML = `
+            <div class="tarjeta-vinculada__head" style="opacity: 0.85;">
+                <div class="tarjeta-vinculada__info">
+                    <i class="fa-solid fa-credit-card" style="color: #64748b;"></i>
+                    <div>
+                        <strong class="tarjeta-vinculada__titulo" style="color: #94a3b8;">${nombreTarjeta}</strong>
+                        <span class="tarjeta-vinculada__numero" style="color: #64748b; font-size: 0.75rem;">Sin tarjeta asociada</span>
+                    </div>
+                </div>
+            </div>
+            <div class="tarjeta-vinculada__acciones">
+                <button type="button" class="btn-tarjeta-accion btn-solicitar-tarjeta-cuenta" style="grid-column: 1 / -1; background: rgba(229,169,60,0.15); color: #e5a93c; border: 1px dashed rgba(229,169,60,0.4);" title="Solicitar tarjeta ahora">
+                    <i class="fa-solid fa-plus"></i> Solicitar ${nombreTarjeta}
+                </button>
+            </div>
+        `;
+
+        sinTarjetaBox.querySelector('.btn-solicitar-tarjeta-cuenta').addEventListener('click', (e) => {
+            e.stopPropagation();
+            activarTarjetaDesdeSaldos(cuenta, tipoSlug);
+        });
+
+        card.appendChild(sinTarjetaBox);
     }
 
     // Si es Tarjeta de Crédito independiente
@@ -209,4 +237,61 @@ function mostrarModalDetallesTarjeta(cuenta, ocultarSaldo = false) {
             }, 2000);
         });
     });
+}
+
+function activarTarjetaDesdeSaldos(cuenta, tipoSlug) {
+    const titulo = tipoSlug === 'debito' ? 'Tarjeta Débito Finara' : 'Tarjeta Cuenta Corriente';
+    const numeroGenerado = '4532 ' + String(Date.now()).slice(-4) + ' ' + Math.floor(1000 + Math.random() * 9000) + ' ' + Math.floor(1000 + Math.random() * 9000);
+    const vencimiento = '09/29';
+    const cvv = String(Math.floor(100 + Math.random() * 900));
+
+    const nuevaTarjeta = {
+        tipo: tipoSlug,
+        titulo: titulo,
+        numeroTarjeta: numeroGenerado,
+        fechaVencimiento: vencimiento,
+        cvv: cvv,
+        fechaAprobacion: new Date().toISOString()
+    };
+
+    let listaUsuarios = JSON.parse(localStorage.getItem("finara_usuarios_local")) || [];
+    let usuarioActual = JSON.parse(localStorage.getItem("userProfile")) || { username: cuenta.username || 'maria17' };
+    const username = cuenta.username || usuarioActual.username || 'maria17';
+
+    listaUsuarios = listaUsuarios.map(u => {
+        if ((u.username && u.username === username) || (u.correo && u.correo === username)) {
+            const tAprobadas = u.tarjetasAprobadas || [];
+            if (!tAprobadas.some(t => t.tipo === tipoSlug)) {
+                tAprobadas.push(nuevaTarjeta);
+            }
+            u.tarjetasAprobadas = tAprobadas;
+        }
+        return u;
+    });
+    localStorage.setItem("finara_usuarios_local", JSON.stringify(listaUsuarios));
+
+    if (usuarioActual && ((usuarioActual.username && usuarioActual.username === username) || (usuarioActual.correo && usuarioActual.correo === username))) {
+        const tAprobadas = usuarioActual.tarjetasAprobadas || [];
+        if (!tAprobadas.some(t => t.tipo === tipoSlug)) {
+            tAprobadas.push(nuevaTarjeta);
+        }
+        usuarioActual.tarjetasAprobadas = tAprobadas;
+        localStorage.setItem("userProfile", JSON.stringify(usuarioActual));
+    }
+
+    if (window.Swal) {
+        Swal.fire({
+            icon: 'success',
+            title: '¡Tarjeta Activada!',
+            text: `Se ha emitido y asociado tu ${titulo} a esta cuenta con éxito.`,
+            background: '#12151c',
+            color: '#ffffff',
+            confirmButtonColor: '#e5a93c'
+        }).then(() => {
+            window.location.reload();
+        });
+    } else {
+        alert(`¡${titulo} emitida y asociada con éxito!`);
+        window.location.reload();
+    }
 }
