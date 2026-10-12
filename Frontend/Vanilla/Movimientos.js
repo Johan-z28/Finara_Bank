@@ -1,5 +1,7 @@
 import { initGlobalComponents } from './Global/app.js';
 import { PERIODOS, obtenerCuentasFiltro, obtenerMovimientos, SesionExpiradaError } from './movimientosService.js';
+import { obtenerDatosExtracto, descargarExtractoPDF } from './extractoService.js';
+import { guardarNotificacion } from './notificaciones.js';
 
 const TAMANO_PAGINA = 8;
 
@@ -161,10 +163,98 @@ document.addEventListener('DOMContentLoaded', async () => {
             o.value = c.id;
             selCuenta.append(o);
         });
+        // Poblar selector del modal de extractos
+        const selExtractoCuenta = $('extractoCuentaSelect');
+        if (selExtractoCuenta) {
+            selExtractoCuenta.replaceChildren();
+            cuentas.forEach(c => {
+                const opt = el('option', '', `${c.nombre} · •••• ${String(c.numero).replace(/\D/g, '').slice(-4)}`);
+                opt.value = c.id;
+                selExtractoCuenta.append(opt);
+            });
+        }
+
         filtros.cuentaId = selCuenta.value;
         cargar();
     } catch (err) {
         if (err instanceof SesionExpiradaError) { window.location.href = '../index.html'; return; }
         mostrarEstado('No pudimos cargar tus cuentas. Intenta de nuevo.', { reintentar: true });
+    }
+
+    // ----- Manejo de Modal de Extractos Bancarios (HU-19) -----
+    const modalExtracto = $('modalExtractoBancario');
+    const btnAbrirModal = $('btnAbrirModalExtracto');
+    const btnCerrarModal = $('btnCerrarModalExtracto');
+    const btnCancelarModal = $('btnCancelarExtracto');
+    const formExtracto = $('formGenerarExtracto');
+    const selMes = $('extractoMesSelect');
+    const selAnio = $('extractoAnioSelect');
+
+    // Seleccionar por defecto el mes actual
+    if (selMes) selMes.value = String(new Date().getMonth() + 1);
+
+    const abrirModal = () => {
+        if (!modalExtracto) return;
+        modalExtracto.classList.remove('hidden');
+    };
+
+    const cerrarModal = () => {
+        if (!modalExtracto) return;
+        modalExtracto.classList.add('hidden');
+    };
+
+    if (btnAbrirModal) btnAbrirModal.addEventListener('click', abrirModal);
+    if (btnCerrarModal) btnCerrarModal.addEventListener('click', cerrarModal);
+    if (btnCancelarModal) btnCancelarModal.addEventListener('click', cerrarModal);
+    if (modalExtracto) {
+        modalExtracto.addEventListener('click', (e) => {
+            if (e.target === modalExtracto) cerrarModal();
+        });
+    }
+
+    if (formExtracto) {
+        formExtracto.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const cuentaId = $('extractoCuentaSelect').value;
+            const mes = selMes.value;
+            const anio = selAnio.value;
+
+            try {
+                const datosDoc = await obtenerDatosExtracto(cuentaId, mes, anio);
+                descargarExtractoPDF(datosDoc);
+
+                cerrarModal();
+
+                if (window.Swal) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Extracto Generado con Éxito!',
+                        html: `
+                            <p style="color: #cbd5e1; font-size: 0.95rem;">
+                                Se ha descargado el extracto oficial de <strong>${datosDoc.cuenta.tipo}</strong> para el periodo <strong>${datosDoc.periodoTexto}</strong>.
+                            </p>
+                            <small style="color: #94a3b8; display: block; margin-top: 0.5rem;">
+                                Revisa tu carpeta de Descargas o la ventana de impresión para guardarlo como PDF.
+                            </small>
+                        `,
+                        background: '#12151c',
+                        color: '#ffffff',
+                        confirmButtonColor: '#e5a93c'
+                    });
+                }
+            } catch (err) {
+                console.error('Error al generar extracto:', err);
+                if (window.Swal) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error al generar extracto',
+                        text: err.message || 'No se pudo generar el documento.',
+                        background: '#12151c',
+                        color: '#ffffff',
+                        confirmButtonColor: '#e5a93c'
+                    });
+                }
+            }
+        });
     }
 });

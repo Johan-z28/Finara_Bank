@@ -334,3 +334,37 @@ export function generarHTMLDocumentoExtracto(datos) {
 </html>
     `;
 }
+
+/**
+ * Habilita la descarga directa del archivo PDF / documento desde el navegador web.
+ * Utiliza iframe oculto / Blob URL para activar la descarga inmediata e impresión oficial a PDF.
+ */
+export function descargarExtractoPDF(datos) {
+    const htmlContenido = generarHTMLDocumentoExtracto(datos);
+    const nombreArchivo = `Extracto_Finara_${String(datos.cuenta.numero).slice(-4)}_${datos.mes}_${datos.anio}.html`;
+
+    // 1. Descarga directa como archivo oficial HTML/PDF
+    const blob = new Blob([htmlContenido], { type: 'text/html;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const linkDescarga = document.createElement('a');
+    linkDescarga.href = url;
+    linkDescarga.setAttribute('download', nombreArchivo);
+    document.body.appendChild(linkDescarga);
+    linkDescarga.click();
+    document.body.removeChild(linkDescarga);
+
+    // 2. Abrir ventana de impresión nativa a PDF para guardar directo como .pdf si el usuario lo desea
+    const ventanaImpresion = window.open('', '_blank');
+    if (ventanaImpresion) {
+        ventanaImpresion.document.write(htmlContenido);
+        ventanaImpresion.document.close();
+        setTimeout(() => {
+            ventanaImpresion.focus();
+            ventanaImpresion.print();
+        }, 350);
+    }
+
+    URL.revokeObjectURL(url);
+    return { exito: true, nombreArchivo };
+}
+
