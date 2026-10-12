@@ -52,89 +52,19 @@ export function obtenerPeriodoActual() {
     return `${d.getFullYear()}-${mes}`;
 }
 
-function generarRubrosInicialesDemo(username, periodo) {
-    return [
-        {
-            id: `PRE-DEMO-1`,
-            username,
-            tipo: 'INGRESO',
-            categoria: 'salario',
-            descripcion: 'Salario / Nómina principal',
-            monto: 3800000,
-            periodo,
-            fechaCreacion: new Date().toISOString()
-        },
-        {
-            id: `PRE-DEMO-2`,
-            username,
-            tipo: 'INGRESO',
-            categoria: 'honorarios',
-            descripcion: 'Ingresos freelance / Asesorías',
-            monto: 850000,
-            periodo,
-            fechaCreacion: new Date().toISOString()
-        },
-        {
-            id: `PRE-DEMO-3`,
-            username,
-            tipo: 'GASTO',
-            categoria: 'vivienda',
-            descripcion: 'Arriendo y servicios públicos',
-            monto: 1250000,
-            periodo,
-            fechaCreacion: new Date().toISOString()
-        },
-        {
-            id: `PRE-DEMO-4`,
-            username,
-            tipo: 'GASTO',
-            categoria: 'alimentacion',
-            descripcion: 'Supermercado y mercado del mes',
-            monto: 780000,
-            periodo,
-            fechaCreacion: new Date().toISOString()
-        },
-        {
-            id: `PRE-DEMO-5`,
-            username,
-            tipo: 'GASTO',
-            categoria: 'transporte',
-            descripcion: 'Transporte, gasolina y movilidad',
-            monto: 320000,
-            periodo,
-            fechaCreacion: new Date().toISOString()
-        },
-        {
-            id: `PRE-DEMO-6`,
-            username,
-            tipo: 'GASTO',
-            categoria: 'entretenimiento',
-            descripcion: 'Salidas y plataformas streaming',
-            monto: 190000,
-            periodo,
-            fechaCreacion: new Date().toISOString()
-        }
-    ];
-}
-
 export function obtenerPresupuestosUsuario(periodo = null) {
     const usuarioActivo = obtenerUsernameActivo();
     let todos = leerTodos();
-    const periodoActual = periodo || obtenerPeriodoActual();
 
-    // Solo generar presupuesto base la primera vez que el usuario abre el módulo (bandera por usuario y periodo)
-    const claveInit = `finara_pre_init_${usuarioActivo}_${periodoActual}`;
-    const yaInicializado = localStorage.getItem(claveInit) === 'true';
-
-    if (!yaInicializado && todos.length === 0) {
-        const demo = generarRubrosInicialesDemo(usuarioActivo, periodoActual);
-        todos = [...demo, ...todos];
+    // Purgar rubros residuales de demo que se hayan guardado en el navegador del usuario
+    const hayDemosResiduales = todos.some(p => p.id && String(p.id).startsWith('PRE-DEMO-'));
+    if (hayDemosResiduales) {
+        todos = todos.filter(p => !p.id || !String(p.id).startsWith('PRE-DEMO-'));
         guardarTodos(todos);
-        localStorage.setItem(claveInit, 'true');
     }
 
     return todos.filter(p => {
-        const matchUsuario = (p.username === usuarioActivo || (!p.username && usuarioActivo === 'maria17'));
+        const matchUsuario = (p.username === usuarioActivo);
         if (!periodo) return matchUsuario;
         return matchUsuario && p.periodo === periodo;
     });

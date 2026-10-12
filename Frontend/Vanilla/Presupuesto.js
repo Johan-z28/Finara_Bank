@@ -38,9 +38,105 @@ document.addEventListener('DOMContentLoaded', () => {
     const progresoTexto = document.getElementById('progresoTexto');
     const progresoFill = document.getElementById('progresoFill');
 
+    // Nombres de los meses en español
+    const MESES_NOMBRES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    const MESES_CORTOS = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
     // Inicializar periodo por defecto (mes actual)
-    const periodoActual = obtenerPeriodoActual();
-    selectPeriodo.value = periodoActual;
+    let [anioActual, mesActualNum] = (obtenerPeriodoActual()).split('-').map(Number);
+    let anioSeleccionado = anioActual;
+    let mesSeleccionado = mesActualNum; // 1-12
+    let anioNavegandoDropdown = anioSeleccionado;
+
+    const selectorPeriodoContainer = document.getElementById('selectorPeriodoContainer');
+    const periodoDisplayBtn = document.getElementById('periodoDisplayBtn');
+    const periodoTextoLabel = document.getElementById('periodoTextoLabel');
+    const dropdownMesesMenu = document.getElementById('dropdownMesesMenu');
+    const btnMesAnterior = document.getElementById('btnMesAnterior');
+    const btnMesSiguiente = document.getElementById('btnMesSiguiente');
+    const btnYearPrev = document.getElementById('btnYearPrev');
+    const btnYearNext = document.getElementById('btnYearNext');
+    const labelYearSeleccionado = document.getElementById('labelYearSeleccionado');
+    const gridMesesDropdown = document.getElementById('gridMesesDropdown');
+
+    function actualizarPeriodoActivo(anio, mes) {
+        anioSeleccionado = anio;
+        mesSeleccionado = mes;
+        const clave = `${anio}-${String(mes).padStart(2, '0')}`;
+        selectPeriodo.value = clave;
+        periodoTextoLabel.textContent = `${MESES_NOMBRES[mes - 1]} ${anio}`;
+        renderizarPresupuestos();
+        renderizarGridDropdown();
+    }
+
+    function renderizarGridDropdown() {
+        labelYearSeleccionado.textContent = anioNavegandoDropdown;
+        gridMesesDropdown.innerHTML = MESES_CORTOS.map((m, idx) => {
+            const mesNum = idx + 1;
+            const esActivo = (anioNavegandoDropdown === anioSeleccionado && mesNum === mesSeleccionado);
+            return `<button type="button" class="btn-mes-item ${esActivo ? 'activo' : ''}" data-mes="${mesNum}">${m}</button>`;
+        }).join('');
+    }
+
+    // Toggle Dropdown
+    periodoDisplayBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdownMesesMenu.classList.toggle('hidden');
+        selectorPeriodoContainer.classList.toggle('abierto');
+        anioNavegandoDropdown = anioSeleccionado;
+        renderizarGridDropdown();
+    });
+
+    // Cerrar al hacer click afuera
+    document.addEventListener('click', (e) => {
+        if (!selectorPeriodoContainer.contains(e.target)) {
+            dropdownMesesMenu.classList.add('hidden');
+            selectorPeriodoContainer.classList.remove('abierto');
+        }
+    });
+
+    // Navegar mes anterior
+    btnMesAnterior.addEventListener('click', () => {
+        let m = mesSeleccionado - 1;
+        let y = anioSeleccionado;
+        if (m < 1) { m = 12; y--; }
+        actualizarPeriodoActivo(y, m);
+    });
+
+    // Navegar mes siguiente
+    btnMesSiguiente.addEventListener('click', () => {
+        let m = mesSeleccionado + 1;
+        let y = anioSeleccionado;
+        if (m > 12) { m = 1; y++; }
+        actualizarPeriodoActivo(y, m);
+    });
+
+    // Navegar años en el dropdown
+    btnYearPrev.addEventListener('click', (e) => {
+        e.stopPropagation();
+        anioNavegandoDropdown--;
+        renderizarGridDropdown();
+    });
+
+    btnYearNext.addEventListener('click', (e) => {
+        e.stopPropagation();
+        anioNavegandoDropdown++;
+        renderizarGridDropdown();
+    });
+
+    // Seleccionar mes del grid
+    gridMesesDropdown.addEventListener('click', (e) => {
+        const btnMes = e.target.closest('.btn-mes-item');
+        if (btnMes) {
+            e.stopPropagation();
+            const mesElegido = Number(btnMes.getAttribute('data-mes'));
+            actualizarPeriodoActivo(anioNavegandoDropdown, mesElegido);
+            dropdownMesesMenu.classList.add('hidden');
+            selectorPeriodoContainer.classList.remove('abierto');
+        }
+    });
+
+    actualizarPeriodoActivo(anioActual, mesActualNum);
 
     // Actualizar select de categorías según el tipo seleccionado
     function cargarCategorias() {
@@ -79,7 +175,12 @@ document.addEventListener('DOMContentLoaded', () => {
         progresoTexto.textContent = `${Math.min(resumen.porcentajeGastado, 100)}% consumido`;
         progresoFill.style.width = `${Math.min(resumen.porcentajeGastado, 100)}%`;
 
-        if (resumen.esDeficit) {
+        if (resumen.totalIngresos === 0 && resumen.totalGastos === 0) {
+            metricaSaldoNeto.style.color = 'var(--text-muted)';
+            metricaEstadoBalance.textContent = 'Sin rubros registrados para este mes';
+            metricaEstadoBalance.style.color = 'var(--text-muted)';
+            iconoBalanceBox.className = 'pre-metrica-icono bg-balance';
+        } else if (resumen.esDeficit) {
             metricaSaldoNeto.style.color = 'var(--color-gasto)';
             metricaEstadoBalance.textContent = 'Déficit presupuestario (Gastos superan ingresos)';
             metricaEstadoBalance.style.color = 'var(--color-gasto)';

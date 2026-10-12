@@ -35,36 +35,159 @@
     font-size: 0.85rem;
 }
 
+/* Selector de Periodo Personalizado (Finara Dark & Gold) */
 .pre-selector-periodo {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    background: #0d111a;
+    padding: 4px;
+    border-radius: 12px;
+    border: 1px solid rgba(229, 169, 60, 0.35);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    gap: 4px;
+    user-select: none;
+}
+
+.btn-periodo-nav {
+    background: transparent;
+    border: none;
+    color: var(--gold-main);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 10px;
-    background: var(--bg-card-dark);
-    padding: 8px 16px;
-    border-radius: var(--radius-md);
-    border: 1px solid rgba(229, 169, 60, 0.3);
+    justify-content: center;
+    font-size: 0.8rem;
+    transition: background 0.2s, transform 0.2s;
 }
 
-.pre-selector-periodo label {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    font-weight: 500;
+.btn-periodo-nav:hover {
+    background: rgba(229, 169, 60, 0.15);
+    transform: scale(1.05);
 }
 
-.pre-input-periodo {
-    background: #090c12;
-    color: #fff;
-    border: 1px solid rgba(229, 169, 60, 0.3);
+.periodo-display-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    padding: 6px 14px;
     border-radius: 8px;
-    padding: 6px 12px;
-    font-family: inherit;
-    font-size: 0.85rem;
     cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
 }
 
-.pre-input-periodo:focus {
-    border-color: var(--gold-main);
-    outline: none;
+.periodo-display-box:hover {
+    background: rgba(229, 169, 60, 0.1);
+    border-color: rgba(229, 169, 60, 0.3);
+}
+
+.periodo-display-box span {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #fff;
+    min-width: 110px;
+    text-align: center;
+}
+
+.flecha-dropdown {
+    font-size: 0.75rem;
+    color: var(--gold-main);
+    transition: transform 0.2s ease;
+}
+
+.pre-selector-periodo.abierto .flecha-dropdown {
+    transform: rotate(180deg);
+}
+
+/* Dropdown Flotante de Selección de Mes y Año */
+.pre-dropdown-meses {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 250px;
+    background: #0e121b;
+    border: 1px solid rgba(229, 169, 60, 0.4);
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.8), 0 0 20px rgba(229, 169, 60, 0.2);
+    z-index: 100;
+    backdrop-filter: blur(12px);
+    animation: fadeInScale 0.2s ease-out;
+}
+
+@keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.96) translateY(-6px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.dropdown-header-year {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dropdown-header-year strong {
+    font-size: 0.95rem;
+    color: var(--gold-main);
+}
+
+.btn-year-nav {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-year-nav:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.grid-meses-dropdown {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+}
+
+.btn-mes-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid transparent;
+    color: #cbd5e1;
+    padding: 8px 4px;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.btn-mes-item:hover {
+    background: rgba(229, 169, 60, 0.15);
+    color: #fff;
+    border-color: rgba(229, 169, 60, 0.3);
+}
+
+.btn-mes-item.activo {
+    background: linear-gradient(135deg, #e5a93c 0%, #b8860b 100%);
+    color: #0b0e14;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(229, 169, 60, 0.35);
 }
 
 /* Métricas de Saldo e Indicadores (Cálculo Automático) */
