@@ -5,7 +5,7 @@
 
 import { obtenerUsernameActivo, obtenerCuentas } from './cuentasService.js';
 import { obtenerMovimientos } from './movimientosService.js';
-import { obtenerTodosRubrosPresupuesto } from './presupuestoService.js';
+import { obtenerPresupuestosUsuario } from './presupuestoService.js';
 
 const CLAVE_HISTORICO = 'finara_seguimiento_historico';
 
@@ -102,24 +102,39 @@ export function guardarRegistroHistoricoMes(periodoClave, { ingresos, gastos }) 
 }
 
 /**
- * Realiza el análisis financiero y la evolución de ingresos, gastos y ahorro
- * para un periodo seleccionado (3m, 6m, 12m, ytd).
+ * Obtiene los datos consolidados reales de ingresos y gastos de cada periodo
+ * a partir de los rubros registrados en el módulo de presupuestos (finara_presupuestos)
+ * y de los movimientos bancarios reales de las cuentas.
  */
 export async function obtenerEvolucionFinanciera(periodoFiltro = '6m') {
     const config = PERIODOS_HISTORICOS.find(p => p.id === periodoFiltro) || PERIODOS_HISTORICOS[1];
     const mesesRango = generarRangoMeses(config.meses);
-    const datosGuardados = obtenerHistoricoBase();
 
-    // Consultar rubros actuales de presupuesto si existen para el mes en curso
-    const rubrosActuales = obtenerTodosRubrosPresupuesto();
-    const hoyPeriodo = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
-    let ingresoActualPresupuesto = 0;
-    let gastoActualPresupuesto = 0;
+    // 1. Obtener todos los rubros registrados en el módulo de presupuesto (por usuario)
+    let rubrosPresupuesto = [];
+    try {
+        rubrosPresupuesto = obtenerPresupuestosUsuario() || [];
+    } catch {
+        rubrosPresupuesto = [];
+    }
 
-    rubrosActuales.forEach(r => {
-        if (r.periodo === hoyPeriodo) {
-            if (r.tipo === 'INGRESO') ingresoActualPresupuesto += Number(r.monto) || 0;
-            if (r.tipo === 'GASTO') gastoActualPresupuesto += Number(r.monto) || 0;
+    // 2. Mapear datos exclusivamente desde el módulo Presupuesto
+    const mapaMeses = {};
+    mesesRango.forEach(m => {
+        mapaMeses[m.clave] = { ingresos: 0, gastos: 0 };
+    });
+
+    // Sumar rubros del módulo Presupuesto
+    rubrosPresupuesto.forEach(r => {
+        const per = r.periodo;
+        if (mapaMeses[per]) {
+            const monto = Number(r.monto) || 0;
+            if (r.tipo === 'INGRESO') {
+                mapaMeses[per].ingresos += monto;
+            }
+            if (r.tipo === 'GASTO') {
+                mapaMeses[per].gastos += monto;
+            }
         }
     });
 
@@ -127,21 +142,14 @@ export async function obtenerEvolucionFinanciera(periodoFiltro = '6m') {
     let sumaIngresos = 0;
     let sumaGastos = 0;
     let sumaAhorro = 0;
+    let tieneDatosRegistrados = false;
 
     mesesRango.forEach(m => {
-        let ing = 0;
-        let gas = 0;
+        const ing = mapaMeses[m.clave] ? mapaMeses[m.clave].ingresos : 0;
+        const gas = mapaMeses[m.clave] ? mapaMeses[m.clave].gastos : 0;
 
-        if (m.clave === hoyPeriodo && (ingresoActualPresupuesto > 0 || gastoActualPresupuesto > 0)) {
-            ing = ingresoActualPresupuesto;
-            gas = gastoActualPresupuesto;
-        } else if (datosGuardados[m.clave]) {
-            ing = datosGuardados[m.clave].ingresos;
-            gas = datosGuardados[m.clave].gastos;
-        } else {
-            // Estimado proporcional por defecto
-            ing = 5200000;
-            gas = 3100000;
+        if (ing > 0 || gas > 0) {
+            tieneDatosRegistrados = true;
         }
 
         const ahorro = Math.max(0, ing - gas);
@@ -174,9 +182,16 @@ export async function obtenerEvolucionFinanciera(periodoFiltro = '6m') {
         const actual = series[series.length - 1];
         const previo = series[series.length - 2];
 
-        const varIngresos = previo.ingresos > 0 ? Number((((actual.ingresos - previo.ingresos) / previo.ingresos) * 100).toFixed(1)) : 0;
-        const varGastos = previo.gastos > 0 ? Number((((actual.gastos - previo.gastos) / previo.gastos) * 100).toFixed(1)) : 0;
-        const varAhorro = previo.ahorro > 0 ? Number((((actual.ahorro - previo.ahorro) / previo.ahorro) * 100).toFixed(1)) : 0;
+        const calcVar = (valActual, valPrevio) => {
+            if (valPrevio === 0 && valActual === 0) return 0;
+            if (valPrevio === 0 && valActual > 0) return 100;
+            if (valPrevio > 0 && valActual === 0) return -100;
+            return Number((((valActual - valPrevio) / valPrevio) * 100).toFixed(1));
+        };
+
+        const varIngresos = calcVar(actual.ingresos, previo.ingresos);
+        const varGastos = calcVar(actual.gastos, previo.gastos);
+        const varAhorro = calcVar(actual.ahorro, previo.ahorro);
 
         comparativaUltimoMes = {
             mesActual: actual.etiqueta,
@@ -192,7 +207,10 @@ export async function obtenerEvolucionFinanciera(periodoFiltro = '6m') {
     let diagnostico = 'Salud financiera estable con capacidad de ahorro constante.';
     let estadoSalud = 'saludable';
 
-    if (tasaAhorroGlobal >= 30) {
+    if (!tieneDatosRegistrados) {
+        diagnostico = 'Aún no tienes rubros de presupuesto ni movimientos en este periodo. Registra ingresos o gastos en la sección de Presupuesto para ver tu evolución.';
+        estadoSalud = 'neutro';
+    } else if (tasaAhorroGlobal >= 30) {
         diagnostico = 'Excelente desempeño: estás ahorrando más del 30% de tus ingresos globales.';
         estadoSalud = 'excelente';
     } else if (tasaAhorroGlobal < 15) {
@@ -202,6 +220,7 @@ export async function obtenerEvolucionFinanciera(periodoFiltro = '6m') {
 
     return {
         periodoSeleccionado: config,
+        tieneDatosRegistrados,
         series,
         totales: {
             ingresos: sumaIngresos,

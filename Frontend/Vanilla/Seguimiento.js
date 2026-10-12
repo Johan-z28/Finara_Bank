@@ -57,8 +57,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const ctxDistribucion = document.getElementById('chartDistribucionPeriodo');
 
         // Configuración de estilo Finara Bank (Dark + Gold + Emerald)
-        Chart.defaults.color = '#94a3b8';
-        Chart.defaults.font.family = 'inherit';
+        if (typeof Chart !== 'undefined') {
+            Chart.defaults.color = '#94a3b8';
+            Chart.defaults.font.family = 'inherit';
+        } else {
+            console.warn('Chart.js no está disponible en la ventana');
+            return;
+        }
 
         // 1. Gráfico de Evolución Principal (Ingresos, Gastos, Ahorro)
         if (chartEvolucion) chartEvolucion.destroy();
@@ -268,7 +273,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 varAhorroIcono.className = `fa-solid ${c.varAhorro >= 0 ? 'fa-arrow-up positivo' : 'fa-arrow-down negativo'}`;
             }
 
-            diagnosticoTexto.textContent = evolucion.diagnostico;
+            // Mostrar o esconder banner de estado vacío
+            const segEmptyStateAlert = document.getElementById('segEmptyStateAlert');
+            if (segEmptyStateAlert) {
+                if (evolucion.tieneDatosRegistrados) {
+                    segEmptyStateAlert.classList.add('hidden');
+                } else {
+                    segEmptyStateAlert.classList.remove('hidden');
+                }
+            }
 
             // Gráficos y Tabla
             renderizarGraficos(evolucion);
@@ -291,3 +304,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Carga inicial (6 meses por defecto)
     await cargarDashboard(periodoActual);
 });
+
