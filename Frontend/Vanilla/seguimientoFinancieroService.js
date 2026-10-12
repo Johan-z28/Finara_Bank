@@ -219,3 +219,36 @@ export async function obtenerEvolucionFinanciera(periodoFiltro = '6m') {
         estadoSalud
     };
 }
+
+/**
+ * Realiza un análisis comparativo directo entre dos meses específicos pasados:
+ * evalúa diferencias en montos de ingresos, gastos, ahorro neto y porcentaje de variación.
+ */
+export function compararDosMeses(claveMesA, claveMesB) {
+    const data = obtenerHistoricoBase();
+    const regA = data[claveMesA] || { ingresos: 5000000, gastos: 3200000 };
+    const regB = data[claveMesB] || { ingresos: 5200000, gastos: 3000000 };
+
+    const ahorroA = Math.max(0, regA.ingresos - regA.gastos);
+    const ahorroB = Math.max(0, regB.ingresos - regB.gastos);
+
+    const difIngresos = regB.ingresos - regA.ingresos;
+    const difGastos = regB.gastos - regA.gastos;
+    const difAhorro = ahorroB - ahorroA;
+
+    const varIngresos = regA.ingresos > 0 ? Number(((difIngresos / regA.ingresos) * 100).toFixed(1)) : 0;
+    const varGastos = regA.gastos > 0 ? Number(((difGastos / regA.gastos) * 100).toFixed(1)) : 0;
+    const varAhorro = ahorroA > 0 ? Number(((difAhorro / ahorroA) * 100).toFixed(1)) : 0;
+
+    return {
+        mesA: { clave: claveMesA, ingresos: regA.ingresos, gastos: regA.gastos, ahorro: ahorroA },
+        mesB: { clave: claveMesB, ingresos: regB.ingresos, gastos: regB.gastos, ahorro: ahorroB },
+        difIngresos,
+        difGastos,
+        difAhorro,
+        varIngresos,
+        varGastos,
+        varAhorro,
+        mejoraAhorro: difAhorro >= 0
+    };
+}
