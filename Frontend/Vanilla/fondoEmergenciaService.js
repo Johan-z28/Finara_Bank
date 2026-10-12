@@ -47,3 +47,88 @@ export function calcularFondoSugerido(gastosFijosMensuales, mesesCobertura = 3) 
         coberturaRecomendada: gastos * 6 // Cobertura óptima: 6 meses
     };
 }
+
+/**
+ * Obtiene la meta configurada del fondo de emergencia del usuario actual y sincroniza con el saldo real de su cuenta de ahorro.
+ */
+export async function obtenerMetaFondoUsuario() {
+    const usuarioActivo = obtenerUsernameActivo();
+    const fondos = leerTodosFondos();
+    let meta = fondos.find(f => f.username === usuarioActivo || (!f.username && usuarioActivo === 'maria17'));
+
+    // Consultar cuentas activas del usuario para vincular su cuenta de Ahorros
+    const cuentas = await obtenerCuentas();
+    const cuentaAhorros = cuentas.find(c => c.tipo === 'AHORROS') || cuentas[0] || null;
+    const saldoAhorros = cuentaAhorros ? (Number(cuentaAhorros.saldo) || 0) : 0;
+
+    if (!meta) {
+        // Meta por defecto vinculada al saldo inicial de ahorro
+        meta = {
+            id: `FE-${Date.now()}`,
+            username: usuarioActivo,
+            metaMonto: 10800000,
+            gastosFijos: 1800000,
+            mesesCobertura: 6,
+            cuentaVinculadaId: cuentaAhorros ? cuentaAhorros.id : null,
+            cuentaVinculadaNumero: cuentaAhorros ? cuentaAhorros.numero : '',
+            fechaCreacion: new Date().toISOString()
+        };
+        fondos.push(meta);
+        guardarTodosFondos(fondos);
+    }
+
+    return {
+        ...meta,
+        saldoActualAhorro: saldoAhorros,
+        cuentaVinculada: cuentaAhorros
+    };
+}
+
+/**
+ * Permite al usuario definir y actualizar su meta de fondo de emergencia vinculada a su ahorro.
+ */
+export async function guardarMetaFondoUsuario({ metaMonto, gastosFijos, mesesCobertura, cuentaId }) {
+    const usuarioActivo = obtenerUsernameActivo();
+    let fondos = leerTodosFondos();
+    const indice = fondos.findIndex(f => f.username === usuarioActivo || (!f.username && usuarioActivo === 'maria17'));
+
+    const montoNum = Number(metaMonto);
+    if (!Number.isFinite(montoNum) || montoNum <= 0) {
+        throw new Error('El monto de la meta debe ser un valor válido mayor a cero.');
+    }
+
+    const cuentas = await obtenerCuentas();
+    const cta = cuentas.find(c => String(c.id) === String(cuentaId)) || cuentas.find(c => c.tipo === 'AHORROS') || null;
+
+    const datosGuardar = {
+        id: indice !== -1 ? fondos[indice].id : `FE-${Date.now()}`,
+        username: usuarioActivo,
+        metaMonto: montoNum,
+        gastosFijos: Number(gastosFijos) || 1800000,
+        mesesCobertura: Number(mesesCobertura) || 6,
+        cuentaVinculadaId: cta ? cta.id : null,
+        cuentaVinculadaNumero: cta ? cta.numero : '',
+        fechaActualizacion: new Date().toISOString()
+    };
+
+    if (indice !== -1) {
+        fondos[indice] = { ...fondos[indice], ...datosGuardar };
+    } else {
+        fondos.push(datosGuardar);
+    }
+
+    guardarTodosFondos(fondos);
+
+    // Notificación en el sistema
+    guardarNotificacion({
+        titulo: 'Meta de Fondo de Emergencia Actualizada',
+        mensaje: `Has fijado tu meta de fondo en ${formatoCOP.format(montoNum)} vinculada a tu cuenta terminada en ${String(cta?.numero || '').slice(-4)}.`,
+        tipo: 'exito'
+    });
+
+    try {
+        actualizarCampana();
+    } catch { }
+
+    return datosGuardar;
+}

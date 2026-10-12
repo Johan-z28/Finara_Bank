@@ -204,6 +204,48 @@
                     </div>
                 </div>
             </section>
+
+            <!-- Sección de Definición de Meta y Vinculación a Cuenta de Ahorro -->
+            <section class="fe-meta-card">
+                <div class="fe-card-head">
+                    <div class="fe-badge-icono" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3);">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                    <div>
+                        <h3>Definir Meta de Fondo y Vincular Ahorro</h3>
+                        <p>Establece tu objetivo financiero y vincula tu cuenta bancaria para monitorear tu progreso.</p>
+                    </div>
+                </div>
+
+                <form id="formDefinirMeta" class="fe-meta-form">
+                    <div class="fe-meta-inputs-grid">
+                        <div class="fe-campo">
+                            <label for="inputMetaPersonalizada">Monto Objetivo / Meta (COP)</label>
+                            <div class="fe-input-wrapper">
+                                <span class="fe-currency-prefix">$</span>
+                                <input type="text" id="inputMetaPersonalizada" placeholder="Ej. 10.800.000" required inputmode="numeric">
+                            </div>
+                            <button type="button" class="btn-usar-sugerido" id="btnUsarSugerido">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Usar monto de la calculadora
+                            </button>
+                        </div>
+
+                        <div class="fe-campo">
+                            <label for="selectCuentaVinculada">Vincular a Cuenta de Ahorro</label>
+                            <select id="selectCuentaVinculada" class="fe-select-cuenta" required>
+                                <!-- Opciones cargadas dinámicamente con cuentas del usuario -->
+                            </select>
+                            <small class="fe-hint">El progreso se alimentará automáticamente del saldo de esta cuenta.</small>
+                        </div>
+                    </div>
+
+                    <div class="fe-meta-acciones">
+                        <button type="submit" class="btn-guardar-meta" id="btnGuardarMeta">
+                            <i class="fa-solid fa-check"></i> Fijar Meta y Vincular Ahorro
+                        </button>
+                    </div>
+                </form>
+            </section>
         </main>
     </div>
 

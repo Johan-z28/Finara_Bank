@@ -222,3 +222,82 @@
     color: #fff;
     font-family: monospace;
 }
+
+/* Sección de Definición de Meta */
+.fe-meta-card {
+    background: var(--bg-card-dark);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    border-radius: var(--radius-lg);
+    padding: 1.6rem;
+    margin-bottom: 1.8rem;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+}
+
+.fe-meta-inputs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.4rem;
+}
+
+.btn-usar-sugerido {
+    background: transparent;
+    border: 1px dashed rgba(229, 169, 60, 0.5);
+    color: var(--gold-main);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 6px;
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-usar-sugerido:hover {
+    background: rgba(229, 169, 60, 0.15);
+    border-style: solid;
+}
+
+.fe-select-cuenta {
+    background: #090c12;
+    color: #fff;
+    border: 1px solid rgba(229, 169, 60, 0.3);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.fe-select-cuenta:focus {
+    border-color: var(--gold-main);
+    box-shadow: 0 0 10px rgba(229, 169, 60, 0.25);
+    outline: none;
+}
+
+.btn-guardar-meta {
+    background: var(--gold-main);
+    color: #07090e;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-guardar-meta:hover {
+    background: #ffbe44;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(229, 169, 60, 0.3);
+}
