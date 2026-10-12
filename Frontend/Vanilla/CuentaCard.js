@@ -66,6 +66,7 @@ export function crearCuentaCard(cuenta, { ocultarSaldo = false } = {}) {
         const tarjetaBox = el('div', 'cuenta-card__tarjeta-vinculada');
         const numTarjeta = cuenta.tarjetaAsociada.numero || '4532 0000 0000 0000';
         const numVisible = ocultarSaldo ? '•••• •••• •••• ••••' : formatearNumeroCuenta(numTarjeta, false);
+        const estaBloqueada = Boolean(cuenta.tarjetaAsociada.bloqueada);
 
         tarjetaBox.innerHTML = `
             <div class="tarjeta-vinculada__head">
@@ -76,13 +77,16 @@ export function crearCuentaCard(cuenta, { ocultarSaldo = false } = {}) {
                         <span class="tarjeta-vinculada__numero">${numVisible}</span>
                     </div>
                 </div>
-                <span class="tarjeta-vinculada__badge badge--activa">
-                    <i class="fa-solid fa-circle-check"></i> Activa
+                <span class="tarjeta-vinculada__badge ${estaBloqueada ? 'badge--bloqueada' : 'badge--activa'}">
+                    <i class="fa-solid ${estaBloqueada ? 'fa-lock' : 'fa-circle-check'}"></i> ${estaBloqueada ? 'Bloqueada' : 'Activa'}
                 </span>
             </div>
             <div class="tarjeta-vinculada__acciones">
-                <button type="button" class="btn-tarjeta-accion btn-ver-detalles" style="grid-column: 1 / -1;" title="Ver datos de seguridad">
-                    <i class="fa-regular fa-eye"></i> Ver datos de tarjeta (Vencimiento y CVV)
+                <button type="button" class="btn-tarjeta-accion btn-ver-detalles" title="Ver datos de seguridad">
+                    <i class="fa-regular fa-eye"></i> Ver datos
+                </button>
+                <button type="button" class="btn-tarjeta-accion ${estaBloqueada ? 'btn-desbloquear-tarjeta' : 'btn-bloquear-tarjeta'}" title="${estaBloqueada ? 'Desbloquear tarjeta' : 'Bloquear tarjeta temporalmente'}">
+                    <i class="fa-solid ${estaBloqueada ? 'fa-lock-open' : 'fa-lock'}"></i> ${estaBloqueada ? 'Desbloquear' : 'Bloquear'}
                 </button>
             </div>
         `;
@@ -91,9 +95,25 @@ export function crearCuentaCard(cuenta, { ocultarSaldo = false } = {}) {
             e.stopPropagation();
             mostrarModalDetallesTarjeta({
                 ...cuenta.tarjetaAsociada,
-                username: cuenta.username
+                username: cuenta.username,
+                tipoCuentaPadre: cuenta.tipo
             }, ocultarSaldo);
         });
+
+        const btnToggleBloqueo = tarjetaBox.querySelector(estaBloqueada ? '.btn-desbloquear-tarjeta' : '.btn-bloquear-tarjeta');
+        if (btnToggleBloqueo) {
+            btnToggleBloqueo.addEventListener('click', (e) => {
+                e.stopPropagation();
+                gestionarBloqueoTarjeta({
+                    tipo: cuenta.tarjetaAsociada.tipo,
+                    numero: cuenta.tarjetaAsociada.numero,
+                    titulo: cuenta.tarjetaAsociada.titulo,
+                    bloqueada: estaBloqueada,
+                    esAsociada: true,
+                    cuentaPadreId: cuenta.id
+                });
+            });
+        }
 
         card.appendChild(tarjetaBox);
     } else if (cuenta.tipo === 'AHORROS' || cuenta.tipo === 'CORRIENTE') {
@@ -128,17 +148,37 @@ export function crearCuentaCard(cuenta, { ocultarSaldo = false } = {}) {
 
     // Si es Tarjeta de Crédito independiente
     if (cuenta.tipo === 'TARJETA_CREDITO') {
-        const btnDetalles = el('button', 'btn-tarjeta-accion btn-ver-detalles');
-        btnDetalles.type = 'button';
-        btnDetalles.style.marginTop = '-0.4rem';
-        btnDetalles.innerHTML = '<i class="fa-regular fa-eye"></i> Ver datos de tarjeta (Vencimiento y CVV)';
-        btnDetalles.title = 'Ver número completo, vencimiento y CVV';
-        btnDetalles.addEventListener('click', (e) => {
+        const estaBloqueadaTC = Boolean(cuenta.bloqueada || cuenta.estado === 'BLOQUEADA');
+        const contAccionesTC = el('div', 'tarjeta-vinculada__acciones');
+        contAccionesTC.style.marginTop = '-0.4rem';
+
+        contAccionesTC.innerHTML = `
+            <button type="button" class="btn-tarjeta-accion btn-ver-detalles" title="Ver número completo, vencimiento y CVV">
+                <i class="fa-regular fa-eye"></i> Ver datos
+            </button>
+            <button type="button" class="btn-tarjeta-accion ${estaBloqueadaTC ? 'btn-desbloquear-tarjeta' : 'btn-bloquear-tarjeta'}" title="${estaBloqueadaTC ? 'Desbloquear tarjeta de crédito' : 'Bloquear tarjeta de crédito temporalmente'}">
+                <i class="fa-solid ${estaBloqueadaTC ? 'fa-lock-open' : 'fa-lock'}"></i> ${estaBloqueadaTC ? 'Desbloquear' : 'Bloquear'}
+            </button>
+        `;
+
+        contAccionesTC.querySelector('.btn-ver-detalles').addEventListener('click', (e) => {
             e.stopPropagation();
             mostrarModalDetallesTarjeta(cuenta, ocultarSaldo);
         });
 
-        card.appendChild(btnDetalles);
+        contAccionesTC.querySelector(estaBloqueadaTC ? '.btn-desbloquear-tarjeta' : '.btn-bloquear-tarjeta').addEventListener('click', (e) => {
+            e.stopPropagation();
+            gestionarBloqueoTarjeta({
+                tipo: 'credito',
+                numero: cuenta.numero,
+                titulo: cuenta.titulo || 'Tarjeta de Crédito',
+                bloqueada: estaBloqueadaTC,
+                esAsociada: false,
+                cuentaId: cuenta.id
+            });
+        });
+
+        card.appendChild(contAccionesTC);
     }
 
     return card;
@@ -152,6 +192,7 @@ function mostrarModalDetallesTarjeta(cuenta, ocultarSaldo = false) {
     const vencimiento = cuenta.fechaVencimiento || '09/29';
     const cvv = cuenta.cvv || '584';
     const tituloTarjeta = cuenta.titulo || (cuenta.tipo === 'TARJETA_CREDITO' ? 'Tarjeta de Crédito Gold' : 'Tarjeta Débito Finara');
+    const estaBloqueada = Boolean(cuenta.bloqueada || cuenta.estado === 'BLOQUEADA');
 
     const overlay = document.createElement("div");
     overlay.id = "modalDetallesTarjetaFinara";
@@ -171,8 +212,17 @@ function mostrarModalDetallesTarjeta(cuenta, ocultarSaldo = false) {
                 </button>
             </div>
 
+            <!-- ESTADO BADGE -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <span style="font-size: 0.85rem; color: #94a3b8;">Estado de la tarjeta:</span>
+                <span class="tarjeta-vinculada__badge ${estaBloqueada ? 'badge--bloqueada' : 'badge--activa'}">
+                    <i class="fa-solid ${estaBloqueada ? 'fa-lock' : 'fa-circle-check'}"></i> ${estaBloqueada ? 'Bloqueada temporalmente' : 'Activa y operativa'}
+                </span>
+            </div>
+
             <!-- TARJETA VISUAL 3D VIRTUAL -->
-            <div style="background: linear-gradient(135deg, #1b202c 0%, #0d0f14 100%); border: 1px solid rgba(229,169,60,0.5); border-radius: 14px; padding: 1.4rem; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.5); margin-bottom: 1.5rem;">
+            <div style="background: linear-gradient(135deg, #1b202c 0%, #0d0f14 100%); border: 1px solid ${estaBloqueada ? 'rgba(248,113,113,0.5)' : 'rgba(229,169,60,0.5)'}; border-radius: 14px; padding: 1.4rem; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.5); margin-bottom: 1.5rem; opacity: ${estaBloqueada ? '0.75' : '1'};">
+                ${estaBloqueada ? '<div style="position: absolute; top: 10px; right: 12px; background: rgba(248,113,113,0.2); color: #f87171; font-size: 0.75rem; font-weight: bold; padding: 3px 8px; border-radius: 4px; border: 1px solid #f87171;"><i class="fa-solid fa-lock"></i> BLOQUEADA</div>' : ''}
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                     <span style="font-size: 0.8rem; font-weight: 700; color: #e5a93c; letter-spacing: 1px;">FINARA BANK</span>
                     <i class="fa-solid fa-wifi" style="color: rgba(229,169,60,0.7); font-size: 1.1rem;"></i>
@@ -214,9 +264,14 @@ function mostrarModalDetallesTarjeta(cuenta, ocultarSaldo = false) {
                 </div>
             </div>
 
-            <button type="button" id="btnCopiarDatosTarjeta" style="width: 100%; background: #e5a93c; color: #0a0c10; border: none; padding: 0.75rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                <i class="fa-regular fa-copy"></i> Copiar número de tarjeta
-            </button>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button type="button" id="btnCopiarDatosTarjeta" style="background: #e5a93c; color: #0a0c10; border: none; padding: 0.75rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.82rem;">
+                    <i class="fa-regular fa-copy"></i> Copiar número
+                </button>
+                <button type="button" id="btnBloquearModalTarjeta" class="btn-tarjeta-accion ${estaBloqueada ? 'btn-desbloquear-tarjeta' : 'btn-bloquear-tarjeta'}" style="padding: 0.75rem; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.82rem;">
+                    <i class="fa-solid ${estaBloqueada ? 'fa-lock-open' : 'fa-lock'}"></i> ${estaBloqueada ? 'Desbloquear' : 'Bloquear tarjeta'}
+                </button>
+            </div>
         </div>
     `;
 
@@ -231,12 +286,28 @@ function mostrarModalDetallesTarjeta(cuenta, ocultarSaldo = false) {
     overlay.querySelector("#btnCopiarDatosTarjeta").addEventListener("click", () => {
         navigator.clipboard.writeText(String(numCompleto).replace(/\s+/g, '')).then(() => {
             const btn = overlay.querySelector("#btnCopiarDatosTarjeta");
-            btn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Copiado al portapapeles!';
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Copiado!';
             setTimeout(() => {
-                btn.innerHTML = '<i class="fa-regular fa-copy"></i> Copiar número de tarjeta';
+                btn.innerHTML = '<i class="fa-regular fa-copy"></i> Copiar número';
             }, 2000);
         });
     });
+
+    overlay.querySelector("#btnBloquearModalTarjeta").addEventListener("click", () => {
+        cerrar();
+        gestionarBloqueoTarjeta({
+            tipo: cuenta.tipo === 'TARJETA_CREDITO' ? 'credito' : cuenta.tipo,
+            numero: numCompleto,
+            titulo: tituloTarjeta,
+            bloqueada: estaBloqueada,
+            esAsociada: cuenta.tipo !== 'TARJETA_CREDITO',
+            cuentaId: cuenta.id
+        });
+    });
+}
+
+function gestionarBloqueoTarjeta(datosTarjeta) {
+    // Definida para ser implementada en siguientes commits de HU-12
 }
 
 function activarTarjetaDesdeSaldos(cuenta, tipoSlug) {

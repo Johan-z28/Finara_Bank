@@ -202,8 +202,16 @@
     border: 1px solid rgba(52, 211, 153, 0.3);
 }
 
+.badge--bloqueada {
+    background: rgba(248, 113, 113, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.35);
+}
+
 .tarjeta-vinculada__acciones {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
     width: 100%;
 }
 
@@ -231,6 +239,28 @@
 
 .btn-ver-detalles:hover {
     background: var(--gold-main);
+    color: #07090e;
+}
+
+.btn-bloquear-tarjeta {
+    background: rgba(248, 113, 113, 0.12);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.35);
+}
+
+.btn-bloquear-tarjeta:hover {
+    background: #f87171;
+    color: #07090e;
+}
+
+.btn-desbloquear-tarjeta {
+    background: rgba(52, 211, 153, 0.12);
+    color: #34d399;
+    border: 1px solid rgba(52, 211, 153, 0.35);
+}
+
+.btn-desbloquear-tarjeta:hover {
+    background: #34d399;
     color: #07090e;
 }
 
