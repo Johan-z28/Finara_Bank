@@ -39,6 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const selOrigen = $('trOrigen'), selTipo = $('trTipoDestino');
     const inpNumero = $('trNumeroDestino'), inpMonto = $('trMonto'), inpConcepto = $('trConcepto');
     const hintOrigen = $('trOrigenHint'), boxDestino = $('trDestino');
+    const trOrigenCard = $('trOrigenCard'), trCardTipo = $('trCardTipo'), trCardSaldo = $('trCardSaldo'), trCardBadge = $('trCardBadge');
+    const btnTransferirTodo = $('btnTransferirTodo'), chipsMonto = $('chipsMonto');
     const errOrigen = $('errOrigen'), errDestino = $('errDestino'), errMonto = $('errMonto');
     const vistas = { 1: $('vistaForm'), 2: $('vistaResumen'), 3: $('vistaExito') };
     const pasos = document.querySelectorAll('.tr-paso');
@@ -81,15 +83,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function pintarHint() {
         const c = cuentaSeleccionada();
-        if (!c) { hintOrigen.textContent = ''; return; }
-        const extra = c.tipo === 'CORRIENTE' ? ' (incluye sobregiro del 20%)' : '';
-        hintOrigen.textContent = `Saldo: ${formatoCOP.format(c.saldo)} · Disponible: ${formatoCOP.format(calcularDisponible(c))}${extra}`;
+        if (!c) {
+            hintOrigen.textContent = '';
+            if (trOrigenCard) trOrigenCard.style.display = 'none';
+            return;
+        }
+        const extra = c.tipo === 'CORRIENTE' ? ' (incluye sobregiro)' : '';
+        const disponible = calcularDisponible(c);
+        hintOrigen.textContent = `Saldo: ${formatoCOP.format(c.saldo)} · Disponible: ${formatoCOP.format(disponible)}${extra}`;
+
+        if (trOrigenCard) {
+            trOrigenCard.style.display = 'flex';
+            if (trCardTipo) trCardTipo.textContent = `${TIPOS[c.tipo]} · •••• ${ultimos4(c.numero)}`;
+            if (trCardSaldo) trCardSaldo.textContent = formatoCOP.format(disponible);
+            if (trCardBadge) trCardBadge.textContent = c.tipo === 'CORRIENTE' ? 'Disponible + Sobregiro' : 'Disponible';
+        }
     }
 
     async function cargarCuentas() {
         const previa = selOrigen.value;
         try {
-            cuentas = await obtenerCuentasOrigen();
+            const rawCuentas = await obtenerCuentasOrigen();
+            // Desduplicar estrictamente por número y tipo
+            const cuentasUnicas = [];
+            const vistos = new Set();
+            for (const c of rawCuentas) {
+                const clave = `${c.tipo}_${String(c.numero || '').replace(/\D/g, '')}`;
+                if (!vistos.has(clave)) {
+                    vistos.add(clave);
+                    cuentasUnicas.push(c);
+                }
+            }
+            cuentas = cuentasUnicas;
         } catch (err) {
             if (err instanceof SesionExpiradaError) return irALogin();
             estadoGlobal.replaceChildren(el('p', '', 'No pudimos cargar tus cuentas. Intenta de nuevo.'));
@@ -109,11 +134,48 @@ document.addEventListener('DOMContentLoaded', () => {
         pintarHint();
     }
 
+    function actualizarChipsActivos(montoActual) {
+        if (!chipsMonto) return;
+        chipsMonto.querySelectorAll('.tr-chip').forEach(btn => {
+            const val = Number(btn.dataset.monto);
+            btn.classList.toggle('activo', val === montoActual);
+        });
+    }
+
     inpMonto.addEventListener('input', () => {
         const digitos = inpMonto.value.replace(/\D/g, '').slice(0, 12);
-        inpMonto.value = digitos ? new Intl.NumberFormat('es-CO').format(Number(digitos)) : '';
+        const num = Number(digitos) || 0;
+        inpMonto.value = digitos ? new Intl.NumberFormat('es-CO').format(num) : '';
         errMonto.textContent = '';
+        actualizarChipsActivos(num);
     });
+
+    if (chipsMonto) {
+        chipsMonto.querySelectorAll('.tr-chip').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const monto = Number(btn.dataset.monto);
+                inpMonto.value = new Intl.NumberFormat('es-CO').format(monto);
+                errMonto.textContent = '';
+                actualizarChipsActivos(monto);
+                inpMonto.focus();
+            });
+        });
+    }
+
+    if (btnTransferirTodo) {
+        btnTransferirTodo.addEventListener('click', () => {
+            const c = cuentaSeleccionada();
+            if (!c) return;
+            const disp = Math.max(0, calcularDisponible(c));
+            if (disp > 0) {
+                inpMonto.value = new Intl.NumberFormat('es-CO').format(disp);
+                errMonto.textContent = '';
+                actualizarChipsActivos(disp);
+                inpMonto.focus();
+            }
+        });
+    }
+
     selOrigen.addEventListener('change', () => { pintarHint(); errOrigen.textContent = ''; errMonto.textContent = ''; });
 
     // ---------- Punto 3: validar cuenta destino y mostrar titular ----------
