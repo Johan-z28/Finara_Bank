@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -225,7 +225,7 @@
                             <label for="inputGastosFijos">Gastos fijos mensuales promedio (COP)</label>
                             <div class="fe-input-wrapper">
                                 <span class="fe-currency-prefix">$</span>
-                                <input type="text" id="inputGastosFijos" placeholder="Ej. 1.800.000" value="1.800.000" inputmode="numeric">
+                                <input type="text" id="inputGastosFijos" placeholder="0" value="" inputmode="numeric">
                             </div>
                             <small class="fe-hint">Incluye vivienda, servicios públicos, alimentación, transporte y salud.</small>
                         </div>
@@ -246,15 +246,15 @@
                             <span>Monto de fondo sugerido</span>
                             <span class="fe-pill" id="pillCobertura">Cobertura para 6 meses</span>
                         </div>
-                        <h2 class="fe-monto-sugerido" id="montoSugeridoCalc">$ 10.800.000</h2>
+                        <h2 class="fe-monto-sugerido" id="montoSugeridoCalc">$ 0</h2>
                         <div class="fe-res-desglose">
                             <div class="fe-desglose-fila">
                                 <span>Cobertura Mínima (3 meses):</span>
-                                <strong id="resMinimo3m">$ 5.400.000</strong>
+                                <strong id="resMinimo3m">$ 0</strong>
                             </div>
                             <div class="fe-desglose-fila">
                                 <span>Cobertura Óptima (6 meses):</span>
-                                <strong id="resOptimo6m" class="color-dorado">$ 10.800.000</strong>
+                                <strong id="resOptimo6m" class="color-dorado">$ 0</strong>
                             </div>
                         </div>
                     </div>
@@ -279,7 +279,7 @@
                             <label for="inputMetaPersonalizada">Monto Objetivo / Meta (COP)</label>
                             <div class="fe-input-wrapper">
                                 <span class="fe-currency-prefix">$</span>
-                                <input type="text" id="inputMetaPersonalizada" placeholder="10.800.000" required inputmode="numeric">
+                                <input type="text" id="inputMetaPersonalizada" placeholder="0" required inputmode="numeric">
                             </div>
                             <button type="button" class="btn-usar-sugerido" id="btnUsarSugerido">
                                 <i class="fa-solid fa-wand-magic-sparkles"></i> Usar monto de la calculadora
@@ -289,6 +289,7 @@
                         <div class="fe-campo">
                             <label for="selectCuentaVinculada">Vincular a Cuenta (Ahorros o Corriente)</label>
                             <select id="selectCuentaVinculada" class="fe-select-cuenta" required>
+                                <option value="" disabled selected>Selecciona una cuenta</option>
                                 <!-- Opciones cargadas dinámicamente con cuentas del usuario -->
                             </select>
                             <small class="fe-hint">El progreso se alimentará automáticamente del saldo de esta cuenta.</small>

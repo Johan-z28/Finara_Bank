@@ -47,10 +47,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (avanceSaldoActual) avanceSaldoActual.textContent = formatoCOP.format(avance.saldoActual);
             if (avanceMetaMonto) avanceMetaMonto.textContent = formatoCOP.format(avance.meta);
             if (avanceMontoFaltante) {
-                avanceMontoFaltante.textContent = avance.montoFaltante === 0 ? 'Meta Completada' : formatoCOP.format(avance.montoFaltante);
-                if (avance.montoFaltante === 0) {
+                if (avance.meta === 0) {
+                    avanceMontoFaltante.textContent = '$ 0';
+                    avanceMontoFaltante.classList.remove('color-verde');
+                } else if (avance.montoFaltante === 0) {
+                    avanceMontoFaltante.textContent = 'Meta Completada';
                     avanceMontoFaltante.classList.add('color-verde');
                 } else {
+                    avanceMontoFaltante.textContent = formatoCOP.format(avance.montoFaltante);
                     avanceMontoFaltante.classList.remove('color-verde');
                 }
             }
@@ -68,11 +72,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             if (avanceCoberturaMeses) {
-                avanceCoberturaMeses.textContent = `Meta para ${avance.mesesCobertura || 6} meses`;
+                avanceCoberturaMeses.textContent = avance.meta > 0 ? `Meta para ${avance.mesesCobertura || 6} meses` : 'Sin meta definida';
             }
 
-            if (avanceCuentaDesc && avance.cuentaVinculada) {
-                avanceCuentaDesc.textContent = `${avance.cuentaVinculada.tipo === 'AHORROS' ? 'Cuenta de Ahorros' : 'Cuenta'} •••• ${String(avance.cuentaVinculada.numero || '').slice(-4)}`;
+            if (avanceCuentaDesc) {
+                if (avance.cuentaVinculada) {
+                    avanceCuentaDesc.textContent = `${avance.cuentaVinculada.tipo === 'AHORROS' ? 'Cuenta de Ahorros' : 'Cuenta'} •••• ${String(avance.cuentaVinculada.numero || '').slice(-4)}`;
+                } else {
+                    avanceCuentaDesc.textContent = 'Sin cuenta vinculada';
+                }
             }
 
             if (badgeSeguridad && textoSeguridad) {
@@ -132,19 +140,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
-            selectCuentaVinculada.innerHTML = cuentasPermitidas.map(c => `
-                <option value="${c.id}">
-                    ${c.tipo === 'AHORROS' ? 'Cuenta de Ahorros' : 'Cuenta Corriente'} · •••• ${String(c.numero || '').slice(-4)} (${formatoCOP.format(c.saldo)})
-                </option>
-            `).join('');
-
             metaActual = await obtenerMetaFondoUsuario();
+
+            selectCuentaVinculada.innerHTML = `
+                <option value="" disabled ${!metaActual || !metaActual.cuentaVinculadaId ? 'selected' : ''}>Selecciona una cuenta</option>
+                ${cuentasPermitidas.map(c => `
+                    <option value="${c.id}" ${metaActual && String(metaActual.cuentaVinculadaId) === String(c.id) ? 'selected' : ''}>
+                        ${c.tipo === 'AHORROS' ? 'Cuenta de Ahorros' : 'Cuenta Corriente'} · •••• ${String(c.numero || '').slice(-4)} (${formatoCOP.format(c.saldo)})
+                    </option>
+                `).join('')}
+            `;
+
             if (metaActual) {
-                if (metaActual.metaMonto) {
-                    inputMetaPersonalizada.value = new Intl.NumberFormat('es-CO').format(metaActual.metaMonto);
+                if (metaActual.gastosFijos && metaActual.gastosFijos > 0) {
+                    inputGastos.value = new Intl.NumberFormat('es-CO').format(metaActual.gastosFijos);
                 }
-                if (metaActual.cuentaVinculadaId) {
-                    selectCuentaVinculada.value = String(metaActual.cuentaVinculadaId);
+                if (metaActual.metaMonto && metaActual.metaMonto > 0) {
+                    inputMetaPersonalizada.value = new Intl.NumberFormat('es-CO').format(metaActual.metaMonto);
                 }
             }
         } catch (e) {
@@ -161,11 +173,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (avanceCuentaDesc) {
                 avanceCuentaDesc.textContent = `${seleccionada.tipo === 'AHORROS' ? 'Cuenta de Ahorros' : 'Cuenta Corriente'} •••• ${String(seleccionada.numero || '').slice(-4)}`;
             }
-            const montoMeta = Number(inputMetaPersonalizada.value.replace(/\D/g, '')) || (metaActual ? metaActual.metaMonto : 10800000);
+            const montoMeta = Number(inputMetaPersonalizada.value.replace(/\D/g, '')) || (metaActual ? metaActual.metaMonto : 0);
             const saldo = Number(seleccionada.saldo) || 0;
-            const faltante = Math.max(0, montoMeta - saldo);
+            const faltante = montoMeta > 0 ? Math.max(0, montoMeta - saldo) : 0;
             if (avanceMontoFaltante) {
-                avanceMontoFaltante.textContent = faltante === 0 ? 'Meta Completada' : formatoCOP.format(faltante);
+                avanceMontoFaltante.textContent = montoMeta > 0 ? (faltante === 0 ? 'Meta Completada' : formatoCOP.format(faltante)) : '$ 0';
             }
             const porcentaje = montoMeta > 0 ? Math.round((saldo / montoMeta) * 100) : 0;
             if (avancePorcentajeTexto) {
@@ -174,9 +186,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (avanceFillProgreso) {
                 avanceFillProgreso.style.width = `${Math.min(100, porcentaje)}%`;
             }
-            const gastos = Number(inputGastos.value.replace(/\D/g, '')) || 1800000;
-            if (avanceMesesCubiertos && gastos > 0) {
-                avanceMesesCubiertos.textContent = `${(saldo / gastos).toFixed(1)} meses cubiertos`;
+            const gastos = Number(inputGastos.value.replace(/\D/g, '')) || 0;
+            if (avanceMesesCubiertos) {
+                avanceMesesCubiertos.textContent = gastos > 0 ? `${(saldo / gastos).toFixed(1)} meses cubiertos` : '0 meses cubiertos';
             }
         }
     });
@@ -184,8 +196,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     formDefinirMeta.addEventListener('submit', async (e) => {
         e.preventDefault();
         const montoMeta = Number(inputMetaPersonalizada.value.replace(/\D/g, ''));
-        const gastos = Number(inputGastos.value.replace(/\D/g, '')) || 1800000;
+        const gastos = Number(inputGastos.value.replace(/\D/g, '')) || 0;
         const ctaId = selectCuentaVinculada.value;
+
+        if (!ctaId) {
+            if (window.Swal) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Cuenta Requerida',
+                    text: 'Debes seleccionar una cuenta de ahorros o corriente para vincular tu fondo de emergencia.',
+                    background: '#12151c',
+                    color: '#fff',
+                    confirmButtonColor: '#e5a93c'
+                });
+            } else {
+                alert('Debes seleccionar una cuenta de ahorros o corriente para vincular tu fondo de emergencia.');
+            }
+            return;
+        }
 
         if (!montoMeta || montoMeta <= 0) {
             if (window.Swal) {
