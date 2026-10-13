@@ -210,6 +210,20 @@
     border: 1px solid rgba(52, 211, 153, 0.3);
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    transition: all 0.25s ease;
+}
+.tr-origen-card__badge--bloqueada {
+    background: rgba(248, 113, 113, 0.18) !important;
+    color: #f87171 !important;
+    border-color: rgba(248, 113, 113, 0.4) !important;
+}
+.tr-origen-card--bloqueada {
+    border-color: rgba(248, 113, 113, 0.4) !important;
+    background: linear-gradient(135deg, rgba(23, 27, 38, 0.95), rgba(40, 20, 24, 0.7)) !important;
+}
+.tr-origen-card--bloqueada .tr-origen-card__icon {
+    background: rgba(248, 113, 113, 0.15) !important;
+    color: #f87171 !important;
 }
 
 .tr-monto-header {

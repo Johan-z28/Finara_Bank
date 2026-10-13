@@ -89,11 +89,15 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const estaBloqueada = Boolean(c.bloqueada || c.estado === 'BLOQUEADA' || (c.tarjetaAsociada && c.tarjetaAsociada.bloqueada));
         const disponible = calcularDisponible(c);
         let badgeTexto = 'Disponible';
         let saldoStr = formatoCOP.format(disponible);
 
-        if (c.tipo === 'TARJETA_CREDITO') {
+        if (estaBloqueada) {
+            badgeTexto = 'Bloqueada';
+            hintOrigen.textContent = `Cuenta o tarjeta bloqueada temporalmente. Desbloquéala desde Saldos para transferir.`;
+        } else if (c.tipo === 'TARJETA_CREDITO') {
             hintOrigen.textContent = `Cupo Total: ${formatoCOP.format(c.saldo)} · Avance permitido (hasta 50%): ${formatoCOP.format(disponible)}`;
             badgeTexto = 'Cupo Avance';
         } else if (c.tipo === 'CORRIENTE') {
@@ -109,7 +113,15 @@ document.addEventListener('DOMContentLoaded', () => {
             trOrigenCard.style.display = 'flex';
             if (trCardTipo) trCardTipo.textContent = `${TIPOS[c.tipo]} · •••• ${ultimos4(c.numero)}`;
             if (trCardSaldo) trCardSaldo.textContent = saldoStr;
-            if (trCardBadge) trCardBadge.textContent = badgeTexto;
+            if (trCardBadge) {
+                trCardBadge.textContent = badgeTexto;
+                trCardBadge.classList.toggle('tr-origen-card__badge--bloqueada', estaBloqueada);
+            }
+            trOrigenCard.classList.toggle('tr-origen-card--bloqueada', estaBloqueada);
+            const iconEl = trOrigenCard.querySelector('.tr-origen-card__icon i');
+            if (iconEl) {
+                iconEl.className = estaBloqueada ? 'fa-solid fa-lock' : 'fa-solid fa-building-columns';
+            }
         }
     }
 
