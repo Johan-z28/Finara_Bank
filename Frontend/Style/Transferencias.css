@@ -318,6 +318,27 @@
 .tr-destino--ok { color: var(--ingreso); background: rgba(52, 211, 153, 0.12); border-color: rgba(52, 211, 153, 0.4); }
 .tr-destino--ok strong { color: var(--text-white); font-size: 1rem; }
 .tr-destino--error { color: var(--egreso); background: rgba(248, 113, 113, 0.12); border-color: rgba(248, 113, 113, 0.4); }
+.tr-destino--bloqueada {
+    color: #f87171 !important;
+    background: rgba(248, 113, 113, 0.12) !important;
+    border-color: rgba(248, 113, 113, 0.4) !important;
+}
+.tr-destino__header-titular {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.tr-destino__badge-bloqueada {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: rgba(248, 113, 113, 0.2);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.4);
+}
 
 /* ----- Botones ----- */
 .tr-acciones { display: flex; flex-wrap: wrap; gap: 0.9rem; margin-top: 1.6rem; }

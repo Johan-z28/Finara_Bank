@@ -216,9 +216,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const texto = el('div', 'tr-destino__texto');
 
         if (estado === 'ok') {
-            texto.append(el('span', 'tr-destino__label', 'Titular de la cuenta'),
-                el('strong', '', dato.titular),
-                el('span', 'tr-destino__sub', `${TIPOS[dato.tipo]} · •••• ${ultimos4(dato.numero)}${dato.esPropia ? ' · Tu cuenta' : ''}`));
+            const estaBloqueada = Boolean(dato.bloqueada || dato.estado === 'BLOQUEADA');
+            const badgeBloqueo = estaBloqueada
+                ? el('span', 'tr-destino__badge-bloqueada', 'Bloqueada')
+                : null;
+
+            const headerTitular = el('div', 'tr-destino__header-titular');
+            headerTitular.append(el('strong', '', dato.titular));
+            if (badgeBloqueo) headerTitular.append(badgeBloqueo);
+
+            texto.append(
+                el('span', 'tr-destino__label', 'Titular de la cuenta'),
+                headerTitular,
+                el('span', 'tr-destino__sub', `${TIPOS[dato.tipo]} · •••• ${ultimos4(dato.numero)}${dato.esPropia ? ' · Tu cuenta' : ''}${estaBloqueada ? ' · No disponible para transferencias' : ''}`)
+            );
+            if (estaBloqueada) {
+                boxDestino.classList.add('tr-destino--bloqueada');
+                i.className = 'fa-solid fa-lock';
+            }
         } else {
             texto.append(el('span', '', dato));
         }
@@ -278,14 +293,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const monto = leerMonto();
         const v = validarTransferencia({ origen, destino, monto });
         if (!v.ok) {
-            const esPorBloqueo = origen && (origen.bloqueada || origen.estado === 'BLOQUEADA' || (origen.tarjetaAsociada && origen.tarjetaAsociada.bloqueada));
+            const esPorBloqueoOrigen = origen && (origen.bloqueada || origen.estado === 'BLOQUEADA' || (origen.tarjetaAsociada && origen.tarjetaAsociada.bloqueada));
+            const esPorBloqueoDestino = destino && (destino.bloqueada || destino.estado === 'BLOQUEADA');
             
-            if (esPorBloqueo) {
+            if (esPorBloqueoOrigen) {
                 if (window.Swal) {
                     Swal.fire({
                         icon: 'warning',
                         title: 'Tarjeta o Producto Bloqueado',
-                        text: 'El producto o tarjeta seleccionada se encuentra bloqueada temporalmente. Desbloquéala desde Saldos para operar.',
+                        text: 'El producto o tarjeta de origen se encuentra bloqueada temporalmente. Desbloquéala desde Saldos para operar.',
                         background: '#12151c',
                         color: '#ffffff',
                         showCancelButton: true,
@@ -299,7 +315,21 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     });
                 } else {
-                    alert('El producto o tarjeta seleccionada se encuentra bloqueada temporalmente. Desbloquéala desde Saldos para operar.');
+                    alert('El producto o tarjeta de origen se encuentra bloqueada temporalmente. Desbloquéala desde Saldos para operar.');
+                }
+            } else if (esPorBloqueoDestino) {
+                if (window.Swal) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Cuenta Destino Bloqueada',
+                        text: `La cuenta de ${destino.titular} se encuentra bloqueada temporalmente y no puede recibir transferencias en este momento.`,
+                        background: '#12151c',
+                        color: '#ffffff',
+                        confirmButtonColor: '#e5a93c',
+                        confirmButtonText: 'Entendido'
+                    });
+                } else {
+                    alert(`La cuenta de destino se encuentra bloqueada temporalmente y no puede recibir transferencias.`);
                 }
             } else {
                 mostrarErrorCampo(v.campo, v.mensaje);

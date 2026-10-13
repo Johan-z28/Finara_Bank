@@ -51,6 +51,13 @@ export function validarTransferencia({ origen, destino, monto }) {
         };
     }
     if (!destino) return { ok: false, campo: 'destino', mensaje: 'Ingresa y valida la cuenta de destino antes de continuar.' };
+    if (destino.bloqueada || destino.estado === 'BLOQUEADA') {
+        return {
+            ok: false,
+            campo: 'destino',
+            mensaje: 'La cuenta de destino se encuentra bloqueada temporalmente y no puede recibir transferencias.'
+        };
+    }
     if (!Number.isFinite(monto) || monto <= 0) return { ok: false, campo: 'monto', mensaje: 'Ingresa un monto mayor a cero.' };
     if (destino.id === origen.id && destino.esPropia) {
         return { ok: false, campo: 'destino', mensaje: 'No puedes transferir al mismo producto de origen.' };
@@ -105,9 +112,15 @@ function resolverDestinoMock(numero, tipo, cuentas, terceros) {
     const n = soloDigitos(numero);
     const tipoNormalizado = String(tipo || '').toUpperCase().trim();
     const propia = cuentas.find(c => soloDigitos(c.numero) === n && String(c.tipo || '').toUpperCase().trim() === tipoNormalizado);
-    if (propia) return { id: propia.id, titular: nombreUsuario(), tipo, numero: n, esPropia: true };
+    if (propia) {
+        const estaBloqueada = Boolean(propia.bloqueada || propia.estado === 'BLOQUEADA' || (propia.tarjetaAsociada && propia.tarjetaAsociada.bloqueada));
+        return { id: propia.id, titular: nombreUsuario(), tipo, numero: n, esPropia: true, bloqueada: estaBloqueada, estado: propia.estado };
+    }
     const t = terceros.find(c => soloDigitos(c.numero) === n && String(c.tipo || '').toUpperCase().trim() === tipoNormalizado);
-    if (t) return { id: t.id, titular: t.titular, tipo, numero: n, esPropia: false };
+    if (t) {
+        const estaBloqueada = Boolean(t.bloqueada || t.estado === 'BLOQUEADA');
+        return { id: t.id, titular: t.titular, tipo, numero: n, esPropia: false, bloqueada: estaBloqueada, estado: t.estado || 'ACTIVA' };
+    }
     return null;
 }
 
