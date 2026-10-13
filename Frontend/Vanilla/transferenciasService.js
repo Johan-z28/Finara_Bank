@@ -119,8 +119,21 @@ export async function obtenerCuentasOrigen() {
 
     // Obtener estrictamente las cuentas y tarjetas activas del usuario autenticado
     const cuentasUsuario = await obtenerCuentasUsuario();
-    // Permitir Ahorros, Corriente y Tarjetas de Crédito activas y NO bloqueadas para transferencias/avances
-    return cuentasUsuario.filter(c => c && (c.tipo in TIPOS) && c.estado === 'ACTIVA' && !c.bloqueada);
+
+    // Saneamiento y desduplicación estricta por tipo y número de cuenta
+    const cuentasFiltradas = cuentasUsuario.filter(c => c && (c.tipo in TIPOS) && c.estado === 'ACTIVA' && !c.bloqueada);
+    const cuentasUnicas = [];
+    const vistas = new Set();
+    for (const c of cuentasFiltradas) {
+        const numLimpio = soloDigitos(c.numero);
+        const clave = `${c.tipo}_${numLimpio}`;
+        if (!vistas.has(clave)) {
+            vistas.add(clave);
+            cuentasUnicas.push(c);
+        }
+    }
+
+    return cuentasUnicas;
 }
 
 export async function buscarCuentaDestino(numero, tipo) {

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -7,9 +7,6 @@
     <title>Transferencias | Finara Bank</title>
     <link rel="icon" type="image/png" sizes="32x32" href="../Style/image/favicon.svg">
     <link rel="stylesheet" href="../Style/Transferencias.css">
-    <!-- SweetAlert2 CSS y JS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="general-body">
@@ -37,9 +34,9 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="solicitudTarjeta.html" class="nav-link" data-route="productos" title="Solicitar Productos">
+                    <a href="solicitudTarjeta.html" class="nav-link" data-route="tarjeta" title="Solicitar Tarjeta">
                         <i class="fa-regular fa-credit-card"></i>
-                        <span>Solicitar Productos</span>
+                        <span>Solicitar Tarjeta</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -182,6 +179,16 @@
                         <div class="tr-campo">
                             <label for="trOrigen">Cuenta de origen</label>
                             <select id="trOrigen"></select>
+                            <div class="tr-origen-card" id="trOrigenCard">
+                                <div class="tr-origen-card__icon">
+                                    <i class="fa-solid fa-wallet"></i>
+                                </div>
+                                <div class="tr-origen-card__info">
+                                    <span class="tr-origen-card__tipo" id="trCardTipo">Cuenta Finara</span>
+                                    <strong class="tr-origen-card__saldo" id="trCardSaldo">$ 0</strong>
+                                </div>
+                                <div class="tr-origen-card__badge" id="trCardBadge">Disponible</div>
+                            </div>
                             <p class="tr-hint" id="trOrigenHint"></p>
                             <p class="tr-error" id="errOrigen" role="alert"></p>
                         </div>
@@ -204,10 +211,19 @@
                         <p class="tr-error" id="errDestino" role="alert"></p>
 
                         <div class="tr-campo" style="margin-top: 1.1rem;">
-                            <label for="trMonto">Monto</label>
+                            <div class="tr-monto-header">
+                                <label for="trMonto">Monto a transferir</label>
+                                <button type="button" class="tr-btn-maximo" id="btnTransferirTodo">Todo el disponible</button>
+                            </div>
                             <div class="tr-monto">
                                 <span>$</span>
                                 <input id="trMonto" type="text" inputmode="numeric" autocomplete="off" placeholder="0">
+                            </div>
+                            <div class="tr-chips-monto" id="chipsMonto">
+                                <button type="button" class="tr-chip" data-monto="50000">$ 50.000</button>
+                                <button type="button" class="tr-chip" data-monto="100000">$ 100.000</button>
+                                <button type="button" class="tr-chip" data-monto="200000">$ 200.000</button>
+                                <button type="button" class="tr-chip" data-monto="500000">$ 500.000</button>
                             </div>
                             <p class="tr-error" id="errMonto" role="alert"></p>
                         </div>
