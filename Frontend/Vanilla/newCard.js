@@ -20,11 +20,12 @@ class TarjetaBancaria {
 
     // Método para generar un número único de tarjeta aleatorio tipo bancario
     generarNumeroUnico() {
+        // Usar una parte fija y mezclar milisegundos con aleatoriedad para evitar colisiones
+        const timestamp = String(Date.now()).slice(-4);
         const bloque1 = Math.floor(1000 + Math.random() * 9000);
         const bloque2 = Math.floor(1000 + Math.random() * 9000);
         const bloque3 = Math.floor(1000 + Math.random() * 9000);
-        const bloque4 = Math.floor(1000 + Math.random() * 9000);
-        return `4532 ${bloque1} ${bloque2} ${bloque4}`; // Prefijo simulado Visa/Finara
+        return `4532 ${bloque1} ${bloque2} ${timestamp}`;
     }
 }
 

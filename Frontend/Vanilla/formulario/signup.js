@@ -147,7 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 productosActivos: 0,
                 saldoDisponible: "$ 0",
                 ultimaActividad: "Recién registrado",
-                avatar: "../../Style/image/profile/avatar_maria.png",
+                avatar: "../Style/image/profile/avatarDefault.png",
                 verificado: true,
             };
 
