@@ -1,20 +1,19 @@
 // Vanilla/movimientosService.js
-// Capa de acceso a datos de movimientos. La UI nunca llama a fetch directamente.
+// Capa de acceso a datos de movimientos para HU-05 (Consulta de movimientos).
+// La UI nunca llama a fetch o toca localStorage directamente.
+// Cuando el backend REST esté disponible, USAR_API_BACKEND se activa y consulta el servidor.
 
-// Cambia a false cuando el endpoint del Backend esté disponible.
-const USAR_DATOS_DE_PRUEBA = true;
+import { obtenerCuentas as obtenerCuentasSaldos, SesionExpiradaError as SesionExpiradaCuentas } from './cuentasService.js';
+
+const USAR_API_BACKEND = false;
 const API_BASE = 'http://localhost:8080/api';
 
-// Contrato esperado del API:
-//   GET /api/cuentas/{cuentaId}/movimientos?periodo=30d&orden=desc&pagina=1&tamano=8
-//   -> {
-//        items: [{ id, fecha (ISO), descripcion, categoria|null, tipo: 'INGRESO'|'EGRESO', valor (>0) }],
-//        total, pagina, totalPaginas,
-//        resumen: { ingresos, egresos }   // sobre TODO el periodo filtrado, no solo la página
-//      }
-// periodo: 7d | 30d | 90d | mes | todo      orden: desc (recientes primero) | asc
-
-export class SesionExpiradaError extends Error { }
+export class SesionExpiradaError extends Error {
+    constructor(mensaje = 'Tu sesión ha expirado o no estás autenticado.') {
+        super(mensaje);
+        this.name = 'SesionExpiradaError';
+    }
+}
 
 export const PERIODOS = [
     { valor: '7d', etiqueta: 'Últimos 7 días' },
@@ -24,84 +23,146 @@ export const PERIODOS = [
     { valor: 'todo', etiqueta: 'Todo el historial' }
 ];
 
-// ----- Datos de prueba (simulan lo que haría el servidor) -----
-const CUENTAS_MOCK = [
-    { id: 1, nombre: 'Cuenta de Ahorros', numero: '4021587701234' },
-    { id: 2, nombre: 'Cuenta Corriente', numero: '4021587705678' },
-    { id: 3, nombre: 'Tarjeta de Crédito', numero: '5412750000009012' }
-];
-
-// [díasAtrás, hora, descripción, categoría, tipo, valor]
-const MOCK_POR_CUENTA = {
-    1: [
-        [0, 9, 'Consignación en cajero', null, 'INGRESO', 500000],
-        [2, 14, 'Retiro en cajero', 'Mercado', 'EGRESO', 150000],
-        [4, 11, 'Transferencia recibida', null, 'INGRESO', 200000],
-        [6, 18, 'Pago de servicios', 'Servicios', 'EGRESO', 120000],
-        [9, 10, 'Compra en tienda', 'Ocio', 'EGRESO', 80000],
-        [12, 16, 'Rendimiento mensual 1.5%', null, 'INGRESO', 18750],
-        [15, 13, 'Retiro en cajero', 'Mercado', 'EGRESO', 100000],
-        [21, 9, 'Consignación nómina', null, 'INGRESO', 1200000],
-        [28, 19, 'Transferencia enviada', 'Servicios', 'EGRESO', 300000],
-        [40, 12, 'Retiro en cajero', 'Ocio', 'EGRESO', 90000],
-        [55, 15, 'Consignación en cajero', null, 'INGRESO', 400000],
-        [75, 10, 'Pago de servicios', 'Servicios', 'EGRESO', 210000],
-        [110, 17, 'Consignación nómina', null, 'INGRESO', 1200000]
-    ],
-    2: [
-        [1, 8, 'Pago de nómina', null, 'INGRESO', 2400000],
-        [3, 12, 'Pago de tarjeta', 'Servicios', 'EGRESO', 200000],
-        [5, 15, 'Compra en supermercado', 'Mercado', 'EGRESO', 185000],
-        [8, 20, 'Transferencia enviada', 'Ocio', 'EGRESO', 120000],
-        [11, 11, 'Pago de arriendo', 'Servicios', 'EGRESO', 900000],
-        [14, 9, 'Consignación en cajero', null, 'INGRESO', 350000],
-        [19, 18, 'Compra en restaurante', 'Ocio', 'EGRESO', 95000],
-        [26, 14, 'Pago de servicios públicos', 'Servicios', 'EGRESO', 240000],
-        [31, 8, 'Pago de nómina', null, 'INGRESO', 2400000],
-        [48, 13, 'Compra en supermercado', 'Mercado', 'EGRESO', 210000],
-        [70, 16, 'Transferencia recibida', null, 'INGRESO', 150000],
-        [95, 10, 'Pago de arriendo', 'Servicios', 'EGRESO', 900000]
-    ],
-    3: [
-        [0, 19, 'Compra en tienda (3 cuotas)', 'Ocio', 'EGRESO', 450000],
-        [3, 13, 'Compra en supermercado', 'Mercado', 'EGRESO', 230000],
-        [7, 17, 'Suscripción streaming', 'Ocio', 'EGRESO', 38000],
-        [13, 10, 'Pago a la tarjeta', null, 'INGRESO', 500000],
-        [20, 12, 'Compra online (6 cuotas)', 'Ocio', 'EGRESO', 780000],
-        [33, 15, 'Gasolina', 'Servicios', 'EGRESO', 120000],
-        [52, 11, 'Pago a la tarjeta', null, 'INGRESO', 600000],
-        [80, 18, 'Compra en supermercado', 'Mercado', 'EGRESO', 260000]
-    ]
+const TIPOS_CUENTA = {
+    AHORROS: 'Cuenta de Ahorros',
+    CORRIENTE: 'Cuenta Corriente',
+    TARJETA_CREDITO: 'Tarjeta de Crédito'
 };
-
-function fechaHaceDias(dias, hora) {
-    const d = new Date();
-    d.setDate(d.getDate() - dias);
-    d.setHours(hora, 0, 0, 0);
-    return d;
-}
 
 function limiteInferior(periodo) {
     const ahora = new Date();
     const inicioDia = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
     if (periodo === 'mes') return new Date(ahora.getFullYear(), ahora.getMonth(), 1);
     const m = /^(\d+)d$/.exec(periodo);
-    if (m) { inicioDia.setDate(inicioDia.getDate() - Number(m[1])); return inicioDia; }
+    if (m) {
+        inicioDia.setDate(inicioDia.getDate() - Number(m[1]));
+        return inicioDia;
+    }
     return null; // 'todo'
 }
 
-function consultarMock({ cuentaId, periodo, orden, pagina, tamano }) {
-    const base = (MOCK_POR_CUENTA[cuentaId] ?? []).map(([dias, hora, descripcion, categoria, tipo, valor], i) => ({
-        id: `${cuentaId}-${i}`, fecha: fechaHaceDias(dias, hora).toISOString(), descripcion, categoria, tipo, valor
-    }));
+/**
+ * Movimientos base de cortesía para el usuario demo maria17
+ * en caso de que aún no haya registrado transferencias en la sesión actual.
+ */
+function generarMovimientosBase(cuentaId, cuentaTipo) {
+    const ahora = new Date();
+    const d1 = new Date(ahora); d1.setHours(9, 30, 0, 0);
+    const d2 = new Date(ahora); d2.setDate(d2.getDate() - 3); d2.setHours(14, 15, 0, 0);
+    const d3 = new Date(ahora); d3.setDate(d3.getDate() - 7); d3.setHours(11, 0, 0, 0);
+    const d4 = new Date(ahora); d4.setDate(d4.getDate() - 15); d4.setHours(16, 45, 0, 0);
 
+    if (cuentaTipo === 'CORRIENTE') {
+        return [
+            { id: `MOV-CORR-1`, cuentaId, fecha: d1.toISOString(), descripcion: 'Pago de nómina empresarial', categoria: 'Nómina', tipo: 'INGRESO', valor: 2400000 },
+            { id: `MOV-CORR-2`, cuentaId, fecha: d2.toISOString(), descripcion: 'Pago de arriendo oficina', categoria: 'Servicios', tipo: 'EGRESO', valor: 900000 },
+            { id: `MOV-CORR-3`, cuentaId, fecha: d3.toISOString(), descripcion: 'Consignación en efectivo', categoria: 'Depósito', tipo: 'INGRESO', valor: 350000 },
+            { id: `MOV-CORR-4`, cuentaId, fecha: d4.toISOString(), descripcion: 'Pago de servicios públicos', categoria: 'Servicios', tipo: 'EGRESO', valor: 240000 }
+        ];
+    } else if (cuentaTipo === 'TARJETA_CREDITO') {
+        return [
+            { id: `MOV-TC-1`, cuentaId, fecha: d1.toISOString(), descripcion: 'Compra en tienda por departamento', categoria: 'Compras', tipo: 'EGRESO', valor: 350000 },
+            { id: `MOV-TC-2`, cuentaId, fecha: d3.toISOString(), descripcion: 'Suscripción servicios digitales', categoria: 'Ocio', tipo: 'EGRESO', valor: 45000 },
+            { id: `MOV-TC-3`, cuentaId, fecha: d4.toISOString(), descripcion: 'Pago mensual de tarjeta', categoria: 'Abono', tipo: 'INGRESO', valor: 400000 }
+        ];
+    } else {
+        // AHORROS
+        return [
+            { id: `MOV-AHO-1`, cuentaId, fecha: d1.toISOString(), descripcion: 'Transferencia recibida', categoria: 'Transferencia', tipo: 'INGRESO', valor: 500000 },
+            { id: `MOV-AHO-2`, cuentaId, fecha: d2.toISOString(), descripcion: 'Compra en supermercado', categoria: 'Mercado', tipo: 'EGRESO', valor: 150000 },
+            { id: `MOV-AHO-3`, cuentaId, fecha: d3.toISOString(), descripcion: 'Rendimiento mensual 1.5%', categoria: 'Intereses', tipo: 'INGRESO', valor: 18750 },
+            { id: `MOV-AHO-4`, cuentaId, fecha: d4.toISOString(), descripcion: 'Retiro en cajero automático', categoria: 'Efectivo', tipo: 'EGRESO', valor: 100000 }
+        ];
+    }
+}
+
+/**
+ * Obtiene las cuentas reales del usuario asociadas a la sesión activa
+ * usando la fuente compartida de cuentas de HU-04 (cuentasService).
+ */
+export async function obtenerCuentasFiltro() {
+    if (USAR_API_BACKEND) {
+        return pedir(`${API_BASE}/cuentas`);
+    }
+
+    try {
+        const cuentasReales = await obtenerCuentasSaldos();
+        return cuentasReales.map(c => ({
+            id: String(c.id),
+            nombre: TIPOS_CUENTA[c.tipo] || c.tipo,
+            numero: String(c.numero || ''),
+            tipo: c.tipo,
+            saldo: c.saldo
+        }));
+    } catch (e) {
+        if (e instanceof SesionExpiradaCuentas) throw new SesionExpiradaError();
+        throw e;
+    }
+}
+
+/**
+ * Obtiene los movimientos paginados y filtrados para la cuenta seleccionada,
+ * unificando los movimientos de transferencias (finara_movimientos) con la cuenta.
+ */
+export async function obtenerMovimientos({ cuentaId, periodo = '30d', tipo = 'todos', orden = 'desc', pagina = 1, tamano = 8 }) {
+    if (USAR_API_BACKEND) {
+        const qs = new URLSearchParams({ periodo, tipo, orden, pagina, tamano });
+        return pedir(`${API_BASE}/cuentas/${encodeURIComponent(cuentaId)}/movimientos?${qs}`);
+    }
+
+    await new Promise(r => setTimeout(r, 200)); // Latencia suave de UI
+
+    // 1. Cuentas del usuario para validar pertenencia y tipo
+    const cuentas = await obtenerCuentasFiltro();
+    const cuentaActiva = cuentas.find(c => String(c.id) === String(cuentaId)) || cuentas[0];
+    const idEfectivo = cuentaActiva ? String(cuentaActiva.id) : String(cuentaId);
+
+    // 2. Leer movimientos guardados en localStorage por Transferencias y operaciones
+    let movimientosLocales = [];
+    try {
+        movimientosLocales = JSON.parse(localStorage.getItem('finara_movimientos')) || [];
+        if (!Array.isArray(movimientosLocales)) movimientosLocales = [];
+    } catch {
+        movimientosLocales = [];
+    }
+
+    // Filtrar los movimientos que pertenezcan estrictamente a esta cuenta seleccionada
+    const numLimpio = cuentaActiva ? String(cuentaActiva.numero || '').replace(/\D/g, '') : '';
+    let movimientosCuenta = movimientosLocales.filter(m => {
+        const mId = String(m.cuentaId || '');
+        const mNum = String(m.cuentaNumero || '').replace(/\D/g, '');
+
+        if (mId && mId === idEfectivo) return true;
+        if (numLimpio && mNum && mNum === numLimpio) return true;
+        return false;
+    });
+
+    // Si aún no hay transacciones hechas por el usuario en esta cuenta particular, proveer movimientos base de cortesía
+    if (movimientosCuenta.length === 0) {
+        movimientosCuenta = generarMovimientosBase(idEfectivo, cuentaActiva ? cuentaActiva.tipo : 'AHORROS');
+    }
+
+    // 3. Filtrar por período
     const desde = limiteInferior(periodo);
-    const filtrados = base
-        .filter(m => !desde || new Date(m.fecha) >= desde)
-        .sort((a, b) => orden === 'asc'
-            ? new Date(a.fecha) - new Date(b.fecha)
-            : new Date(b.fecha) - new Date(a.fecha));
+    let filtrados = movimientosCuenta.filter(m => !desde || new Date(m.fecha) >= desde);
 
+    // Calcular los totales del periodo antes del filtro de tipo (o según el filtro activo)
+    const ingresosPeriodo = filtrados.filter(m => m.tipo === 'INGRESO').reduce((s, m) => s + (Number(m.valor) || 0), 0);
+    const egresosPeriodo = filtrados.filter(m => m.tipo === 'EGRESO').reduce((s, m) => s + (Number(m.valor) || 0), 0);
+
+    // 4. Filtrar por tipo (INGRESO, EGRESO o todos)
+    if (tipo && tipo !== 'todos') {
+        filtrados = filtrados.filter(m => m.tipo === tipo);
+    }
+
+    // 5. Ordenamiento cronológico
+    filtrados.sort((a, b) => {
+        const fa = new Date(a.fecha).getTime();
+        const fb = new Date(b.fecha).getTime();
+        return orden === 'asc' ? fa - fb : fb - fa;
+    });
+
+    // 6. Paginación
     const total = filtrados.length;
     const totalPaginas = Math.max(1, Math.ceil(total / tamano));
     const paginaOk = Math.min(Math.max(1, pagina), totalPaginas);
@@ -109,27 +170,14 @@ function consultarMock({ cuentaId, periodo, orden, pagina, tamano }) {
 
     return {
         items: filtrados.slice(inicio, inicio + tamano),
-        total, pagina: paginaOk, totalPaginas,
+        total,
+        pagina: paginaOk,
+        totalPaginas,
         resumen: {
-            ingresos: filtrados.filter(m => m.tipo === 'INGRESO').reduce((s, m) => s + m.valor, 0),
-            egresos: filtrados.filter(m => m.tipo === 'EGRESO').reduce((s, m) => s + m.valor, 0)
+            ingresos: ingresosPeriodo,
+            egresos: egresosPeriodo
         }
     };
-}
-
-// ----- API pública del servicio -----
-export async function obtenerCuentasFiltro() {
-    if (USAR_DATOS_DE_PRUEBA) return CUENTAS_MOCK;
-    return pedir(`${API_BASE}/cuentas`);
-}
-
-export async function obtenerMovimientos({ cuentaId, periodo = '30d', orden = 'desc', pagina = 1, tamano = 8 }) {
-    if (USAR_DATOS_DE_PRUEBA) {
-        await new Promise(r => setTimeout(r, 350)); // simula latencia
-        return consultarMock({ cuentaId, periodo, orden, pagina, tamano });
-    }
-    const qs = new URLSearchParams({ periodo, orden, pagina, tamano });
-    return pedir(`${API_BASE}/cuentas/${encodeURIComponent(cuentaId)}/movimientos?${qs}`);
 }
 
 async function pedir(url) {
