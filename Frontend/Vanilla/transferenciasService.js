@@ -13,7 +13,7 @@ const API_BASE = 'http://localhost:8080/api';
 //   GET  /api/cuentas                                  -> [{ id, tipo, numero, saldo, estado }]
 //   GET  /api/cuentas/validar-destino?numero=&tipo=    -> { id, titular, tipo, numero, esPropia } | 404
 //   POST /api/transferencias { origenId, destinoNumero, destinoTipo, monto, concepto }
-//        -> { referencia, fecha, monto, origen, destino, saldoOrigen, usaSobregiro }
+//    -> { referencia, fecha, monto, origen, destino, saldoOrigen, usaSobregiro }
 
 export class SesionExpiradaError extends Error { }
 
