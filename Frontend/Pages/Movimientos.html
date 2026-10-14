@@ -1,12 +1,16 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movimientos | Finara Bank</title>
-    <link rel="icon" type="image/png" sizes="32x32" href="../Style/image/favicon.svg">
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../Style/Movimientos.css">
+    <!-- SweetAlert2 CSS y JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="general-body">
@@ -34,9 +38,9 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="solicitudTarjeta.html" class="nav-link" data-route="saldos" title="Solicitar Tarjeta">
+                    <a href="solicitudTarjeta.html" class="nav-link" data-route="productos" title="Solicitar Productos">
                         <i class="fa-regular fa-credit-card"></i>
-                        <span>Solicitar Tarjeta</span>
+                        <span>Solicitar Productos</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -70,9 +74,27 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="Creditos.html" class="nav-link" data-route="creditos" title="Solicitud de Créditos">
-                        <i class="fa-solid fa-hand-holding-dollar"></i>
-                        <span>Solicitud de Créditos</span>
+                    <a href="Presupuesto.html" class="nav-link" data-route="presupuesto" title="Presupuesto">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Presupuesto</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="FondoEmergencia.html" class="nav-link" data-route="fondo" title="Fondo de Emergencia">
+                        <i class="fa-solid fa-shield-heart"></i>
+                        <span>Fondo Emergencia</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Metas.html" class="nav-link" data-route="metas" title="Metas de Ahorro">
+                        <i class="fa-solid fa-bullseye"></i>
+                        <span>Metas de Ahorro</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Seguimiento.html" class="nav-link" data-route="seguimiento" title="Seguimiento Financiero">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Seguimiento Financiero</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -139,9 +161,15 @@
         </header>
 
         <main class="main-content">
-            <div class="mov-header">
-                <h1>Historial de Movimientos</h1>
-                <p class="mov-subtitle">Consulta y controla todos los movimientos de tus cuentas.</p>
+            <div class="mov-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <h1>Historial de Movimientos</h1>
+                    <p class="mov-subtitle">Consulta y controla todos los movimientos de tus cuentas.</p>
+                </div>
+                <button type="button" class="btn-abrir-extracto" id="btnAbrirModalExtracto">
+                    <i class="fa-solid fa-file-arrow-down"></i>
+                    <span>Descargar Extracto</span>
+                </button>
             </div>
 
             <!-- Filtros -->
@@ -225,6 +253,85 @@
                 </div>
             </nav>
         </main>
+    </div>
+
+    <!-- MODAL SELECCIONAR CUENTA Y PERIODO (MES / AÑO) PARA EXTRACTO BANCARIO -->
+    <div id="modalExtractoBancario" class="modal-extracto-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modalExtractoTitulo">
+        <div class="modal-extracto-card">
+            <div class="modal-extracto-header">
+                <div>
+                    <span class="badge-gold" style="font-size: 0.72rem; padding: 2px 8px; border-radius: 10px; background: rgba(229,169,60,0.15); color: #e5a93c;">
+                        <i class="fa-solid fa-file-invoice"></i> Certificaciones Finara
+                    </span>
+                    <h2 id="modalExtractoTitulo" style="margin: 6px 0 2px 0; font-size: 1.25rem; color: #fff;">Descargar Extracto Bancario</h2>
+                    <p style="margin: 0; font-size: 0.82rem; color: #8a8f99;">Genera el estado de cuenta y resumen oficial de movimientos en formato PDF.</p>
+                </div>
+                <button type="button" class="btn-cerrar-modal" id="btnCerrarModalExtracto" aria-label="Cerrar modal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="formGenerarExtracto" class="modal-extracto-form">
+                <div class="extracto-campo">
+                    <label for="extractoCuentaSelect">
+                        <i class="fa-solid fa-wallet"></i> Selecciona la Cuenta
+                    </label>
+                    <select id="extractoCuentaSelect" required></select>
+                </div>
+
+                <div class="extracto-grid-periodo">
+                    <div class="extracto-campo">
+                        <label for="extractoMesSelect">
+                            <i class="fa-regular fa-calendar"></i> Mes
+                        </label>
+                        <select id="extractoMesSelect" required>
+                            <option value="1">Enero</option>
+                            <option value="2">Febrero</option>
+                            <option value="3">Marzo</option>
+                            <option value="4">Abril</option>
+                            <option value="5">Mayo</option>
+                            <option value="6">Junio</option>
+                            <option value="7">Julio</option>
+                            <option value="8">Agosto</option>
+                            <option value="9">Septiembre</option>
+                            <option value="10">Octubre</option>
+                            <option value="11">Noviembre</option>
+                            <option value="12">Diciembre</option>
+                        </select>
+                    </div>
+
+                    <div class="extracto-campo">
+                        <label for="extractoAnioSelect">
+                            <i class="fa-solid fa-clock-rotate-left"></i> Año
+                        </label>
+                        <select id="extractoAnioSelect" required>
+                            <option value="2026">2026</option>
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="extracto-preview-info">
+                    <div class="preview-item">
+                        <span>Formato oficial:</span>
+                        <strong>Documento PDF con sello digital</strong>
+                    </div>
+                    <div class="preview-item">
+                        <span>Contenido:</span>
+                        <span>Resumen financiero, balance y tabla de transacciones</span>
+                    </div>
+                </div>
+
+                <div class="modal-extracto-acciones">
+                    <button type="button" class="btn-cancelar-extracto" id="btnCancelarExtracto">Cancelar</button>
+                    <button type="submit" class="btn-descargar-extracto" id="btnConfirmarDescargaExtracto">
+                        <i class="fa-solid fa-file-pdf"></i>
+                        <span>Generar y Descargar PDF</span>
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Módulo JS principal -->
