@@ -39,6 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const selOrigen = $('trOrigen'), selTipo = $('trTipoDestino');
     const inpNumero = $('trNumeroDestino'), inpMonto = $('trMonto'), inpConcepto = $('trConcepto');
     const hintOrigen = $('trOrigenHint'), boxDestino = $('trDestino');
+    const trOrigenCard = $('trOrigenCard'), trCardTipo = $('trCardTipo'), trCardSaldo = $('trCardSaldo'), trCardBadge = $('trCardBadge');
+    const btnTransferirTodo = $('btnTransferirTodo'), chipsMonto = $('chipsMonto');
     const errOrigen = $('errOrigen'), errDestino = $('errDestino'), errMonto = $('errMonto');
     const vistas = { 1: $('vistaForm'), 2: $('vistaResumen'), 3: $('vistaExito') };
     const pasos = document.querySelectorAll('.tr-paso');
@@ -81,15 +83,63 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function pintarHint() {
         const c = cuentaSeleccionada();
-        if (!c) { hintOrigen.textContent = ''; return; }
-        const extra = c.tipo === 'CORRIENTE' ? ' (incluye sobregiro del 20%)' : '';
-        hintOrigen.textContent = `Saldo: ${formatoCOP.format(c.saldo)} · Disponible: ${formatoCOP.format(calcularDisponible(c))}${extra}`;
+        if (!c) {
+            hintOrigen.textContent = '';
+            if (trOrigenCard) trOrigenCard.style.display = 'none';
+            return;
+        }
+
+        const estaBloqueada = Boolean(c.bloqueada || c.estado === 'BLOQUEADA' || (c.tarjetaAsociada && c.tarjetaAsociada.bloqueada));
+        const disponible = calcularDisponible(c);
+        let badgeTexto = 'Disponible';
+        let saldoStr = formatoCOP.format(disponible);
+
+        if (estaBloqueada) {
+            badgeTexto = 'Bloqueada';
+            hintOrigen.textContent = `Cuenta o tarjeta bloqueada temporalmente. Desbloquéala desde Saldos para transferir.`;
+        } else if (c.tipo === 'TARJETA_CREDITO') {
+            hintOrigen.textContent = `Cupo Total: ${formatoCOP.format(c.saldo)} · Avance permitido (hasta 50%): ${formatoCOP.format(disponible)}`;
+            badgeTexto = 'Cupo Avance';
+        } else if (c.tipo === 'CORRIENTE') {
+            const extra = ' (incluye sobregiro del 20%)';
+            hintOrigen.textContent = `Saldo: ${formatoCOP.format(c.saldo)} · Disponible: ${formatoCOP.format(disponible)}${extra}`;
+            badgeTexto = 'Disponible + Sobregiro';
+        } else {
+            hintOrigen.textContent = `Saldo: ${formatoCOP.format(c.saldo)} · Disponible: ${formatoCOP.format(disponible)}`;
+            badgeTexto = 'Disponible';
+        }
+
+        if (trOrigenCard) {
+            trOrigenCard.style.display = 'flex';
+            if (trCardTipo) trCardTipo.textContent = `${TIPOS[c.tipo]} · •••• ${ultimos4(c.numero)}`;
+            if (trCardSaldo) trCardSaldo.textContent = saldoStr;
+            if (trCardBadge) {
+                trCardBadge.textContent = badgeTexto;
+                trCardBadge.classList.toggle('tr-origen-card__badge--bloqueada', estaBloqueada);
+            }
+            trOrigenCard.classList.toggle('tr-origen-card--bloqueada', estaBloqueada);
+            const iconEl = trOrigenCard.querySelector('.tr-origen-card__icon i');
+            if (iconEl) {
+                iconEl.className = estaBloqueada ? 'fa-solid fa-lock' : 'fa-solid fa-building-columns';
+            }
+        }
     }
 
     async function cargarCuentas() {
         const previa = selOrigen.value;
         try {
-            cuentas = await obtenerCuentasOrigen();
+            const rawCuentas = await obtenerCuentasOrigen();
+            // Desduplicar estrictamente por número y tipo
+            const cuentasUnicas = [];
+            const vistos = new Set();
+            for (const c of rawCuentas) {
+                const clave = `${c.tipo}_${String(c.numero || '').replace(/\D/g, '')}`;
+                if (!vistos.has(clave)) {
+                    vistos.add(clave);
+                    cuentasUnicas.push(c);
+                }
+            }
+            cuentas = cuentasUnicas;
         } catch (err) {
             if (err instanceof SesionExpiradaError) return irALogin();
             estadoGlobal.replaceChildren(el('p', '', 'No pudimos cargar tus cuentas. Intenta de nuevo.'));
@@ -109,11 +159,48 @@ document.addEventListener('DOMContentLoaded', () => {
         pintarHint();
     }
 
+    function actualizarChipsActivos(montoActual) {
+        if (!chipsMonto) return;
+        chipsMonto.querySelectorAll('.tr-chip').forEach(btn => {
+            const val = Number(btn.dataset.monto);
+            btn.classList.toggle('activo', val === montoActual);
+        });
+    }
+
     inpMonto.addEventListener('input', () => {
         const digitos = inpMonto.value.replace(/\D/g, '').slice(0, 12);
-        inpMonto.value = digitos ? new Intl.NumberFormat('es-CO').format(Number(digitos)) : '';
+        const num = Number(digitos) || 0;
+        inpMonto.value = digitos ? new Intl.NumberFormat('es-CO').format(num) : '';
         errMonto.textContent = '';
+        actualizarChipsActivos(num);
     });
+
+    if (chipsMonto) {
+        chipsMonto.querySelectorAll('.tr-chip').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const monto = Number(btn.dataset.monto);
+                inpMonto.value = new Intl.NumberFormat('es-CO').format(monto);
+                errMonto.textContent = '';
+                actualizarChipsActivos(monto);
+                inpMonto.focus();
+            });
+        });
+    }
+
+    if (btnTransferirTodo) {
+        btnTransferirTodo.addEventListener('click', () => {
+            const c = cuentaSeleccionada();
+            if (!c) return;
+            const disp = Math.max(0, calcularDisponible(c));
+            if (disp > 0) {
+                inpMonto.value = new Intl.NumberFormat('es-CO').format(disp);
+                errMonto.textContent = '';
+                actualizarChipsActivos(disp);
+                inpMonto.focus();
+            }
+        });
+    }
+
     selOrigen.addEventListener('change', () => { pintarHint(); errOrigen.textContent = ''; errMonto.textContent = ''; });
 
     // ---------- Punto 3: validar cuenta destino y mostrar titular ----------
@@ -129,9 +216,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const texto = el('div', 'tr-destino__texto');
 
         if (estado === 'ok') {
-            texto.append(el('span', 'tr-destino__label', 'Titular de la cuenta'),
-                el('strong', '', dato.titular),
-                el('span', 'tr-destino__sub', `${TIPOS[dato.tipo]} · •••• ${ultimos4(dato.numero)}${dato.esPropia ? ' · Tu cuenta' : ''}`));
+            const estaBloqueada = Boolean(dato.bloqueada || dato.estado === 'BLOQUEADA');
+            const badgeBloqueo = estaBloqueada
+                ? el('span', 'tr-destino__badge-bloqueada', 'Bloqueada')
+                : null;
+
+            const headerTitular = el('div', 'tr-destino__header-titular');
+            headerTitular.append(el('strong', '', dato.titular));
+            if (badgeBloqueo) headerTitular.append(badgeBloqueo);
+
+            texto.append(
+                el('span', 'tr-destino__label', 'Titular de la cuenta'),
+                headerTitular,
+                el('span', 'tr-destino__sub', `${TIPOS[dato.tipo]} · •••• ${ultimos4(dato.numero)}${dato.esPropia ? ' · Tu cuenta' : ''}${estaBloqueada ? ' · No disponible para transferencias' : ''}`)
+            );
+            if (estaBloqueada) {
+                boxDestino.classList.add('tr-destino--bloqueada');
+                i.className = 'fa-solid fa-lock';
+            }
         } else {
             texto.append(el('span', '', dato));
         }
@@ -190,7 +292,50 @@ document.addEventListener('DOMContentLoaded', () => {
         const origen = cuentaSeleccionada();
         const monto = leerMonto();
         const v = validarTransferencia({ origen, destino, monto });
-        if (!v.ok) return mostrarErrorCampo(v.campo, v.mensaje);
+        if (!v.ok) {
+            const esPorBloqueoOrigen = origen && (origen.bloqueada || origen.estado === 'BLOQUEADA' || (origen.tarjetaAsociada && origen.tarjetaAsociada.bloqueada));
+            const esPorBloqueoDestino = destino && (destino.bloqueada || destino.estado === 'BLOQUEADA');
+            
+            if (esPorBloqueoOrigen) {
+                if (window.Swal) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Tarjeta o Producto Bloqueado',
+                        text: 'El producto o tarjeta de origen se encuentra bloqueada temporalmente. Desbloquéala desde Saldos para operar.',
+                        background: '#12151c',
+                        color: '#ffffff',
+                        showCancelButton: true,
+                        confirmButtonColor: '#e5a93c',
+                        cancelButtonColor: '#64748b',
+                        confirmButtonText: '<i class="fa-solid fa-arrow-right"></i> Ir a Saldos',
+                        cancelButtonText: 'Entendido'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = './Saldos.html';
+                        }
+                    });
+                } else {
+                    alert('El producto o tarjeta de origen se encuentra bloqueada temporalmente. Desbloquéala desde Saldos para operar.');
+                }
+            } else if (esPorBloqueoDestino) {
+                if (window.Swal) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Cuenta Destino Bloqueada',
+                        text: `La cuenta de ${destino.titular} se encuentra bloqueada temporalmente y no puede recibir transferencias en este momento.`,
+                        background: '#12151c',
+                        color: '#ffffff',
+                        confirmButtonColor: '#e5a93c',
+                        confirmButtonText: 'Entendido'
+                    });
+                } else {
+                    alert(`La cuenta de destino se encuentra bloqueada temporalmente y no puede recibir transferencias.`);
+                }
+            } else {
+                mostrarErrorCampo(v.campo, v.mensaje);
+            }
+            return;
+        }
 
         datos = { origen, destino, monto, concepto: inpConcepto.value.trim(), usaSobregiro: v.usaSobregiro };
         pintarResumen();
@@ -199,20 +344,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ---------- Punto 4: resumen y confirmación ----------
     function pintarResumen() {
-        const { origen, destino: d, monto, concepto, usaSobregiro } = datos;
+        const { origen, destino: d, monto, concepto, usaSobregiro, esAvanceTC } = datos;
         const saldoFinal = origen.saldo - monto;
+        const labelSaldoFinal = origen.tipo === 'TARJETA_CREDITO' ? 'Cupo restante después del avance' : 'Saldo después de la operación';
         filas($('resumenLista'), [
-            { label: 'Cuenta de origen', valor: textoCuenta(origen) },
+            { label: 'Producto de origen', valor: textoCuenta(origen) },
             { label: 'Cuenta de destino', valor: d.titular, extra: `${TIPOS[d.tipo]} · •••• ${ultimos4(d.numero)}` },
-            { label: 'Monto a transferir', valor: formatoCOP.format(monto), destacado: true },
+            { label: esAvanceTC ? 'Monto del avance' : 'Monto a transferir', valor: formatoCOP.format(monto), destacado: true },
             { label: 'Concepto', valor: concepto || '—' },
-            { label: 'Saldo después de la operación', valor: formatoCOP.format(saldoFinal), negativo: saldoFinal < 0 },
+            { label: labelSaldoFinal, valor: formatoCOP.format(saldoFinal), negativo: saldoFinal < 0 },
             { label: 'Costo', valor: 'Sin costo' }
         ]);
         resumenError.classList.add('hidden');
-        resumenAlerta.classList.toggle('hidden', !usaSobregiro);
+        resumenAlerta.classList.toggle('hidden', !usaSobregiro && !esAvanceTC);
         if (usaSobregiro) {
             resumenAlerta.textContent = `Atención: esta transferencia usa ${formatoCOP.format(monto - origen.saldo)} de tu sobregiro (hasta 20% sobre el saldo). Úsalo con cuidado.`;
+        } else if (esAvanceTC) {
+            resumenAlerta.textContent = `Operación de Avance: Se desembolsará el monto de tu Tarjeta de Crédito y se acreditará inmediatamente a la cuenta de destino.`;
         }
     }
 
