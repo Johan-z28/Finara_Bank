@@ -9,5 +9,8 @@
         <module name="Terminal" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="Terminal" target="26" />
+    </bytecodeTargetLevel>
   </component>
 </project>
