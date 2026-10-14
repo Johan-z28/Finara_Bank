@@ -151,99 +151,79 @@
     </header>
 
     <!-- CONTENIDO: SOLICITAR PRODUCTOS FINANCIEROS (CUENTAS Y TARJETAS) -->
+    <!-- CONTENIDO: SOLICITAR PRODUCTOS FINANCIEROS (CUENTAS Y TARJETAS) -->
     <main class="card-request-container">
         <div class="request-header">
-            <span class="badge-gold" style="display: inline-flex; align-items: center; gap: 6px; margin-bottom: 0.6rem; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; background: rgba(229,169,60,0.15); color: #e5a93c; border: 1px solid rgba(229,169,60,0.3);">
-                <i class="fa-solid fa-shapes"></i> Portafolio Finara Bank
-            </span>
+        <span class="badge-gold" style="display: inline-flex; align-items: center; gap: 6px; margin-bottom: 0.6rem; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; background: rgba(229,169,60,0.15); color: #e5a93c; border: 1px solid rgba(229,169,60,0.3);">
+            <i class="fa-solid fa-shapes"></i> Portafolio Finara Bank
+        </span>
             <h1>Solicitar Productos</h1>
             <p>Abre tus cuentas bancarias y solicita tus tarjetas de forma 100% digital e inmediata.</p>
         </div>
 
-        <!-- SECCIÓN 1: CUENTAS BANCARIAS -->
-        <div style="margin-bottom: 2.8rem;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem;">
-                <div>
-                    <h2 style="font-size: 1.25rem; font-weight: 600; color: #fff;">1. Cuentas Bancarias</h2>
-                    <p style="font-size: 0.85rem; color: #8a8f99;">Abre una o ambas cuentas para gestionar tus fondos diarios.</p>
+        <!-- UN SOLO GRID DE 4 COLUMNAS PARA TODO -->
+        <div class="catalog-grid" style="grid-template-columns: repeat(4, 1fr) !important; gap: 1.5rem; width: 100%;">
+
+            <!-- 1. Cuenta de Ahorros -->
+            <div class="card-option-box" data-account="ahorros">
+                <div class="card-content-top">
+                    <span class="card-type-tag" style="background: rgba(52, 211, 153, 0.15); color: #34d399;"><i class="fa-solid fa-piggy-bank"></i> Ahorros</span>
+                    <h3>Cuenta de Ahorros</h3>
+                    <p>Rentabiliza tu dinero con total disponibilidad y acceso a transferencias inmediatas.</p>
+                    <ul class="card-benefits">
+                        <li><i class="fa-solid fa-check"></i> Cero cuota de manejo</li>
+                        <li><i class="fa-solid fa-check"></i> Rentabilidad sobre saldo</li>
+                        <li><i class="fa-solid fa-check"></i> Incluye Tarjeta Débito</li>
+                    </ul>
                 </div>
+                <button class="request-card-btn" id="btnAperturarAhorros" data-action="aperturar-ahorros">Aperturar</button>
             </div>
 
-            <div class="catalog-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));">
-                <!-- Cuenta de Ahorros -->
-                <div class="card-option-box" data-account="ahorros">
-                    <div class="card-content-top">
-                        <span class="card-type-tag" style="background: rgba(52, 211, 153, 0.15); color: #34d399;"><i class="fa-solid fa-piggy-bank"></i> Ahorros</span>
-                        <h3>Cuenta de Ahorros</h3>
-                        <p>Rentabiliza tu dinero con total disponibilidad y acceso a transferencias inmediatas.</p>
-                        <ul class="card-benefits">
-                            <li><i class="fa-solid fa-check"></i> Cero cuota de manejo</li>
-                            <li><i class="fa-solid fa-check"></i> Rentabilidad sobre saldo diario</li>
-                            <li><i class="fa-solid fa-check"></i> Incluye opción de Tarjeta Débito</li>
-                        </ul>
-                    </div>
-                    <button class="request-card-btn" id="btnAperturarAhorros" data-action="aperturar-ahorros">Aperturar Cuenta de Ahorros</button>
+            <!-- 2. Cuenta Corriente -->
+            <div class="card-option-box" data-account="corriente">
+                <div class="card-content-top">
+                    <span class="card-type-tag" style="background: rgba(96, 165, 250, 0.15); color: #60a5fa;"><i class="fa-solid fa-building-columns"></i> Corriente</span>
+                    <h3>Cuenta Corriente</h3>
+                    <p>Herramienta diseñada para transacciones ágiles con cupo de sobregiro.</p>
+                    <ul class="card-benefits">
+                        <li><i class="fa-solid fa-check"></i> Sobregiro autorizado</li>
+                        <li><i class="fa-solid fa-check"></i> Transferencias directas</li>
+                        <li><i class="fa-solid fa-check"></i> Incluye Tarjeta Corriente</li>
+                    </ul>
                 </div>
-
-                <!-- Cuenta Corriente -->
-                <div class="card-option-box" data-account="corriente">
-                    <div class="card-content-top">
-                        <span class="card-type-tag" style="background: rgba(96, 165, 250, 0.15); color: #60a5fa;"><i class="fa-solid fa-building-columns"></i> Corriente</span>
-                        <h3>Cuenta Corriente</h3>
-                        <p>Herramienta diseñada para transacciones ágiles con posibilidad de cupo de sobregiro.</p>
-                        <ul class="card-benefits">
-                            <li><i class="fa-solid fa-check"></i> Sobregiro bancario autorizado</li>
-                            <li><i class="fa-solid fa-check"></i> Chequera y transferencias directas</li>
-                            <li><i class="fa-solid fa-check"></i> Incluye opción de Tarjeta Corriente</li>
-                        </ul>
-                    </div>
-                    <button class="request-card-btn" id="btnAperturarCorriente" data-action="aperturar-corriente">Aperturar Cuenta Corriente</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- SECCIÓN 2: TARJETAS Y CRÉDITOS FINANCIEROS -->
-        <div>
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem;">
-                <div>
-                    <h2 style="font-size: 1.25rem; font-weight: 600; color: #fff;">2. Tarjetas y Financiación</h2>
-                    <p style="font-size: 0.85rem; color: #8a8f99;">Potencia tu capacidad financiera con tarjetas de crédito y préstamos a tu medida.</p>
-                </div>
+                <button class="request-card-btn" id="btnAperturarCorriente" data-action="aperturar-corriente">Aperturar</button>
             </div>
 
-            <div class="catalog-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));">
-                <!-- Tarjeta: Crédito Gold -->
-                <div class="card-option-box" data-card="credito">
-                    <div class="card-content-top">
-                        <span class="card-type-tag" style="background: rgba(229,169,60,0.15); color: #e5a93c;"><i class="fa-solid fa-credit-card"></i> Crédito</span>
-                        <h3>Tarjeta de Crédito Gold</h3>
-                        <p>Financia tus proyectos y compras con líneas de crédito flexibles y acumulación de puntos.</p>
-                        <ul class="card-benefits">
-                            <li><i class="fa-solid fa-check"></i> Cupo preaprobado dinámico</li>
-                            <li><i class="fa-solid fa-check"></i> Asistencia en viajes internacional</li>
-                            <li><i class="fa-solid fa-check"></i> Avances de efectivo hasta el 50%</li>
-                            <li><i class="fa-solid fa-check"></i> 2% de cashback en compras</li>
-                        </ul>
-                    </div>
-                    <button class="request-card-btn" data-action="solicitar-credito">Solicitar Crédito</button>
+            <!-- 3. Tarjeta de Crédito Gold -->
+            <div class="card-option-box" data-card="credito">
+                <div class="card-content-top">
+                    <span class="card-type-tag" style="background: rgba(229,169,60,0.15); color: #e5a93c;"><i class="fa-solid fa-credit-card"></i> Crédito</span>
+                    <h3>Tarjeta Crédito Gold</h3>
+                    <p>Financia tus proyectos y compras con líneas flexibles y puntos.</p>
+                    <ul class="card-benefits">
+                        <li><i class="fa-solid fa-check"></i> Cupo preaprobado dinámico</li>
+                        <li><i class="fa-solid fa-check"></i> Asistencia internacional</li>
+                        <li><i class="fa-solid fa-check"></i> 2% de cashback en compras</li>
+                    </ul>
                 </div>
-
-                <!-- Crédito de Libre Inversión / Préstamos -->
-                <div class="card-option-box" data-credito-personal="true">
-                    <div class="card-content-top">
-                        <span class="card-type-tag" style="background: rgba(168, 85, 247, 0.15); color: #c084fc;"><i class="fa-solid fa-hand-holding-dollar"></i> Préstamos</span>
-                        <h3>Crédito de Libre Destino</h3>
-                        <p>Financiación inmediata con tasas preferenciales para libre inversión, estudio o vehículo.</p>
-                        <ul class="card-benefits">
-                            <li><i class="fa-solid fa-check"></i> Aprobación 100% digital e inmediata</li>
-                            <li><i class="fa-solid fa-check"></i> Plazos flexibles desde 12 hasta 60 meses</li>
-                            <li><i class="fa-solid fa-check"></i> Tasa de interés preferencial fija</li>
-                            <li><i class="fa-solid fa-check"></i> Desembolso directo en tu cuenta</li>
-                        </ul>
-                    </div>
-                    <button class="request-card-btn" id="btnSolicitarPrestamo" style="background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4);">Simular y Solicitar Crédito</button>
-                </div>
+                <button class="request-card-btn" data-action="solicitar-credito">Solicitar</button>
             </div>
+
+            <!-- 4. Crédito de Libre Destino -->
+            <div class="card-option-box" data-credito-personal="true">
+                <div class="card-content-top">
+                    <span class="card-type-tag" style="background: rgba(168, 85, 247, 0.15); color: #c084fc;"><i class="fa-solid fa-hand-holding-dollar"></i> Préstamos</span>
+                    <h3>Crédito Libre Destino</h3>
+                    <p>Financiación inmediata con tasas preferenciales para estudio o vehículo.</p>
+                    <ul class="card-benefits">
+                        <li><i class="fa-solid fa-check"></i> Aprobación digital 100%</li>
+                        <li><i class="fa-solid fa-check"></i> Plazos de 12 a 60 meses</li>
+                        <li><i class="fa-solid fa-check"></i> Tasa de interés fija</li>
+                    </ul>
+                </div>
+                <button class="request-card-btn" id="btnSolicitarPrestamo" style="background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4);">Simular</button>
+            </div>
+
         </div>
     </main>
 </div>
