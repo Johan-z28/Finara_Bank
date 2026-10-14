@@ -34,9 +34,9 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="solicitudTarjeta.html" class="nav-link active" data-route="saldos" title="Solicitar Tarjeta">
+                    <a href="solicitudTarjeta.html" class="nav-link" data-route="saldos" title="Solicitar Tarjeta">
                         <i class="fa-regular fa-credit-card"></i>
-                        <span>Solcitar Tarjeta</span>
+                        <span>Solicitar Tarjeta</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -153,6 +153,14 @@
                 <div class="mov-campo">
                     <label for="filtroPeriodo">Periodo</label>
                     <select id="filtroPeriodo"></select>
+                </div>
+                <div class="mov-campo">
+                    <label for="filtroTipo">Tipo de movimiento</label>
+                    <select id="filtroTipo">
+                        <option value="todos">Todos los movimientos</option>
+                        <option value="INGRESO">Solo Ingresos</option>
+                        <option value="EGRESO">Solo Egresos</option>
+                    </select>
                 </div>
                 <div class="mov-campo">
                     <label for="filtroOrden">Orden</label>

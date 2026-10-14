@@ -29,8 +29,13 @@
 .mov-filtros {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 1.4rem;
+    gap: 1.2rem;
+    margin-bottom: 1.6rem;
+    background: var(--bg-card-dark);
+    border: 1px solid rgba(229, 169, 60, 0.25);
+    border-radius: var(--radius-lg);
+    padding: 1.2rem;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
 }
 
 .mov-campo {
@@ -44,53 +49,74 @@
 .mov-campo label {
     color: var(--text-muted);
     font-size: 0.75rem;
+    font-weight: 500;
 }
 
 .mov-campo select {
-    background: var(--bg-card-dark);
+    background: #090c12;
     color: var(--text-white);
-    border: 1px solid var(--border-dark);
+    border: 1px solid rgba(229, 169, 60, 0.3);
     border-radius: 10px;
-    padding: 10px 12px;
+    padding: 11px 14px;
     font-family: inherit;
     font-size: 0.85rem;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .mov-campo select:hover,
 .mov-campo select:focus {
     border-color: var(--gold-main);
+    box-shadow: 0 0 10px rgba(229, 169, 60, 0.25);
     outline: none;
 }
 
-/* ----- Resumen del periodo (mismo patrón que las tarjetas de Saldos) ----- */
+/* ----- Resumen del periodo con estética dorada premium ----- */
 .mov-resumen {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-    gap: 1.2rem;
-    margin-bottom: 1.4rem;
+    gap: 1.4rem;
+    margin-bottom: 1.6rem;
 }
 
 .mov-total {
     --acento: var(--gold-main);
     background: var(--bg-card-dark);
-    border: 1px solid var(--border-dark);
-    border-top: 3px solid var(--acento);
+    border: 1px solid var(--acento);
     border-radius: var(--radius-lg);
     padding: 1.4rem;
     display: flex;
     flex-direction: column;
     gap: 1.6rem;
-    transition: transform 0.2s ease, border-color 0.2s ease;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .mov-total:hover {
-    transform: translateY(-3px);
-    border-color: var(--acento);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
 }
 
-.mov-total--ingreso { --acento: var(--ingreso); }
-.mov-total--egreso { --acento: var(--egreso); }
+.mov-total--ingreso {
+    --acento: #34d399;
+    border-color: rgba(52, 211, 153, 0.5);
+}
+
+.mov-total--ingreso:hover {
+    border-color: #34d399;
+    box-shadow: 0 8px 30px rgba(52, 211, 153, 0.2);
+}
+
+.mov-total--egreso {
+    --acento: #f87171;
+    border-color: rgba(248, 113, 113, 0.5);
+}
+
+.mov-total--egreso:hover {
+    border-color: #f87171;
+    box-shadow: 0 8px 30px rgba(248, 113, 113, 0.2);
+}
 
 .mov-total__head {
     display: flex;
@@ -133,12 +159,12 @@
     overflow-wrap: anywhere;
 }
 
-/* ----- Tabla ----- */
+/* ----- Tabla con marco premium dorado ----- */
 .mov-tabla-wrap {
     background: var(--bg-card-dark);
-    border: 1px solid var(--border-dark);
-    border-top: 3px solid var(--gold-main);
+    border: 1px solid rgba(229, 169, 60, 0.35);
     border-radius: var(--radius-lg);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     overflow-x: auto;
 }
 
