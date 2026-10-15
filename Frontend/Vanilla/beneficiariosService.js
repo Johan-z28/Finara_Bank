@@ -63,11 +63,12 @@ function guardarTodosLosBeneficiarios(lista) {
 
 /**
  * Obtiene los beneficiarios que pertenecen de manera exclusiva al usuario autenticado.
+ * Por defecto filtra los beneficiarios con estado ACTIVO (respetando borrado lógico).
  */
-export function obtenerBeneficiariosUsuario() {
+export function obtenerBeneficiariosUsuario(incluirInactivos = false) {
     const username = obtenerUsernameActivo();
     const todos = leerTodosLosBeneficiarios();
-    return todos.filter(b => b.usuarioPropietario === username);
+    return todos.filter(b => b.usuarioPropietario === username && (incluirInactivos || b.estado !== 'INACTIVO'));
 }
 
 /**
@@ -193,27 +194,89 @@ export async function registrarBeneficiario(datos) {
     return nuevoBeneficiario;
 }
 
+const CLAVE_AUDITORIA = 'finara_auditoria';
+
 /**
- * Elimina un beneficiario del usuario actual.
+ * Registra un evento en el log de auditoría del sistema en localStorage.
  */
-export function eliminarBeneficiario(idBeneficiario) {
+export function registrarLogAuditoria({ accion, detalle, modulo = 'BENEFICIARIOS', estado = 'EXITOSO' }) {
+    try {
+        const username = obtenerUsernameActivo();
+        const logsRaw = JSON.parse(localStorage.getItem(CLAVE_AUDITORIA)) || [];
+        const nuevoLog = {
+            id: `log_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+            fechaHora: new Date().toISOString(),
+            usuario: username,
+            modulo,
+            accion,
+            detalle,
+            estado,
+            ip: '127.0.0.1',
+            navegador: navigator.userAgent.split(' ')[0] || 'Browser'
+        };
+        logsRaw.unshift(nuevoLog);
+        localStorage.setItem(CLAVE_AUDITORIA, JSON.stringify(logsRaw.slice(0, 50)));
+        return nuevoLog;
+    } catch {
+        return null;
+    }
+}
+
+export function obtenerLogsAuditoria(modulo = 'BENEFICIARIOS') {
+    try {
+        const username = obtenerUsernameActivo();
+        const logsRaw = JSON.parse(localStorage.getItem(CLAVE_AUDITORIA)) || [];
+        return logsRaw.filter(l => l.usuario === username && (!modulo || l.modulo === modulo));
+    } catch {
+        return [];
+    }
+}
+
+/**
+ * Elimina un beneficiario del usuario actual con borrado lógico o físico y auditoría.
+ */
+export function eliminarBeneficiario(idBeneficiario, { tipoBorrado = 'LOGICO', motivo = 'Eliminación voluntaria por el usuario' } = {}) {
     const username = obtenerUsernameActivo();
     const todos = leerTodosLosBeneficiarios();
     const index = todos.findIndex(b => b.id === idBeneficiario && b.usuarioPropietario === username);
 
     if (index === -1) {
+        registrarLogAuditoria({
+            accion: 'ELIMINAR_BENEFICIARIO_FALLIDO',
+            detalle: `Intento de eliminación fallido: Beneficiario ${idBeneficiario} no encontrado o no autorizado.`,
+            estado: 'FALLIDO'
+        });
         throw new Error('El beneficiario no existe o no tienes autorización para eliminarlo.');
     }
 
-    const eliminado = todos[index];
-    todos.splice(index, 1);
+    const beneficiario = todos[index];
+
+    if (tipoBorrado === 'LOGICO') {
+        // Borrado lógico: se marca inactivo y se registra fecha de eliminación
+        beneficiario.estado = 'INACTIVO';
+        beneficiario.fechaEliminacion = new Date().toISOString();
+        beneficiario.motivoEliminacion = motivo;
+    } else {
+        // Borrado físico: remoción total de la colección
+        todos.splice(index, 1);
+    }
+
     guardarTodosLosBeneficiarios(todos);
 
+    // Registrar en el log de auditoría del sistema
+    registrarLogAuditoria({
+        accion: tipoBorrado === 'LOGICO' ? 'DESACTIVAR_BENEFICIARIO' : 'ELIMINAR_BENEFICIARIO_FISICO',
+        detalle: `Beneficiario "${beneficiario.nombre}" (${beneficiario.banco} - •••• ${beneficiario.numeroCuenta.slice(-4)}) eliminado (${tipoBorrado}). Motivo: ${motivo}.`,
+        estado: 'EXITOSO'
+    });
+
+    // Guardar notificación oficial en localStorage
     guardarNotificacion({
         titulo: 'Beneficiario Eliminado',
-        mensaje: `Has eliminado a ${eliminado.nombre} de tu lista de beneficiarios inscritos.`,
+        mensaje: `Has eliminado a ${beneficiario.nombre} (${beneficiario.banco}) de tu lista de transferencias frecuentes.`,
         tipo: 'alerta'
     });
 
-    return eliminado;
+    return beneficiario;
 }
+
