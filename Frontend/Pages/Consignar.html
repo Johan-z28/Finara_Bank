@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -16,7 +16,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="general-body">
-
 <!-- ======= SIDEBAR DE NAVEGACIÓN ======= -->
 <aside class="sidebar">
     <button class="sidebar-edge-toggle" id="sidebarCollapseBtn" aria-label="Colapsar menú" title="Alternar menú">
@@ -29,55 +28,73 @@
     <nav class="sidebar-nav">
         <ul>
             <li class="nav-item">
-                <a href="Dashboard.html" class="nav-link" title="Dashboard">
+                <a href="Dashboard.html" class="nav-link" data-route="dashboard" title="Dashboard">
                     <i class="fa-solid fa-house"></i>
                     <span>Dashboard</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="solicitudTarjeta.html" class="nav-link" title="Solicitar Tarjeta">
+                <a href="solicitudTarjeta.html" class="nav-link" data-route="productos" title="Solicitar Productos">
                     <i class="fa-regular fa-credit-card"></i>
-                    <span>Solicitar Tarjeta</span>
+                    <span>Solicitar Productos</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="Saldos.html" class="nav-link" title="Saldos">
+                <a href="Saldos.html" class="nav-link" data-route="saldos" title="Saldos">
                     <i class="fa-regular fa-credit-card"></i>
                     <span>Saldos</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="Transferencias.html" class="nav-link" title="Transferencias">
+                <a href="Transferencias.html" class="nav-link" data-route="transferencias" title="Transferencias">
                     <i class="fa-solid fa-arrows-rotate"></i>
                     <span>Transferencias</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="Consignar.html" class="nav-link active" title="Consignar">
+                <a href="Consignar.html" class="nav-link active" data-route="consignar" title="Consignar">
                     <i class="fa-solid fa-wallet"></i>
                     <span>Consignar</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="Retiros.html" class="nav-link" title="Retiros">
+                <a href="Retiros.html" class="nav-link" data-route="retiros" title="Retiros">
                     <i class="fa-solid fa-money-bill-transfer"></i>
                     <span>Retiros</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="Movimientos.html" class="nav-link" title="Movimientos">
+                <a href="Movimientos.html" class="nav-link" data-route="movimientos" title="Movimientos">
                     <i class="fa-solid fa-list-ul"></i>
                     <span>Movimientos</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="Creditos.html" class="nav-link" title="Solicitud de Créditos">
-                    <i class="fa-solid fa-hand-holding-dollar"></i>
-                    <span>Solicitud de Créditos</span>
+                <a href="Presupuesto.html" class="nav-link" data-route="presupuesto" title="Presupuesto">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Presupuesto</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="Beneficios.html" class="nav-link" title="Beneficios">
+                <a href="FondoEmergencia.html" class="nav-link" data-route="fondo" title="Fondo de Emergencia">
+                    <i class="fa-solid fa-shield-heart"></i>
+                    <span>Fondo Emergencia</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="Metas.html" class="nav-link" data-route="metas" title="Metas de Ahorro">
+                    <i class="fa-solid fa-bullseye"></i>
+                    <span>Metas de Ahorro</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="Seguimiento.html" class="nav-link" data-route="seguimiento" title="Seguimiento Financiero">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Seguimiento Financiero</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="Beneficios.html" class="nav-link" data-route="beneficios" title="Beneficios">
                     <i class="fa-regular fa-star"></i>
                     <span>Beneficios</span>
                 </a>
@@ -98,162 +115,17 @@
                 <h2>Hola, <span id="greetingName">Usuario</span></h2>
             </div>
         </div>
-
-        <nav class="sidebar-nav">
-            <ul>
-                <li class="nav-item">
-                    <a href="Dashboard.html" class="nav-link" data-route="dashboard" title="Dashboard">
-                        <i class="fa-solid fa-house"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="solicitudTarjeta.html" class="nav-link active" data-route="saldos" title="Solicitar Tarjeta">
-                        <i class="fa-regular fa-credit-card"></i>
-                        <span>Solcitar Tarjeta</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="Saldos.html" class="nav-link" data-route="saldos" title="Saldos">
-                        <i class="fa-regular fa-credit-card"></i>
-                        <span>Saldos</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="Transferencias.html" class="nav-link" data-route="transferencias" title="Transferencias">
-                        <i class="fa-solid fa-arrows-rotate"></i>
-                        <span>Transferencias</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="Consignar.html" class="nav-link active" data-route="consignar" title="Consignar">
-                        <i class="fa-solid fa-wallet"></i>
-                        <span>Consignar</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="Retiros.html" class="nav-link" data-route="retiros" title="Retiros">
-                        <i class="fa-solid fa-money-bill-transfer"></i>
-                        <span>Retiros</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="Movimientos.html" class="nav-link" data-route="movimientos" title="Movimientos">
-                        <i class="fa-solid fa-list-ul"></i>
-                        <span>Movimientos</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="Creditos.html" class="nav-link" data-route="creditos" title="Solicitud de Créditos">
-                        <i class="fa-solid fa-hand-holding-dollar"></i>
-                        <span>Solicitud de Créditos</span>
-                    </a>
-                    <a href="../index.html" class="dropdown-item logout-item" id="logoutBtn">
-                        <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
-                    </a>
-                </div>
-            </div>
-        </div>
     </header>
 
-    <!-- CONTENIDO PRINCIPAL: CONSIGNACIÓN DIGITAL -->
-    <main class="main-content">
-        <div class="deposit-page-header">
-            <h1>Depósito Digital</h1>
-            <p>Ingresa fondos a tu cuenta de manera rápida, segura y sin comisiones ocultas.</p>
-        </div>
-
-        <div class="deposit-container-grid">
-            <!-- Columna Izquierda: Formulario de Consignación -->
-            <div class="deposit-card-form">
-                <div class="card-title-box">
-                    <div class="card-icon-gold">
-                        <i class="fa-solid fa-wallet"></i>
-                    </div>
-                    <div>
-                        <h3>Nueva Consignación</h3>
-                        <span>Completa los datos de la transacción</span>
-                    </div>
-                </div>
-
-                <form id="formConsignacion" class="deposit-form">
-                    <div class="form-group">
-                        <label for="cuentaOrigen">Selecciona tu Tarjeta / Cuenta Origen</label>
-                        <select id="cuentaOrigen" required>
-                            <option value="" disabled selected>Cargando tus tarjetas...</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="cuentaDestino">Cuenta o Correo Destino (Beneficiario)</label>
-                        <input type="text" id="cuentaDestino" placeholder="Ej. usuario@admin.com o N° de tarjeta" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="metodoPago">Método de Consignación</label>
-                        <div class="payment-methods-grid">
-                            <label class="method-option active">
-                                <input type="radio" name="metodo" value="pse" checked>
-                                <i class="fa-solid fa-building-columns"></i>
-                                <span>PSE / Banco</span>
-                            </label>
-                            <label class="method-option">
-                                <input type="radio" name="metodo" value="tarjeta">
-                                <i class="fa-regular fa-credit-card"></i>
-                                <span>Tarjeta Débito</span>
-                            </label>
-                            <label class="method-option">
-                                <input type="radio" name="metodo" value="efectivo">
-                                <i class="fa-solid fa-store"></i>
-                                <span>Punto Efectivo</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="montoConsignar">Monto a Consignar ($ COP)</label>
-                        <div class="amount-input-wrapper">
-                            <span>$</span>
-                            <input type="number" id="montoConsignar" placeholder="Ej. 150000" min="1000" required>
-                        </div>
-                        <small class="helper-text">Monto mínimo: $ 10.000 COP</small>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="descripcionConsignacion">Descripción o Motivo (Opcional)</label>
-                        <input type="text" id="descripcionConsignacion" placeholder="Ej. Pago de servicios, transferencia...">
-                    </div>
-
-                    <button type="submit" class="btn-submit-deposit">
-                        <i class="fa-solid fa-circle-check"></i> Procesar Consignación
-                    </button>
-                </form>
+    <!-- ======= CONTENIDO PRINCIPAL DE CONSIGNACIÓN ======= -->
+    <main class="content-container" style="padding: 2rem;">
+        <div class="info-widget help-widget">
+            <div class="widget-header">
+                <i class="fa-solid fa-headset"></i>
+                <h4>¿Necesitas asistencia?</h4>
             </div>
-
-            <!-- Columna Derecha: Resumen y Consejos -->
-            <div class="deposit-sidebar-info">
-                <div class="info-widget summary-widget">
-                    <div class="widget-header">
-                        <i class="fa-solid fa-shield-halved"></i>
-                        <h4>Garantía Finara Bank</h4>
-                    </div>
-                    <p>Tus consignaciones digitales se procesan de forma inmediata mediante protocolos de encriptación bancaria de alta seguridad.</p>
-                    <ul class="security-benefits">
-                        <li><i class="fa-solid fa-check"></i> Acreditación en tiempo real</li>
-                        <li><i class="fa-solid fa-check"></i> Sin cobro de cuota de manejo</li>
-                        <li><i class="fa-solid fa-check"></i> Soporte 24/7 disponible</li>
-                    </ul>
-                </div>
-
-                <div class="info-widget help-widget">
-                    <div class="widget-header">
-                        <i class="fa-solid fa-headset"></i>
-                        <h4>¿Necesitas asistencia?</h4>
-                    </div>
-                    <p>Si tienes inconvenientes con el reflejo de tu dinero, contacta a nuestro asesor virtual o comunícate a la línea dorada.</p>
-                    <button type="button" class="btn-support">Contactar Asesor</button>
-                </div>
-            </div>
+            <p>Si tienes inconvenientes con el reflejo de tu dinero, contacta a nuestro asesor virtual o comunícate a la línea dorada.</p>
+            <button type="button" class="btn-support">Contactar Asesor</button>
         </div>
     </main>
 </div>

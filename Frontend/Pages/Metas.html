@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asesoría de Metas | Finara Bank</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="../Style/image/favicon.svg">
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../Style/Metas.css">
+    <!-- SweetAlert2 CSS y JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body class="general-body">
+
+    <!-- ======= SIDEBAR DE NAVEGACIÓN ======= -->
+    <aside class="sidebar">
+        <button class="sidebar-edge-toggle" id="sidebarCollapseBtn" aria-label="Colapsar menú" title="Alternar menú">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
+        <div class="sidebar-header">
+            <img src="../Style/image/Logo_finara.svg" alt="Finara Logo" class="sidebar-logo">
+            <img src="../Style/image/favicon.svg" alt="Finara Icon" class="sidebar-logo-small">
+        </div>
+
+        <nav class="sidebar-nav">
+            <ul>
+                <li class="nav-item">
+                    <a href="Dashboard.html" class="nav-link" data-route="dashboard" title="Dashboard">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="solicitudTarjeta.html" class="nav-link" data-route="productos" title="Solicitar Productos">
+                        <i class="fa-regular fa-credit-card"></i>
+                        <span>Solicitar Productos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Saldos.html" class="nav-link" data-route="saldos" title="Saldos">
+                        <i class="fa-regular fa-credit-card"></i>
+                        <span>Saldos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Transferencias.html" class="nav-link" data-route="transferencias" title="Transferencias">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <span>Transferencias</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Consignar.html" class="nav-link" data-route="consignar" title="Consignar">
+                        <i class="fa-solid fa-wallet"></i>
+                        <span>Consignar</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Retiros.html" class="nav-link" data-route="retiros" title="Retiros">
+                        <i class="fa-solid fa-money-bill-transfer"></i>
+                        <span>Retiros</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Movimientos.html" class="nav-link" data-route="movimientos" title="Movimientos">
+                        <i class="fa-solid fa-list-ul"></i>
+                        <span>Movimientos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Presupuesto.html" class="nav-link" data-route="presupuesto" title="Presupuesto">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Presupuesto</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="FondoEmergencia.html" class="nav-link" data-route="fondo" title="Fondo de Emergencia">
+                        <i class="fa-solid fa-shield-heart"></i>
+                        <span>Fondo Emergencia</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Metas.html" class="nav-link active" data-route="metas" title="Metas de Ahorro">
+                        <i class="fa-solid fa-bullseye"></i>
+                        <span>Metas de Ahorro</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Seguimiento.html" class="nav-link" data-route="seguimiento" title="Seguimiento Financiero">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Seguimiento Financiero</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Beneficios.html" class="nav-link" data-route="beneficios" title="Beneficios">
+                        <i class="fa-regular fa-star"></i>
+                        <span>Beneficios</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- ======= CONTENEDOR PRINCIPAL ======= -->
+    <div class="main-wrapper">
+
+        <!-- ======= NAVBAR SUPERIOR ======= -->
+        <header class="dashboard-navbar">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menú navegación">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="user-greeting">
+                    <h2>Hola, <span id="greetingName">Usuario</span></h2>
+                </div>
+            </div>
+
+            <div class="navbar-actions">
+                <button class="navbar-chatbot-btn" id="openChatbotNavBtn">
+                    <i class="fa-solid fa-comment-dots"></i>
+                    <span>Asesoría Financiera</span>
+                </button>
+
+                <button class="icon-btn" aria-label="Notificaciones">
+                    <i class="fa-regular fa-bell"></i>
+                </button>
+
+                <div class="profile-menu-container">
+                    <button class="profile-btn" id="profileMenuBtn">
+                        <div class="avatar-placeholder" id="avatarContainer">
+                            <img src="" alt="Foto de perfil" id="userAvatarImg" class="profile-img hidden">
+                            <i class="fa-solid fa-user profile-icon" id="userAvatarIcon"></i>
+                        </div>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="dropdown-header">
+                            <strong id="dropdownUserName">Usuario</strong>
+                        </div>
+                        <hr>
+                        <a href="Perfil.html" class="dropdown-item" data-route="perfil">
+                            <i class="fa-regular fa-user"></i> Ver Perfil
+                        </a>
+                        <a href="../index.html" class="dropdown-item logout-item">
+                            <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ======= VISTA PRINCIPAL DE ASESORÍA DE METAS (HU-28) ======= -->
+        <main class="main-content" id="metasApp">
+            <div class="metas-header">
+                <div>
+                    <h1>Asesoría para Alcanzar una Meta</h1>
+                    <p class="metas-subtitle">Proyecta tus objetivos financieros con plazo e importe, calcula tu brecha restante y planifica tu ahorro periódico.</p>
+                </div>
+                <button type="button" class="btn-nueva-meta" id="btnAbrirModalNuevaMeta">
+                    <i class="fa-solid fa-plus"></i> Nueva Meta
+                </button>
+            </div>
+
+            <!-- Panel de Resumen Global de Metas -->
+            <section class="metas-resumen-grid">
+                <div class="metas-resumen-card">
+                    <div class="card-icono oro"><i class="fa-solid fa-bullseye"></i></div>
+                    <div>
+                        <span class="label-muted">Monto Total en Metas</span>
+                        <h3 class="valor-metas color-dorado" id="totalMontoMetas">$ 0</h3>
+                        <small id="cantMetasTexto">0 metas activas</small>
+                    </div>
+                </div>
+
+                <div class="metas-resumen-card">
+                    <div class="card-icono verde"><i class="fa-solid fa-wallet"></i></div>
+                    <div>
+                        <span class="label-muted">Saldo Asignado Acumulado</span>
+                        <h3 class="valor-metas color-verde" id="totalSaldoAsignado">$ 0</h3>
+                        <small>Cuentas vinculadas</small>
+                    </div>
+                </div>
+
+                <div class="metas-resumen-card">
+                    <div class="card-icono azul"><i class="fa-solid fa-arrows-split-up-and-left"></i></div>
+                    <div>
+                        <span class="label-muted">Brecha Restante Global</span>
+                        <h3 class="valor-metas" id="totalBrechaGlobal">$ 0</h3>
+                        <small id="progresoGlobalTexto">0% alcanzado</small>
+                    </div>
+                </div>
+
+                <div class="metas-resumen-card">
+                    <div class="card-icono purpura"><i class="fa-solid fa-calendar-check"></i></div>
+                    <div>
+                        <span class="label-muted">Ahorro Mensual Recomendado</span>
+                        <h3 class="valor-metas color-dorado" id="totalAhorroMensualRequerido">$ 0</h3>
+                        <small>Suma de aportes sugeridos</small>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección de Proyección Interactiva de Metas -->
+            <section class="seccion-proyeccion-card">
+                <div class="seccion-head">
+                    <div class="seccion-head-info">
+                        <div class="badge-seccion"><i class="fa-solid fa-chart-line"></i></div>
+                        <div>
+                            <h3>Simulador y Proyección de Metas</h3>
+                            <p>Modifica el plazo y el importe objetivo para ver la proyección y el plan de ahorro sugerido en tiempo real.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="formSimuladorMeta" class="simulador-grid">
+                    <div class="campo-grupo">
+                        <label for="simNombreMeta">Nombre de la Meta</label>
+                        <input type="text" id="simNombreMeta" placeholder="Ej. Comprar Auto, Maestría, Vacaciones" required>
+                    </div>
+
+                    <div class="campo-grupo">
+                        <label for="simCategoriaMeta">Categoría</label>
+                        <select id="simCategoriaMeta">
+                            <option value="Vehículo">🚗 Vehículo</option>
+                            <option value="Viaje">✈️ Viaje o Vacaciones</option>
+                            <option value="Vivienda">🏠 Vivienda / Remodelación</option>
+                            <option value="Educación">🎓 Educación / Cursos</option>
+                            <option value="Inversión">📈 Inversión / Negocio</option>
+                            <option value="Tecnología">💻 Tecnología</option>
+                            <option value="Otro">🎯 Otro Objetivo</option>
+                        </select>
+                    </div>
+
+                    <div class="campo-grupo">
+                        <label for="simMontoObjetivo">Importe Objetivo / Meta (COP)</label>
+                        <div class="input-moneda">
+                            <span>$</span>
+                            <input type="text" id="simMontoObjetivo" placeholder="0" required inputmode="numeric">
+                        </div>
+                    </div>
+
+                    <div class="campo-grupo">
+                        <label for="simPlazoMeses">Plazo Deseado (Meses)</label>
+                        <div class="plazo-slider-box">
+                            <input type="range" id="simPlazoSlider" min="1" max="60" value="12" step="1">
+                            <div class="plazo-badge-display">
+                                <strong id="simPlazoTexto">12</strong> meses
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="campo-grupo campo-completo">
+                        <label for="simCuentaAsignada">Conectar con Saldo Asignado de Cuenta</label>
+                        <select id="simCuentaAsignada" required>
+                            <!-- Cuentas de Ahorro y Corriente cargadas dinámicamente -->
+                        </select>
+                        <small class="hint-texto">El simulador conectará el saldo disponible de esta cuenta para calcular la brecha y el plan exacto.</small>
+                    </div>
+                </form>
+
+                <!-- Tarjeta de Asesoría Financiera Resultante de la Proyección -->
+                <div class="resultado-proyeccion-box" id="resultadoProyeccionBox">
+                    <div class="resultado-head">
+                        <div>
+                            <span class="etiqueta-resultado">Plan de Asesoría Financiera</span>
+                            <h4 id="resTituloMeta">Proyección: Comprar Vehículo</h4>
+                        </div>
+                        <div class="badge-estado" id="resBadgeEstado">
+                            <i class="fa-solid fa-clock"></i> <span id="resTextoEstado">En planificación</span>
+                        </div>
+                    </div>
+
+                    <!-- Métricas de brecha y saldo -->
+                    <div class="metricas-brecha-grid">
+                        <div class="metrica-brecha-caja">
+                            <span class="m-label">Meta Total</span>
+                            <strong class="m-val color-dorado" id="resMontoTotal">$ 0</strong>
+                            <small id="resPlazoMesesTexto">Plazo de 12 meses</small>
+                        </div>
+                        <div class="metrica-brecha-caja">
+                            <span class="m-label">Saldo Asignado Actual</span>
+                            <strong class="m-val color-verde" id="resSaldoAsignado">$ 0</strong>
+                            <small id="resCuentaDesc">Cuenta conectada</small>
+                        </div>
+                        <div class="metrica-brecha-caja">
+                            <span class="m-label">Brecha Restante por Cubrir</span>
+                            <strong class="m-val" id="resBrechaRestante">$ 0</strong>
+                            <small id="resPorcentajeAvanceTexto">0% completado</small>
+                        </div>
+                    </div>
+
+                    <!-- Barra de progreso hacia la meta -->
+                    <div class="barra-meta-box">
+                        <div class="barra-meta-labels">
+                            <span>Avance del saldo hacia el importe objetivo</span>
+                            <strong class="color-dorado" id="barraMetaPorcentaje">0%</strong>
+                        </div>
+                        <div class="track-meta">
+                            <div class="fill-meta" id="fillMetaProgreso" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Cuotas de Ahorro Periódico Necesario -->
+                    <div class="cuotas-ahorro-panel">
+                        <h5 class="cuotas-titulo"><i class="fa-solid fa-piggy-bank"></i> Ahorro Periódico Sugerido para Cumplir el Plazo</h5>
+                        <div class="cuotas-grid">
+                            <div class="cuota-card recomendada">
+                                <span class="cuota-frecuencia">Aporte Mensual</span>
+                                <strong class="cuota-monto color-dorado" id="cuotaMensualMonto">$ 0</strong>
+                                <small>Cada mes durante el plazo</small>
+                            </div>
+                            <div class="cuota-card">
+                                <span class="cuota-frecuencia">Aporte Quincenal</span>
+                                <strong class="cuota-monto" id="cuotaQuincenalMonto">$ 0</strong>
+                                <small>2 aportes al mes</small>
+                            </div>
+                            <div class="cuota-card">
+                                <span class="cuota-frecuencia">Aporte Semanal</span>
+                                <strong class="cuota-monto" id="cuotaSemanalMonto">$ 0</strong>
+                                <small>Aporte semanal continuo</small>
+                            </div>
+                            <div class="cuota-card">
+                                <span class="cuota-frecuencia">Aporte Diario (Opcional)</span>
+                                <strong class="cuota-monto" id="cuotaDiarioMonto">$ 0</strong>
+                                <small>Equivalente diario</small>
+                            </div>
+                        </div>
+                        <div class="asesoria-consejo-box">
+                            <i class="fa-solid fa-lightbulb"></i>
+                            <span id="consejoAsesoriaTexto">Para cerrar tu brecha a tiempo, programa transferencias automáticas a tu cuenta asignada el día de pago.</span>
+                        </div>
+                        <div class="proyeccion-fecha-estimada">
+                            <i class="fa-regular fa-calendar-days"></i>
+                            <span>Fecha estimada de cumplimiento: <strong id="resFechaCumplimiento">--</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="acciones-simulador">
+                        <button type="button" class="btn-guardar-proyeccion" id="btnGuardarMetaSimulada">
+                            <i class="fa-solid fa-floppy-disk"></i> Guardar Meta en mi Plan
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Listado de Metas del Usuario -->
+            <section class="mis-metas-section">
+                <div class="mis-metas-head">
+                    <div>
+                        <h3>Mis Metas Activas</h3>
+                        <p>Monitorea y administra tus metas financieras proyectadas.</p>
+                    </div>
+                </div>
+
+                <div class="metas-lista-grid" id="contenedorMetasLista">
+                    <!-- Renderizado dinámico de tarjetas de metas -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script type="module" src="../Vanilla/Metas.js"></script>
+</body>
+
+</html>
