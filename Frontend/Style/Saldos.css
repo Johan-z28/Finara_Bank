@@ -19,6 +19,12 @@
     margin-bottom: 1.8rem;
 }
 
+.saldos-header-acciones {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .saldos-subtitle {
     color: var(--text-muted);
     font-size: 0.85rem;

@@ -38,7 +38,8 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="solicitudTarjeta.html" class="nav-link active" data-route="saldos" title="Solicitar Productos">
+                    <a href="solicitudTarjeta.html" class="nav-link active" data-route="saldos"
+                        title="Solicitar Productos">
                         <i class="fa-regular fa-credit-card"></i>
                         <span>Solicitar Productos</span>
                     </a>
@@ -167,9 +168,15 @@
                     <h1>Consulta de Saldos y Cuentas</h1>
                     <p class="saldos-subtitle">Tus productos bancarios y su saldo disponible.</p>
                 </div>
-                <button class="toggle-saldos" id="toggleSaldos" aria-pressed="false" aria-label="Ocultar saldos">
-                    <i class="fa-regular fa-eye"></i>
-                </button>
+                <div class="saldos-actions-group">
+                    <!-- BOTÓN HU-13: HISTORIAL DE TARJETAS -->
+                    <a href="HistorialTarjetas.html" class="btn-historial-tarjetas">
+                        <i class="fa-regular fa-credit-card"></i> Historial de Tarjetas
+                    </a>
+                    <button class="toggle-saldos" id="toggleSaldos" aria-pressed="false" aria-label="Ocultar saldos">
+                        <i class="fa-regular fa-eye"></i>
+                    </button>
+                </div>
             </div>
 
             <section class="cuentas-grid" id="cuentasLista" aria-live="polite" aria-busy="true"></section>
@@ -190,9 +197,12 @@
                     <div class="analitica-card__body">
                         <div class="distribucion-visual">
                             <div class="barra-distribucion">
-                                <div class="barra-segmento barra-segmento--ahorros" id="segAhorros" style="width: 50%;" title="Cuenta de Ahorros"></div>
-                                <div class="barra-segmento barra-segmento--corriente" id="segCorriente" style="width: 50%;" title="Cuenta Corriente"></div>
-                                <div class="barra-segmento barra-segmento--credito hidden" id="segCredito" style="width: 0%;" title="Tarjeta de Crédito"></div>
+                                <div class="barra-segmento barra-segmento--ahorros" id="segAhorros" style="width: 50%;"
+                                    title="Cuenta de Ahorros"></div>
+                                <div class="barra-segmento barra-segmento--corriente" id="segCorriente"
+                                    style="width: 50%;" title="Cuenta Corriente"></div>
+                                <div class="barra-segmento barra-segmento--credito hidden" id="segCredito"
+                                    style="width: 0%;" title="Tarjeta de Crédito"></div>
                             </div>
 
                             <div class="distribucion-leyenda">
@@ -242,7 +252,8 @@
                     <div class="patrimonio-monto-box">
                         <span class="patrimonio-label">Saldo Total Consolidado</span>
                         <h2 class="patrimonio-valor" id="saldoTotalConsolidado">$ 0</h2>
-                        <span class="patrimonio-badge"><i class="fa-solid fa-arrow-trend-up"></i> Fondos disponibles para operaciones</span>
+                        <span class="patrimonio-badge"><i class="fa-solid fa-arrow-trend-up"></i> Fondos disponibles
+                            para operaciones</span>
                     </div>
 
                     <div class="saldos-accesos-rapidos">
@@ -268,7 +279,7 @@
                     </div>
                 </div>
             </section>
-        </main> 
+        </main>
     </div>
 
     <!-- Módulo JS principal -->
