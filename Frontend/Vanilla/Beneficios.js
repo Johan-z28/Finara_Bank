@@ -42,7 +42,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const statFinara = $('statCuentasFinara');
     const statOtros = $('statOtrosBancos');
 
+    // Elementos del Modal de Eliminación (HU-09)
+    const modalEliminar = $('modalConfirmarEliminar');
+    const btnCerrarModalEliminar = $('btnCerrarModalEliminar');
+    const btnCancelarEliminacion = $('btnCancelarEliminacion');
+    const btnConfirmarEliminacionFinal = $('btnConfirmarEliminacionFinal');
+    const datosBeneficiarioAEliminar = $('datosBeneficiarioAEliminar');
+    const selectTipoBorrado = $('selectTipoBorrado');
+    const inputMotivoEliminacion = $('inputMotivoEliminacion');
+
     let beneficiarios = [];
+    let beneficiarioSeleccionadoParaEliminar = null;
 
     // ---------- 1. Cargar y renderizar datos ----------
     function recargarBeneficiarios() {
@@ -161,8 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
         contenedorBeneficiarios.querySelectorAll('.btn-eliminar-ben').forEach(btn => {
             btn.addEventListener('click', () => {
                 const id = btn.getAttribute('data-id');
-                const nombre = btn.getAttribute('data-nombre');
-                confirmarEliminacion(id, nombre);
+                abrirModalEliminar(id);
             });
         });
     }
@@ -270,34 +279,67 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ---------- 3. Confirmación de Eliminación ----------
-    async function confirmarEliminacion(id, nombre) {
-        const result = await Swal.fire({
-            title: '¿Eliminar beneficiario?',
-            html: `¿Estás seguro de eliminar a <strong>${nombre}</strong> de tus beneficiarios inscritos?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, Eliminar',
-            cancelButtonText: 'Cancelar',
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#64748b',
-            background: '#12151c',
-            color: '#fff'
-        });
+    // ---------- 3. Modal de Confirmación de Eliminación (HU-09) ----------
+    function abrirModalEliminar(id) {
+        const b = beneficiarios.find(item => item.id === id);
+        if (!b) return;
 
-        if (result.isConfirmed) {
+        beneficiarioSeleccionadoParaEliminar = b;
+        if (datosBeneficiarioAEliminar) {
+            datosBeneficiarioAEliminar.innerHTML = `
+                <strong>${b.nombre} ${b.alias ? `("${b.alias}")` : ''}</strong>
+                <span>${b.banco} · ${b.tipoCuenta === 'AHORROS' ? 'Cuenta de Ahorros' : 'Cuenta Corriente'} •••• ${b.numeroCuenta.slice(-4)}</span>
+                <span>Documento: ${b.tipoDocumento} ${b.numeroDocumento}</span>
+            `;
+        }
+
+        if (inputMotivoEliminacion) inputMotivoEliminacion.value = '';
+        if (selectTipoBorrado) selectTipoBorrado.value = 'LOGICO';
+
+        if (modalEliminar) {
+            modalEliminar.classList.remove('hidden');
+            modalEliminar.style.display = 'flex';
+        }
+    }
+
+    function cerrarModalEliminar() {
+        if (modalEliminar) {
+            modalEliminar.classList.add('hidden');
+            modalEliminar.style.display = 'none';
+        }
+        beneficiarioSeleccionadoParaEliminar = null;
+    }
+
+    if (btnCerrarModalEliminar) btnCerrarModalEliminar.addEventListener('click', cerrarModalEliminar);
+    if (btnCancelarEliminacion) btnCancelarEliminacion.addEventListener('click', cerrarModalEliminar);
+
+    if (modalEliminar) {
+        modalEliminar.addEventListener('click', e => {
+            if (e.target === modalEliminar) cerrarModalEliminar();
+        });
+    }
+
+    if (btnConfirmarEliminacionFinal) {
+        btnConfirmarEliminacionFinal.addEventListener('click', () => {
+            if (!beneficiarioSeleccionadoParaEliminar) return;
+
+            const id = beneficiarioSeleccionadoParaEliminar.id;
+            const nombre = beneficiarioSeleccionadoParaEliminar.nombre;
+            const tipoBorrado = selectTipoBorrado?.value || 'LOGICO';
+            const motivo = inputMotivoEliminacion?.value?.trim() || 'Eliminado voluntariamente desde la interfaz';
+
             try {
-                eliminarBeneficiario(id);
+                eliminarBeneficiario(id, { tipoBorrado, motivo });
+                cerrarModalEliminar();
                 recargarBeneficiarios();
+
                 Swal.fire({
                     icon: 'success',
-                    title: 'Eliminado',
-                    text: 'El beneficiario fue eliminado correctamente.',
+                    title: 'Beneficiario Eliminado',
+                    html: `Se ha ${tipoBorrado === 'LOGICO' ? 'desactivado' : 'eliminado permanentemente'} a <strong>${nombre}</strong>.<br><small style="color: #94a3b8;">La acción quedó registrada en el log de auditoría del sistema.</small>`,
                     background: '#12151c',
                     color: '#fff',
-                    confirmButtonColor: '#e5a93c',
-                    timer: 2000,
-                    showConfirmButton: false
+                    confirmButtonColor: '#e5a93c'
                 });
             } catch (err) {
                 Swal.fire({
@@ -309,7 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     confirmButtonColor: '#e5a93c'
                 });
             }
-        }
+        });
     }
 
     // ---------- 4. Filtros y Búsqueda reactiva ----------
