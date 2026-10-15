@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Tarjetas | Finara Bank</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../Style/HistorialTarjetas.css">
+</head>
+
+<body class="general-body">
+
+<!-- ======= SIDEBAR DE NAVEGACIÓN ======= -->
+    <aside class="sidebar">
+        <!-- BOTÓN CÍRCULO FLOTANTE EN EL BORDE DERECHO (ESCRITORIO) -->
+        <button class="sidebar-edge-toggle" id="sidebarCollapseBtn" aria-label="Colapsar menú" title="Alternar menú">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
+        <div class="sidebar-header">
+            <!-- Logo completo en modo expandido -->
+            <img src="../Style/image/Logo_finara.svg" alt="Finara Logo" class="sidebar-logo">
+            <!-- Isotipo favicon.svg al colapsar a 70px -->
+            <img src="../Style/image/favicon.svg" alt="Finara Icon" class="sidebar-logo-small">
+        </div>
+
+        <nav class="sidebar-nav">
+            <ul>
+                <li class="nav-item">
+                    <a href="Dashboard.html" class="nav-link" data-route="dashboard" title="Dashboard">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="solicitudTarjeta.html" class="nav-link active" data-route="saldos"
+                        title="Solicitar Productos">
+                        <i class="fa-regular fa-credit-card"></i>
+                        <span>Solicitar Productos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Saldos.html" class="nav-link active" data-route="saldos" title="Saldos">
+                        <i class="fa-regular fa-credit-card"></i>
+                        <span>Saldos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Transferencias.html" class="nav-link" data-route="transferencias" title="Transferencias">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <span>Transferencias</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Consignar.html" class="nav-link" data-route="consignar" title="Consignar">
+                        <i class="fa-solid fa-wallet"></i>
+                        <span>Consignar</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Retiros.html" class="nav-link" data-route="retiros" title="Retiros">
+                        <i class="fa-solid fa-money-bill-transfer"></i>
+                        <span>Retiros</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Movimientos.html" class="nav-link" data-route="movimientos" title="Movimientos">
+                        <i class="fa-solid fa-list-ul"></i>
+                        <span>Movimientos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Presupuesto.html" class="nav-link" data-route="presupuesto" title="Presupuesto">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Presupuesto</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="FondoEmergencia.html" class="nav-link" data-route="fondo" title="Fondo de Emergencia">
+                        <i class="fa-solid fa-shield-heart"></i>
+                        <span>Fondo Emergencia</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Metas.html" class="nav-link" data-route="metas" title="Metas de Ahorro">
+                        <i class="fa-solid fa-bullseye"></i>
+                        <span>Metas de Ahorro</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Seguimiento.html" class="nav-link" data-route="seguimiento" title="Seguimiento Financiero">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Seguimiento Financiero</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Beneficios.html" class="nav-link" data-route="beneficios" title="Beneficios">
+                        <i class="fa-regular fa-star"></i>
+                        <span>Beneficios</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- ======= CONTENIDO PRINCIPAL ======= -->
+    <div class="main-wrapper">
+        <header class="dashboard-navbar">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menú navegación">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="user-greeting">
+                    <h2>Hola, <span id="greetingName">Usuario</span></h2>
+                </div>
+            </div>
+
+            <div class="navbar-actions">
+                <button class="navbar-chatbot-btn" id="openChatbotNavBtn">
+                    <i class="fa-solid fa-comment-dots"></i>
+                    <span>Asesoría Financiera</span>
+                </button>
+                <div class="profile-menu-container">
+                    <button class="profile-btn" id="profileMenuBtn">
+                        <div class="avatar-placeholder">
+                            <i class="fa-solid fa-user profile-icon"></i>
+                        </div>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <a href="Perfil.html" class="dropdown-item"><i class="fa-regular fa-user"></i> Ver Perfil</a>
+                        <a href="../index.html" class="dropdown-item logout-item"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="saldos-header">
+                <div>
+                    <h1>Historial de Tarjetas</h1>
+                    <p class="saldos-subtitle">Consulta el estado de tus tarjetas asociadas y datos enmascarados (HU-13).</p>
+                </div>
+                <a href="Saldos.html" class="btn-volver-saldos">
+                    <i class="fa-solid fa-arrow-left"></i> Volver a Saldos
+                </a>
+            </div>
+
+            <!-- FILTROS POR ESTADO -->
+            <div class="tarjetas-filtros-bar">
+                <button class="btn-filtro-estado active" data-filter="todas">Todas</button>
+                <button class="btn-filtro-estado" data-filter="activa">Activas</button>
+                <button class="btn-filtro-estado" data-filter="inactiva">Inactivas</button>
+                <button class="btn-filtro-estado" data-filter="cancelada">Canceladas</button>
+            </div>
+
+            <!-- GRILLA DE TARJETAS -->
+            <section class="cuentas-grid" id="tarjetasGrid"></section>
+        </main>
+    </div>
+
+    <!-- MODAL DE DETALLE DE TARJETA -->
+    <div class="card-detail-modal-overlay hidden" id="cardDetailModal" style="position: fixed; inset: 0; background: rgba(5,8,13,0.85); display: flex; align-items: center; justify-content: center; z-index: 2000;">
+        <div class="analitica-card" style="max-width: 450px; width: 90%;">
+            <div class="analitica-card__header">
+                <h3 class="analitica-card__title">Detalle de Tarjeta</h3>
+                <button id="btnCloseModal" style="background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="modalCardBody" class="distribucion-leyenda"></div>
+        </div>
+    </div>
+
+    <script type="module" src="../Vanilla/HistorialTarjetas.js"></script>
+    <script src="../Vanilla/app.js"></script>
+</body>
+
+</html>
