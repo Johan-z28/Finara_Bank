@@ -30,6 +30,41 @@
     font-size: 0.85rem;
 }
 
+/* Botón de acceso al Historial de Productos */
+.saldos-actions-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-historial-productos {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(229, 169, 60, 0.12);
+    color: var(--gold-main);
+    border: 1px solid rgba(229, 169, 60, 0.35);
+    border-radius: var(--radius-btn);
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-historial-productos:hover {
+    background: var(--gold-main);
+    color: #07090e;
+    border-color: var(--gold-main);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(229, 169, 60, 0.3);
+}
+
+.btn-historial-productos i {
+    font-size: 0.9rem;
+}
+
 .toggle-saldos {
     background: #07090e;
     border: 1px solid rgba(255, 255, 255, 0.08);

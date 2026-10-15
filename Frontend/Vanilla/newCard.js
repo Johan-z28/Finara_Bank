@@ -266,6 +266,7 @@ function emitirTarjetaDirecta(usuarioActivo, tipoTarjeta) {
     const numeroGenerado = tarjetaObj.generarNumeroUnico();
     const vencimiento = '09/29';
     const cvv = String(Math.floor(100 + Math.random() * 900));
+    const usernameActual = usuarioActivo.username || usuarioActivo.correo || 'maria17';
 
     const datosTarjetaAprobada = {
         tipo: tipoTarjeta,
@@ -276,7 +277,7 @@ function emitirTarjetaDirecta(usuarioActivo, tipoTarjeta) {
         fechaAprobacion: new Date().toISOString()
     };
 
-    // Actualizar lista global de usuarios en localStorage
+    // 1. Guardar en el perfil del usuario
     let listaUsuarios = JSON.parse(localStorage.getItem("finara_usuarios_local")) || [];
     listaUsuarios = listaUsuarios.map(u => {
         if (u.correo === usuarioActivo.correo || u.username === usuarioActivo.username) {
@@ -287,6 +288,23 @@ function emitirTarjetaDirecta(usuarioActivo, tipoTarjeta) {
         return u;
     });
     localStorage.setItem("finara_usuarios_local", JSON.stringify(listaUsuarios));
+
+    // 2. Guardar en finara_cuentas para que sea visible en Saldos.js
+    let todasLasCuentas = JSON.parse(localStorage.getItem('finara_cuentas')) || [];
+    let tipoCuentaBackend = 'AHORROS';
+    if (tipoTarjeta === 'corriente') tipoCuentaBackend = 'CORRIENTE';
+    if (tipoTarjeta === 'credito') tipoCuentaBackend = 'TARJETA_CREDITO';
+
+    todasLasCuentas.push({
+        id: `CTA-${tipoTarjeta.toUpperCase()}-${Date.now()}`,
+        tipo: tipoCuentaBackend,
+        numero: numeroGenerado,
+        saldo: tipoTarjeta === 'credito' ? 5000000 : 0,
+        estado: 'ACTIVA',
+        username: usernameActual,
+        fechaCreacion: new Date().toISOString()
+    });
+    localStorage.setItem('finara_cuentas', JSON.stringify(todasLasCuentas));
 
     // Actualizar usuario activo local
     usuarioActivo.tarjetasAprobadas = usuarioActivo.tarjetasAprobadas || [];

@@ -1,14 +1,68 @@
 import { initGlobalComponents } from './Global/app.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Obtener perfil de usuario o mock de tarjetas aprobadas
+    if (typeof initGlobalComponents === 'function') {
+        initGlobalComponents();
+    }
+
+    // 1. Obtener usuario activo
     const usuarioPerfil = JSON.parse(localStorage.getItem('userProfile')) || {};
-    const tarjetasAprobadas = usuarioPerfil.tarjetasAprobadas || [
-        { id: '1', tipo: 'Crédito', titulo: 'Visa Gold Finara', numeroTarjeta: '4532 8821 1092 4821', estado: 'activa', fechaAprobacion: '2024-05-12' },
-        { id: '2', tipo: 'Débito', titulo: 'Tarjeta Débito Preferencial', numeroTarjeta: '4532 9912 3341 1092', estado: 'activa', fechaAprobacion: '2023-01-10' },
-        { id: '3', tipo: 'Crédito', titulo: 'Visa Black Signature', numeroTarjeta: '4532 1100 2299 8821', estado: 'inactiva', fechaAprobacion: '2022-11-20' },
-        { id: '4', tipo: 'Crédito', titulo: 'Tarjeta Clásica', numeroTarjeta: '4532 4433 2211 3341', estado: 'cancelada', fechaAprobacion: '2020-03-15' }
-    ];
+    const emailLogueado = localStorage.getItem('usuarioLogueado') || localStorage.getItem('emailSesion');
+    const listaUsuarios = JSON.parse(localStorage.getItem('finara_usuarios_local')) || [];
+    const usuarioActivo = listaUsuarios.find(u => u.correo === emailLogueado || u.username === emailLogueado) || usuarioPerfil;
+    const usernameActual = usuarioActivo.username || usuarioActivo.correo || 'maria17';
+
+    // 2. Extraer tarjetas aprobadas directamente del perfil
+    let productosUsuario = [...(usuarioActivo.tarjetasAprobadas || [])];
+
+    // 3. Sincronizar desde `finara_cuentas` (Cuentas aperturadas y TC)
+    const todasLasCuentas = JSON.parse(localStorage.getItem('finara_cuentas')) || [];
+    const cuentasDelUsuario = todasLasCuentas.filter(c => c && (c.username === usernameActual || (!c.username && usernameActual === 'maria17')));
+
+    cuentasDelUsuario.forEach(cuenta => {
+        const yaEstaEnLista = productosUsuario.some(p => p.numeroTarjeta === cuenta.numero || p.numeroTarjeta?.replace(/\s+/g, '') === cuenta.numero?.replace(/\s+/g, ''));
+        if (!yaEstaEnLista) {
+            let tipoProducto = 'debito';
+            let tituloProducto = 'Cuenta de Ahorros';
+
+            if (cuenta.tipo === 'CORRIENTE') {
+                tipoProducto = 'corriente';
+                tituloProducto = 'Cuenta Corriente';
+            } else if (cuenta.tipo === 'TARJETA_CREDITO') {
+                tipoProducto = 'credito';
+                tituloProducto = 'Tarjeta de Crédito Gold';
+            }
+
+            productosUsuario.push({
+                id: cuenta.id,
+                tipo: tipoProducto,
+                titulo: tituloProducto,
+                numeroTarjeta: cuenta.numero,
+                monto: cuenta.saldo,
+                estado: (cuenta.estado || 'activa').toLowerCase(),
+                fechaAprobacion: cuenta.fechaCreacion || cuenta.fechaAprobacion || new Date().toISOString()
+            });
+        }
+    });
+
+    // 4. Incluir créditos desembolsados desde los movimientos
+    const movimientos = JSON.parse(localStorage.getItem('finara_movimientos')) || [];
+    const prestamos = movimientos.filter(m => m.tipo === 'CREDITO_DESEMBOLSO');
+
+    prestamos.forEach(p => {
+        const yaExiste = productosUsuario.some(prod => prod.id === p.id);
+        if (!yaExiste) {
+            productosUsuario.push({
+                id: p.id,
+                tipo: 'prestamo',
+                titulo: 'Crédito Libre Destino',
+                numeroTarjeta: `5542 0000 0000 ${String(p.cuentaDestino).slice(-4)}`,
+                monto: p.monto,
+                estado: 'activa',
+                fechaAprobacion: p.fecha
+            });
+        }
+    });
 
     const tarjetasGrid = document.getElementById('tarjetasGrid');
     const filterTabs = document.querySelectorAll('.btn-filtro-estado');
@@ -16,85 +70,124 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnCloseModal = document.getElementById('btnCloseModal');
     const modalCardBody = document.getElementById('modalCardBody');
 
-    // 🔒 Función de enmascaramiento HU-13 (Muestra solo los últimos 4 dígitos)
+    // 🔒 Enmascaramiento de números (HU-13)
     function enmascararNumero(num) {
-        if (!num) return '•••• •••• •••• ••••';
-        const ultimos4 = num.replace(/\s+/g, '').slice(-4);
-        return `•••• •••• •••• ${ultimos4}`;
+        if (!num) return '**** **** **** ****';
+        const ultimos4 = String(num).replace(/\s+/g, '').slice(-4);
+        return `**** **** **** ${ultimos4}`;
     }
 
-    // Renderizar tarjetas según filtro
-    function renderTarjetas(filtro = 'todas') {
-        const filtradas = tarjetasAprobadas.filter(t => filtro === 'todas' || (t.estado || 'activa') === filtro);
-
-        if (filtradas.length === 0) {
-            tarjetasGrid.innerHTML = `<p class="saldos-subtitle">No tienes tarjetas registradas bajo el estado <strong>${filtro}</strong>.</p>`;
+    function renderProductos(filtro = 'todas') {
+        if (productosUsuario.length === 0) {
+            tarjetasGrid.innerHTML = `
+                <div class="cuentas-estado-vacio">
+                    <i class="fa-solid fa-credit-card cuentas-estado-vacio__icono"></i>
+                    <h3 class="cuentas-estado-vacio__titulo">Aún no tienes productos o tarjetas asociadas</h3>
+                    <p class="cuentas-estado-vacio__desc">
+                        Explora nuestro portafolio y solicita tu tarjeta de crédito, débito o cuenta corriente en minutos.
+                    </p>
+                    <a href="solicitudTarjeta.html" class="btn-solicitar-vacio">
+                        <i class="fa-solid fa-plus"></i> Solicitar Producto
+                    </a>
+                </div>
+            `;
             return;
         }
 
-        tarjetasGrid.innerHTML = filtradas.map(card => {
-            const estado = card.estado || 'activa';
-            const badgeClass = estado === 'activa' ? 'badge--activa' : (estado === 'inactiva' ? 'badge-gold' : 'badge--bloqueada');
+        const filtrados = productosUsuario.filter(p => filtro === 'todas' || (p.estado || 'activa') === filtro);
+
+        if (filtrados.length === 0) {
+            tarjetasGrid.innerHTML = `<p class="saldos-subtitle" style="grid-column: 1 / -1; text-align: center;">No tienes productos bajo el filtro <strong>${filtro}</strong>.</p>`;
+            return;
+        }
+
+        tarjetasGrid.innerHTML = filtrados.map(prod => {
+            const estado = prod.estado || 'activa';
+            const tipo = (prod.tipo || 'debito').toLowerCase();
+
+            let tarjetaClase = 'tarjeta-dorada';
+            let tagTexto = 'Ahorros';
+            let logoSrc = '../Style/image/Logo_finara_black.svg';
+
+            if (tipo === 'corriente') {
+                tarjetaClase = 'tarjeta-platino';
+                tagTexto = 'Corriente';
+                logoSrc = '../Style/image/Logo_finara_black.svg';
+            } else if (tipo === 'credito') {
+                tarjetaClase = 'tarjeta-negra';
+                tagTexto = 'Crédito';
+                logoSrc = '../Style/image/Logo_finara.svg';
+            } else if (tipo === 'prestamo') {
+                tarjetaClase = 'tarjeta-prestamo';
+                tagTexto = 'Préstamo';
+                logoSrc = '../Style/image/Logo_finara.svg';
+            }
 
             return `
-                <div class="cuenta-card cuenta-card--tarjeta">
-                    <div class="cuenta-card__head">
-                        <div class="cuenta-card__icon">
-                            <i class="fa-solid fa-credit-card"></i>
+                <div class="tarjeta-producto-wrapper">
+                    <div class="tarjeta-plastico ${tarjetaClase}">
+                        <div class="head-tarjeta">
+                            <img src="${logoSrc}" alt="Finara Logo" class="logo-svg">
+                            <i class="fa-solid fa-wifi card-contactless"></i>
                         </div>
-                        <div class="cuenta-card__titles">
-                            <span class="cuenta-card__tipo">${card.titulo || 'Tarjeta Finara'}</span>
-                            <span class="tarjeta-mascara-numero">${enmascararNumero(card.numeroTarjeta)}</span>
+
+                        <div class="card-chip-area">
+                            <div class="chip"></div>
+                            <span class="card-tag">${tagTexto}</span>
                         </div>
-                        <span class="cuenta-card__estado ${estado === 'inactiva' || estado === 'cancelada' ? 'cuenta-card__estado--inactiva' : ''}">
-                            ${estado.toUpperCase()}
-                        </span>
+
+                        <div class="foot-tarjeta">
+                            <span class="card-number">${enmascararNumero(prod.numeroTarjeta)}</span>
+                            <span class="card-type">VISA</span>
+                        </div>
                     </div>
 
-                    <div class="tarjeta-vinculada__acciones">
-                        <button class="btn-tarjeta-accion btn-ver-detalles btn-card-detail" data-id="${card.id || card.numeroTarjeta}">
-                            <i class="fa-regular fa-eye"></i> Ver detalle
+                    <div class="tarjeta-producto-footer">
+                        <span class="card-badge-estado status-${estado}">${estado.toUpperCase()}</span>
+                        <button class="btn-card-detail-action btn-card-detail" data-id="${prod.id || prod.numeroTarjeta}">
+                            Ver detalle <i class="fa-solid fa-chevron-right"></i>
                         </button>
                     </div>
                 </div>
             `;
         }).join('');
 
-        // Eventos para ver detalle en modal
+        // Eventos Modal
         document.querySelectorAll('.btn-card-detail').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const id = e.currentTarget.getAttribute('data-id');
-                const card = tarjetasAprobadas.find(t => (t.id || t.numeroTarjeta) === id);
-                if (card) {
+                const prod = productosUsuario.find(p => (p.id || p.numeroTarjeta) === id);
+                if (prod) {
                     modalCardBody.innerHTML = `
                         <div class="leyenda-item">
                             <div class="leyenda-info">
                                 <span class="leyenda-nombre">Producto:</span>
-                                <strong>${card.titulo || 'Tarjeta Finara'}</strong>
-                            </div>
-                        </div>
-                        <div class="leyenda-item">
-                            <div class="leyenda-info">
-                                <span class="leyenda-nombre">Tipo:</span>
-                                <strong>${card.tipo}</strong>
+                                <strong>${prod.titulo || 'Producto Finara'}</strong>
                             </div>
                         </div>
                         <div class="leyenda-item">
                             <div class="leyenda-info">
                                 <span class="leyenda-nombre">Número Enmascarado:</span>
-                                <strong class="tarjeta-mascara-numero">${enmascararNumero(card.numeroTarjeta)}</strong>
+                                <strong style="font-family: monospace; color: var(--gold-main);">${enmascararNumero(prod.numeroTarjeta)}</strong>
                             </div>
                         </div>
                         <div class="leyenda-item">
                             <div class="leyenda-info">
                                 <span class="leyenda-nombre">Estado:</span>
-                                <strong>${(card.estado || 'activa').toUpperCase()}</strong>
+                                <strong>${(prod.estado || 'activa').toUpperCase()}</strong>
                             </div>
                         </div>
+                        ${prod.monto !== undefined ? `
+                        <div class="leyenda-item">
+                            <div class="leyenda-info">
+                                <span class="leyenda-nombre">Saldo / Monto:</span>
+                                <strong style="color: var(--gold-main);">$ ${Number(prod.monto).toLocaleString('es-CO')}</strong>
+                            </div>
+                        </div>` : ''}
                         <div class="leyenda-item">
                             <div class="leyenda-info">
                                 <span class="leyenda-nombre">Fecha de Emisión:</span>
-                                <strong>${card.fechaAprobacion || 'Reciente'}</strong>
+                                <strong>${prod.fechaAprobacion ? prod.fechaAprobacion.split('T')[0] : 'Reciente'}</strong>
                             </div>
                         </div>
                     `;
@@ -104,12 +197,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Eventos de pestañas de filtro
     filterTabs.forEach(tab => {
         tab.addEventListener('click', () => {
             filterTabs.forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
-            renderTarjetas(tab.getAttribute('data-filter'));
+            renderProductos(tab.getAttribute('data-filter'));
         });
     });
 
@@ -117,5 +209,5 @@ document.addEventListener('DOMContentLoaded', () => {
         btnCloseModal.addEventListener('click', () => modal.classList.add('hidden'));
     }
 
-    renderTarjetas('todas');
+    renderProductos('todas');
 });
