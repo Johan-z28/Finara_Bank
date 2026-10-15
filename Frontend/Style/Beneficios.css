@@ -468,3 +468,42 @@
     from { opacity: 0; transform: translateY(6px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* Estilos de Alerta y Modal de Eliminación (HU-09) */
+.ben-modal-content--alerta {
+    border-color: rgba(239, 68, 68, 0.4);
+    max-width: 520px;
+}
+
+.ben-alerta-box {
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    border-radius: 12px;
+    padding: 14px 16px;
+    color: #fca5a5;
+    font-size: 0.88rem;
+    line-height: 1.4;
+}
+
+.ben-info-eliminacion {
+    margin-top: 10px;
+    background: #090c12;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 12px;
+    color: #ffffff;
+    font-size: 0.84rem;
+}
+
+.ben-info-eliminacion strong {
+    color: var(--gold-main, #e5a93c);
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.95rem;
+}
+
+.ben-info-eliminacion span {
+    color: #94a3b8;
+    display: block;
+    font-size: 0.78rem;
+}
