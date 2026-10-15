@@ -33,18 +33,10 @@
                         <span>Dashboard</span>
                     </a>
                 </li>
-
-                </li>
                 <li class="nav-item">
-                    <a href="solicitudTarjeta.html" class="nav-link active" data-route="saldos" title="Solicitar Tarjeta">
+                    <a href="solicitudTarjeta.html" class="nav-link" data-route="productos" title="Solicitar Productos">
                         <i class="fa-regular fa-credit-card"></i>
-                        <span>Solcitar Tarjeta</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="solicitudTarjeta.html" class="nav-link" data-route="saldos" title="Saldos">
-                        <i class="fa-regular fa-credit-card"></i>
-                        <span>Solcitar Tarjeta</span>
+                        <span>Solicitar Productos</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -78,9 +70,27 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="Creditos.html" class="nav-link" data-route="creditos" title="Solicitud de Créditos">
-                        <i class="fa-solid fa-hand-holding-dollar"></i>
-                        <span>Solicitud de Créditos</span>
+                    <a href="Presupuesto.html" class="nav-link" data-route="presupuesto" title="Presupuesto">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Presupuesto</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="FondoEmergencia.html" class="nav-link" data-route="fondo" title="Fondo de Emergencia">
+                        <i class="fa-solid fa-shield-heart"></i>
+                        <span>Fondo Emergencia</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Metas.html" class="nav-link" data-route="metas" title="Metas de Ahorro">
+                        <i class="fa-solid fa-bullseye"></i>
+                        <span>Metas de Ahorro</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Seguimiento.html" class="nav-link" data-route="seguimiento" title="Seguimiento Financiero">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Seguimiento Financiero</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -170,17 +180,20 @@
 
             <div id="chatBody" class="chatbot-body">
                 <div class="chat-bubble bot-bubble">
-                    ¡Hola! 👋 Soy tu asistente virtual de <strong>Finara Bank</strong>. ¿En qué puedo ayudarte hoy con tus tarjetas o saldos?
+                    ¡Hola! 👋 Soy tu asistente virtual de <strong>Finara Bank</strong>. ¿En qué puedo orientarte hoy?
                 </div>
             </div>
 
+            <div class="chat-input-bar">
+                <input type="text" id="chatInputText" class="chat-input-field" placeholder="Escribe tu consulta (ej: horarios)..." />
+                <button id="chatSendBtn" class="chat-send-btn" title="Enviar"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+
             <div class="chatbot-footer" id="chatOptions">
+                <button class="option-btn highlight-btn" data-action="horarios">🕒 Horarios de Atención</button>
                 <button class="option-btn" data-action="consultar">🔍 Revisar Saldo</button>
-                <button class="option-btn" data-action="leer">📖 Mis Tarjetas</button>
-                <button class="option-btn" data-action="agregar">➕ Agregar</button>
-                <button class="option-btn" data-action="actualizar">✏ Actualizar</button>
-                <button class="option-btn" data-action="eliminar">🗑 Eliminar</button>
-                <button class="option-btn highlight-btn" data-action="transferir">💸 Enviar Dinero</button>
+                <button class="option-btn" data-action="transferir">💸 Enviar Dinero</button>
+                <button class="option-btn" data-action="menu_principal">🔄 Ayuda General</button>
             </div>
         </div>
 
