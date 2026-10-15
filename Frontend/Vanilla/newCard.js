@@ -4,13 +4,15 @@
 
 // Clase Padre (Superclase)
 class TarjetaBancaria {
-    constructor(tipo, titulo, proposito, operaciones, intereses, condicion) {
+    constructor(tipo, titulo, proposito, operaciones, intereses, condicion, estado = 'activa') {
         this.tipo = tipo;
         this.titulo = titulo;
         this.proposito = proposito;
         this.operaciones = operaciones;
         this.intereses = intereses;
         this.condicion = condicion;
+        this.estado = estado; // 'activa' | 'inactiva' | 'cancelada'
+        this.numeroCompleto = this.generarNumeroUnico();
     }
 
     // Método genérico de evaluación (a sobreescribir en las hijas)
@@ -26,6 +28,24 @@ class TarjetaBancaria {
         const bloque2 = Math.floor(1000 + Math.random() * 9000);
         const bloque3 = Math.floor(1000 + Math.random() * 9000);
         return `4532 ${bloque1} ${bloque2} ${timestamp}`;
+    }
+
+    // 🔒 MÉTODO POO HU-13: ENMASCARAMIENTO DE DATOS SENSIBLES
+    getNumeroEnmascarado() {
+        if (!this.numeroCompleto) return '•••• •••• •••• ••••';
+        const digitosLimpio = this.numeroCompleto.replace(/\s+/g, '');
+        const ultimos4 = digitosLimpio.slice(-4);
+        return `•••• •••• •••• ${ultimos4}`;
+    }
+
+    // Obtener badge CSS según estado
+    getBadgeClass() {
+        switch (this.estado) {
+            case 'activa': return 'badge-active';
+            case 'inactiva': return 'badge-inactive';
+            case 'cancelada': return 'badge-canceled';
+            default: return '';
+        }
     }
 }
 
