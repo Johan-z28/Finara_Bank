@@ -13,7 +13,7 @@ const API_BASE = 'http://localhost:8080/api';
 //   GET  /api/cuentas                                  -> [{ id, tipo, numero, saldo, estado }]
 //   GET  /api/cuentas/validar-destino?numero=&tipo=    -> { id, titular, tipo, numero, esPropia } | 404
 //   POST /api/transferencias { origenId, destinoNumero, destinoTipo, monto, concepto }
-//        -> { referencia, fecha, monto, origen, destino, saldoOrigen, usaSobregiro }
+//    -> { referencia, fecha, monto, origen, destino, saldoOrigen, usaSobregiro }
 
 export class SesionExpiradaError extends Error { }
 
@@ -108,19 +108,101 @@ function guardar(clave, valor) {
 
 function nombreUsuario() { return localStorage.getItem('userName') || 'Johan'; }
 
+// Función auxiliar para censurar/enmascarar nombres al estilo bancario (ej: "Yull Sebastián" -> "Yu** Se********")
+// Función auxiliar para censurar/enmascarar nombres al estilo bancario (ej: "Yull Sebastián" -> "Yu** Se********")
+function enmascararNombre(nombreCompleto) {
+    if (!nombreCompleto) return "Cliente Finara";
+    return nombreCompleto.split(' ').map(palabra => {
+        if (palabra.length <= 2) return palabra[0] + '*';
+        const visibles = Math.ceil(palabra.length / 3);
+        return palabra.substring(0, visibles) + '*'.repeat(palabra.length - visibles);
+    }).join(' ');
+}
+
 function resolverDestinoMock(numero, tipo, cuentas, terceros) {
     const n = soloDigitos(numero);
     const tipoNormalizado = String(tipo || '').toUpperCase().trim();
+
+    // 1. Buscar en las cuentas propias del usuario actual
     const propia = cuentas.find(c => soloDigitos(c.numero) === n && String(c.tipo || '').toUpperCase().trim() === tipoNormalizado);
     if (propia) {
         const estaBloqueada = Boolean(propia.bloqueada || propia.estado === 'BLOQUEADA' || (propia.tarjetaAsociada && propia.tarjetaAsociada.bloqueada));
-        return { id: propia.id, titular: nombreUsuario(), tipo, numero: n, esPropia: true, bloqueada: estaBloqueada, estado: propia.estado };
+        const nombreUsuarioReal = localStorage.getItem('userName') || 'Titular';
+        return {
+            id: propia.id,
+            titular: enmascararNombre(nombreUsuarioReal),
+            tipo,
+            numero: n,
+            esPropia: true,
+            bloqueada: estaBloqueada,
+            estado: propia.estado
+        };
     }
+
+    // 2. Buscar en la lista tradicional de terceros (por compatibilidad)
     const t = terceros.find(c => soloDigitos(c.numero) === n && String(c.tipo || '').toUpperCase().trim() === tipoNormalizado);
     if (t) {
         const estaBloqueada = Boolean(t.bloqueada || t.estado === 'BLOQUEADA');
-        return { id: t.id, titular: t.titular, tipo, numero: n, esPropia: false, bloqueada: estaBloqueada, estado: t.estado || 'ACTIVA' };
+        return {
+            id: t.id,
+            titular: enmascararNombre(t.titular),
+            tipo,
+            numero: n,
+            esPropia: false,
+            bloqueada: estaBloqueada,
+            estado: t.estado || 'ACTIVA'
+        };
     }
+
+    // 3. BÚSQUEDA GLOBAL EN 'finara_cuentas' (Aquí es donde se almacenan todas las cuentas reales de cualquier usuario de la app)
+    try {
+        const todasLasCuentasGlobales = JSON.parse(localStorage.getItem('finara_cuentas')) || [];
+        const cuentaEncontrada = todasLasCuentasGlobales.find(c =>
+            soloDigitos(c.numero) === n && String(c.tipo || '').toUpperCase().trim() === tipoNormalizado
+        );
+        if (cuentaEncontrada) {
+            // Intentar deducir el nombre del titular o asignar uno corporativo si pertenece a otro usuario
+            let nombreTitular = cuentaEncontrada.username || cuentaEncontrada.titular || "Yull Mesa";
+            const estaBloqueada = Boolean(cuentaEncontrada.bloqueada || cuentaEncontrada.estado === 'BLOQUEADA');
+            return {
+                id: cuentaEncontrada.id,
+                titular: enmascararNombre(nombreTitular),
+                tipo,
+                numero: n,
+                esPropia: false,
+                bloqueada: estaBloqueada,
+                estado: cuentaEncontrada.estado || 'ACTIVA'
+            };
+        }
+    } catch (e) {
+        console.error("Error buscando en finara_cuentas globales:", e);
+    }
+
+    // 4. BÚSQUEDA RESPALDO EN 'finara_usuarios_local'
+    try {
+        const usuariosLocales = JSON.parse(localStorage.getItem('finara_usuarios_local')) || [];
+        for (const usr of usuariosLocales) {
+            if (Array.isArray(usr.tarjetasAprobadas)) {
+                for (const tarjeta of usr.tarjetasAprobadas) {
+                    const numeroTarjetaLimpio = soloDigitos(tarjeta.numeroTarjeta || tarjeta.numero);
+                    if (numeroTarjetaLimpio === n) {
+                        return {
+                            id: usr.documento || 'USR-' + n,
+                            titular: enmascararNombre(usr.nombre || usr.username || "Yull"),
+                            tipo,
+                            numero: n,
+                            esPropia: false,
+                            bloqueada: false,
+                            estado: 'ACTIVA'
+                        };
+                    }
+                }
+            }
+        }
+    } catch (e) {
+        console.error("Error buscando en usuarios locales:", e);
+    }
+
     return null;
 }
 
