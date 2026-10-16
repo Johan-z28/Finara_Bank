@@ -1,0 +1,509 @@
+/* Frontend/Style/Beneficios.css */
+/* Estilos modernos y coherentes con la temática oscura y dorada de Finara Bank */
+
+@import url('global/styles.css');
+
+.ben-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3rem;
+}
+
+.ben-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+    margin-bottom: 2rem;
+}
+
+.ben-header-info h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-white, #ffffff);
+    margin-bottom: 0.3rem;
+}
+
+.ben-subtitle {
+    color: var(--text-muted, #94a3b8);
+    font-size: 0.95rem;
+}
+
+.ben-header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Métricas rápidas */
+.ben-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.ben-stat-card {
+    background: #0d1118;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 14px;
+    padding: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.ben-stat-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: rgba(229, 169, 60, 0.1);
+    color: var(--gold-main, #e5a93c);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+}
+
+.ben-stat-info span {
+    font-size: 0.8rem;
+    color: var(--text-muted, #94a3b8);
+    display: block;
+}
+
+.ben-stat-info strong {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+/* Layout Principal */
+.ben-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.8rem;
+}
+
+/* Tarjeta principal */
+.ben-card {
+    background: #0b0e14;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 1.8rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+.ben-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.ben-card-header h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+}
+
+/* Buscador y filtros */
+.ben-toolbar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.ben-search-box {
+    position: relative;
+    flex: 1;
+    min-width: 240px;
+}
+
+.ben-search-box i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.ben-search-box input {
+    width: 100%;
+    padding: 10px 14px 10px 38px;
+    background: #080a0f;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 0.88rem;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.ben-search-box input:focus {
+    border-color: var(--gold-main, #e5a93c);
+    box-shadow: 0 0 0 2px rgba(229, 169, 60, 0.15);
+}
+
+.ben-filter-select {
+    padding: 10px 14px;
+    background: #080a0f;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 0.88rem;
+    outline: none;
+    cursor: pointer;
+}
+
+/* Grid de beneficiarios */
+.ben-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1rem;
+}
+
+.ben-item-card {
+    background: #090c12;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 14px;
+    padding: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 12px;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.ben-item-card:hover {
+    border-color: rgba(229, 169, 60, 0.4);
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.ben-item-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.ben-item-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: rgba(229, 169, 60, 0.12);
+    color: var(--gold-main, #e5a93c);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.ben-item-badge {
+    background: rgba(52, 211, 153, 0.12);
+    color: #34d399;
+    border: 1px solid rgba(52, 211, 153, 0.25);
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+}
+
+.ben-item-nombre {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 4px 0 2px;
+    display: block;
+}
+
+.ben-item-alias {
+    font-size: 0.78rem;
+    color: var(--gold-main, #e5a93c);
+    display: block;
+}
+
+.ben-item-detalles {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 0.8rem;
+    display: grid;
+    gap: 6px;
+}
+
+.ben-detalle-fila {
+    display: flex;
+    justify-content: space-between;
+}
+
+.ben-detalle-fila span {
+    color: var(--text-muted, #94a3b8);
+}
+
+.ben-detalle-fila strong {
+    color: #ffffff;
+    font-family: inherit;
+}
+
+.ben-item-acciones {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+/* Botones */
+.ben-btn {
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    cursor: pointer;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.ben-btn--primary {
+    background: var(--gold-main, #e5a93c);
+    color: #0b0e14;
+}
+
+.ben-btn--primary:hover {
+    background: #f0b755;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(229, 169, 60, 0.3);
+}
+
+.ben-btn--ghost {
+    background: transparent;
+    color: var(--text-muted, #94a3b8);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.ben-btn--ghost:hover {
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.ben-btn--danger {
+    background: rgba(239, 68, 68, 0.12);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    padding: 7px 12px;
+    font-size: 0.78rem;
+    border-radius: 8px;
+}
+
+.ben-btn--danger:hover {
+    background: rgba(239, 68, 68, 0.25);
+    color: #ffffff;
+}
+
+.ben-btn--transferir {
+    background: rgba(229, 169, 60, 0.15);
+    color: var(--gold-main, #e5a93c);
+    border: 1px solid rgba(229, 169, 60, 0.3);
+    flex: 1;
+    font-size: 0.82rem;
+    padding: 7px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.ben-btn--transferir:hover {
+    background: var(--gold-main, #e5a93c);
+    color: #0b0e14;
+}
+
+/* Estado vacío */
+.ben-vacio {
+    text-align: center;
+    padding: 3.5rem 1rem;
+    color: #94a3b8;
+    grid-column: 1 / -1;
+}
+
+.ben-vacio-icon {
+    font-size: 3rem;
+    color: rgba(255, 255, 255, 0.12);
+    margin-bottom: 1rem;
+}
+
+.ben-vacio h3 {
+    color: #ffffff;
+    font-size: 1.15rem;
+    margin-bottom: 0.5rem;
+}
+
+.ben-vacio p {
+    font-size: 0.88rem;
+    max-width: 420px;
+    margin: 0 auto 1.5rem;
+}
+
+/* Modal Formulario */
+.ben-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.ben-modal-overlay.hidden {
+    display: none !important;
+}
+
+.ben-modal-content {
+    background: #0f131a;
+    border: 1px solid rgba(229, 169, 60, 0.3);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 580px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+    animation: fadeIn 0.3s ease;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.ben-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ben-modal-header h3 {
+    font-size: 1.15rem;
+    color: #fff;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ben-modal-close {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-size: 1.6rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.ben-modal-close:hover {
+    color: #fff;
+}
+
+.ben-modal-body {
+    padding: 24px;
+}
+
+.ben-form-grupo {
+    margin-bottom: 1.2rem;
+}
+
+.ben-form-grupo label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted, #94a3b8);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.ben-form-fila {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.ben-input, .ben-select {
+    width: 100%;
+    background: #090c12;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: #fff;
+    font-size: 0.88rem;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.ben-input:focus, .ben-select:focus {
+    border-color: var(--gold-main, #e5a93c);
+}
+
+.ben-form-hint {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Estilos de Alerta y Modal de Eliminación (HU-09) */
+.ben-modal-content--alerta {
+    border-color: rgba(239, 68, 68, 0.4);
+    max-width: 520px;
+}
+
+.ben-alerta-box {
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    border-radius: 12px;
+    padding: 14px 16px;
+    color: #fca5a5;
+    font-size: 0.88rem;
+    line-height: 1.4;
+}
+
+.ben-info-eliminacion {
+    margin-top: 10px;
+    background: #090c12;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 12px;
+    color: #ffffff;
+    font-size: 0.84rem;
+}
+
+.ben-info-eliminacion strong {
+    color: var(--gold-main, #e5a93c);
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.95rem;
+}
+
+.ben-info-eliminacion span {
+    color: #94a3b8;
+    display: block;
+    font-size: 0.78rem;
+}
