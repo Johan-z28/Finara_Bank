@@ -149,6 +149,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 ultimaActividad: "Recién registrado",
                 avatar: "../Style/image/profile/avatarDefault.png",
                 verificado: true,
+                // Arreglo dinámico vacío para ir agregando cuentas o tarjetas reales conforme se soliciten
+                cuentas: [],
+                tarjetasAprobadas: []
             };
 
             usuariosLocales.push(userData);
