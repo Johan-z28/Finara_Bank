@@ -7,6 +7,14 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn("Componentes globales omitidos:", e);
     }
 
+    // Asegurar FontAwesome en caso de que app.js no lo agregue dinámicamente
+    if (!document.querySelector('link[href*="fontawesome"]')) {
+        const fontAwesomeLink = document.createElement('link');
+        fontAwesomeLink.rel = 'stylesheet';
+        fontAwesomeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+        document.head.appendChild(fontAwesomeLink);
+    }
+
     // 1. Recuperar usuario activo desde localStorage
     const usuarioActivo = obtenerUsuarioActivoReal();
 
@@ -38,13 +46,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // 4. Poblar el selector de origen con las tarjetas reales
     poblarSelectorTarjetas(usuarioActivo);
 
-    // 5. Manejar el formulario de consignación con validación de tarjeta de crédito
+    // 5. Manejar el formulario de consignación
     const formConsignacion = document.getElementById('formConsignacion');
     if (formConsignacion) {
         formConsignacion.addEventListener('submit', (e) => {
             e.preventDefault();
 
             const selectOrigen = document.getElementById('cuentaOrigen');
+            if (!selectOrigen || selectOrigen.selectedIndex === -1) return;
+
             const tarjetaSeleccionadaTexto = selectOrigen.options[selectOrigen.selectedIndex].text.toLowerCase();
 
             // REGLA DE NEGOCIO: No se puede consignar desde una Tarjeta de Crédito
@@ -181,10 +191,9 @@ function procesarConsignacionFinal(usuarioActivo) {
         return;
     }
 
-    // Extraer limpiamente el saldo actual evitando errores con puntos, comas o décimas fantasma
+    // Extraer limpiamente el saldo actual
     let saldoActualNum = 0;
     if (usuarioActivo.saldoDisponible) {
-        // Reemplazar puntos de miles y limpiar formato monetario string a número flotante real
         const limpioStr = usuarioActivo.saldoDisponible.toString()
             .replace('$', '')
             .trim()
@@ -197,12 +206,13 @@ function procesarConsignacionFinal(usuarioActivo) {
     // Sumar de forma exacta el monto ingresado
     saldoActualNum += monto;
 
-    // Guardar el saldo formateado limpiamente sin decimales extraños en pesos colombianos
+    // Guardar el saldo formateado limpiamente en pesos colombianos
     usuarioActivo.saldoDisponible = `$ ${Math.round(saldoActualNum).toLocaleString('es-CO')}`;
     usuarioActivo.ultimaActividad = "Hace un momento";
 
-    // Actualizar localStorage
+    // Actualizar localStorage en todas las llaves posibles
     localStorage.setItem('userProfile', JSON.stringify(usuarioActivo));
+    localStorage.setItem('usuarioActivo', JSON.stringify(usuarioActivo));
 
     let listaUsuarios = JSON.parse(localStorage.getItem("finara_usuarios_local")) || [];
     listaUsuarios = listaUsuarios.map(u => {
