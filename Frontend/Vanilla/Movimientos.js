@@ -79,16 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const p = el('p', '', mensaje);
         estado.append(p);
 
-        if (restablecer) {
-            const btnReset = el('button', 'btn-reintentar', 'Ver todo el historial');
-            btnReset.addEventListener('click', () => {
-                selPeriodo.value = 'todo';
-                filtros.periodo = 'todo';
-                filtros.pagina = 1;
-                cargar();
-            });
-            estado.append(btnReset);
-        } else if (reintentar) {
+        if (reintentar) {
             const b = el('button', 'btn-reintentar', 'Reintentar');
             b.addEventListener('click', cargar);
             estado.append(b);
