@@ -289,21 +289,44 @@ function emitirTarjetaDirecta(usuarioActivo, tipoTarjeta) {
     });
     localStorage.setItem("finara_usuarios_local", JSON.stringify(listaUsuarios));
 
-    // 2. Guardar en finara_cuentas para que sea visible en Saldos.js
+    // 2. Asociar la tarjeta a la cuenta bancaria existente en finara_cuentas
     let todasLasCuentas = JSON.parse(localStorage.getItem('finara_cuentas')) || [];
-    let tipoCuentaBackend = 'AHORROS';
-    if (tipoTarjeta === 'corriente') tipoCuentaBackend = 'CORRIENTE';
-    if (tipoTarjeta === 'credito') tipoCuentaBackend = 'TARJETA_CREDITO';
+    let tipoCuentaAsociada = tipoTarjeta === 'corriente' ? 'CORRIENTE' : 'AHORROS';
 
-    todasLasCuentas.push({
-        id: `CTA-${tipoTarjeta.toUpperCase()}-${Date.now()}`,
-        tipo: tipoCuentaBackend,
+    const tarjetaInfo = {
+        tipo: tipoTarjeta,
+        titulo: tarjetaObj.titulo,
         numero: numeroGenerado,
-        saldo: tipoTarjeta === 'credito' ? 5000000 : 0,
-        estado: 'ACTIVA',
-        username: usernameActual,
-        fechaCreacion: new Date().toISOString()
+        fechaVencimiento: vencimiento,
+        cvv: cvv,
+        bloqueada: false
+    };
+
+    // Vincular la tarjeta a la cuenta bancaria del usuario correspondiente
+    let cuentaAsociadaEncontrada = false;
+    todasLasCuentas = todasLasCuentas.map(cta => {
+        if (cta && (cta.username === usernameActual || (!cta.username && usernameActual === 'maria17')) && cta.tipo === tipoCuentaAsociada) {
+            cta.tarjetaAsociada = tarjetaInfo;
+            cuentaAsociadaEncontrada = true;
+        }
+        return cta;
     });
+
+    // Si no existía la cuenta previa (caso excepcional), se crea la cuenta y se le asocia la tarjeta
+    if (!cuentaAsociadaEncontrada) {
+        const nuevoNumCuenta = '4021' + String(Date.now()).slice(-8);
+        todasLasCuentas.push({
+            id: `CTA-${tipoCuentaAsociada.slice(0, 3)}-${Date.now()}`,
+            tipo: tipoCuentaAsociada,
+            numero: nuevoNumCuenta,
+            saldo: 0,
+            estado: 'ACTIVA',
+            username: usernameActual,
+            fechaCreacion: new Date().toISOString(),
+            tarjetaAsociada: tarjetaInfo
+        });
+    }
+
     localStorage.setItem('finara_cuentas', JSON.stringify(todasLasCuentas));
 
     // Actualizar usuario activo local

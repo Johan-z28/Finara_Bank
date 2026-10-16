@@ -124,51 +124,55 @@ function resolverDestinoMock(numero, tipo, cuentas, terceros) {
     const tipoNormalizado = String(tipo || '').toUpperCase().trim();
 
     // 1. Buscar en las cuentas propias del usuario actual
-    const propia = cuentas.find(c => soloDigitos(c.numero) === n && String(c.tipo || '').toUpperCase().trim() === tipoNormalizado);
+    const propia = cuentas.find(c => {
+        const numMatch = soloDigitos(c.numero) === n || (c.tarjetaAsociada && soloDigitos(c.tarjetaAsociada.numero) === n);
+        const tipoMatch = !tipoNormalizado || String(c.tipo || '').toUpperCase().trim() === tipoNormalizado;
+        return numMatch && tipoMatch;
+    });
     if (propia) {
         const estaBloqueada = Boolean(propia.bloqueada || propia.estado === 'BLOQUEADA' || (propia.tarjetaAsociada && propia.tarjetaAsociada.bloqueada));
-        const nombreUsuarioReal = localStorage.getItem('userName') || 'Titular';
+        const nombreUsuarioReal = localStorage.getItem('userName') || (cuentas[0] && cuentas[0].username) || 'Titular';
         return {
             id: propia.id,
             titular: enmascararNombre(nombreUsuarioReal),
-            tipo,
-            numero: n,
+            tipo: propia.tipo,
+            numero: propia.numero,
             esPropia: true,
             bloqueada: estaBloqueada,
-            estado: propia.estado
+            estado: propia.estado || 'ACTIVA'
         };
     }
 
-    // 2. Buscar en la lista tradicional de terceros (por compatibilidad)
-    const t = terceros.find(c => soloDigitos(c.numero) === n && String(c.tipo || '').toUpperCase().trim() === tipoNormalizado);
-    if (t) {
-        const estaBloqueada = Boolean(t.bloqueada || t.estado === 'BLOQUEADA');
-        return {
-            id: t.id,
-            titular: enmascararNombre(t.titular),
-            tipo,
-            numero: n,
-            esPropia: false,
-            bloqueada: estaBloqueada,
-            estado: t.estado || 'ACTIVA'
-        };
-    }
-
-    // 3. BÚSQUEDA GLOBAL EN 'finara_cuentas' (Aquí es donde se almacenan todas las cuentas reales de cualquier usuario de la app)
+    // 2. BÚSQUEDA GLOBAL EN 'finara_cuentas' (Cuentas de todos los usuarios registrados en el sistema)
     try {
         const todasLasCuentasGlobales = JSON.parse(localStorage.getItem('finara_cuentas')) || [];
-        const cuentaEncontrada = todasLasCuentasGlobales.find(c =>
-            soloDigitos(c.numero) === n && String(c.tipo || '').toUpperCase().trim() === tipoNormalizado
-        );
+        const cuentaEncontrada = todasLasCuentasGlobales.find(c => {
+            if (!c) return false;
+            const numCuentaLimpio = soloDigitos(c.numero);
+            const numTarjetaLimpia = c.tarjetaAsociada ? soloDigitos(c.tarjetaAsociada.numero) : '';
+            const coincideNumero = numCuentaLimpio === n || numTarjetaLimpia === n;
+            const tipoMatch = !tipoNormalizado || String(c.tipo || '').toUpperCase().trim() === tipoNormalizado;
+            return coincideNumero && tipoMatch;
+        });
+
         if (cuentaEncontrada) {
-            // Intentar deducir el nombre del titular o asignar uno corporativo si pertenece a otro usuario
-            let nombreTitular = cuentaEncontrada.username || cuentaEncontrada.titular || "Yull Mesa";
-            const estaBloqueada = Boolean(cuentaEncontrada.bloqueada || cuentaEncontrada.estado === 'BLOQUEADA');
+            // Obtener el nombre real del titular desde finara_usuarios_local o userProfile
+            let nombreTitular = cuentaEncontrada.titular || cuentaEncontrada.username;
+            if (!nombreTitular || nombreTitular === 'maria17') {
+                const usuariosLocales = JSON.parse(localStorage.getItem('finara_usuarios_local')) || [];
+                const usrMatch = usuariosLocales.find(u => u.username === cuentaEncontrada.username || u.correo === cuentaEncontrada.username);
+                if (usrMatch && usrMatch.nombre) {
+                    nombreTitular = usrMatch.nombre;
+                }
+            }
+            if (!nombreTitular) nombreTitular = 'Cliente Finara';
+
+            const estaBloqueada = Boolean(cuentaEncontrada.bloqueada || cuentaEncontrada.estado === 'BLOQUEADA' || (cuentaEncontrada.tarjetaAsociada && cuentaEncontrada.tarjetaAsociada.bloqueada));
             return {
                 id: cuentaEncontrada.id,
                 titular: enmascararNombre(nombreTitular),
-                tipo,
-                numero: n,
+                tipo: cuentaEncontrada.tipo,
+                numero: cuentaEncontrada.numero,
                 esPropia: false,
                 bloqueada: estaBloqueada,
                 estado: cuentaEncontrada.estado || 'ACTIVA'
@@ -178,7 +182,22 @@ function resolverDestinoMock(numero, tipo, cuentas, terceros) {
         console.error("Error buscando en finara_cuentas globales:", e);
     }
 
-    // 4. BÚSQUEDA RESPALDO EN 'finara_usuarios_local'
+    // 3. Buscar en la lista tradicional de terceros (por compatibilidad)
+    const t = terceros.find(c => soloDigitos(c.numero) === n && String(c.tipo || '').toUpperCase().trim() === tipoNormalizado);
+    if (t) {
+        const estaBloqueada = Boolean(t.bloqueada || t.estado === 'BLOQUEADA');
+        return {
+            id: t.id,
+            titular: enmascararNombre(t.titular),
+            tipo: t.tipo || tipo,
+            numero: n,
+            esPropia: false,
+            bloqueada: estaBloqueada,
+            estado: t.estado || 'ACTIVA'
+        };
+    }
+
+    // 4. BÚSQUEDA DIRECTA EN 'finara_usuarios_local' (por tarjetas o datos de perfil)
     try {
         const usuariosLocales = JSON.parse(localStorage.getItem('finara_usuarios_local')) || [];
         for (const usr of usuariosLocales) {
@@ -188,8 +207,8 @@ function resolverDestinoMock(numero, tipo, cuentas, terceros) {
                     if (numeroTarjetaLimpio === n) {
                         return {
                             id: usr.documento || 'USR-' + n,
-                            titular: enmascararNombre(usr.nombre || usr.username || "Yull"),
-                            tipo,
+                            titular: enmascararNombre(usr.nombre || usr.username || "Cliente Finara"),
+                            tipo: tarjeta.tipo === 'corriente' ? 'CORRIENTE' : (tarjeta.tipo === 'credito' ? 'TARJETA_CREDITO' : 'AHORROS'),
                             numero: n,
                             esPropia: false,
                             bloqueada: false,
@@ -317,6 +336,35 @@ export async function ejecutarTransferencia({ origenId, destinoNumero, destinoTi
         valor: monto,
         descripcion: descEgreso
     });
+
+    // Si la cuenta destino es de otro usuario en finara_cuentas, actualizar su saldo directamente en el ecosistema
+    try {
+        let todasLasCuentas = JSON.parse(localStorage.getItem(K.cuentas)) || [];
+        const idxDestino = todasLasCuentas.findIndex(c => String(c.id) === String(destino.id) || soloDigitos(c.numero) === numDestinoLimpio);
+        if (idxDestino !== -1 && !destino.esPropia) {
+            todasLasCuentas[idxDestino].saldo = (Number(todasLasCuentas[idxDestino].saldo) || 0) + monto;
+            guardar(K.cuentas, todasLasCuentas);
+
+            // Registrar movimiento de ingreso para la cuenta receptora de ese usuario
+            const titularDestino = todasLasCuentas[idxDestino].username || destino.titular;
+            movimientos.push({
+                id: `${referencia}-I`,
+                cuentaId: String(todasLasCuentas[idxDestino].id),
+                cuentaNumero: numDestinoLimpio,
+                cuentaOrigen: numOrigenLimpio,
+                cuentaDestino: numDestinoLimpio,
+                username: titularDestino,
+                fecha,
+                referencia,
+                categoria: 'Transferencia',
+                tipo: 'INGRESO',
+                valor: monto,
+                descripcion: `Transferencia recibida de ${nombreUsuario()}${nota}`
+            });
+        }
+    } catch (e) {
+        console.error("Error acreditando saldo a cuenta destino:", e);
+    }
 
     if (destino.esPropia) {
         const descIngreso = origen.tipo === 'TARJETA_CREDITO'

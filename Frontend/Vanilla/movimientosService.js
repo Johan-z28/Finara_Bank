@@ -137,10 +137,8 @@ export async function obtenerMovimientos({ cuentaId, periodo = '30d', tipo = 'to
         return false;
     });
 
-    // Si aún no hay transacciones hechas por el usuario en esta cuenta particular, proveer movimientos base de cortesía
-    if (movimientosCuenta.length === 0) {
-        movimientosCuenta = generarMovimientosBase(idEfectivo, cuentaActiva ? cuentaActiva.tipo : 'AHORROS');
-    }
+    // Si no hay transacciones hechas por el usuario en esta cuenta, la lista permanece vacía con datos reales
+    // (no se inyectan movimientos falsos ni datos mock)
 
     // 3. Filtrar por período
     const desde = limiteInferior(periodo);
