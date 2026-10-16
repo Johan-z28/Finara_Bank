@@ -39,7 +39,7 @@ public class main {
                         System.out.print("Ingrese su correo electrónico: ");
                         String correoLogin = scanner.nextLine().trim();
                         if (baseDatosUsuarios.containsKey(correoLogin)) {
-                            Syste   m.out.print("Ingrese su contraseña: ");
+                            System.out.print("Ingrese su contraseña: ");
                             String passLogin = scanner.nextLine().trim();
                             Map<String, String> datosUsuario = baseDatosUsuarios.get(correoLogin);
                             if (datosUsuario.get("password").equals(passLogin)) {
