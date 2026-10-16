@@ -717,6 +717,129 @@ body.dark-theme {
 }
 
 /* ==========================================
+   ESTILOS RESPUESTA HORARIOS DE ATENCIÓN (HU-36)
+   ========================================== */
+.chat-horarios-respuesta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.horario-seccion-item {
+  background: rgba(10, 14, 23, 0.7);
+  border-radius: 12px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--gold-main);
+}
+
+.horario-seccion-item.virtual {
+  border-left-color: #34d399;
+}
+
+.horario-seccion-item.presencial {
+  border-left-color: var(--gold-main);
+}
+
+.horario-badge {
+  font-size: 0.82rem;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.horario-seccion-item.virtual .horario-badge i {
+  color: #34d399;
+}
+
+.horario-seccion-item.presencial .horario-badge i {
+  color: var(--gold-main);
+}
+
+.horario-tiempo {
+  margin: 0 0 6px 0;
+  font-size: 0.8rem;
+  color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.horario-tiempo i {
+  color: #94a3b8;
+  font-size: 0.75rem;
+}
+
+.horario-lista {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.76rem;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+.horario-lista li {
+  margin-bottom: 3px;
+}
+
+.horario-footer-tip {
+  margin: 4px 0 0 0;
+  font-size: 0.78rem;
+  color: #cbd5e1;
+  border-top: 1px dashed rgba(229, 169, 60, 0.3);
+  padding-top: 8px;
+}
+
+.horario-footer-tip i {
+  color: var(--gold-main);
+}
+
+/* Input para escribir preguntas directamente al chatbot */
+.chat-input-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #090c12;
+  border-top: 1px solid rgba(229, 169, 60, 0.2);
+}
+
+.chat-input-field {
+  flex: 1;
+  background: #141923;
+  border: 1px solid rgba(229, 169, 60, 0.3);
+  color: #fff;
+  border-radius: 20px;
+  padding: 7px 12px;
+  font-size: 0.78rem;
+  outline: none;
+}
+
+.chat-input-field:focus {
+  border-color: var(--gold-main);
+}
+
+.chat-send-btn {
+  background: var(--gold-main);
+  color: #000;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  transition: transform 0.2s;
+}
+
+.chat-send-btn:hover {
+  transform: scale(1.08);
+}
+
+/* ==========================================
    REGLAS DEL MINI SIDEBAR COLAPSADO EN ESCRITORIO (> 992px)
    ========================================== */
 

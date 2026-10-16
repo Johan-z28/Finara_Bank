@@ -1,13 +1,68 @@
+import { procesarMensajeChatbot, generarRespuestaHorarios } from '../chatbotService.js';
+
 let isGlobalListenersInitialized = false;
 
 export function initGlobalComponents() {
     updateUserData();
     highlightActiveMenu();
+    ensureChatbotWidget();
 
     if (!isGlobalListenersInitialized) {
         setupGlobalEvents();
         isGlobalListenersInitialized = true;
     }
+}
+
+/**
+ * Asegura que el widget del Chatbot esté presente en cualquier página del ecosistema.
+ */
+function ensureChatbotWidget() {
+    if (document.getElementById('chatWidgetContainer')) return;
+
+    const widgetHTML = `
+    <div id="chatWidgetContainer">
+        <div id="windowChat" class="chatbot-window hidden">
+            <div class="chatbot-header">
+                <div class="chatbot-info">
+                    <div class="bot-avatar-container">
+                        <img src="../Style/image/bot_finara.png" alt="Finara Bot" class="bot-avatar-img">
+                    </div>
+                    <div>
+                        <h6>Asistente Finara</h6>
+                        <small class="status-online">• En línea</small>
+                    </div>
+                </div>
+                <button id="btnCloseChat" class="close-chat-btn" aria-label="Cerrar chat">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div id="chatBody" class="chatbot-body">
+                <div class="chat-bubble bot-bubble">
+                    ¡Hola! 👋 Soy tu asistente virtual de <strong>Finara Bank</strong>. ¿En qué puedo orientarte hoy?
+                </div>
+            </div>
+
+            <div class="chat-input-bar">
+                <input type="text" id="chatInputText" class="chat-input-field" placeholder="Escribe tu consulta (ej: horarios)..." />
+                <button id="chatSendBtn" class="chat-send-btn" title="Enviar"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+
+            <div class="chatbot-footer" id="chatOptions">
+                <button class="option-btn highlight-btn" data-action="horarios">🕒 Horarios de Atención</button>
+                <button class="option-btn" data-action="consultar">🔍 Revisar Saldo</button>
+                <button class="option-btn" data-action="transferir">💸 Enviar Dinero</button>
+                <button class="option-btn" data-action="menu_principal">🔄 Ayuda General</button>
+            </div>
+        </div>
+
+        <button id="btnToggleChat" class="chatbot-float-btn" title="Asistente Virtual Finara">
+            <img src="../Style/image/bot_finara.png" alt="Finara Bot" class="float-btn-img">
+        </button>
+    </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', widgetHTML);
 }
 
 /**
@@ -52,6 +107,48 @@ function highlightActiveMenu() {
             link.classList.remove('active');
         }
     });
+}
+
+/**
+ * Maneja el envío y procesamiento de mensajes del Chatbot (HU-36)
+ */
+function enviarMensajeChat(texto) {
+    if (!texto || !texto.trim()) return;
+
+    const chatBody = document.getElementById('chatBody');
+    const chatInput = document.getElementById('chatInputText');
+    const chatOptions = document.getElementById('chatOptions');
+    if (!chatBody) return;
+
+    // 1. Mensaje del usuario
+    const userBubble = document.createElement('div');
+    userBubble.className = 'chat-bubble';
+    userBubble.style.alignSelf = 'flex-end';
+    userBubble.style.background = 'var(--gold-main)';
+    userBubble.style.color = '#000000';
+    userBubble.style.fontWeight = '600';
+    userBubble.textContent = texto.trim();
+    chatBody.appendChild(userBubble);
+    chatBody.scrollTop = chatBody.scrollHeight;
+
+    if (chatInput) chatInput.value = '';
+
+    // 2. Respuesta del bot procesada mediante el servicio de intenciones (HU-36)
+    setTimeout(() => {
+        const respuesta = procesarMensajeChatbot(texto);
+        const botBubble = document.createElement('div');
+        botBubble.className = 'chat-bubble bot-bubble';
+        botBubble.innerHTML = respuesta.html;
+        chatBody.appendChild(botBubble);
+        chatBody.scrollTop = chatBody.scrollHeight;
+
+        // Actualizar opciones rápidas disponibles
+        if (chatOptions && respuesta.opcionesSiguientes) {
+            chatOptions.innerHTML = respuesta.opcionesSiguientes.map(op => `
+                <button class="option-btn ${op.accion === 'horarios' ? 'highlight-btn' : ''}" data-action="${op.accion}">${op.texto}</button>
+            `).join('');
+        }
+    }, 300);
 }
 
 /**
@@ -109,7 +206,13 @@ function setupGlobalEvents() {
 
         if (openChatNavBtn || floatChatBtn) {
             e.preventDefault();
-            if (windowChat) windowChat.classList.toggle('hidden');
+            if (windowChat) {
+                windowChat.classList.toggle('hidden');
+                if (!windowChat.classList.contains('hidden')) {
+                    const inp = document.getElementById('chatInputText');
+                    if (inp) inp.focus();
+                }
+            }
             return;
         }
 
@@ -119,10 +222,49 @@ function setupGlobalEvents() {
             return;
         }
 
-        // E. Clic fuera del sidebar en móviles
+        // E. Opciones rápidas del Chatbot (HU-36)
+        const btnOpcionChat = e.target.closest('.option-btn');
+        if (btnOpcionChat && btnOpcionChat.closest('#chatWidgetContainer')) {
+            e.preventDefault();
+            const action = btnOpcionChat.getAttribute('data-action');
+            if (action === 'horarios') {
+                enviarMensajeChat('¿Cuáles son los horarios de atención?');
+            } else if (action === 'consultar') {
+                enviarMensajeChat('¿Cómo consulto mi saldo?');
+            } else if (action === 'transferir') {
+                enviarMensajeChat('¿Cómo realizar una transferencia?');
+            } else if (action === 'menu_principal') {
+                enviarMensajeChat('Hola');
+            } else {
+                enviarMensajeChat(btnOpcionChat.textContent);
+            }
+            return;
+        }
+
+        // F. Botón Enviar mensaje del Chatbot
+        const chatSendBtn = e.target.closest('#chatSendBtn');
+        if (chatSendBtn) {
+            e.preventDefault();
+            const input = document.getElementById('chatInputText');
+            if (input) enviarMensajeChat(input.value);
+            return;
+        }
+
+        // G. Clic fuera del sidebar en móviles
         if (window.innerWidth <= 992 && sidebar && sidebar.classList.contains('open')) {
             if (!sidebar.contains(e.target) && !e.target.closest('#mobileMenuBtn')) {
                 sidebar.classList.remove('open');
+            }
+        }
+    });
+
+    // Enter para enviar mensaje en el Chatbot
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const chatInput = document.getElementById('chatInputText');
+            if (chatInput && document.activeElement === chatInput) {
+                e.preventDefault();
+                enviarMensajeChat(chatInput.value);
             }
         }
     });

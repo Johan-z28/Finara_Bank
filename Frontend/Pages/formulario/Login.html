@@ -4,94 +4,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar sesión | Finara Bank</title>   
-    <!-- SweetAlert2 CSS -->
+    <title>Iniciar sesión | Finara Bank</title>
+    <link rel="icon" type="image/svg+xml" href="../../Style/image/favicon.svg">
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../../Style/Login.css"> 
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="../../Style/Login.css">
 </head>
 
 <body>
+    
+    <main class="login-container">
 
-    <div class="login-container">
+        <!-- IMAGEN -->
+        <section class="login-image">
+            <img src="../../Style/image/login.png" alt="Tarjeta Finara Bank">
+        </section>
 
-        <div class="banner">
-            <img src="../../Style/image/login.png" alt="Finara Bank">
-        </div>
+        <!-- FORMULARIO -->
+        <section class="login-form-container">
+            <div class="login-form">
 
-        <div class="login">
-
-            <div class="login-box">
-
-                <a href="../../index.html" class="back">
-                    <i class="fa-solid fa-arrow-left"></i>
-                    Volver al inicio
-                </a>
-
-                <img src="../../Style/image/Logo_finara.svg" alt="Logo Finara" class="logo">
-
-                <h1>Bienvenido de nuevo</h1>
-
-                <p class="description">
-                    Inicia sesión para acceder a tu cuenta
-                </p>
-
-                <form id="loginForm">
-
-                    <label for="usuario">
-                        Usuario
-                    </label>
-
-                    <div class="input-box">
-                        <i class="fa-solid fa-user"></i>
-
-                        <input type="text" id="usuario" placeholder="Ingresa tu usuario" required>
-                    </div>
-
-                    <label for="password">
-                        Contraseña
-                    </label>
-
-                    <div class="input-box">
-
-                        <i class="fa-solid fa-lock"></i>
-
-                        <input type="password" id="password" placeholder="Ingresa tu contraseña" required>
-
-                        <button type="button" id="showPassword">
-                            <i class="fa-regular fa-eye"></i>
-                        </button>
-
-                    </div>
-
-                    <div id="attempts">
-                        Intentos restantes: 3
-                    </div>
-
-                    <a href="#" class="forgot" id="forgotPassword">
-                        ¿Olvidaste tu contraseña?
+                <!-- Volver al inicio -->
+                <div class="form-back-wrapper">
+                    <a href="../../index.html" class="back-home-link">
+                        <i class="fa-solid fa-arrow-left"></i> Volver al inicio
                     </a>
+                </div>
 
+                <!-- Encabezado -->
+                <div class="form-header">
+                    <div class="form-icon">
+                        <i class="fa-solid fa-right-to-bracket"></i>
+                    </div>
+                    <div>
+                        <h1>Iniciar sesión</h1>
+                        <p>Ingresa tu usuario y contraseña para acceder a tu cuenta.</p>
+                    </div>
+                </div>
+
+                <!-- Formulario -->
+                <form id="loginForm" novalidate>
+
+                    <!-- USUARIO -->
+                    <div class="input-group">
+                        <label for="usuario">Usuario <span>*</span></label>
+                        <div class="input-box">
+                            <i class="fa-solid fa-at"></i>
+                            <input type="text" id="usuario" name="usuario" placeholder="Ej. yull_mesa"
+                                autocomplete="username" autocapitalize="none" spellcheck="false" required>
+                        </div>
+                    </div>
+
+                    <!-- CONTRASEÑA -->
+                    <div class="input-group">
+                        <label for="password">Contraseña <span>*</span></label>
+                        <div class="input-box">
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="password" id="password" name="password" placeholder="Ingresa tu contraseña"
+                                autocomplete="current-password" required>
+                            <button type="button" class="show-password" aria-label="Mostrar u ocultar contraseña"
+                                onclick="togglePassword('password', this)">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <a href="#" id="forgotPassword" class="forgot">¿Olvidaste tu contraseña?</a>
+
+                    <!-- BOTÓN -->
                     <button type="submit" class="login-button">
-                        Iniciar sesión
+                        <i class="fa-solid fa-right-to-bracket"></i>
+                        <span>Iniciar sesión</span>
                         <i class="fa-solid fa-arrow-right"></i>
                     </button>
 
+                    <!-- LINK A REGISTRO -->
+                    <div class="register-link">
+                        <span></span>
+                        <p>
+                            ¿No tienes una cuenta?
+                            <a href="signup.html">Regístrate <i class="fa-solid fa-arrow-right"></i></a>
+                        </p>
+                        <span></span>
+                    </div>
                 </form>
-
-                <div class="register">
-                    ¿No tienes una cuenta?
-                    <a href="signup.html">Crear cuenta</a>
-                </div>
-
             </div>
-
-        </div>
-
-    </div>
+        </section>
+    </main>
 
     <!-- SweetAlert2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="../../Vanilla/formulario/Login.js" defer></script>
+    <!-- JS del login -->
+    <script src="../../Vanilla/formulario/Login.js"></script>
 </body>
 
 </html>

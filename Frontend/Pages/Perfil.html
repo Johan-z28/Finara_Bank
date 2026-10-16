@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -23,6 +23,12 @@
                     <a href="Dashboard.html" class="nav-link" data-route="dashboard" title="Dashboard">
                         <i class="fa-solid fa-house"></i>
                         <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="solicitudTarjeta.html" class="nav-link" data-route="productos" title="Solicitar Productos">
+                        <i class="fa-regular fa-credit-card"></i>
+                        <span>Solicitar Productos</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -56,9 +62,27 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="Creditos.html" class="nav-link" data-route="creditos" title="Solicitud de Créditos">
-                        <i class="fa-solid fa-hand-holding-dollar"></i>
-                        <span>Solicitud de Créditos</span>
+                    <a href="Presupuesto.html" class="nav-link" data-route="presupuesto" title="Presupuesto">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Presupuesto</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="FondoEmergencia.html" class="nav-link" data-route="fondo" title="Fondo de Emergencia">
+                        <i class="fa-solid fa-shield-heart"></i>
+                        <span>Fondo Emergencia</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Metas.html" class="nav-link" data-route="metas" title="Metas de Ahorro">
+                        <i class="fa-solid fa-bullseye"></i>
+                        <span>Metas de Ahorro</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Seguimiento.html" class="nav-link" data-route="seguimiento" title="Seguimiento Financiero">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Seguimiento Financiero</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -131,57 +155,37 @@
 
             <!-- TARJETA PRINCIPAL DEL PERFIL -->
             <section class="profile-hero">
-
                 <div class="profile-user">
-
                     <div class="profile-avatar">
-                        <img src="../Style/image/avatar-maria.png" alt="María Gómez">
-                        <button class="change-photo">
+                        <img src="../Style/image/profile/avatar-maria.png" alt="Foto de perfil" id="profileAvatarImg">
+                        <!-- Input oculto para cambiar la foto al hacer clic en la cámara -->
+                        <input type="file" id="inputCambiarFoto" accept="image/*" style="display: none;">
+                        <button class="change-photo" id="btnCambiarFoto" title="Cambiar foto de perfil">
                             <i class="fa-solid fa-camera"></i>
                         </button>
                     </div>
-
                     <div class="profile-data">
-
                         <div class="profile-name">
-                            <h2>María Gómez</h2>
-                            <span>Cliente</span>
+                            <h2 id="profileHeroName">María Gómez</h2>
+                            <span id="profileHeroRole">Cliente</span>
                         </div>
-
-                        <div class="profile-contact">
-                            <p>
-                                <i class="fa-regular fa-envelope"></i>
-                                maria.gomez@email.com
-                            </p>
-
-                            <p>
-                                <i class="fa-solid fa-phone"></i>
-                                +57 300 123 4567
-                            </p>
-
-                            <p>
-                                <i class="fa-solid fa-location-dot"></i>
-                                Bogotá, Colombia
-                            </p>
+                        <!-- Badge de Verificación Dinámico -->
+                        <div class="verification-badge-container" style="margin-top: 12px;">
+                           <span id="verificationStatusBadge" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500;">
+                               <i class="fa-solid fa-circle-check"></i> Cuenta Verificada
+                           </span>
                         </div>
-
                     </div>
                 </div>
-
-
                 <!-- Decoración derecha -->
                 <div class="profile-security">
-
                     <div class="gold-plant">
                         <i class="fa-solid fa-seedling"></i>
                     </div>
-
                     <div class="security-shield">
                         <i class="fa-solid fa-check"></i>
                     </div>
-
                 </div>
-
             </section>
 
 

@@ -118,6 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const respuestasFAQ = {
+            horarios: "Nuestros horarios son:<br><br>🌐 **Canales Digitales y Virtuales:** 24 horas, 7 días a la semana (24/7) en web y móvil.<br><br>🏛️ **Oficinas Presenciales:** Lunes a Viernes de 8:00 a.m. a 4:30 p.m. y Sábados de 9:00 a.m. a 1:00 p.m. (Domingos y festivos cerrado).",
             cuentas: "Ofrecemos **Cuenta de Ahorros** (0 cuota de manejo, rentabilidad diaria) y **Cuenta Corriente** con chequera digital activa.",
             creditos: "Puedes solicitar préstamos de libre inversión con aprobación en minutos y plazos flexibles de hasta 60 meses.",
             inversion: "Con **Inversión Inteligente** puedes hacer crecer tu capital desde $100.000 COP sin cláusula de permanencia.",

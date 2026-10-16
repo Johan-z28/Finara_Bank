@@ -4,6 +4,7 @@ import java.util.Scanner;
 import admin.crud; // <-- Importar la clase crud desde el paquete admin
 import form.ProfileManager;
 import form.signUp;
+import tarjetaPoo.GestorTarjetas; // <-- Importar el gestor de tarjetas POO
 
 public class main {
     public static void main(String[] args) {
@@ -38,12 +39,32 @@ public class main {
                         System.out.print("Ingrese su correo electrónico: ");
                         String correoLogin = scanner.nextLine().trim();
                         if (baseDatosUsuarios.containsKey(correoLogin)) {
-                            System.out.print("Ingrese su contraseña: ");
+                            Syste   m.out.print("Ingrese su contraseña: ");
                             String passLogin = scanner.nextLine().trim();
                             Map<String, String> datosUsuario = baseDatosUsuarios.get(correoLogin);
                             if (datosUsuario.get("password").equals(passLogin)) {
                                 System.out.println("¡Inicio de sesión exitoso! Bienvenido de nuevo, " + datosUsuario.get("nombre"));
-                                ProfileManager.gestionarPerfil(scanner, datosUsuario);
+
+                                // Menú interactivo post-login que incluye Perfil y Tarjetas POO
+                                boolean sesionActiva = true;
+                                while(sesionActiva) {
+                                    System.out.println("\n--- MENÚ DE USUARIO ---");
+                                    System.out.println("1. Gestionar Perfil");
+                                    System.out.println("2. Catálogo y Solicitud de Tarjetas (POO)");
+                                    System.out.println("3. Cerrar sesión");
+                                    System.out.print("Elija una opción: ");
+                                    String subMenu = scanner.nextLine().trim();
+                                    if(subMenu.equals("1")) {
+                                        ProfileManager.gestionarPerfil(scanner, datosUsuario);
+                                    } else if(subMenu.equals("2")) {
+                                        GestorTarjetas.gestionarMenuTarjetas(scanner, datosUsuario);
+                                    } else if(subMenu.equals("3")) {
+                                        sesionActiva = false;
+                                        System.out.println("Sesión cerrada.");
+                                    } else {
+                                        System.out.println("Opción inválida.");
+                                    }
+                                }
                             } else {
                                 System.out.println("Error: Contraseña incorrecta.");
                             }

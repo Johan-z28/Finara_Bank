@@ -1,11 +1,13 @@
 import { initGlobalComponents } from './Global/app.js';
 import { PERIODOS, obtenerCuentasFiltro, obtenerMovimientos, SesionExpiradaError } from './movimientosService.js';
+import { obtenerDatosExtracto, descargarExtractoPDF } from './extractoService.js';
+import { guardarNotificacion } from './notificaciones.js';
 
 const TAMANO_PAGINA = 8;
 
 const formatoCOP = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
 const formatoFecha = new Intl.DateTimeFormat('es-CO', { day: '2-digit', month: 'short', year: 'numeric' });
-const formatoHora = new Intl.DateTimeFormat('es-CO', { hour: '2-digit', minute: '2-digit' });
+const formatoHora = new Intl.DateTimeFormat('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true });
 
 function el(tag, clase, texto) {
     const nodo = document.createElement(tag);
@@ -20,13 +22,18 @@ function crearFila(mov) {
     const fila = el('tr', `mov-fila mov-fila--${esIngreso ? 'ingreso' : 'egreso'}`);
 
     const fecha = new Date(mov.fecha);
+    const fechaValida = !isNaN(fecha.getTime()) ? fecha : new Date();
+
     const tdFecha = el('td');
     tdFecha.dataset.label = 'Fecha';
-    tdFecha.append(el('span', 'mov-fecha', formatoFecha.format(fecha)), el('span', 'mov-hora', formatoHora.format(fecha)));
+    tdFecha.append(
+        el('span', 'mov-fecha', formatoFecha.format(fechaValida)),
+        el('span', 'mov-hora', formatoHora.format(fechaValida))
+    );
 
     const tdDesc = el('td');
     tdDesc.dataset.label = 'Descripción';
-    tdDesc.append(el('span', 'mov-desc', mov.descripcion));
+    tdDesc.append(el('span', 'mov-desc', mov.descripcion || 'Transacción bancaria'));
     if (mov.categoria) tdDesc.append(el('span', 'mov-categoria', mov.categoria));
 
     const tdTipo = el('td');
@@ -40,7 +47,7 @@ function crearFila(mov) {
     const tdValor = el('td', 'mov-valor-celda');
     tdValor.dataset.label = 'Valor';
     tdValor.append(el('strong', `mov-valor mov-valor--${esIngreso ? 'ingreso' : 'egreso'}`,
-        `${esIngreso ? '+' : '−'} ${formatoCOP.format(mov.valor)}`));
+        `${esIngreso ? '+' : '−'} ${formatoCOP.format(Number(mov.valor) || 0)}`));
 
     fila.append(tdFecha, tdDesc, tdTipo, tdValor);
     return fila;
@@ -51,12 +58,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     initGlobalComponents();
 
     const $ = id => document.getElementById(id);
-    const selCuenta = $('filtroCuenta'), selPeriodo = $('filtroPeriodo'), selOrden = $('filtroOrden');
+    const selCuenta = $('filtroCuenta'), selPeriodo = $('filtroPeriodo');
+    const selTipo = $('filtroTipo'), selOrden = $('filtroOrden');
     const cuerpo = $('movCuerpo'), estado = $('movEstado'), tablaWrap = $('movTablaWrap');
     const btnPrev = $('pagPrev'), btnNext = $('pagNext'), pagInfo = $('pagInfo'), pagResumen = $('pagResumen');
     const totIngresos = $('totIngresos'), totEgresos = $('totEgresos');
 
-    const filtros = { cuentaId: null, periodo: '30d', orden: 'desc', pagina: 1 };
+    const filtros = { cuentaId: null, periodo: '30d', tipo: 'todos', orden: 'desc', pagina: 1 };
     let peticion = 0; // descarta respuestas viejas si el usuario cambia filtros rápido
 
     PERIODOS.forEach(p => {
@@ -66,13 +74,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     selPeriodo.value = filtros.periodo;
 
-    const mostrarEstado = (mensaje, { reintentar = false } = {}) => {
-        estado.replaceChildren(el('p', '', mensaje));
-        if (reintentar) {
+    const mostrarEstado = (mensaje, { reintentar = false, restablecer = false } = {}) => {
+        estado.replaceChildren();
+        const p = el('p', '', mensaje);
+        estado.append(p);
+
+        if (restablecer) {
+            const btnReset = el('button', 'btn-reintentar', 'Ver todo el historial');
+            btnReset.addEventListener('click', () => {
+                selPeriodo.value = 'todo';
+                filtros.periodo = 'todo';
+                filtros.pagina = 1;
+                cargar();
+            });
+            estado.append(btnReset);
+        } else if (reintentar) {
             const b = el('button', 'btn-reintentar', 'Reintentar');
             b.addEventListener('click', cargar);
             estado.append(b);
         }
+
         estado.classList.remove('hidden');
         tablaWrap.classList.add('hidden');
     };
@@ -101,7 +122,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!r.items.length) {
                 pagResumen.textContent = '';
                 pagInfo.textContent = '';
-                mostrarEstado('No hay movimientos en este periodo.');
+                mostrarEstado('No hay movimientos registrados en este periodo.', { restablecer: filtros.periodo !== 'todo' });
                 return;
             }
 
@@ -124,11 +145,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const alCambiarFiltro = () => {
         filtros.cuentaId = selCuenta.value;
         filtros.periodo = selPeriodo.value;
+        filtros.tipo = selTipo ? selTipo.value : 'todos';
         filtros.orden = selOrden.value;
         filtros.pagina = 1;
         cargar();
     };
-    [selCuenta, selPeriodo, selOrden].forEach(s => s.addEventListener('change', alCambiarFiltro));
+    [selCuenta, selPeriodo, selTipo, selOrden].filter(Boolean).forEach(s => s.addEventListener('change', alCambiarFiltro));
     btnPrev.addEventListener('click', () => { filtros.pagina--; cargar(); });
     btnNext.addEventListener('click', () => { filtros.pagina++; cargar(); });
 
@@ -141,10 +163,108 @@ document.addEventListener('DOMContentLoaded', async () => {
             o.value = c.id;
             selCuenta.append(o);
         });
+        // Poblar selector del modal de extractos
+        const selExtractoCuenta = $('extractoCuentaSelect');
+        if (selExtractoCuenta) {
+            selExtractoCuenta.replaceChildren();
+            cuentas.forEach(c => {
+                const opt = el('option', '', `${c.nombre} · •••• ${String(c.numero).replace(/\D/g, '').slice(-4)}`);
+                opt.value = c.id;
+                selExtractoCuenta.append(opt);
+            });
+        }
+
         filtros.cuentaId = selCuenta.value;
         cargar();
     } catch (err) {
         if (err instanceof SesionExpiradaError) { window.location.href = '../index.html'; return; }
         mostrarEstado('No pudimos cargar tus cuentas. Intenta de nuevo.', { reintentar: true });
+    }
+
+    // ----- Manejo de Modal de Extractos Bancarios (HU-19) -----
+    const modalExtracto = $('modalExtractoBancario');
+    const btnAbrirModal = $('btnAbrirModalExtracto');
+    const btnCerrarModal = $('btnCerrarModalExtracto');
+    const btnCancelarModal = $('btnCancelarExtracto');
+    const formExtracto = $('formGenerarExtracto');
+    const selMes = $('extractoMesSelect');
+    const selAnio = $('extractoAnioSelect');
+
+    // Seleccionar por defecto el mes actual
+    if (selMes) selMes.value = String(new Date().getMonth() + 1);
+
+    const abrirModal = () => {
+        if (!modalExtracto) return;
+        modalExtracto.classList.remove('hidden');
+    };
+
+    const cerrarModal = () => {
+        if (!modalExtracto) return;
+        modalExtracto.classList.add('hidden');
+    };
+
+    if (btnAbrirModal) btnAbrirModal.addEventListener('click', abrirModal);
+    if (btnCerrarModal) btnCerrarModal.addEventListener('click', cerrarModal);
+    if (btnCancelarModal) btnCancelarModal.addEventListener('click', cerrarModal);
+    if (modalExtracto) {
+        modalExtracto.addEventListener('click', (e) => {
+            if (e.target === modalExtracto) cerrarModal();
+        });
+    }
+
+    if (formExtracto) {
+        formExtracto.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const cuentaId = $('extractoCuentaSelect').value;
+            const mes = selMes.value;
+            const anio = selAnio.value;
+
+            try {
+                const datosDoc = await obtenerDatosExtracto(cuentaId, mes, anio);
+                descargarExtractoPDF(datosDoc);
+
+                // Requisito 4: Notificación - Guardar en localStorage
+                guardarNotificacion({
+                    titulo: 'Extracto bancario generado',
+                    mensaje: `Se descargó exitosamente el extracto de ${datosDoc.cuenta.tipo} (terminada en ${String(datosDoc.cuenta.numero).slice(-4)}) para el periodo ${datosDoc.periodoTexto}. Folio: ${datosDoc.folioCertificado}.`,
+                    tipo: 'exito'
+                });
+
+                cerrarModal();
+
+                if (window.Swal) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Extracto Generado con Éxito!',
+                        html: `
+                            <p style="color: #cbd5e1; font-size: 0.95rem;">
+                                Se ha descargado el extracto oficial de <strong>${datosDoc.cuenta.tipo}</strong> para el periodo <strong>${datosDoc.periodoTexto}</strong>.
+                            </p>
+                            <small style="color: #94a3b8; display: block; margin-top: 0.5rem;">
+                                Revisa tu carpeta de Descargas o la ventana de impresión para guardarlo como PDF.
+                            </small>
+                        `,
+                        background: '#12151c',
+                        color: '#ffffff',
+                        confirmButtonColor: '#e5a93c',
+                        confirmButtonText: 'Aceptar',
+                        allowOutsideClick: true,
+                        allowEscapeKey: true
+                    });
+                }
+            } catch (err) {
+                console.error('Error al generar extracto:', err);
+                if (window.Swal) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error al generar extracto',
+                        text: err.message || 'No se pudo generar el documento.',
+                        background: '#12151c',
+                        color: '#ffffff',
+                        confirmButtonColor: '#e5a93c'
+                    });
+                }
+            }
+        });
     }
 });

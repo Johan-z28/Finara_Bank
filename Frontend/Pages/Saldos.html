@@ -1,12 +1,14 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Saldos | Finara Bank</title>
-    <link rel="icon" type="image/png" sizes="32x32" href="../Style/image/favicon.svg">
     <link rel="stylesheet" href="../Style/Saldos.css">
+    <!-- SweetAlert2 CSS y JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="general-body">
@@ -31,6 +33,13 @@
                     <a href="Dashboard.html" class="nav-link" data-route="dashboard" title="Dashboard">
                         <i class="fa-solid fa-house"></i>
                         <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="solicitudTarjeta.html" class="nav-link" data-route="saldos"
+                        title="Solicitar Productos">
+                        <i class="fa-regular fa-credit-card"></i>
+                        <span>Solicitar Productos</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -64,9 +73,27 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="Creditos.html" class="nav-link" data-route="creditos" title="Solicitud de Créditos">
-                        <i class="fa-solid fa-hand-holding-dollar"></i>
-                        <span>Solicitud de Créditos</span>
+                    <a href="Presupuesto.html" class="nav-link" data-route="presupuesto" title="Presupuesto">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Presupuesto</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="FondoEmergencia.html" class="nav-link" data-route="fondo" title="Fondo de Emergencia">
+                        <i class="fa-solid fa-shield-heart"></i>
+                        <span>Fondo Emergencia</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Metas.html" class="nav-link" data-route="metas" title="Metas de Ahorro">
+                        <i class="fa-solid fa-bullseye"></i>
+                        <span>Metas de Ahorro</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Seguimiento.html" class="nav-link" data-route="seguimiento" title="Seguimiento Financiero">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Seguimiento Financiero</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -139,14 +166,118 @@
                     <h1>Consulta de Saldos y Cuentas</h1>
                     <p class="saldos-subtitle">Tus productos bancarios y su saldo disponible.</p>
                 </div>
-                <button class="toggle-saldos" id="toggleSaldos" aria-pressed="false" aria-label="Ocultar saldos">
-                    <i class="fa-regular fa-eye"></i>
-                </button>
+                <div class="saldos-actions-group">
+                    <!-- BOTÓN HU-13: HISTORIAL DE TARJETAS -->
+                    <a href="HistorialTarjetas.html" class="btn-historial-productos">
+                        <i class="a-solid fa-shapes"></i> Historial de Productos
+                    </a>
+                    <button class="toggle-saldos" id="toggleSaldos" aria-pressed="false" aria-label="Ocultar saldos">
+                        <i class="fa-regular fa-eye"></i>
+                    </button>
+                </div>
             </div>
 
             <section class="cuentas-grid" id="cuentasLista" aria-live="polite" aria-busy="true"></section>
             <div class="cuentas-estado hidden" id="cuentasEstado" role="status"></div>
-        </main> 
+
+            <!-- SECCIÓN PREMIUM: RESUMEN FINANCIERO Y DISTRIBUCIÓN DE SALDOS -->
+            <section class="saldos-analitica-grid">
+                <!-- Gráfico de distribución de saldo -->
+                <div class="analitica-card">
+                    <div class="analitica-card__header">
+                        <div>
+                            <h2 class="analitica-card__title">Distribución de Liquidez</h2>
+                            <p class="analitica-card__subtitle">Proporción de saldo entre tus productos activos</p>
+                        </div>
+                        <span class="badge-gold"><i class="fa-solid fa-chart-pie"></i> Balance Activo</span>
+                    </div>
+
+                    <div class="analitica-card__body">
+                        <div class="distribucion-visual">
+                            <div class="barra-distribucion">
+                                <div class="barra-segmento barra-segmento--ahorros" id="segAhorros" style="width: 50%;"
+                                    title="Cuenta de Ahorros"></div>
+                                <div class="barra-segmento barra-segmento--corriente" id="segCorriente"
+                                    style="width: 50%;" title="Cuenta Corriente"></div>
+                                <div class="barra-segmento barra-segmento--credito hidden" id="segCredito"
+                                    style="width: 0%;" title="Tarjeta de Crédito"></div>
+                            </div>
+
+                            <div class="distribucion-leyenda">
+                                <div class="leyenda-item" id="itemLeyendaAhorros">
+                                    <span class="leyenda-dot leyenda-dot--ahorros"></span>
+                                    <div class="leyenda-info">
+                                        <span class="leyenda-nombre">Cuenta de Ahorros</span>
+                                        <strong class="leyenda-monto" id="montoAhorrosTotal">$ 0</strong>
+                                        <small class="leyenda-porcentaje" id="porcentajeAhorros">0%</small>
+                                    </div>
+                                </div>
+
+                                <div class="leyenda-item" id="itemLeyendaCorriente">
+                                    <span class="leyenda-dot leyenda-dot--corriente"></span>
+                                    <div class="leyenda-info">
+                                        <span class="leyenda-nombre">Cuenta Corriente</span>
+                                        <strong class="leyenda-monto" id="montoCorrienteTotal">$ 0</strong>
+                                        <small class="leyenda-porcentaje" id="porcentajeCorriente">0%</small>
+                                    </div>
+                                </div>
+
+                                <div class="leyenda-item hidden" id="itemLeyendaCredito">
+                                    <span class="leyenda-dot leyenda-dot--credito"></span>
+                                    <div class="leyenda-info">
+                                        <span class="leyenda-nombre">Cupo Crédito Aprobado</span>
+                                        <strong class="leyenda-monto" id="montoCreditoTotal">$ 0</strong>
+                                        <small class="leyenda-porcentaje" id="porcentajeCredito">0%</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resumen consolidado y acciones rápidas -->
+                <div class="analitica-card analitica-card--resumen">
+                    <div class="analitica-card__header">
+                        <div>
+                            <h2 class="analitica-card__title">Patrimonio Disponible</h2>
+                            <p class="analitica-card__subtitle">Suma total de tus cuentas activas</p>
+                        </div>
+                        <div class="icono-oro-circulo">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                    </div>
+
+                    <div class="patrimonio-monto-box">
+                        <span class="patrimonio-label">Saldo Total Consolidado</span>
+                        <h2 class="patrimonio-valor" id="saldoTotalConsolidado">$ 0</h2>
+                        <span class="patrimonio-badge"><i class="fa-solid fa-arrow-trend-up"></i> Fondos disponibles
+                            para operaciones</span>
+                    </div>
+
+                    <div class="saldos-accesos-rapidos">
+                        <span class="accesos-label">Operaciones frecuentes:</span>
+                        <div class="accesos-botones">
+                            <a href="Transferencias.html" class="btn-acceso-rapido">
+                                <i class="fa-solid fa-paper-plane"></i>
+                                <span>Transferir</span>
+                            </a>
+                            <a href="Consignar.html" class="btn-acceso-rapido">
+                                <i class="fa-solid fa-wallet"></i>
+                                <span>Consignar</span>
+                            </a>
+                            <a href="Movimientos.html" class="btn-acceso-rapido">
+                                <i class="fa-solid fa-receipt"></i>
+                                <span>Ver Movimientos</span>
+                            </a>
+                            <a href="Presupuesto.html" class="btn-acceso-rapido">
+                                <i class="fa-solid fa-chart-pie"></i>
+                                <span>Presupuesto</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
 
     <!-- Módulo JS principal -->

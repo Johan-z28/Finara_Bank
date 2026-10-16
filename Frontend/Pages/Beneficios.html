@@ -4,9 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Beneficios | Finara Bank</title>
+    <title>Beneficiarios | Finara Bank</title>
     <link rel="icon" type="image/png" sizes="32x32" href="../Style/image/favicon.svg">
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../Style/Beneficios.css">
+    <!-- SweetAlert2 CSS y JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="general-body">
@@ -31,6 +36,12 @@
                     <a href="Dashboard.html" class="nav-link" data-route="dashboard" title="Dashboard">
                         <i class="fa-solid fa-house"></i>
                         <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="solicitudTarjeta.html" class="nav-link" data-route="productos" title="Solicitar Productos">
+                        <i class="fa-regular fa-credit-card"></i>
+                        <span>Solicitar Productos</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -64,15 +75,33 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="Creditos.html" class="nav-link" data-route="creditos" title="Solicitud de Créditos">
-                        <i class="fa-solid fa-hand-holding-dollar"></i>
-                        <span>Solicitud de Créditos</span>
+                    <a href="Presupuesto.html" class="nav-link" data-route="presupuesto" title="Presupuesto">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Presupuesto</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="Beneficios.html" class="nav-link active" data-route="beneficios" title="Beneficios">
-                        <i class="fa-regular fa-star"></i>
-                        <span>Beneficios</span>
+                    <a href="FondoEmergencia.html" class="nav-link" data-route="fondo" title="Fondo de Emergencia">
+                        <i class="fa-solid fa-shield-heart"></i>
+                        <span>Fondo Emergencia</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Metas.html" class="nav-link" data-route="metas" title="Metas de Ahorro">
+                        <i class="fa-solid fa-bullseye"></i>
+                        <span>Metas de Ahorro</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Seguimiento.html" class="nav-link" data-route="seguimiento" title="Seguimiento Financiero">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Seguimiento Financiero</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Beneficios.html" class="nav-link active" data-route="beneficios" title="Beneficiarios">
+                        <i class="fa-solid fa-user-group"></i>
+                        <span>Beneficiarios</span>
                     </a>
                 </li>
             </ul>
@@ -133,7 +162,215 @@
         </header>
 
         <!-- CONTENIDO PRINCIPAL -->
-        
+        <main class="ben-container">
+            <div class="ben-header">
+                <div class="ben-header-info">
+                    <h1>Directorio de Beneficiarios</h1>
+                    <p class="ben-subtitle">Inscribe y gestiona las cuentas de personas o empresas a las que transfieres dinero frecuentemente.</p>
+                </div>
+                <div class="ben-header-actions">
+                    <button type="button" class="ben-btn ben-btn--primary" id="btnAbrirModalNuevo">
+                        <i class="fa-solid fa-user-plus"></i> Inscribir Beneficiario
+                    </button>
+                </div>
+            </div>
+
+            <!-- Métricas rápidas -->
+            <div class="ben-stats-grid">
+                <div class="ben-stat-card">
+                    <div class="ben-stat-icon">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div class="ben-stat-info">
+                        <span>Total Beneficiarios</span>
+                        <strong id="statTotalBeneficiarios">0</strong>
+                    </div>
+                </div>
+                <div class="ben-stat-card">
+                    <div class="ben-stat-icon">
+                        <i class="fa-solid fa-building-columns"></i>
+                    </div>
+                    <div class="ben-stat-info">
+                        <span>Cuentas Finara</span>
+                        <strong id="statCuentasFinara">0</strong>
+                    </div>
+                </div>
+                <div class="ben-stat-card">
+                    <div class="ben-stat-icon">
+                        <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                    </div>
+                    <div class="ben-stat-info">
+                        <span>Otros Bancos</span>
+                        <strong id="statOtrosBancos">0</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ben-layout">
+                <section class="ben-card">
+                    <div class="ben-card-header">
+                        <h2><i class="fa-solid fa-address-book text-gold"></i> Beneficiarios Inscritos</h2>
+                    </div>
+
+                    <!-- Buscador y filtro de banco -->
+                    <div class="ben-toolbar">
+                        <div class="ben-search-box">
+                            <i class="fa-solid fa-search"></i>
+                            <input type="text" id="inputBuscarBeneficiario" placeholder="Buscar por nombre, documento o número de cuenta...">
+                        </div>
+                        <select id="selectFiltroBanco" class="ben-filter-select">
+                            <option value="TODOS">Todos los Bancos</option>
+                            <option value="Finara Bank">Finara Bank</option>
+                            <option value="Bancolombia">Bancolombia</option>
+                            <option value="Davivienda">Davivienda</option>
+                            <option value="Banco de Bogotá">Banco de Bogotá</option>
+                            <option value="Nequi">Nequi</option>
+                            <option value="Daviplata">Daviplata</option>
+                            <option value="OTROS">Otros Bancos</option>
+                        </select>
+                    </div>
+
+                    <!-- Cuadrícula / Listado dinámico -->
+                    <div class="ben-grid" id="contenedorBeneficiarios">
+                        <!-- Inyectado dinámicamente -->
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Formulario para Registrar Beneficiario -->
+    <div id="modalBeneficiario" class="ben-modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
+        <div class="ben-modal-content">
+            <div class="ben-modal-header">
+                <h3 id="modalTitulo"><i class="fa-solid fa-user-plus text-gold"></i> Inscribir Nuevo Beneficiario</h3>
+                <button type="button" class="ben-modal-close" id="btnCerrarModal" aria-label="Cerrar modal">&times;</button>
+            </div>
+            <form id="formBeneficiario" class="ben-modal-body" novalidate>
+                
+                <!-- Datos Personales -->
+                <div class="ben-form-grupo">
+                    <label for="benNombre">Nombre Completo del Titular *</label>
+                    <input type="text" id="benNombre" class="ben-input" placeholder="Ej: Andrés Felipe Pérez" required>
+                    <p class="ben-form-hint">Nombre tal como figura en su cuenta bancaria.</p>
+                </div>
+
+                <div class="ben-form-fila">
+                    <div class="ben-form-grupo">
+                        <label for="benTipoDocumento">Tipo de Documento *</label>
+                        <select id="benTipoDocumento" class="ben-select" required>
+                            <option value="CC" selected>Cédula de Ciudadanía (CC)</option>
+                            <option value="CE">Cédula de Extranjería (CE)</option>
+                            <option value="TI">Tarjeta de Identidad (TI)</option>
+                            <option value="PAS">Pasaporte (PAS)</option>
+                            <option value="NIT">NIT</option>
+                        </select>
+                    </div>
+                    <div class="ben-form-grupo">
+                        <label for="benNumeroDocumento">Número de Documento *</label>
+                        <input type="text" id="benNumeroDocumento" class="ben-input" inputmode="numeric" placeholder="Ej: 1020304050" maxlength="15" required>
+                    </div>
+                </div>
+
+                <!-- Datos Bancarios -->
+                <div class="ben-form-grupo">
+                    <label for="benBanco">Entidad Bancaria *</label>
+                    <select id="benBanco" class="ben-select" required>
+                        <option value="Finara Bank" selected>Finara Bank</option>
+                        <option value="Bancolombia">Bancolombia</option>
+                        <option value="Banco de Bogotá">Banco de Bogotá</option>
+                        <option value="Davivienda">Davivienda</option>
+                        <option value="Banco BBVA">Banco BBVA</option>
+                        <option value="Banco de Occidente">Banco de Occidente</option>
+                        <option value="Banco Popular">Banco Popular</option>
+                        <option value="Banco AV Villas">Banco AV Villas</option>
+                        <option value="Scotiabank Colpatria">Scotiabank Colpatria</option>
+                        <option value="Banco Caja Social">Banco Caja Social</option>
+                        <option value="Banco Falabella">Banco Falabella</option>
+                        <option value="Nequi">Nequi</option>
+                        <option value="Daviplata">Daviplata</option>
+                        <option value="Lulo Bank">Lulo Bank</option>
+                        <option value="Nu Colombia">Nu Colombia</option>
+                    </select>
+                </div>
+
+                <div class="ben-form-fila">
+                    <div class="ben-form-grupo">
+                        <label for="benTipoCuenta">Tipo de Cuenta *</label>
+                        <select id="benTipoCuenta" class="ben-select" required>
+                            <option value="AHORROS" selected>Cuenta de Ahorros</option>
+                            <option value="CORRIENTE">Cuenta Corriente</option>
+                        </select>
+                    </div>
+                    <div class="ben-form-grupo">
+                        <label for="benNumeroCuenta">Número de Cuenta *</label>
+                        <input type="text" id="benNumeroCuenta" class="ben-input" inputmode="numeric" placeholder="Ej: 4021599900111" maxlength="20" required>
+                    </div>
+                </div>
+
+                <!-- Datos Opcionales -->
+                <div class="ben-form-grupo">
+                    <label for="benAlias">Alias o Apodo (Opcional)</label>
+                    <input type="text" id="benAlias" class="ben-input" placeholder="Ej: Hermano Andrés, Arriendo, Proveedor">
+                </div>
+
+                <div class="ben-form-fila">
+                    <div class="ben-form-grupo">
+                        <label for="benEmail">Correo Electrónico (Opcional)</label>
+                        <input type="email" id="benEmail" class="ben-input" placeholder="correo@ejemplo.com">
+                    </div>
+                    <div class="ben-form-grupo">
+                        <label for="benTelefono">Celular / Teléfono (Opcional)</label>
+                        <input type="tel" id="benTelefono" class="ben-input" inputmode="numeric" placeholder="3001234567" maxlength="12">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 1.5rem;">
+                    <button type="button" class="ben-btn ben-btn--ghost" id="btnCancelarModal">Cancelar</button>
+                    <button type="submit" class="ben-btn ben-btn--primary" id="btnGuardarBeneficiario">
+                        <i class="fa-solid fa-floppy-disk"></i> Guardar Beneficiario
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación de Eliminación (HU-09) -->
+    <div id="modalConfirmarEliminar" class="ben-modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modalEliminarTitulo">
+        <div class="ben-modal-content ben-modal-content--alerta">
+            <div class="ben-modal-header" style="border-bottom-color: rgba(239, 68, 68, 0.2);">
+                <h3 id="modalEliminarTitulo" style="color: #f87171;"><i class="fa-solid fa-triangle-exclamation"></i> Confirmar Eliminación</h3>
+                <button type="button" class="ben-modal-close" id="btnCerrarModalEliminar" aria-label="Cerrar modal">&times;</button>
+            </div>
+            <div class="ben-modal-body">
+                <div class="ben-alerta-box">
+                    <p>¿Estás seguro de que deseas eliminar este beneficiario de tus transferencias frecuentes?</p>
+                    <div class="ben-info-eliminacion" id="datosBeneficiarioAEliminar">
+                        <!-- Inyectado dinámicamente -->
+                    </div>
+                </div>
+
+                <div class="ben-form-grupo" style="margin-top: 1rem;">
+                    <label for="selectTipoBorrado">Tipo de eliminación</label>
+                    <select id="selectTipoBorrado" class="ben-select">
+                        <option value="LOGICO" selected>Desactivar beneficiario (Recomendado - Conserva trazabilidad)</option>
+                        <option value="FISICO">Eliminar permanentemente del sistema</option>
+                    </select>
+                </div>
+
+                <div class="ben-form-grupo">
+                    <label for="inputMotivoEliminacion">Motivo de la eliminación (Auditoría)</label>
+                    <input type="text" id="inputMotivoEliminacion" class="ben-input" placeholder="Ej: Cuenta bancaria cerrada, datos obsoletos, etc.">
+                </div>
+
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 1.5rem;">
+                    <button type="button" class="ben-btn ben-btn--ghost" id="btnCancelarEliminacion">Cancelar</button>
+                    <button type="button" class="ben-btn ben-btn--danger" id="btnConfirmarEliminacionFinal" style="padding: 10px 20px;">
+                        <i class="fa-solid fa-trash-can"></i> Confirmar y Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Módulo JS principal -->

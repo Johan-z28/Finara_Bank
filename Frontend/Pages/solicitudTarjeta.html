@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Estilos globales y específicos -->
     <link rel="stylesheet" href="../Style/global/styles.css">
-    <link rel="stylesheet" href="../Style/Dashboard.css">
     <link rel="stylesheet" href="../Style/solicitudTarjeta.css">
     <!-- SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -37,9 +36,9 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="solicitudTarjeta.html" class="nav-link active" data-route="saldos" title="Solicitar Tarjeta">
-                    <i class="fa-regular fa-credit-card"></i>
-                    <span>Solcitar Tarjeta</span>
+                <a href="solicitudTarjeta.html" class="nav-link active" data-route="productos" title="Solicitar Productos">
+                    <i class="fa-solid fa-shapes"></i>
+                    <span>Solicitar Productos</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -73,11 +72,29 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="Creditos.html" class="nav-link" data-route="creditos" title="Solicitud de Créditos">
-                    <i class="fa-solid fa-hand-holding-dollar"></i>
-                    <span>Solicitud de Créditos</span>
+                <a href="Presupuesto.html" class="nav-link" data-route="presupuesto" title="Presupuesto">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Presupuesto</span>
                 </a>
             </li>
+                <li class="nav-item">
+                    <a href="FondoEmergencia.html" class="nav-link" data-route="fondo" title="Fondo de Emergencia">
+                        <i class="fa-solid fa-shield-heart"></i>
+                        <span>Fondo Emergencia</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Metas.html" class="nav-link" data-route="metas" title="Metas de Ahorro">
+                        <i class="fa-solid fa-bullseye"></i>
+                        <span>Metas de Ahorro</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Seguimiento.html" class="nav-link" data-route="seguimiento" title="Seguimiento Financiero">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Seguimiento Financiero</span>
+                    </a>
+                </li>
             <li class="nav-item">
                 <a href="Beneficios.html" class="nav-link" data-route="beneficios" title="Beneficios">
                     <i class="fa-regular fa-star"></i>
@@ -111,7 +128,7 @@
             <div class="profile-menu-container">
                 <button class="profile-btn" id="profileMenuBtn">
                     <div class="avatar-placeholder" id="avatarContainer">
-                        <img src="" alt="Foto de perfil" id="userAvatarImg" class="profile-img hidden">
+                        <img src="../Style/image/profile/avatarDefault.png" alt="Foto de perfil" id="userAvatarImg" class="profile-img">
                         <i class="fa-solid fa-user profile-icon" id="userAvatarIcon"></i>
                     </div>
                     <i class="fa-solid fa-chevron-down"></i>
@@ -132,58 +149,79 @@
         </div>
     </header>
 
-    <!-- CONTENIDO: 3 TARJETAS EN GRID -->
+    <!-- CONTENIDO: SOLICITAR PRODUCTOS FINANCIEROS (CUENTAS Y TARJETAS) -->
     <main class="card-request-container">
         <div class="request-header">
-            <h1>Catálogo de Tarjetas</h1>
-            <p>Selecciona el tipo de producto que deseas solicitar. Recuerda que tu cuenta debe estar verificada.</p>
+        <span class="badge-gold" style="display: inline-flex; align-items: center; gap: 6px; margin-bottom: 0.6rem; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; background: rgba(229,169,60,0.15); color: #e5a93c; border: 1px solid rgba(229,169,60,0.3);">
+            <i class="fa-solid fa-shapes"></i> Portafolio Finara Bank
+        </span>
+            <h1>Solicitar Productos</h1>
+            <p>Abre tus cuentas bancarias y solicita tus tarjetas de forma 100% digital e inmediata.</p>
         </div>
 
-        <div class="catalog-grid">
-            <!-- Tarjeta 1: Débito -->
-            <div class="card-option-box" data-card="debito">
+        <!-- UN SOLO GRID DE 4 COLUMNAS PARA TODO -->
+        <div class="catalog-grid" style="grid-template-columns: repeat(4, 1fr) !important; gap: 1.5rem; width: 100%;">
+
+            <!-- 1. Cuenta de Ahorros -->
+            <div class="card-option-box" data-account="ahorros">
                 <div class="card-content-top">
-                    <span class="card-type-tag">Débito</span>
-                    <h3>Tarjeta Débito Finara</h3>
-                    <p>Ideal para el manejo diario de tu dinero con acceso directo a tu cuenta de ahorros.</p>
+                    <span class="card-type-tag" style="background: rgba(52, 211, 153, 0.15); color: #34d399;"><i class="fa-solid fa-piggy-bank"></i> Ahorros</span>
+                    <h3>Cuenta de Ahorros</h3>
+                    <p>Rentabiliza tu dinero con total disponibilidad y acceso a transferencias inmediatas.</p>
                     <ul class="card-benefits">
                         <li><i class="fa-solid fa-check"></i> Cero cuota de manejo</li>
-                        <li><i class="fa-solid fa-check"></i> Retiros gratis en red propia</li>
-                        <li><i class="fa-solid fa-check"></i> Compras seguras en línea</li>
+                        <li><i class="fa-solid fa-check"></i> Rentabilidad sobre saldo</li>
+                        <li><i class="fa-solid fa-check"></i> Incluye Tarjeta Débito</li>
                     </ul>
                 </div>
-                <button class="request-card-btn" data-action="solicitar-debito">Solicitar Débito</button>
+                <button class="request-card-btn" id="btnAperturarAhorros" data-action="aperturar-ahorros">Aperturar</button>
             </div>
 
-            <!-- Tarjeta 2: Crédito -->
+            <!-- 2. Cuenta Corriente -->
+            <div class="card-option-box" data-account="corriente">
+                <div class="card-content-top">
+                    <span class="card-type-tag" style="background: rgba(96, 165, 250, 0.15); color: #60a5fa;"><i class="fa-solid fa-building-columns"></i> Corriente</span>
+                    <h3>Cuenta Corriente</h3>
+                    <p>Herramienta diseñada para transacciones ágiles con cupo de sobregiro.</p>
+                    <ul class="card-benefits">
+                        <li><i class="fa-solid fa-check"></i> Sobregiro autorizado</li>
+                        <li><i class="fa-solid fa-check"></i> Transferencias directas</li>
+                        <li><i class="fa-solid fa-check"></i> Incluye Tarjeta Corriente</li>
+                    </ul>
+                </div>
+                <button class="request-card-btn" id="btnAperturarCorriente" data-action="aperturar-corriente">Aperturar</button>
+            </div>
+
+            <!-- 3. Tarjeta de Crédito Gold -->
             <div class="card-option-box" data-card="credito">
                 <div class="card-content-top">
-                    <span class="card-type-tag">Crédito</span>
-                    <h3>Tarjeta de Crédito Gold</h3>
-                    <p>Financia tus proyectos y compras con líneas de crédito flexibles y acumulación de puntos.</p>
+                    <span class="card-type-tag" style="background: rgba(229,169,60,0.15); color: #e5a93c;"><i class="fa-solid fa-credit-card"></i> Crédito</span>
+                    <h3>Tarjeta Crédito Gold</h3>
+                    <p>Financia tus proyectos y compras con líneas flexibles y puntos.</p>
                     <ul class="card-benefits">
                         <li><i class="fa-solid fa-check"></i> Cupo preaprobado dinámico</li>
-                        <li><i class="fa-solid fa-check"></i> Asistencia en viajes internacional</li>
+                        <li><i class="fa-solid fa-check"></i> Asistencia internacional</li>
                         <li><i class="fa-solid fa-check"></i> 2% de cashback en compras</li>
                     </ul>
                 </div>
-                <button class="request-card-btn" data-action="solicitar-credito">Solicitar Crédito</button>
+                <button class="request-card-btn" data-action="solicitar-credito">Solicitar</button>
             </div>
 
-            <!-- Tarjeta 3: Cuenta Corriente -->
-            <div class="card-option-box" data-card="corriente">
+            <!-- 4. Crédito de Libre Destino -->
+            <div class="card-option-box" data-credito-personal="true">
                 <div class="card-content-top">
-                    <span class="card-type-tag">Corriente</span>
-                    <h3>Tarjeta Cuenta Corriente</h3>
-                    <p>Diseñada para profesionales y comerciantes con respaldo de sobregiro y chequera digital.</p>
+                    <span class="card-type-tag" style="background: rgba(168, 85, 247, 0.15); color: #c084fc;"><i class="fa-solid fa-hand-holding-dollar"></i> Préstamos</span>
+                    <h3>Crédito Libre Destino</h3>
+                    <p>Financiación inmediata con tasas preferenciales para estudio o vehículo.</p>
                     <ul class="card-benefits">
-                        <li><i class="fa-solid fa-check"></i> Cupo de sobregiro autorizado</li>
-                        <li><i class="fa-solid fa-check"></i> Transferencias ilimitadas</li>
-                        <li><i class="fa-solid fa-check"></i> Extractos detallados</li>
+                        <li><i class="fa-solid fa-check"></i> Aprobación digital 100%</li>
+                        <li><i class="fa-solid fa-check"></i> Plazos de 12 a 60 meses</li>
+                        <li><i class="fa-solid fa-check"></i> Tasa de interés fija</li>
                     </ul>
                 </div>
-                <button class="request-card-btn" data-action="solicitar-corriente">Solicitar Corriente</button>
+                <button class="request-card-btn" id="btnSolicitarPrestamo" style="background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4);">Simular</button>
             </div>
+
         </div>
     </main>
 </div>
