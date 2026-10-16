@@ -4,13 +4,15 @@
 
 // Clase Padre (Superclase)
 class TarjetaBancaria {
-    constructor(tipo, titulo, proposito, operaciones, intereses, condicion) {
+    constructor(tipo, titulo, proposito, operaciones, intereses, condicion, estado = 'activa') {
         this.tipo = tipo;
         this.titulo = titulo;
         this.proposito = proposito;
         this.operaciones = operaciones;
         this.intereses = intereses;
         this.condicion = condicion;
+        this.estado = estado; // 'activa' | 'inactiva' | 'cancelada'
+        this.numeroCompleto = this.generarNumeroUnico();
     }
 
     // Método genérico de evaluación (a sobreescribir en las hijas)
@@ -20,11 +22,30 @@ class TarjetaBancaria {
 
     // Método para generar un número único de tarjeta aleatorio tipo bancario
     generarNumeroUnico() {
+        // Usar una parte fija y mezclar milisegundos con aleatoriedad para evitar colisiones
+        const timestamp = String(Date.now()).slice(-4);
         const bloque1 = Math.floor(1000 + Math.random() * 9000);
         const bloque2 = Math.floor(1000 + Math.random() * 9000);
         const bloque3 = Math.floor(1000 + Math.random() * 9000);
-        const bloque4 = Math.floor(1000 + Math.random() * 9000);
-        return `4532 ${bloque1} ${bloque2} ${bloque4}`; // Prefijo simulado Visa/Finara
+        return `4532 ${bloque1} ${bloque2} ${timestamp}`;
+    }
+
+    // 🔒 MÉTODO POO HU-13: ENMASCARAMIENTO DE DATOS SENSIBLES
+    getNumeroEnmascarado() {
+        if (!this.numeroCompleto) return '•••• •••• •••• ••••';
+        const digitosLimpio = this.numeroCompleto.replace(/\s+/g, '');
+        const ultimos4 = digitosLimpio.slice(-4);
+        return `•••• •••• •••• ${ultimos4}`;
+    }
+
+    // Obtener badge CSS según estado
+    getBadgeClass() {
+        switch (this.estado) {
+            case 'activa': return 'badge-active';
+            case 'inactiva': return 'badge-inactive';
+            case 'cancelada': return 'badge-canceled';
+            default: return '';
+        }
     }
 }
 
@@ -245,6 +266,7 @@ function emitirTarjetaDirecta(usuarioActivo, tipoTarjeta) {
     const numeroGenerado = tarjetaObj.generarNumeroUnico();
     const vencimiento = '09/29';
     const cvv = String(Math.floor(100 + Math.random() * 900));
+    const usernameActual = usuarioActivo.username || usuarioActivo.correo || 'maria17';
 
     const datosTarjetaAprobada = {
         tipo: tipoTarjeta,
@@ -255,7 +277,7 @@ function emitirTarjetaDirecta(usuarioActivo, tipoTarjeta) {
         fechaAprobacion: new Date().toISOString()
     };
 
-    // Actualizar lista global de usuarios en localStorage
+    // 1. Guardar en el perfil del usuario
     let listaUsuarios = JSON.parse(localStorage.getItem("finara_usuarios_local")) || [];
     listaUsuarios = listaUsuarios.map(u => {
         if (u.correo === usuarioActivo.correo || u.username === usuarioActivo.username) {
@@ -266,6 +288,23 @@ function emitirTarjetaDirecta(usuarioActivo, tipoTarjeta) {
         return u;
     });
     localStorage.setItem("finara_usuarios_local", JSON.stringify(listaUsuarios));
+
+    // 2. Guardar en finara_cuentas para que sea visible en Saldos.js
+    let todasLasCuentas = JSON.parse(localStorage.getItem('finara_cuentas')) || [];
+    let tipoCuentaBackend = 'AHORROS';
+    if (tipoTarjeta === 'corriente') tipoCuentaBackend = 'CORRIENTE';
+    if (tipoTarjeta === 'credito') tipoCuentaBackend = 'TARJETA_CREDITO';
+
+    todasLasCuentas.push({
+        id: `CTA-${tipoTarjeta.toUpperCase()}-${Date.now()}`,
+        tipo: tipoCuentaBackend,
+        numero: numeroGenerado,
+        saldo: tipoTarjeta === 'credito' ? 5000000 : 0,
+        estado: 'ACTIVA',
+        username: usernameActual,
+        fechaCreacion: new Date().toISOString()
+    });
+    localStorage.setItem('finara_cuentas', JSON.stringify(todasLasCuentas));
 
     // Actualizar usuario activo local
     usuarioActivo.tarjetasAprobadas = usuarioActivo.tarjetasAprobadas || [];

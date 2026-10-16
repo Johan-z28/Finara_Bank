@@ -518,3 +518,15 @@
 
     cursor: pointer;
 }
+
+/* Hacer interactiva visualmente la tarjeta de productos activos en el resumen */
+.profile-card.account-summary .summary-item:first-child {
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+    border: 1px solid transparent;
+}
+.profile-card.account-summary .summary-item:first-child:hover {
+    transform: translateY(-2px);
+    border-color: rgba(229, 169, 60, 0.4);
+    background: #181c24;
+}
