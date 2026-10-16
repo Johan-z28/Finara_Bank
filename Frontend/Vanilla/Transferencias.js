@@ -98,8 +98,8 @@ document.addEventListener('DOMContentLoaded', () => {
             badgeTexto = 'Bloqueada';
             hintOrigen.textContent = `Cuenta o tarjeta bloqueada temporalmente. Desbloquéala desde Saldos para transferir.`;
         } else if (c.tipo === 'TARJETA_CREDITO') {
-            hintOrigen.textContent = `Cupo Total: ${formatoCOP.format(c.saldo)} · Avance permitido (hasta 50%): ${formatoCOP.format(disponible)}`;
-            badgeTexto = 'Cupo Avance';
+            hintOrigen.textContent = `Cupo total de compras: ${formatoCOP.format(c.saldo)} · Avance permitido (50% del cupo): ${formatoCOP.format(disponible)}`;
+            badgeTexto = 'Cupo Avance (50%)';
         } else if (c.tipo === 'CORRIENTE') {
             const extra = ' (incluye sobregiro del 20%)';
             hintOrigen.textContent = `Saldo: ${formatoCOP.format(c.saldo)} · Disponible: ${formatoCOP.format(disponible)}${extra}`;
