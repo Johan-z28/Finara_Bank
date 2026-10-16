@@ -1,0 +1,540 @@
+@import url('global/styles.css');
+
+/* ==========================================
+   ESTILOS DE PRESUPUESTO (HU-23)
+   ========================================== */
+
+:root {
+    --color-ingreso: #34d399;
+    --color-gasto: #f87171;
+    --color-balance-positivo: #38bdf8;
+    --color-balance-alerta: #fbbf24;
+}
+
+.color-ingreso { color: var(--color-ingreso) !important; }
+.color-gasto { color: var(--color-gasto) !important; }
+
+.pre-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+    margin-bottom: 1.8rem;
+}
+
+.pre-header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-white);
+    margin-bottom: 0.3rem;
+}
+
+.pre-subtitle {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+/* Selector de Periodo Personalizado (Finara Dark & Gold) */
+.pre-selector-periodo {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    background: #0d111a;
+    padding: 4px;
+    border-radius: 12px;
+    border: 1px solid rgba(229, 169, 60, 0.35);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    gap: 4px;
+    user-select: none;
+}
+
+.btn-periodo-nav {
+    background: transparent;
+    border: none;
+    color: var(--gold-main);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.btn-periodo-nav:hover {
+    background: rgba(229, 169, 60, 0.15);
+    transform: scale(1.05);
+}
+
+.periodo-display-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.periodo-display-box:hover {
+    background: rgba(229, 169, 60, 0.1);
+    border-color: rgba(229, 169, 60, 0.3);
+}
+
+.periodo-display-box span {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #fff;
+    min-width: 110px;
+    text-align: center;
+}
+
+.flecha-dropdown {
+    font-size: 0.75rem;
+    color: var(--gold-main);
+    transition: transform 0.2s ease;
+}
+
+.pre-selector-periodo.abierto .flecha-dropdown {
+    transform: rotate(180deg);
+}
+
+/* Dropdown Flotante de Selección de Mes y Año */
+.pre-dropdown-meses {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 250px;
+    background: #0e121b;
+    border: 1px solid rgba(229, 169, 60, 0.4);
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.8), 0 0 20px rgba(229, 169, 60, 0.2);
+    z-index: 100;
+    backdrop-filter: blur(12px);
+    animation: fadeInScale 0.2s ease-out;
+}
+
+@keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.96) translateY(-6px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.dropdown-header-year {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dropdown-header-year strong {
+    font-size: 0.95rem;
+    color: var(--gold-main);
+}
+
+.btn-year-nav {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-year-nav:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.grid-meses-dropdown {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+}
+
+.btn-mes-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid transparent;
+    color: #cbd5e1;
+    padding: 8px 4px;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.btn-mes-item:hover {
+    background: rgba(229, 169, 60, 0.15);
+    color: #fff;
+    border-color: rgba(229, 169, 60, 0.3);
+}
+
+.btn-mes-item.activo {
+    background: linear-gradient(135deg, #e5a93c 0%, #b8860b 100%);
+    color: #0b0e14;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(229, 169, 60, 0.35);
+}
+
+/* Métricas de Saldo e Indicadores (Cálculo Automático) */
+.pre-metricas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.4rem;
+    margin-bottom: 1.5rem;
+}
+
+.pre-metrica-card {
+    background: var(--bg-card-dark);
+    border: 1px solid rgba(229, 169, 60, 0.25);
+    border-radius: var(--radius-lg);
+    padding: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+    transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.pre-metrica-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--gold-main);
+}
+
+.pre-metrica-icono {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.bg-ingreso {
+    background: rgba(52, 211, 153, 0.15);
+    color: var(--color-ingreso);
+    border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.bg-gasto {
+    background: rgba(248, 113, 113, 0.15);
+    color: var(--color-gasto);
+    border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+.bg-balance {
+    background: rgba(56, 189, 248, 0.15);
+    color: var(--color-balance-positivo);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.bg-balance--superavit {
+    background: rgba(52, 211, 153, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.bg-balance--deficit {
+    background: rgba(248, 113, 113, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+.pre-metrica-info span {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    display: block;
+}
+
+.pre-metrica-info h3 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 4px 0 2px 0;
+    font-family: monospace;
+    letter-spacing: -0.02em;
+}
+
+.pre-metrica-info small {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}
+
+/* Barra de progreso de consumo de presupuesto */
+.pre-barra-progreso-card {
+    background: var(--bg-card-dark);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-md);
+    padding: 1.1rem 1.4rem;
+    margin-bottom: 1.8rem;
+}
+
+.pre-progreso-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.pre-progreso-info strong {
+    color: var(--text-white);
+    font-family: monospace;
+}
+
+.pre-progreso-track {
+    width: 100%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.pre-progreso-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #34d399 0%, #e5a93c 70%, #f87171 100%);
+    border-radius: 999px;
+    transition: width 0.5s ease-in-out;
+}
+
+/* Panel de Formulario de Registro */
+.pre-registro-card {
+    background: var(--bg-card-dark);
+    border: 1px solid rgba(229, 169, 60, 0.25);
+    border-radius: var(--radius-lg);
+    padding: 1.4rem;
+    margin-bottom: 1.8rem;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+}
+
+.pre-registro-head h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--gold-main);
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pre-form-registro {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.2rem;
+    align-items: flex-end;
+}
+
+.pre-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.pre-campo label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.pre-campo input,
+.pre-campo select {
+    background: #090c12;
+    color: var(--text-white);
+    border: 1px solid rgba(229, 169, 60, 0.3);
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    width: 100%;
+    transition: all 0.2s ease;
+}
+
+.pre-campo input:focus,
+.pre-campo select:focus {
+    border-color: var(--gold-main);
+    box-shadow: 0 0 10px rgba(229, 169, 60, 0.25);
+    outline: none;
+}
+
+.btn-guardar-rubro {
+    background: var(--gold-main);
+    color: #07090e;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    transition: all 0.2s ease;
+}
+
+.btn-guardar-rubro:hover {
+    background: #ffbe44;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(229, 169, 60, 0.3);
+}
+
+/* Listados de Ingresos y Gastos */
+.pre-listados-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+.pre-columna-card {
+    background: var(--bg-card-dark);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-lg);
+    padding: 1.4rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.pre-columna-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pre-columna-head h4 {
+    font-size: 0.95rem;
+    color: var(--text-white);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.badge-total-col {
+    font-family: monospace;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.pre-items-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 150px;
+}
+
+.pre-lista-vacia {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    text-align: center;
+    margin: auto 0;
+    padding: 2rem 0;
+}
+
+.pre-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 12px 14px;
+    transition: all 0.2s ease;
+}
+
+.pre-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(229, 169, 60, 0.3);
+}
+
+.pre-item-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pre-item-icono {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+}
+
+.pre-item-detalles strong {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-white);
+}
+
+.pre-item-detalles span {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}
+
+.pre-item-monto {
+    font-family: monospace;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-align: right;
+}
+
+.pre-item-lateral {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pre-item-acciones {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-accion-pre {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+.btn-editar-pre {
+    color: #94a3b8;
+}
+
+.btn-editar-pre:hover {
+    color: var(--gold-main);
+    background: rgba(229, 169, 60, 0.15);
+}
+
+.btn-eliminar-pre {
+    color: #94a3b8;
+}
+
+.btn-eliminar-pre:hover {
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.15);
+}

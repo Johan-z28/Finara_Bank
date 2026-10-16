@@ -108,8 +108,18 @@ export async function obtenerCuentas() {
         todasLasCuentas = [];
     }
 
-    // Filtrar estrictamente las cuentas del usuario actual
-    let cuentasUsuario = todasLasCuentas.filter(c => c && (c.username === usernameActual || (!c.username && usernameActual === 'maria17')));
+    const userAlias = usuario.username || '';
+    const userEmail = usuario.correo || '';
+
+    // Filtrar estrictamente las cuentas del usuario actual (por username o correo)
+    let cuentasUsuario = todasLasCuentas.filter(c => {
+        if (!c) return false;
+        if (c.username === usernameActual) return true;
+        if (userAlias && c.username === userAlias) return true;
+        if (userEmail && c.username === userEmail) return true;
+        if (!c.username && usernameActual === 'maria17') return true;
+        return false;
+    });
 
     // Si el usuario es nuevo y no tiene ninguna cuenta registrada en finara_cuentas,
     // configurar sus cuentas iniciales según su perfil (Ahorros y Corriente por defecto para maria17)
@@ -153,16 +163,32 @@ export async function obtenerCuentas() {
 
         // Si es tarjeta débito o corriente, vincularla a la cuenta correspondiente para que se vea asociada en Saldos
         if (tipoCuenta === 'AHORROS' || tipoCuenta === 'CORRIENTE') {
-            const ctaMatch = cuentasUsuario.find(c => c.tipo === tipoCuenta);
+            let ctaMatch = cuentasUsuario.find(c => c.tipo === tipoCuenta);
+            const tarjetaInfo = {
+                tipo: tarjeta.tipo,
+                titulo: tarjeta.titulo,
+                numero: tarjeta.numeroTarjeta || ('4532' + String(Date.now()).slice(-12)),
+                fechaVencimiento: tarjeta.fechaVencimiento || '09/29',
+                cvv: tarjeta.cvv || '584',
+                bloqueada: tarjeta.bloqueada || false
+            };
+
             if (ctaMatch) {
-                ctaMatch.tarjetaAsociada = {
-                    tipo: tarjeta.tipo,
-                    titulo: tarjeta.titulo,
-                    numero: tarjeta.numeroTarjeta || ('4532' + String(Date.now()).slice(-12)),
-                    fechaVencimiento: tarjeta.fechaVencimiento || '09/29',
-                    cvv: tarjeta.cvv || '584',
-                    bloqueada: tarjeta.bloqueada || false
+                ctaMatch.tarjetaAsociada = tarjetaInfo;
+            } else {
+                const nuevaCta = {
+                    id: `CTA-${tipoCuenta.slice(0, 3)}-${Date.now()}-${index}`,
+                    tipo: tipoCuenta,
+                    numero: '4021' + String(Date.now()).slice(-8),
+                    saldo: 0,
+                    estado: 'ACTIVA',
+                    username: usernameActual,
+                    fechaCreacion: new Date().toISOString(),
+                    tarjetaAsociada: tarjetaInfo
                 };
+                cuentasUsuario.push(nuevaCta);
+                todasLasCuentas.push(nuevaCta);
+                cambios = true;
             }
         }
 

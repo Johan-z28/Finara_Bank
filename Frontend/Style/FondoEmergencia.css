@@ -1,0 +1,476 @@
+@import url('global/styles.css');
+
+/* ==========================================
+   ESTILOS FONDO DE EMERGENCIA (HU-25)
+   ========================================== */
+
+:root {
+    --color-progreso-verde: #34d399;
+    --color-progreso-oro: #e5a93c;
+    --color-progreso-azul: #38bdf8;
+}
+
+.color-dorado { color: var(--gold-main) !important; }
+.color-verde { color: var(--color-progreso-verde) !important; }
+
+.fe-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+    margin-bottom: 1.8rem;
+}
+
+.fe-header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-white);
+    margin-bottom: 0.3rem;
+}
+
+.fe-subtitle {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+/* Card Calculadora */
+.fe-calculadora-card {
+    background: var(--bg-card-dark);
+    border: 1px solid rgba(229, 169, 60, 0.25);
+    border-radius: var(--radius-lg);
+    padding: 1.6rem;
+    margin-bottom: 1.8rem;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+}
+
+.fe-card-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 1.6rem;
+}
+
+.fe-badge-icono {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(229, 169, 60, 0.15);
+    color: var(--gold-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    border: 1px solid rgba(229, 169, 60, 0.3);
+    flex-shrink: 0;
+}
+
+.fe-card-head h3 {
+    font-size: 1.1rem;
+    color: var(--text-white);
+    margin-bottom: 4px;
+}
+
+.fe-card-head p {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.fe-calc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.8rem;
+    align-items: center;
+}
+
+.fe-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 1.2rem;
+}
+
+.fe-campo label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.fe-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.fe-currency-prefix {
+    position: absolute;
+    left: 14px;
+    color: var(--gold-main);
+    font-weight: 700;
+    font-size: 1.05rem;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.fe-input-wrapper input {
+    background: #090c12;
+    color: #fff;
+    border: 1px solid rgba(229, 169, 60, 0.3);
+    border-radius: 10px;
+    padding: 12px 14px 12px 38px;
+    font-family: inherit;
+    font-size: 1.05rem;
+    font-weight: 600;
+    width: 100%;
+    transition: all 0.2s ease;
+}
+
+.fe-input-wrapper input:focus {
+    border-color: var(--gold-main);
+    box-shadow: 0 0 10px rgba(229, 169, 60, 0.25);
+    outline: none;
+}
+
+.fe-hint {
+    font-size: 0.72rem;
+    color: #64748b;
+}
+
+.fe-meses-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 8px;
+}
+
+.btn-meses {
+    background: #090c12;
+    color: var(--text-muted);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-meses:hover {
+    border-color: rgba(229, 169, 60, 0.4);
+    color: #fff;
+}
+
+.btn-meses.active {
+    background: rgba(229, 169, 60, 0.15);
+    color: var(--gold-main);
+    border-color: var(--gold-main);
+    font-weight: 600;
+}
+
+/* Panel de Resultado Calculadora */
+.fe-calc-resultado {
+    background: linear-gradient(135deg, rgba(27, 32, 44, 0.8) 0%, rgba(13, 15, 20, 0.95) 100%);
+    border: 1px solid rgba(229, 169, 60, 0.35);
+    border-radius: 14px;
+    padding: 1.6rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.fe-res-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.8rem;
+}
+
+.fe-res-header span {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.fe-pill {
+    background: rgba(229, 169, 60, 0.2);
+    color: var(--gold-main);
+    border: 1px solid rgba(229, 169, 60, 0.4);
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.fe-monto-sugerido {
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: #fff;
+    font-family: monospace;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.4rem;
+}
+
+.fe-res-desglose {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 0.8rem;
+}
+
+.fe-desglose-fila {
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-muted);
+}
+
+.fe-desglose-fila strong {
+    color: #fff;
+    font-family: monospace;
+}
+
+/* Sección de Definición de Meta */
+.fe-meta-card {
+    background: var(--bg-card-dark);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    border-radius: var(--radius-lg);
+    padding: 1.6rem;
+    margin-bottom: 1.8rem;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+}
+
+.fe-meta-inputs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.4rem;
+}
+
+.btn-usar-sugerido {
+    background: transparent;
+    border: 1px dashed rgba(229, 169, 60, 0.5);
+    color: var(--gold-main);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 6px;
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-usar-sugerido:hover {
+    background: rgba(229, 169, 60, 0.15);
+    border-style: solid;
+}
+
+.fe-select-cuenta {
+    background: #090c12;
+    color: #fff;
+    border: 1px solid rgba(229, 169, 60, 0.3);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.fe-select-cuenta:focus {
+    border-color: var(--gold-main);
+    box-shadow: 0 0 10px rgba(229, 169, 60, 0.25);
+    outline: none;
+}
+
+.btn-guardar-meta {
+    background: var(--gold-main);
+    color: #07090e;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-guardar-meta:hover {
+    background: #ffbe44;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(229, 169, 60, 0.3);
+}
+
+/* ========================================================
+   INDICADOR DE AVANCE HACIA LA META (Criterio 3)
+   ======================================================== */
+.fe-avance-card {
+    background: linear-gradient(135deg, rgba(18, 21, 28, 0.95) 0%, rgba(10, 12, 17, 0.98) 100%);
+    border: 1px solid rgba(229, 169, 60, 0.3);
+    border-radius: 16px;
+    padding: 1.8rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.fe-avance-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--gold-main);
+    box-shadow: 0 0 12px var(--gold-main);
+}
+
+.fe-avance-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.fe-etiqueta-avance {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--gold-main);
+    font-weight: 700;
+    display: inline-block;
+    margin-bottom: 4px;
+}
+
+.fe-avance-titulo {
+    font-size: 1.35rem;
+    color: #fff;
+    margin: 0;
+    font-weight: 700;
+}
+
+.fe-badge-seguridad {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: rgba(229, 169, 60, 0.15);
+    color: var(--gold-main);
+    border: 1px solid rgba(229, 169, 60, 0.35);
+}
+
+.fe-badge-seguridad.exito {
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+    border-color: rgba(34, 197, 94, 0.4);
+}
+
+.fe-badge-seguridad.progreso {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    border-color: rgba(59, 130, 246, 0.4);
+}
+
+.fe-avance-metricas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.2rem;
+}
+
+.fe-metrica-caja {
+    background: #090c12;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 12px;
+    padding: 1.25rem 1.4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 110px;
+    gap: 6px;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.fe-metrica-caja:hover {
+    border-color: rgba(229, 169, 60, 0.3);
+    transform: translateY(-2px);
+}
+
+.fe-metrica-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
+.fe-metrica-valor {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 2px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fe-metrica-valor.color-verde {
+    color: #4ade80;
+}
+
+.fe-metrica-valor.color-dorado {
+    color: var(--gold-main);
+}
+
+.fe-metrica-caja small {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    font-weight: 500;
+    display: block;
+    line-height: 1.4;
+}
+
+/* Barra de progreso */
+.fe-barra-progreso-box {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: #090c12;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1rem 1.3rem;
+}
+
+.fe-barra-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+
+.fe-track-progreso {
+    width: 100%;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+}
+
+.fe-fill-progreso {
+    height: 100%;
+    background: linear-gradient(90deg, #e5a93c 0%, #38ef7d 100%);
+    border-radius: 20px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 10px rgba(229, 169, 60, 0.5);
+}
