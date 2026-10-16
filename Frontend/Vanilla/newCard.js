@@ -566,100 +566,107 @@ function mostrarModalSolicitud(tarjetaObj, usuarioActivo) {
     const overlay = document.createElement("div");
     overlay.id = "modalFinaraCompleto";
     overlay.style.cssText = `
-       position: fixed;
-       top: 0; left: 0; width: 100vw; height: 100vh;
-       background-color: rgba(5, 8, 13, 0.85);
-       display: flex; justify-content: center; align-items: center;
-       z-index: 9999; font-family: 'Poppins', sans-serif; padding: 1rem;
-   `;
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background-color: rgba(5, 8, 13, 0.85);
+      display: flex; justify-content: center; align-items: center;
+      z-index: 9999; font-family: 'Poppins', sans-serif; padding: 1rem;
+  `;
     overlay.innerHTML = `
-       <div style="
-           background-color: #12151c; border: 1px solid #1f2430; border-radius: 16px;
-           width: 95%; max-width: 1100px; display: grid; grid-template-columns: 1fr 1.2fr 180px;
-           gap: 1.5rem; padding: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-           position: relative; max-height: 90vh; overflow-y: auto;
-       " class="modal-grid-content">
-         
-           <!-- Columna Izquierda (Datos de la Tarjeta usando POO) -->
-           <div style="background: linear-gradient(145deg, rgba(229, 163, 60, 0.08), rgba(18, 21, 28, 0.5)); border: 1px solid rgba(229, 163, 60, 0.25); border-radius: 12px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;">
-               <div>
-                   <span style="color: #e5a93c; font-size: 0.75rem; text-transform: uppercase; font-weight: 600; letter-spacing: 1px;">Detalles del Producto (POO)</span>
-                   <h3 style="color: #fff; font-size: 1.2rem; margin: 0.5rem 0 1rem 0;">${tarjetaObj.titulo}</h3>
-                   <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.85rem; color: #8a8f99; display: flex; flex-direction: column; gap: 0.75rem;">
-                       <li><strong style="color: #fff;">Propósito:</strong> ${tarjetaObj.proposito}</li>
-                       <li><strong style="color: #fff;">Operación:</strong> ${tarjetaObj.operaciones}</li>
-                       <li><strong style="color: #fff;">Intereses:</strong> ${tarjetaObj.intereses}</li>
-                       <li><strong style="color: #fff;">Condición:</strong> ${tarjetaObj.condicion}</li>
-                   </ul>
-               </div>
-               <div style="margin-top: 1rem; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05);">
-                   <i class="fa-solid fa-shield-halved" style="font-size: 1.8rem; color: #e5a93c;"></i>
-                   <p style="font-size: 0.7rem; color: #8a8f99; margin-top: 0.3rem;">Titular: ${usuarioActivo.nombre}</p>
-               </div>
-           </div>
+      <div style="
+          background-color: #12151c; border: 1px solid #1f2430; border-radius: 16px;
+          width: 95%; max-width: 1100px; display: grid; grid-template-columns: 1fr 1.2fr 180px;
+          gap: 1.5rem; padding: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+          position: relative; max-height: 90vh; overflow-y: auto;
+      " class="modal-grid-content">
+       
+          <!-- Columna Izquierda (Datos de la Tarjeta usando POO) -->
+          <div style="background: linear-gradient(145deg, rgba(229, 163, 60, 0.08), rgba(18, 21, 28, 0.5)); border: 1px solid rgba(229, 163, 60, 0.25); border-radius: 12px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                  <span style="color: #e5a93c; font-size: 0.75rem; text-transform: uppercase; font-weight: 600; letter-spacing: 1px;">Detalles del Producto (POO)</span>
+                  <h3 style="color: #fff; font-size: 1.2rem; margin: 0.5rem 0 1rem 0;">${tarjetaObj.titulo}</h3>
+                  <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.85rem; color: #8a8f99; display: flex; flex-direction: column; gap: 0.75rem;">
+                      <li><strong style="color: #fff;">Propósito:</strong> ${tarjetaObj.proposito}</li>
+                      <li><strong style="color: #fff;">Operación:</strong> ${tarjetaObj.operaciones}</li>
+                      <li><strong style="color: #fff;">Intereses:</strong> ${tarjetaObj.intereses}</li>
+                      <li><strong style="color: #fff;">Condición:</strong> ${tarjetaObj.condicion}</li>
+                  </ul>
+              </div>
+              <div style="margin-top: 1rem; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05);">
+                  <i class="fa-solid fa-shield-halved" style="font-size: 1.8rem; color: #e5a93c;"></i>
+                  <p style="font-size: 0.7rem; color: #8a8f99; margin-top: 0.3rem;">Titular: ${usuarioActivo.nombre}</p>
+              </div>
+          </div>
 
-           <!-- Columna Central (Formulario de Evaluación + Dirección de Envío) -->
-           <div style="background-color: rgba(14, 116, 144, 0.07); border: 1px solid rgba(14, 116, 144, 0.25); border-radius: 12px; padding: 1.5rem;">
-               <span style="color: #38bdf8; font-size: 0.75rem; text-transform: uppercase; font-weight: 600; letter-spacing: 1px;">Evaluación de Solicitud</span>
-               <h3 style="color: #fff; font-size: 1.2rem; margin: 0.5rem 0 1.2rem 0;">Datos del Solicitante</h3>
-             
-               <form id="formSolicitudCard" style="display: flex; flex-direction: column; gap: 0.85rem;">
-                   <div>
-                       <label style="display: block; font-size: 0.8rem; color: #8a8f99; margin-bottom: 0.3rem;">Nacionalidad</label>
-                       <select id="nacionalidad" style="width: 100%; padding: 0.6rem; border-radius: 8px; background: #0a0c10; border: 1px solid #1f2430; color: #fff; font-size: 0.85rem;">
-                           <option value="colombiana">Colombiana</option>
-                           <option value="extranjera">Extranjera</option>
-                       </select>
-                   </div>
-                   <div>
-                       <label style="display: block; font-size: 0.8rem; color: #8a8f99; margin-bottom: 0.3rem;">Ingresos Mensuales</label>
-                       <input type="number" id="ingresosMensuales" placeholder="Ej: 3000000" required style="width: 100%; padding: 0.6rem; border-radius: 8px; background: #0a0c10; border: 1px solid #1f2430; color: #fff; font-size: 0.85rem;">
-                   </div>
-                   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-                       <div>
-                           <label style="display: block; font-size: 0.8rem; color: #8a8f99; margin-bottom: 0.3rem;">Moneda</label>
-                           <select id="tipoMoneda" style="width: 100%; padding: 0.6rem; border-radius: 8px; background: #0a0c10; border: 1px solid #1f2430; color: #fff; font-size: 0.85rem;">
-                               <option value="COP">COP ($)</option>
-                               <option value="USD">USD ($)</option>
-                               <option value="EUR">EUR (€)</option>
-                           </select>
-                       </div>
-                       <div>
-                           <label style="display: block; font-size: 0.8rem; color: #8a8f99; margin-bottom: 0.3rem;">Estrato</label>
-                           <select id="estrato" style="width: 100%; padding: 0.6rem; border-radius: 8px; background: #0a0c10; border: 1px solid #1f2430; color: #fff; font-size: 0.85rem;">
-                               <option value="1">Estrato 1</option>
-                               <option value="2">Estrato 2</option>
-                               <option value="3">Estrato 3</option>
-                               <option value="4">Estrato 4</option>
-                               <option value="5">Estrato 5</option>
-                               <option value="6">Estrato 6</option>
-                           </select>
-                       </div>
-                   </div>
-                   <!-- CAMPO NUEVO: Dirección de Envío -->
-                   <div>
-                       <label style="display: block; font-size: 0.8rem; color: #8a8f99; margin-bottom: 0.3rem;">Dirección de envío (Para entrega física)</label>
-                       <input type="text" id="direccionEnvio" value="${usuarioActivo.direccion || ''}" placeholder="Ej. Calle 50 # 45-20" required style="width: 100%; padding: 0.6rem; border-radius: 8px; background: #0a0c10; border: 1px solid #1f2430; color: #fff; font-size: 0.85rem;">
-                   </div>
-               </form>
-           </div>
+          <!-- Columna Central (Formulario de Evaluación + Dirección de Envío) -->
+          <div style="background-color: rgba(14, 116, 144, 0.07); border: 1px solid rgba(14, 116, 144, 0.25); border-radius: 12px; padding: 1.5rem;">
+              <span style="color: #38bdf8; font-size: 0.75rem; text-transform: uppercase; font-weight: 600; letter-spacing: 1px;">Evaluación de Solicitud</span>
+              <h3 style="color: #fff; font-size: 1.2rem; margin: 0.5rem 0 1.2rem 0;">Datos del Solicitante</h3>
+           
+              <form id="formSolicitudCard" style="display: flex; flex-direction: column; gap: 0.85rem;" onsubmit="return false;">
+                  <div>
+                      <label style="display: block; font-size: 0.8rem; color: #8a8f99; margin-bottom: 0.3rem;">Nacionalidad</label>
+                      <select id="nacionalidad" style="width: 100%; padding: 0.6rem; border-radius: 8px; background: #0a0c10; border: 1px solid #1f2430; color: #fff; font-size: 0.85rem;">
+                          <option value="colombiana">Colombiana</option>
+                          <option value="extranjera">Extranjera</option>
+                      </select>
+                  </div>
+                  <div>
+                      <label style="display: block; font-size: 0.8rem; color: #8a8f99; margin-bottom: 0.3rem;">Ingresos Mensuales</label>
+                      <input type="number" id="ingresosMensuales" placeholder="Ej: 3000000" required style="width: 100%; padding: 0.6rem; border-radius: 8px; background: #0a0c10; border: 1px solid #1f2430; color: #fff; font-size: 0.85rem;">
+                  </div>
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                      <div>
+                          <label style="display: block; font-size: 0.8rem; color: #8a8f99; margin-bottom: 0.3rem;">Moneda</label>
+                          <select id="tipoMoneda" style="width: 100%; padding: 0.6rem; border-radius: 8px; background: #0a0c10; border: 1px solid #1f2430; color: #fff; font-size: 0.85rem;">
+                              <option value="COP">COP ($)</option>
+                              <option value="USD">USD ($)</option>
+                              <option value="EUR">EUR (€)</option>
+                          </select>
+                      </div>
+                      <div>
+                          <label style="display: block; font-size: 0.8rem; color: #8a8f99; margin-bottom: 0.3rem;">Estrato</label>
+                          <select id="estrato" style="width: 100%; padding: 0.6rem; border-radius: 8px; background: #0a0c10; border: 1px solid #1f2430; color: #fff; font-size: 0.85rem;">
+                              <option value="1">Estrato 1</option>
+                              <option value="2">Estrato 2</option>
+                              <option value="3">Estrato 3</option>
+                              <option value="4">Estrato 4</option>
+                              <option value="5">Estrato 5</option>
+                              <option value="6">Estrato 6</option>
+                          </select>
+                      </div>
+                  </div>
+                  <div>
+                      <label style="display: block; font-size: 0.8rem; color: #8a8f99; margin-bottom: 0.3rem;">Dirección de envío (Para entrega física)</label>
+                      <input type="text" id="direccionEnvio" value="${usuarioActivo.direccion || ''}" placeholder="Ej. Calle 50 # 45-20" required style="width: 100%; padding: 0.6rem; border-radius: 8px; background: #0a0c10; border: 1px solid #1f2430; color: #fff; font-size: 0.85rem;">
+                  </div>
+              </form>
+          </div>
 
-           <!-- Columna Derecha -->
-           <div style="display: flex; flex-direction: column; justify-content: center; gap: 1rem;">
-               <span style="font-size: 0.75rem; color: #8a8f99; text-align: center;">Acciones</span>
-               <button type="button" id="btnEnviarSolicitud" style="background-color: #e5a93c; color: #0a0c10; border: none; border-radius: 24px; padding: 0.8rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                   <i class="fa-solid fa-check"></i> Solicitar
-               </button>
-               <button type="button" id="btnCancelarSolicitud" style="background-color: #dc2626; color: #ffffff; border: none; border-radius: 24px; padding: 0.8rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                   <i class="fa-solid fa-xmark"></i> Rechazar
-               </button>
-           </div>
-       </div>
-   `;
+          <!-- Columna Derecha -->
+          <div style="display: flex; flex-direction: column; justify-content: center; gap: 1rem;">
+              <span style="font-size: 0.75rem; color: #8a8f99; text-align: center;">Acciones</span>
+              <button type="button" id="btnEnviarSolicitud" style="background-color: #e5a93c; color: #0a0c10; border: none; border-radius: 24px; padding: 0.8rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                  <i class="fa-solid fa-check"></i> Solicitar
+              </button>
+              <button type="button" id="btnCancelarSolicitud" style="background-color: #dc2626; color: #ffffff; border: none; border-radius: 24px; padding: 0.8rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                  <i class="fa-solid fa-xmark"></i> Rechazar
+              </button>
+          </div>
+      </div>
+  `;
 
     document.body.appendChild(overlay);
 
-    document.getElementById("btnEnviarSolicitud").addEventListener("click", () => {
+    // Vincular eventos de forma segura después de adjuntar el HTML al DOM
+    const cerrarModal = () => overlay.remove();
+
+    overlay.querySelector("#btnCancelarSolicitud").addEventListener("click", cerrarModal);
+    overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) cerrarModal();
+    });
+
+    overlay.querySelector("#btnEnviarSolicitud").addEventListener("click", () => {
         const ingresos = parseFloat(document.getElementById("ingresosMensuales").value) || 0;
         const estrato = parseInt(document.getElementById("estrato").value) || 1;
         const moneda = document.getElementById("tipoMoneda").value;
@@ -690,7 +697,6 @@ function mostrarModalSolicitud(tarjetaObj, usuarioActivo) {
         if (cuentasUsuario.length === 0 && usernameActual === 'maria17') {
             cuentasUsuario = [{ tipo: 'AHORROS', estado: 'ACTIVA' }, { tipo: 'CORRIENTE', estado: 'ACTIVA' }];
         }
-
         const tieneAhorros = cuentasUsuario.some(c => c.tipo === 'AHORROS' && c.estado === 'ACTIVA');
         const tieneCorriente = cuentasUsuario.some(c => c.tipo === 'CORRIENTE' && c.estado === 'ACTIVA');
 
@@ -705,7 +711,6 @@ function mostrarModalSolicitud(tarjetaObj, usuarioActivo) {
             });
             return;
         }
-
         if (tarjetaObj.tipo === 'corriente' && !tieneCorriente) {
             Swal.fire({
                 icon: 'error',
@@ -717,7 +722,6 @@ function mostrarModalSolicitud(tarjetaObj, usuarioActivo) {
             });
             return;
         }
-
         if (tarjetaObj.tipo === 'credito' && !tieneAhorros && !tieneCorriente) {
             Swal.fire({
                 icon: 'error',
@@ -749,10 +753,11 @@ function mostrarModalSolicitud(tarjetaObj, usuarioActivo) {
         const resultadoValidacion = tarjetaObj.validarRequisitos(ingresos, estrato);
         const aprobado = resultadoValidacion.aprobado;
         const mensajeMotivo = resultadoValidacion.motivo;
+        let datosTarjetaAprobada = null;
 
         if (aprobado) {
             const numeroGenerado = tarjetaObj.generarNumeroUnico();
-            const datosTarjetaAprobada = {
+            datosTarjetaAprobada = {
                 tipo: tarjetaObj.tipo,
                 titulo: tarjetaObj.titulo,
                 numeroTarjeta: numeroGenerado,
@@ -796,22 +801,13 @@ function mostrarModalSolicitud(tarjetaObj, usuarioActivo) {
                 todasLasCuentas.push(nuevaTC);
                 try {
                     localStorage.setItem('finara_cuentas', JSON.stringify(todasLasCuentas));
-                } catch {
-                    // Ignorar cuota
-                }
+                } catch (e) {}
             }
 
-            // Actualizar reactivamente la interfaz de las tarjetas
             actualizarDisponibilidadTarjetas(usuarioActivo);
         }
 
         mostrarResultadoEvaluacion(aprobado, tarjetaObj.titulo, mensajeMotivo, aprobado ? datosTarjetaAprobada?.numeroTarjeta : null, direccionEnvio);
-    });
-
-    const cerrarModal = () => overlay.remove();
-    document.getElementById("btnCancelarSolicitud").addEventListener("click", cerrarModal);
-    overlay.addEventListener("click", (e) => {
-        if (e.target === overlay) cerrarModal();
     });
 }
 
