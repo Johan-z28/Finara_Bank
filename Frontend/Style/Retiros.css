@@ -1,1 +1,387 @@
 @import url('global/styles.css');
+
+/* =========================================
+   ESTILOS ESPECÍFICOS - VISTA RETIROS (HU-41)
+========================================= */
+.main-content {
+    padding: 35px 42px;
+    color: #f5f5f5;
+}
+
+/* ENCABEZADO DE LA VISTA */
+.withdraw-page-header {
+    margin-bottom: 30px;
+}
+.withdraw-page-header h1 {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 700;
+    color: #ffffff;
+}
+.withdraw-page-header p {
+    margin-top: 6px;
+    color: #a9adb5;
+    font-size: 15px;
+}
+
+/* GRID PRINCIPAL */
+.withdraw-container-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 25px;
+    align-items: start;
+}
+
+/* TARJETA DE FORMULARIO */
+.withdraw-card-form {
+    background: linear-gradient(145deg, #111317, #0c0d10);
+    border: 1px solid #303238;
+    border-radius: 18px;
+    padding: 30px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+}
+
+.card-title-box {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.card-icon-gold {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(229, 169, 60, 0.15);
+    color: #e5a93c;
+    font-size: 20px;
+}
+
+.card-title-box h3 {
+    margin: 0;
+    font-size: 20px;
+    color: #ffffff;
+}
+
+.card-title-box span {
+    font-size: 13px;
+    color: #8a8f99;
+}
+
+/* FORMULARIO */
+.withdraw-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 0.85rem;
+    color: #c9cbd0;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-group select,
+.form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    background: #0a0c10;
+    border: 1px solid #1f2430;
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.form-group select:focus,
+.form-group input:focus {
+    border-color: #e5a93c;
+    box-shadow: 0 0 0 3px rgba(229, 169, 60, 0.15);
+}
+
+/* CAJA DE DETALLES DE CUENTA SELECCIONADA */
+.account-details-box {
+    background: rgba(18, 21, 28, 0.7);
+    border: 1px solid #1f2430;
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.account-badge {
+    align-self: flex-start;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: rgba(229, 169, 60, 0.15);
+    color: #e5a93c;
+    border: 1px solid rgba(229, 169, 60, 0.3);
+}
+
+.account-badge--corriente {
+    background: rgba(56, 189, 248, 0.15);
+    color: #38bdf8;
+    border-color: rgba(56, 189, 248, 0.3);
+}
+
+.account-info-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+.account-info-line.highlight-line {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 8px;
+    font-size: 14px;
+    color: #ffffff;
+}
+
+.rule-hint {
+    margin: 4px 0 0 0;
+    font-size: 12px;
+    color: #e2e8f0;
+    background: rgba(229, 169, 60, 0.08);
+    padding: 6px 10px;
+    border-radius: 6px;
+    border-left: 3px solid #e5a93c;
+}
+
+/* INPUT MONTO */
+.amount-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.amount-input-wrapper span {
+    position: absolute;
+    left: 16px;
+    color: #e5a93c;
+    font-weight: 700;
+    font-size: 16px;
+    pointer-events: none;
+}
+
+.amount-input-wrapper input {
+    padding-left: 35px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.btn-max-amount {
+    background: transparent;
+    border: 1px solid rgba(229, 169, 60, 0.4);
+    color: #e5a93c;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-max-amount:hover {
+    background: rgba(229, 169, 60, 0.15);
+    border-color: #e5a93c;
+}
+
+/* CHIPS DE MONTO RÁPIDO */
+.chips-monto-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.chip-monto {
+    background: #12151c;
+    border: 1px solid #1f2430;
+    color: #cbd5e1;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.chip-monto:hover,
+.chip-monto.activo {
+    background: rgba(229, 169, 60, 0.15);
+    border-color: #e5a93c;
+    color: #e5a93c;
+}
+
+.helper-text {
+    font-size: 12px;
+    color: #8a8f99;
+}
+
+/* CAJA DE DESGLOSE */
+.breakdown-box {
+    background: linear-gradient(135deg, rgba(229, 169, 60, 0.04), rgba(18, 21, 28, 0.7));
+    border: 1px solid rgba(229, 169, 60, 0.2);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.breakdown-box h4 {
+    margin: 0 0 4px 0;
+    font-size: 13px;
+    color: #e5a93c;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+.breakdown-total {
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+    padding-top: 8px;
+    color: #ffffff;
+    font-size: 14px;
+}
+
+.breakdown-result {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 8px 10px;
+    border-radius: 6px;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* BOTÓN DE CONFIRMAR */
+.btn-submit-withdraw {
+    width: 100%;
+    padding: 15px;
+    background: #e5a93c;
+    border: none;
+    border-radius: 12px;
+    color: #0b0d12;
+    font-size: 15px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 15px rgba(229, 169, 60, 0.25);
+}
+
+.btn-submit-withdraw:hover {
+    background: #f1b84f;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(229, 169, 60, 0.4);
+}
+
+.btn-submit-withdraw:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* SIDEBAR DERECHO DE INFORMACIÓN */
+.withdraw-sidebar-info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.info-widget {
+    background: #111317;
+    border: 1px solid #1f2430;
+    border-radius: 16px;
+    padding: 24px;
+}
+
+.widget-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.widget-header i {
+    font-size: 20px;
+}
+
+.widget-header h4 {
+    margin: 0;
+    font-size: 17px;
+    color: #ffffff;
+}
+
+.info-widget p {
+    margin: 0 0 14px 0;
+    font-size: 13px;
+    color: #94a3b8;
+    line-height: 1.5;
+}
+
+.rule-benefits {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.rule-benefits li {
+    font-size: 12.5px;
+    color: #cbd5e1;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.4;
+}
+
+.rule-benefits li i {
+    color: #e5a93c;
+    font-size: 12px;
+    margin-top: 3px;
+}
+
+@media (max-width: 992px) {
+    .withdraw-container-grid {
+        grid-template-columns: 1fr;
+    }
+    .main-content {
+        padding: 20px;
+    }
+}

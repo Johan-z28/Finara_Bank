@@ -1,271 +1,234 @@
-import { procesarMensajeChatbot, generarRespuestaHorarios } from '../chatbotService.js';
+// Vanilla/Global/app.js o app.js principal
+document.addEventListener("DOMContentLoaded", async () => {
+    const getSesion = (key) => {
+        const val = localStorage.getItem(key) || sessionStorage.getItem(key);
+        return (val && val !== "undefined" && val !== "null") ? val : null;
+    };
 
-let isGlobalListenersInitialized = false;
+    const userProfileRaw = getSesion("userProfile");
+    const emailSesion = getSesion("emailSesion");
+    const usuarioLogueadoDirecto = getSesion("usuarioLogueado");
 
-export function initGlobalComponents() {
-    updateUserData();
-    highlightActiveMenu();
-    ensureChatbotWidget();
-
-    if (!isGlobalListenersInitialized) {
-        setupGlobalEvents();
-        isGlobalListenersInitialized = true;
-    }
-}
-
-/**
- * Asegura que el widget del Chatbot esté presente en cualquier página del ecosistema.
- */
-function ensureChatbotWidget() {
-    if (document.getElementById('chatWidgetContainer')) return;
-
-    const widgetHTML = `
-    <div id="chatWidgetContainer">
-        <div id="windowChat" class="chatbot-window hidden">
-            <div class="chatbot-header">
-                <div class="chatbot-info">
-                    <div class="bot-avatar-container">
-                        <img src="../Style/image/bot_finara.png" alt="Finara Bot" class="bot-avatar-img">
-                    </div>
-                    <div>
-                        <h6>Asistente Finara</h6>
-                        <small class="status-online">• En línea</small>
-                    </div>
-                </div>
-                <button id="btnCloseChat" class="close-chat-btn" aria-label="Cerrar chat">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-
-            <div id="chatBody" class="chatbot-body">
-                <div class="chat-bubble bot-bubble">
-                    ¡Hola! 👋 Soy tu asistente virtual de <strong>Finara Bank</strong>. ¿En qué puedo orientarte hoy?
-                </div>
-            </div>
-
-            <div class="chat-input-bar">
-                <input type="text" id="chatInputText" class="chat-input-field" placeholder="Escribe tu consulta (ej: horarios)..." />
-                <button id="chatSendBtn" class="chat-send-btn" title="Enviar"><i class="fa-solid fa-paper-plane"></i></button>
-            </div>
-
-            <div class="chatbot-footer" id="chatOptions">
-                <button class="option-btn highlight-btn" data-action="horarios">🕒 Horarios de Atención</button>
-                <button class="option-btn" data-action="consultar">🔍 Revisar Saldo</button>
-                <button class="option-btn" data-action="transferir">💸 Enviar Dinero</button>
-                <button class="option-btn" data-action="menu_principal">🔄 Ayuda General</button>
-            </div>
-        </div>
-
-        <button id="btnToggleChat" class="chatbot-float-btn" title="Asistente Virtual Finara">
-            <img src="../Style/image/bot_finara.png" alt="Finara Bot" class="float-btn-img">
-        </button>
-    </div>
-    `;
-
-    document.body.insertAdjacentHTML('beforeend', widgetHTML);
-}
-
-/**
- * Carga e inyecta los datos del usuario en el Navbar desde LocalStorage
- */
-function updateUserData() {
-    const storedUserName = localStorage.getItem('userName') || 'Sin Nombre';
-    const storedUserAvatar = localStorage.getItem('userAvatar');
-
-    const greetingName = document.getElementById('greetingName');
-    const dropdownUserName = document.getElementById('dropdownUserName');
-
-    if (greetingName) greetingName.textContent = storedUserName;
-    if (dropdownUserName) dropdownUserName.textContent = storedUserName;
-
-    const userAvatarImg = document.getElementById('userAvatarImg');
-    const userAvatarIcon = document.getElementById('userAvatarIcon');
-
-    if (userAvatarImg && userAvatarIcon) {
-        if (storedUserAvatar && storedUserAvatar.trim() !== '') {
-            userAvatarImg.src = storedUserAvatar;
-            userAvatarImg.classList.remove('hidden');
-            userAvatarIcon.classList.add('hidden');
-        } else {
-            userAvatarImg.classList.add('hidden');
-            userAvatarIcon.classList.remove('hidden');
+    let usuarioActivo = null;
+    if (userProfileRaw) {
+        try {
+            usuarioActivo = JSON.parse(userProfileRaw);
+        } catch (e) {
+            console.error("Error al parsear userProfile:", e);
         }
     }
-}
 
-/**
- * Detecta en qué archivo .html está el navegador y resalta el enlace activo en el Sidebar
- */
-function highlightActiveMenu() {
-    const currentPage = window.location.pathname.split('/').pop().toLowerCase();
+    if (!usuarioActivo && !emailSesion && !usuarioLogueadoDirecto) {
+        window.location.href = "../index.html";
+        return;
+    }
 
-    document.querySelectorAll('.sidebar-nav a').forEach(link => {
-        const linkPage = link.getAttribute('href').split('/').pop().toLowerCase();
-        if (linkPage === currentPage) {
-            link.classList.add('active');
-        } else {
-            link.classList.remove('active');
+    const nombreUsuario = usuarioActivo?.nombre ||
+        usuarioActivo?.username ||
+        (typeof emailSesion === 'string' ? emailSesion.split('@')[0] : "Usuario");
+
+    const greetingName = document.getElementById("greetingName");
+    if (greetingName) greetingName.textContent = nombreUsuario;
+
+    const sidebarUserName = document.getElementById("sidebarUserName");
+    if (sidebarUserName) sidebarUserName.textContent = nombreUsuario;
+
+    const mainContent = document.getElementById("mainContent");
+    const sidebar = document.getElementById("sidebar");
+    const menuToggle = document.getElementById("menuToggle");
+    const sidebarBackdrop = document.getElementById("sidebarBackdrop");
+    const sidebarCollapseBtn = document.getElementById("sidebarCollapseBtn");
+    const mainWrapper = document.querySelector(".main-wrapper");
+
+    if (sidebarCollapseBtn && sidebar && mainWrapper) {
+        sidebarCollapseBtn.addEventListener("click", () => {
+            sidebar.classList.toggle("collapsed");
+            mainWrapper.classList.toggle("expanded");
+        });
+    }
+
+    const cargarVista = async (nombreVista) => {
+        try {
+            const vistaMin = nombreVista.toLowerCase();
+            
+            const mapaVistas = {
+                dashboard: 'Dashboard.html',
+                inicio: 'Dashboard.html',
+                saldos: 'Saldos.html',
+                transferencias: 'Transferencias.html',
+                consignar: 'Consignar.html',
+                retiros: 'Retiros.html',
+                solicitarproductos: 'SolicitarProductos.html',
+                solicitarProductos: 'SolicitarProductos.html',
+                movimientos: 'Movimientos.html',
+                perfil: 'Perfil.html'
+            };
+
+            const archivoVista = mapaVistas[vistaMin] || `${nombreVista}.html`;
+            const respuesta = await fetch(`/Frontend/Pages/views/${archivoVista}`);
+
+            if (!respuesta.ok) {
+                throw new Error(`No se encontró el archivo ${archivoVista}`);
+            }
+
+            const htmlContenido = await respuesta.text();
+            mainContent.innerHTML = htmlContenido;
+
+            switch (vistaMin) {
+                case "dashboard":
+                case "inicio":
+                    try {
+                        const modDash = await import('../Dashboard.js');
+                        if (modDash.initDashboardView) {
+                            await modDash.initDashboardView();
+                        }
+                    } catch (err) {
+                        console.warn("Módulo JS Dashboard no requerido:", err);
+                    }
+                    break;
+
+                case "saldos":
+                    try {
+                        const modSaldos = await import('../Saldos.js');
+                        if (modSaldos.initSaldosView) {
+                            await modSaldos.initSaldosView();
+                        }
+                    } catch (err) {
+                        console.error("Error al inicializar el módulo de Saldos:", err);
+                    }
+                    break;
+
+                case "transferencias":
+                    try {
+                        const modTransf = await import('../Transferencias.js');
+                        if (modTransf.initTransferenciasView) {
+                            await modTransf.initTransferenciasView();
+                        }
+                    } catch (err) {
+                        console.error("Error al inicializar Transferencias:", err);
+                    }
+                    break;
+
+                case "consignar":
+                    try {
+                        const modConsignar = await import('../Consignar.js');
+                        if (modConsignar.initConsignarView) {
+                            await modConsignar.initConsignarView();
+                        }
+                    } catch (err) {
+                        console.warn("Error al inicializar Consignar:", err);
+                    }
+                    break;
+
+                case "retiros":
+                    try {
+                        const modRetiros = await import('../Retiros.js');
+                        if (typeof modRetiros.initRetirosView === 'function') {
+                            await modRetiros.initRetirosView();
+                        }
+                    } catch (err) {
+                        console.warn("Error al inicializar Retiros:", err);
+                    }
+                    break;
+
+                case "solicitarproductos":
+                    try {
+                        const modSolicitar = await import('../newCard.js');
+                        if (modSolicitar.initSolicitarProductosView) {
+                            await modSolicitar.initSolicitarProductosView();
+                        }
+                    } catch (err) {
+                        console.warn("Módulo newCard.js", err);
+                    }
+                    break;
+
+                case "movimientos":
+                    try {
+                        const modMov = await import('../Movimientos.js');
+                        if (modMov.initMovimientosView) {
+                            await modMov.initMovimientosView();
+                        }
+                    } catch (err) {
+                        console.warn("Módulo Movimientos.js", err);
+                    }
+                    break;
+
+                case "perfil":
+                    try {
+                        const modPerfil = await import('../Perfil.js');
+                        if (modPerfil.initPerfilView) {
+                            await modPerfil.initPerfilView();
+                        }
+                    } catch (err) {
+                        console.error("Error al inicializar Perfil:", err);
+                    }
+                    break;
+            }
+
+        } catch (error) {
+            console.error("Error Router SPA:", error);
+            mainContent.innerHTML = `
+                <div style="text-align: center; padding: 4rem 1rem;">
+                    <i class="fa-solid fa-triangle-exclamation" style="font-size: 3rem; color: #f87171; margin-bottom: 1rem;"></i>
+                    <h2 style="color: var(--text-white); margin-bottom: 0.5rem;">Módulo en construcción</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">El módulo (${nombreVista}) estará disponible próximamente.</p>
+                </div>
+            `;
+        }
+    };
+
+    const marcarItemActivo = (vistaDestino) => {
+        document.querySelectorAll("[data-view]").forEach(el => {
+            el.classList.remove("active", "is-active");
+        });
+
+        document.querySelectorAll(`[data-view="${vistaDestino}"]`).forEach(el => {
+            el.classList.add("active", "is-active");
+        });
+    };
+
+    document.addEventListener("click", (e) => {
+        const link = e.target.closest("[data-view]");
+        if (link) {
+            e.preventDefault();
+            const vistaDestino = link.getAttribute("data-view");
+            if (!vistaDestino) return;
+
+            marcarItemActivo(vistaDestino);
+            cargarVista(vistaDestino);
+
+            if (window.innerWidth <= 850 && sidebar) {
+                sidebar.classList.remove("is-open");
+                if (sidebarBackdrop) sidebarBackdrop.classList.add("hidden");
+            }
         }
     });
-}
 
-/**
- * Maneja el envío y procesamiento de mensajes del Chatbot (HU-36)
- */
-function enviarMensajeChat(texto) {
-    if (!texto || !texto.trim()) return;
+    if (menuToggle && sidebar && sidebarBackdrop) {
+        menuToggle.addEventListener("click", () => {
+            const isOpen = sidebar.classList.toggle("is-open");
+            sidebarBackdrop.classList.toggle("hidden", !isOpen);
+        });
+        sidebarBackdrop.addEventListener("click", () => {
+            sidebar.classList.remove("is-open");
+            sidebarBackdrop.classList.add("hidden");
+        });
+    }
 
-    const chatBody = document.getElementById('chatBody');
-    const chatInput = document.getElementById('chatInputText');
-    const chatOptions = document.getElementById('chatOptions');
-    if (!chatBody) return;
-
-    // 1. Mensaje del usuario
-    const userBubble = document.createElement('div');
-    userBubble.className = 'chat-bubble';
-    userBubble.style.alignSelf = 'flex-end';
-    userBubble.style.background = 'var(--gold-main)';
-    userBubble.style.color = '#000000';
-    userBubble.style.fontWeight = '600';
-    userBubble.textContent = texto.trim();
-    chatBody.appendChild(userBubble);
-    chatBody.scrollTop = chatBody.scrollHeight;
-
-    if (chatInput) chatInput.value = '';
-
-    // 2. Respuesta del bot procesada mediante el servicio de intenciones (HU-36)
-    setTimeout(() => {
-        const respuesta = procesarMensajeChatbot(texto);
-        const botBubble = document.createElement('div');
-        botBubble.className = 'chat-bubble bot-bubble';
-        botBubble.innerHTML = respuesta.html;
-        chatBody.appendChild(botBubble);
-        chatBody.scrollTop = chatBody.scrollHeight;
-
-        // Actualizar opciones rápidas disponibles
-        if (chatOptions && respuesta.opcionesSiguientes) {
-            chatOptions.innerHTML = respuesta.opcionesSiguientes.map(op => `
-                <button class="option-btn ${op.accion === 'horarios' ? 'highlight-btn' : ''}" data-action="${op.accion}">${op.texto}</button>
-            `).join('');
-        }
-    }, 300);
-}
-
-/**
- * Eventos del Layout (Sidebar, Navbar, Perfil y Chatbot)
- */
-function setupGlobalEvents() {
-    document.addEventListener('click', (e) => {
-        const sidebar = document.querySelector('.sidebar');
-        const mainWrapper = document.querySelector('.main-wrapper');
-        const profileDropdown = document.getElementById('profileDropdown');
-        const windowChat = document.getElementById('windowChat');
-
-        // A. Toggle Sidebar (Escritorio / Móvil)
-        const sidebarCollapseBtn = e.target.closest('#sidebarCollapseBtn');
-        if (sidebarCollapseBtn) {
+    const btnCerrarSesion = document.getElementById("btnCerrarSesion");
+    if (btnCerrarSesion) {
+        btnCerrarSesion.addEventListener("click", (e) => {
             e.preventDefault();
-            if (sidebar) {
-                if (window.innerWidth > 992) {
-                    sidebar.classList.toggle('collapsed');
-                    if (mainWrapper) mainWrapper.classList.toggle('expanded');
-                } else {
-                    sidebar.classList.toggle('open');
-                }
-            }
-            return;
-        }
+            localStorage.removeItem("userProfile");
+            localStorage.removeItem("usuarioLogueado");
+            localStorage.removeItem("emailSesion");
+            localStorage.removeItem("userName");
+            localStorage.removeItem("usuarioActivo");
+            sessionStorage.clear();
+            window.location.href = "../index.html";
+        });
+    }
 
-        // B. Botón Hamburguesa Móvil
-        const mobileMenuBtn = e.target.closest('#mobileMenuBtn');
-        if (mobileMenuBtn) {
-            e.preventDefault();
-            if (sidebar) sidebar.classList.toggle('open');
-            return;
-        }
-
-        // C. Abrir / Cerrar Desplegable de Perfil
-        const profileBtn = e.target.closest('#profileMenuBtn');
-        if (profileBtn) {
-            e.preventDefault();
-            if (profileDropdown) profileDropdown.classList.toggle('active');
-            return;
-        }
-
-        // Clic fuera del perfil para cerrarlo
-        if (profileDropdown && profileDropdown.classList.contains('active')) {
-            if (!e.target.closest('.profile-menu-container')) {
-                profileDropdown.classList.remove('active');
-            }
-        }
-
-        // D. Abrir / Cerrar Chatbot
-        const openChatNavBtn = e.target.closest('#openChatbotNavBtn');
-        const floatChatBtn = e.target.closest('#btnToggleChat');
-        const closeChatBtn = e.target.closest('#btnCloseChat');
-
-        if (openChatNavBtn || floatChatBtn) {
-            e.preventDefault();
-            if (windowChat) {
-                windowChat.classList.toggle('hidden');
-                if (!windowChat.classList.contains('hidden')) {
-                    const inp = document.getElementById('chatInputText');
-                    if (inp) inp.focus();
-                }
-            }
-            return;
-        }
-
-        if (closeChatBtn) {
-            e.preventDefault();
-            if (windowChat) windowChat.classList.add('hidden');
-            return;
-        }
-
-        // E. Opciones rápidas del Chatbot (HU-36)
-        const btnOpcionChat = e.target.closest('.option-btn');
-        if (btnOpcionChat && btnOpcionChat.closest('#chatWidgetContainer')) {
-            e.preventDefault();
-            const action = btnOpcionChat.getAttribute('data-action');
-            if (action === 'horarios') {
-                enviarMensajeChat('¿Cuáles son los horarios de atención?');
-            } else if (action === 'consultar') {
-                enviarMensajeChat('¿Cómo consulto mi saldo?');
-            } else if (action === 'transferir') {
-                enviarMensajeChat('¿Cómo realizar una transferencia?');
-            } else if (action === 'menu_principal') {
-                enviarMensajeChat('Hola');
-            } else {
-                enviarMensajeChat(btnOpcionChat.textContent);
-            }
-            return;
-        }
-
-        // F. Botón Enviar mensaje del Chatbot
-        const chatSendBtn = e.target.closest('#chatSendBtn');
-        if (chatSendBtn) {
-            e.preventDefault();
-            const input = document.getElementById('chatInputText');
-            if (input) enviarMensajeChat(input.value);
-            return;
-        }
-
-        // G. Clic fuera del sidebar en móviles
-        if (window.innerWidth <= 992 && sidebar && sidebar.classList.contains('open')) {
-            if (!sidebar.contains(e.target) && !e.target.closest('#mobileMenuBtn')) {
-                sidebar.classList.remove('open');
-            }
-        }
-    });
-
-    // Enter para enviar mensaje en el Chatbot
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            const chatInput = document.getElementById('chatInputText');
-            if (chatInput && document.activeElement === chatInput) {
-                e.preventDefault();
-                enviarMensajeChat(chatInput.value);
-            }
-        }
-    });
-}
+    marcarItemActivo("dashboard");
+    cargarVista("dashboard");
+});

@@ -38,6 +38,153 @@
     /* Añade aquí tus estilos de fondo, bordes, sombras y z-index */
 }
 
+/* ==========================================
+   ESTILOS DE CATALOGO DE PRODUCTOS Y PLÁSTICOS
+   ========================================== */
+
+.catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    width: 100%;
+}
+
+.card-option-box {
+    background: #0f121a;
+    border: 1px solid #1a1f2c;
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1.2rem;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-option-box:hover {
+    border-color: var(--gold-main, #e5a93c);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(229, 169, 60, 0.12);
+}
+
+/* Plástico físico de las tarjetas */
+.tarjeta-plastico {
+    width: 100%;
+    height: 185px;
+    border-radius: 14px;
+    padding: 16px 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.5);
+    margin-bottom: 0.5rem;
+    transition: transform 0.3s ease;
+}
+
+.tarjeta-plastico:hover {
+    transform: scale(1.02);
+}
+
+.head-tarjeta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.head-tarjeta .logo-svg {
+    height: 22px;
+    width: auto;
+}
+
+.head-tarjeta .card-contactless {
+    font-size: 1rem;
+    color: #ffffff;
+    transform: rotate(90deg);
+}
+
+.card-chip-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.card-chip-area .chip {
+    width: 36px;
+    height: 25px;
+    background: linear-gradient(135deg, #fce09b 0%, #8a6218 100%);
+    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.card-tag {
+    font-size: 0.82rem;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.foot-tarjeta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    width: 100%;
+}
+
+.foot-tarjeta .card-number {
+    font-size: 0.88rem;
+    letter-spacing: 2px;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.foot-tarjeta .card-type {
+    font-size: 0.95rem;
+    font-weight: 900;
+    font-style: italic;
+    color: #ffffff;
+}
+
+/* Colores de plásticos */
+.tarjeta-dorada {
+    background: linear-gradient(135deg, #e5a93c 0%, #9e6f1a 100%);
+    border: 1px solid #fce09b;
+}
+.tarjeta-dorada .card-number,
+.tarjeta-dorada .card-type,
+.tarjeta-dorada .card-tag,
+.tarjeta-dorada .card-contactless {
+    color: #000000 !important;
+}
+
+.tarjeta-platino {
+    background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%);
+    border: 1px solid #ffffff;
+}
+.tarjeta-platino .card-number,
+.tarjeta-platino .card-type,
+.tarjeta-platino .card-tag,
+.tarjeta-platino .card-contactless {
+    color: #0f172a !important;
+}
+
+.tarjeta-negra {
+    background: linear-gradient(135deg, #1f2533 0%, #0d1017 100%);
+    border: 1px solid #2d3548;
+}
+
+/* Badges de tipo */
+.tag-ahorros { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.tag-corriente { background: rgba(96, 165, 250, 0.15); color: #60a5fa; }
+.tag-credito { background: rgba(229, 169, 60, 0.15); color: #e5a93c; }
+
+@media (max-width: 900px) {
+    .catalog-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Responsividad adaptativa para pantallas medianas y móviles */
 @media (max-width: 1300px) {
     .catalog-grid {

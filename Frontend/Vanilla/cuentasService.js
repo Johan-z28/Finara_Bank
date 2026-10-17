@@ -108,8 +108,19 @@ export async function obtenerCuentas() {
         todasLasCuentas = [];
     }
 
-    // Filtrar estrictamente las cuentas del usuario actual
-    let cuentasUsuario = todasLasCuentas.filter(c => c && (c.username === usernameActual || (!c.username && usernameActual === 'maria17')));
+    // Identificadores reales del usuario activo (username, correo y alias)
+    const correoActual = usuario.correo || '';
+    const usernameNorm = String(usernameActual || '').trim().toLowerCase();
+    const correoNorm = String(correoActual || '').trim().toLowerCase();
+
+    // Filtrar estrictamente las cuentas reales del usuario actual
+    let cuentasUsuario = todasLasCuentas.filter(c => {
+        if (!c) return false;
+        const cUser = String(c.username || '').trim().toLowerCase();
+        if (cUser === usernameNorm || (correoNorm && cUser === correoNorm)) return true;
+        if (!c.username && usernameNorm === 'maria17') return true;
+        return false;
+    });
 
     // Si el usuario es nuevo y no tiene ninguna cuenta registrada en finara_cuentas,
     // configurar sus cuentas iniciales según su perfil (Ahorros y Corriente por defecto para maria17)
