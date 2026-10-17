@@ -424,3 +424,62 @@ body {
         padding: 20px 15px;
     }
 }
+
+/* =========================================================
+   SELECTOR DE ROL (CLIENTE / ADMINISTRADOR - HU-02.2)
+   ========================================================= */
+.login-role-tabs {
+    display: flex;
+    gap: 8px;
+    background: #0d0f14;
+    padding: 5px;
+    border-radius: 12px;
+    border: 1px solid #222631;
+    margin-bottom: 22px;
+}
+
+.login-role-tab {
+    flex: 1;
+    padding: 10px 14px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    color: #94a3b8;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.25s ease;
+}
+
+.login-role-tab:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.login-role-tab.activo {
+    background: #171b23;
+    color: #e5a93c;
+    border-color: rgba(229, 169, 60, 0.4);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.form-icon--admin {
+    background: rgba(215, 158, 33, .18) !important;
+    border-color: #d69d22 !important;
+    color: #f5b52f !important;
+}
+
+.login-button--admin {
+    background: linear-gradient(135deg, #f2b633, #d89518) !important;
+    color: #111318 !important;
+    box-shadow: 0 6px 20px rgba(217, 153, 26, .25) !important;
+}
+
+.login-button--admin:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(217, 153, 26, .35) !important;
+}
