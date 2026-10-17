@@ -29,7 +29,6 @@ export async function initSaldosView() {
     });
 
     const actualizarAnalitica = () => {
-        // Búsqueda flexible de cuentas compatibles con variaciones de nombres
         const ahorros = cuentas.find(c => {
             const t = String(c.tipo || '').toUpperCase();
             return t.includes('AHORRO') || t.includes('DEBITO') || t.includes('DÉBITO');
@@ -54,9 +53,8 @@ export async function initSaldosView() {
 
         const saldoAhorros = limpiarSaldo(ahorros.saldo);
         const saldoCorriente = limpiarSaldo(corriente.saldo);
-        const cupoCredito = credito ? limpiarSaldo(credito.saldo) : 0;
+        const cupoCredito = credito ? limpiarSaldo(credito.saldo || credito.cupoDisponible) : 0;
         
-        // Suma real combinada de los saldos activos
         const total = saldoAhorros + saldoCorriente;
 
         const elAhorrosTotal = document.getElementById('montoAhorrosTotal');
@@ -96,7 +94,6 @@ export async function initSaldosView() {
         if (itemLeyendaAhorros) itemLeyendaAhorros.classList.toggle('hidden', !tieneAhorros);
         if (itemLeyendaCorriente) itemLeyendaCorriente.classList.toggle('hidden', !tieneCorriente);
 
-        // Cálculo de porcentajes con ajuste visual para diferencias extremas
         let pctAhorros = 0;
         let pctCorriente = 0;
 
@@ -164,6 +161,24 @@ export async function initSaldosView() {
             localStorage.setItem(CLAVE_PRIVACIDAD, String(ocultar));
             pintarOjo();
             pintarCuentas();
+            return;
+        }
+
+        // 🚀 Redirección hacia CreditoSimulador.html accionada por el botón destacado de la Tarjeta de Crédito
+        const btnSimular = e.target.closest('.btn-simular-compra');
+        if (btnSimular) {
+            e.preventDefault();
+            const linkSimulador = document.querySelector('[data-view="simuladortc"]') || 
+                                  document.querySelector('[data-view="SimuladorTC"]') ||
+                                  document.querySelector('a[href*="CreditoSimulador"]');
+            
+            if (linkSimulador) {
+                linkSimulador.click();
+            } else {
+                // Disparo de evento global en caso de no encontrar el enlace en la navegación
+                const eventoNav = new CustomEvent('navegarVista', { detail: { vista: 'simuladortc' } });
+                window.dispatchEvent(eventoNav);
+            }
         }
     });
 

@@ -184,9 +184,10 @@ function vincularEventosPerfil() {
         }
     });
 
-    // 5. Configuración de Cuenta
-    const settingRows = document.querySelectorAll('.setting-row');
+    // 5. Configuración de Cuenta (Cambiar contraseña, Notificaciones, etc.)
+    const settingRows = document.querySelectorAll('.setting-row, .setting-item');
     settingRows.forEach((row, idx) => {
+        row.style.cursor = 'pointer';
         row.onclick = async (e) => {
             e.preventDefault();
             await manejarOpcionConfiguracion(idx);
@@ -307,27 +308,143 @@ async function editarCampoIndividual(row) {
     }
 }
 
+// 🚀 FUNCIÓN CORREGIDA: DESPLIEGA EL MODAL REAL DE CAMBIO DE CONTRASEÑA
 async function manejarOpcionConfiguracion(index) {
-    if (!window.Swal) return;
     if (index === 0) {
-        Swal.fire({
-            title: 'Cambiar Contraseña',
-            text: 'Módulo de seguridad para cambiar la clave de acceso.',
-            icon: 'info',
-            background: '#12151c',
-            color: '#ffffff',
-            confirmButtonColor: '#e5a93c'
-        });
+        const userData = JSON.parse(localStorage.getItem('userProfile')) || {};
+        mostrarModalCambiarContrasena(userData);
     } else {
+        if (window.Swal) {
+            Swal.fire({
+                title: 'Configuración de Cuenta',
+                text: 'Esta opción estará disponible próximamente.',
+                icon: 'info',
+                background: '#12151c',
+                color: '#ffffff',
+                confirmButtonColor: '#e5a93c'
+            });
+        }
+    }
+}
+
+function mostrarModalCambiarContrasena(usuario) {
+    const modalExistente = document.getElementById("modalCambiarPasswordFinara");
+    if (modalExistente) modalExistente.remove();
+
+    const overlay = document.createElement("div");
+    overlay.id = "modalCambiarPasswordFinara";
+    overlay.style.cssText = `
+        position: fixed; inset: 0; background: rgba(5, 7, 10, 0.85); backdrop-filter: blur(8px);
+        display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 1.5rem;
+    `;
+
+    overlay.innerHTML = `
+        <div style="background: #11141b; border: 1px solid rgba(229,169,60,0.4); border-radius: 16px; padding: 2rem; max-width: 420px; width: 100%; box-shadow: 0 20px 40px rgba(0,0,0,0.6); color: #fff;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.4rem;">
+                <h3 style="margin: 0; font-size: 1.15rem; color: #fff; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-lock" style="color: #e5a93c;"></i> Cambiar Contraseña
+                </h3>
+                <button type="button" id="btnCerrarModalPass" style="background: none; border: none; color: #8a8f99; font-size: 1.2rem; cursor: pointer;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="formCambiarPassword" style="display: flex; flex-direction: column; gap: 1rem;">
+                <div>
+                    <label style="display: block; font-size: 0.8rem; color: #cbd5e1; margin-bottom: 0.4rem;">Contraseña Actual</label>
+                    <input type="password" id="passActual" placeholder="Ingresa tu contraseña actual" required
+                        style="width: 100%; padding: 0.75rem; background: #1b202c; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 0.9rem; box-sizing: border-box; outline: none;">
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 0.8rem; color: #cbd5e1; margin-bottom: 0.4rem;">Nueva Contraseña</label>
+                    <input type="password" id="passNueva" placeholder="Mínimo 6 caracteres" minlength="6" required
+                        style="width: 100%; padding: 0.75rem; background: #1b202c; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 0.9rem; box-sizing: border-box; outline: none;">
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 0.8rem; color: #cbd5e1; margin-bottom: 0.4rem;">Confirmar Nueva Contraseña</label>
+                    <input type="password" id="passConfirmacion" placeholder="Repite la nueva contraseña" minlength="6" required
+                        style="width: 100%; padding: 0.75rem; background: #1b202c; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 0.9rem; box-sizing: border-box; outline: none;">
+                </div>
+
+                <button type="submit" style="background: linear-gradient(135deg, #e5a93c 0%, #b8860b 100%); color: #0a0c10; border: none; padding: 0.85rem; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(229, 169, 60, 0.3);">
+                    <i class="fa-solid fa-key"></i> Actualizar Contraseña
+                </button>
+            </form>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const cerrar = () => overlay.remove();
+    overlay.querySelector("#btnCerrarModalPass").addEventListener("click", cerrar);
+    overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) cerrar();
+    });
+
+    overlay.querySelector("#formCambiarPassword").addEventListener("submit", (e) => {
+        e.preventDefault();
+        
+        const actual = document.getElementById("passActual").value;
+        const nueva = document.getElementById("passNueva").value;
+        const confirmacion = document.getElementById("passConfirmacion").value;
+
+        const passGuardada = usuario ? (usuario.password || usuario.contrasena || "123456") : "123456";
+
+        if (actual !== passGuardada) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Contraseña Incorrecta',
+                text: 'La contraseña actual no coincide con tus registros.',
+                background: '#12151c',
+                color: '#ffffff',
+                confirmButtonColor: '#e5a93c'
+            });
+            return;
+        }
+
+        if (nueva !== confirmacion) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Las contraseñas no coinciden',
+                text: 'La nueva contraseña y su confirmación deben ser idénticas.',
+                background: '#12151c',
+                color: '#ffffff',
+                confirmButtonColor: '#e5a93c'
+            });
+            return;
+        }
+
+        // Actualización en Almacenamiento Local
+        let userProfile = JSON.parse(localStorage.getItem("userProfile")) || {};
+        userProfile.password = nueva;
+        userProfile.contrasena = nueva;
+        localStorage.setItem("userProfile", JSON.stringify(userProfile));
+
+        let listaUsuarios = JSON.parse(localStorage.getItem("finara_usuarios_local")) || [];
+        const correoUser = usuario ? (usuario.correo || usuario.email || usuario.username) : '';
+
+        listaUsuarios = listaUsuarios.map(u => {
+            if (u.correo === correoUser || u.username === correoUser) {
+                u.password = nueva;
+                u.contrasena = nueva;
+            }
+            return u;
+        });
+        localStorage.setItem("finara_usuarios_local", JSON.stringify(listaUsuarios));
+
+        cerrar();
+
         Swal.fire({
-            title: 'Configuración de Cuenta',
-            text: 'Esta opción estará disponible próximamente.',
-            icon: 'info',
+            icon: 'success',
+            title: '¡Contraseña Actualizada!',
+            text: 'Tu contraseña ha sido modificada con éxito.',
             background: '#12151c',
             color: '#ffffff',
             confirmButtonColor: '#e5a93c'
         });
-    }
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {

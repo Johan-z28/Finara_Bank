@@ -138,7 +138,7 @@ function poblarSelectorTarjetasDestino(usuario) {
 
         const saldoVal = Number(cuenta.saldo !== undefined ? cuenta.saldo : (cuenta.cupoDisponible || 0));
 
-        option.textContent = `${tipoLabel} - [•• ${numLimpio.slice(-4)}] (Saldo actual: $ ${saldoVal.toLocaleString('es-CO')})`;
+        option.textContent = `${tipoLabel} - [•• ${numLimpio.slice(-4)}] (${tipoLabel === 'TARJETA DE CRÉDITO' ? 'Cupo libre' : 'Saldo'}: $ ${saldoVal.toLocaleString('es-CO')})`;
         selectDestino.appendChild(option);
     });
 }
@@ -169,69 +169,104 @@ function procesarRecargaPropia(usuarioActivo) {
     let cuentaSeleccionada = cuentas.find(c => soloDigitos(c.numero) === numeroSeleccionado);
 
     let tipoProducto = cuentaSeleccionada ? (cuentaSeleccionada.tipo || 'AHORROS').toUpperCase() : 'AHORROS';
-    let saldoActual = cuentaSeleccionada ? Number(cuentaSeleccionada.saldo || 0) : 0;
-    let nuevoSaldo = saldoActual + monto;
+    let esCredito = tipoProducto.includes("CREDITO") || tipoProducto.includes("CRÉDITO");
 
     let todasLasCuentas = JSON.parse(localStorage.getItem('finara_cuentas')) || [];
-    let cuentaEncontrada = false;
 
-    todasLasCuentas = todasLasCuentas.map(cta => {
-        const numCta = soloDigitos(cta.numero);
-        if (numCta === numeroSeleccionado) {
-            cta.saldo = nuevoSaldo;
-            cuentaEncontrada = true;
-        }
-        return cta;
-    });
+    if (esCredito) {
+        // 🚀 CONDICIONAL DE CONTROL DE CUPO MÁXIMO
+        const cupoMaximoOriginal = parseFloat(cuentaSeleccionada?.cupoMaximo || cuentaSeleccionada?.cupoInicial) || 3000000;
+        
+        let cupoActual = Number(cuentaSeleccionada?.saldo !== undefined ? cuentaSeleccionada.saldo : (cuentaSeleccionada?.cupoDisponible || cupoMaximoOriginal));
+        if (isNaN(cupoActual)) cupoActual = cupoMaximoOriginal;
 
-    if (!cuentaEncontrada && numeroSeleccionado) {
-        todasLasCuentas.push({
-            id: `CTA-${tipoProducto.slice(0, 3)}-${Date.now()}`,
-            tipo: tipoProducto === 'DEBITO' ? 'AHORROS' : tipoProducto,
-            numero: numeroSeleccionado,
-            saldo: nuevoSaldo,
-            estado: 'ACTIVA',
-            username: usuarioActivo.username || usuarioActivo.correo || 'usuario',
-            fechaCreacion: new Date().toISOString()
-        });
-    }
+        // Calcular la deuda pendiente real (Cupo Máximo Aprobado - Cupo Disponible Actual)
+        const deudaPendienteReal = Math.max(0, cupoMaximoOriginal - cupoActual);
 
-    localStorage.setItem('finara_cuentas', JSON.stringify(todasLasCuentas));
-
-    if (usuarioActivo && Array.isArray(usuarioActivo.tarjetasAprobadas)) {
-        usuarioActivo.tarjetasAprobadas.forEach(t => {
-            if (soloDigitos(t.numeroTarjeta || t.numero) === numeroSeleccionado) {
-                t.saldo = nuevoSaldo;
-                t.cupoDisponible = nuevoSaldo;
+        // 🔴 REGLA 1: Si no se registra ninguna deuda activa en la tarjeta
+        if (deudaPendienteReal <= 0) {
+            if (window.Swal) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Abono no permitido',
+                    html: `Tu Tarjeta de Crédito se encuentra con el cupo al 100% (<strong>$ ${cupoMaximoOriginal.toLocaleString('es-CO')} COP</strong>).<br><br>No tienes deuda pendiente y no es posible aumentar el cupo preaprobado.`,
+                    background: '#12151c',
+                    color: '#ffffff',
+                    confirmButtonColor: '#e5a93c'
+                });
+            } else {
+                alert(`Tu tarjeta de crédito no tiene deuda pendiente ($ ${cupoMaximoOriginal.toLocaleString('es-CO')}). No es posible aumentar el cupo.`);
             }
-        });
-    }
-    localStorage.setItem('userProfile', JSON.stringify(usuarioActivo));
+            return;
+        }
 
-    try {
-        let movimientos = JSON.parse(localStorage.getItem('finara_movimientos')) || [];
-        movimientos.unshift({
-            id: `MOV-${Date.now()}`,
-            cuentaId: numeroSeleccionado,
-            cuentaNumero: numeroSeleccionado,
-            cuentaOrigen: numeroSeleccionado,
-            fecha: new Date().toISOString(),
-            descripcion: `Consignación a ${tipoProducto}`,
-            categoria: 'Consignación',
-            tipo: 'INGRESO',
-            valor: monto,
-            usuario: usuarioActivo.correo || usuarioActivo.username
-        });
-        localStorage.setItem('finara_movimientos', JSON.stringify(movimientos));
-    } catch (e) {
-        console.error("Error al registrar movimiento:", e);
-    }
+        // 🔴 REGLA 2: Si el abono ingresado supera la deuda existente
+        if (monto > deudaPendienteReal) {
+            if (window.Swal) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Exceso de Pago',
+                    html: `El monto a consignar (<strong>$ ${monto.toLocaleString('es-CO')} COP</strong>) excede la deuda pendiente de tu tarjeta.<br><br>Lo máximo que puedes abonar es <strong>$ ${deudaPendienteReal.toLocaleString('es-CO')} COP</strong> para restablecer tu cupo a $ ${cupoMaximoOriginal.toLocaleString('es-CO')} COP.`,
+                    background: '#12151c',
+                    color: '#ffffff',
+                    confirmButtonColor: '#e5a93c'
+                });
+            } else {
+                alert(`El monto excede la deuda pendiente. Lo máximo a abonar es $ ${deudaPendienteReal.toLocaleString('es-CO')}.`);
+            }
+            return;
+        }
 
-    if (window.Swal) {
+        // Lógica de Abono Válido a Cuota / Liberación de Cupo
+        let deudaActualRegistrada = parseFloat(cuentaSeleccionada?.deudaActual || deudaPendienteReal);
+        let nuevaDeuda = Math.max(0, deudaActualRegistrada - monto);
+        let nuevoCupo = Math.min(cupoMaximoOriginal, cupoActual + monto);
+
+        todasLasCuentas = todasLasCuentas.map(cta => {
+            if (soloDigitos(cta.numero) === numeroSeleccionado) {
+                cta.saldo = nuevoCupo;
+                cta.cupoDisponible = nuevoCupo;
+                cta.deudaActual = nuevaDeuda;
+            }
+            return cta;
+        });
+
+        localStorage.setItem('finara_cuentas', JSON.stringify(todasLasCuentas));
+
+        if (usuarioActivo && Array.isArray(usuarioActivo.tarjetasAprobadas)) {
+            usuarioActivo.tarjetasAprobadas.forEach(t => {
+                if (soloDigitos(t.numeroTarjeta || t.numero) === numeroSeleccionado) {
+                    t.saldo = nuevoCupo;
+                    t.cupoDisponible = nuevoCupo;
+                    t.deudaActual = nuevaDeuda;
+                }
+            });
+        }
+        localStorage.setItem('userProfile', JSON.stringify(usuarioActivo));
+
+        // Registrar en Movimientos
+        try {
+            let movimientos = JSON.parse(localStorage.getItem('finara_movimientos')) || [];
+            movimientos.unshift({
+                id: `ABONO-${Date.now()}`,
+                cuentaId: numeroSeleccionado,
+                cuentaNumero: numeroSeleccionado,
+                fecha: new Date().toISOString(),
+                descripcion: `Abono a Cuota Tarjeta de Crédito`,
+                categoria: 'Pago Cuota TC',
+                tipo: 'INGRESO',
+                valor: monto,
+                usuario: usuarioActivo.correo || usuarioActivo.username
+            });
+            localStorage.setItem('finara_movimientos', JSON.stringify(movimientos));
+        } catch (e) {
+            console.error("Error al registrar movimiento:", e);
+        }
+
         Swal.fire({
             icon: 'success',
-            title: '¡Recarga Exitosa!',
-            html: `Has abonado <strong>$ ${monto.toLocaleString('es-CO')} COP</strong>.<br>Nuevo saldo guardado: <strong>$ ${nuevoSaldo.toLocaleString('es-CO')} COP</strong>.`,
+            title: '¡Abono a Tarjeta Exitoso!',
+            html: `Has abonado <strong>$ ${monto.toLocaleString('es-CO')} COP</strong> a tu tarjeta de crédito.<br>Cupo disponible liberado: <strong>$ ${nuevoCupo.toLocaleString('es-CO')} COP</strong>.<br>Deuda restante: <strong>$ ${nuevaDeuda.toLocaleString('es-CO')} COP</strong>.`,
             background: '#12151c',
             color: '#ffffff',
             confirmButtonColor: '#e5a93c',
@@ -241,8 +276,82 @@ function procesarRecargaPropia(usuarioActivo) {
             if (linkSaldos) linkSaldos.click();
             else location.reload();
         });
+
     } else {
-        alert(`¡Recarga Exitosa! Nuevo saldo: $ ${nuevoSaldo.toLocaleString('es-CO')}`);
-        location.reload();
+        // Lógica Estándar de Consignación para Débito / Corriente
+        let saldoActual = cuentaSeleccionada ? Number(cuentaSeleccionada.saldo || 0) : 0;
+        let nuevoSaldo = saldoActual + monto;
+        let cuentaEncontrada = false;
+
+        todasLasCuentas = todasLasCuentas.map(cta => {
+            const numCta = soloDigitos(cta.numero);
+            if (numCta === numeroSeleccionado) {
+                cta.saldo = nuevoSaldo;
+                cuentaEncontrada = true;
+            }
+            return cta;
+        });
+
+        if (!cuentaEncontrada && numeroSeleccionado) {
+            todasLasCuentas.push({
+                id: `CTA-${tipoProducto.slice(0, 3)}-${Date.now()}`,
+                tipo: tipoProducto === 'DEBITO' ? 'AHORROS' : tipoProducto,
+                numero: numeroSeleccionado,
+                saldo: nuevoSaldo,
+                estado: 'ACTIVA',
+                username: usuarioActivo.username || usuarioActivo.correo || 'usuario',
+                fechaCreacion: new Date().toISOString()
+            });
+        }
+
+        localStorage.setItem('finara_cuentas', JSON.stringify(todasLasCuentas));
+
+        if (usuarioActivo && Array.isArray(usuarioActivo.tarjetasAprobadas)) {
+            usuarioActivo.tarjetasAprobadas.forEach(t => {
+                if (soloDigitos(t.numeroTarjeta || t.numero) === numeroSeleccionado) {
+                    t.saldo = nuevoSaldo;
+                    t.cupoDisponible = nuevoSaldo;
+                }
+            });
+        }
+        localStorage.setItem('userProfile', JSON.stringify(usuarioActivo));
+
+        try {
+            let movimientos = JSON.parse(localStorage.getItem('finara_movimientos')) || [];
+            movimientos.unshift({
+                id: `MOV-${Date.now()}`,
+                cuentaId: numeroSeleccionado,
+                cuentaNumero: numeroSeleccionado,
+                cuentaOrigen: numeroSeleccionado,
+                fecha: new Date().toISOString(),
+                descripcion: `Consignación a ${tipoProducto}`,
+                categoria: 'Consignación',
+                tipo: 'INGRESO',
+                valor: monto,
+                usuario: usuarioActivo.correo || usuarioActivo.username
+            });
+            localStorage.setItem('finara_movimientos', JSON.stringify(movimientos));
+        } catch (e) {
+            console.error("Error al registrar movimiento:", e);
+        }
+
+        if (window.Swal) {
+            Swal.fire({
+                icon: 'success',
+                title: '¡Recarga Exitosa!',
+                html: `Has abonado <strong>$ ${monto.toLocaleString('es-CO')} COP</strong>.<br>Nuevo saldo guardado: <strong>$ ${nuevoSaldo.toLocaleString('es-CO')} COP</strong>.`,
+                background: '#12151c',
+                color: '#ffffff',
+                confirmButtonColor: '#e5a93c',
+                width: '520px'
+            }).then(() => {
+                const linkSaldos = document.querySelector('[data-view="saldos"]');
+                if (linkSaldos) linkSaldos.click();
+                else location.reload();
+            });
+        } else {
+            alert(`¡Recarga Exitosa! Nuevo saldo: $ ${nuevoSaldo.toLocaleString('es-CO')}`);
+            location.reload();
+        }
     }
 }

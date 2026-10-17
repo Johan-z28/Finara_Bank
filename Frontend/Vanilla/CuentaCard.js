@@ -108,7 +108,7 @@ export function crearCuentaCard(cuenta, { ocultarSaldo = false } = {}) {
     metaContainer.append(estadoHeader, saldoBox);
     card.append(plasticoCard, metaContainer);
 
-    // 3. Tarjeta Asociada o Botón de Activación (si aplica)
+    // 3. Tarjeta Asociada o Botón de Activación
     if (cuenta.tarjetaAsociada) {
         const tarjetaBox = el('div', 'cuenta-card__tarjeta-vinculada');
         const numTarjeta = cuenta.tarjetaAsociada.numero || '4532 0000 0000 0000';
@@ -193,19 +193,27 @@ export function crearCuentaCard(cuenta, { ocultarSaldo = false } = {}) {
         card.appendChild(sinTarjetaBox);
     }
 
-    // Si es Tarjeta de Crédito independiente
+    // 🚀 INYECCIÓN DESTACADA: BOTÓN PRINCIPAL "SIMULAR COMPRA" + OPCIONES SECUNDARIAS
     if (cuenta.tipo === 'TARJETA_CREDITO') {
         const estaBloqueadaTC = Boolean(cuenta.bloqueada || cuenta.estado === 'BLOQUEADA');
-        const contAccionesTC = el('div', 'tarjeta-vinculada__acciones');
-        contAccionesTC.style.marginTop = '0.5rem';
+        const contAccionesTC = el('div', 'tarjeta-vinculada__acciones-bloque');
+        contAccionesTC.style.cssText = 'display: flex; flex-direction: column; gap: 8px; margin-top: 0.8rem; width: 100%;';
 
         contAccionesTC.innerHTML = `
-            <button type="button" class="btn-tarjeta-accion btn-ver-detalles" title="Ver número completo, vencimiento y CVV">
-                <i class="fa-regular fa-eye"></i> Ver datos
+            <!-- BOTÓN DESTACADO Y GRANDE DIRECCIONADO A CREDITO SIMULADOR -->
+            <button type="button" class="btn-tarjeta-accion btn-simular-compra" data-view="simuladortc" style="width: 100%; background: linear-gradient(135deg, #e5a93c 0%, #b8860b 100%); color: #0a0c10; border: 1px solid #fce09b; font-weight: 700; cursor: pointer; border-radius: 10px; padding: 0.75rem 1rem; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(229, 169, 60, 0.25); transition: transform 0.2s ease;" title="Simular compra a cuotas">
+                <i class="fa-solid fa-calculator" style="font-size: 1.05rem;"></i> Simular compra
             </button>
-            <button type="button" class="btn-tarjeta-accion ${estaBloqueadaTC ? 'btn-desbloquear-tarjeta' : 'btn-bloquear-tarjeta'}" title="${estaBloqueadaTC ? 'Desbloquear tarjeta de crédito' : 'Bloquear tarjeta de crédito temporalmente'}">
-                <i class="fa-solid ${estaBloqueadaTC ? 'fa-lock-open' : 'fa-lock'}"></i> ${estaBloqueadaTC ? 'Desbloquear' : 'Bloquear'}
-            </button>
+
+            <!-- FILA INFERIOR CON ACCIONES SECUNDARIAS -->
+            <div style="display: flex; gap: 8px; width: 100%;">
+                <button type="button" class="btn-tarjeta-accion btn-ver-detalles" style="flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--border-dark); color: #fff; border-radius: 8px; padding: 0.5rem; cursor: pointer;" title="Ver número completo, vencimiento y CVV">
+                    <i class="fa-regular fa-eye"></i> Ver datos
+                </button>
+                <button type="button" class="btn-tarjeta-accion ${estaBloqueadaTC ? 'btn-desbloquear-tarjeta' : 'btn-bloquear-tarjeta'}" style="flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--border-dark); color: #fff; border-radius: 8px; padding: 0.5rem; cursor: pointer;" title="${estaBloqueadaTC ? 'Desbloquear tarjeta de crédito' : 'Bloquear tarjeta de crédito temporalmente'}">
+                    <i class="fa-solid ${estaBloqueadaTC ? 'fa-lock-open' : 'fa-lock'}"></i> ${estaBloqueadaTC ? 'Desbloquear' : 'Bloquear'}
+                </button>
+            </div>
         `;
 
         contAccionesTC.querySelector('.btn-ver-detalles').addEventListener('click', (e) => {

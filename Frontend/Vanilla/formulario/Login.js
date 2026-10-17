@@ -4,7 +4,7 @@ const MINUTOS_BLOQUEO = 50;        // duración del bloqueo
 const CLAVE_USUARIOS = "finara_usuarios_local";   // lo escribe signup.js
 const CLAVE_SESION = "userProfile";               // lo leen Dashboard/Perfil
 const CLAVE_CONTROL = "finara_login_control";     // { cuenta: { intentos, bloqueadoHasta } }
-const RUTA_DASHBOARD = "../app.html";       // Pages/formulario -> Pages/Dashboard.html
+const RUTA_DASHBOARD = "../app.html";       // Pages/formulario -> Pages/app.html
 
 // Estilo base de todas las alertas (igual al formulario de registro)
 const ESTILO_SWAL = {
@@ -51,7 +51,7 @@ function guardarJSON(clave, valor) {
     }
 }
 
-// Lee un campo probando varios nombres posibles (por si el registro lo guardó distinto)
+// Lee un campo probando varios nombres posibles
 function campo(usuario, nombres) {
     for (const n of nombres) {
         if (usuario[n] !== undefined && usuario[n] !== null && String(usuario[n]).trim() !== "") {
@@ -63,7 +63,6 @@ function campo(usuario, nombres) {
 const getUsername = (u) => campo(u, ["username", "userName", "usuario", "user"]);
 const getPassword = (u) => campo(u, ["password", "contrasena", "contraseña", "clave"]);
 
-// Solo se aceptan registros válidos (objetos con nombre de usuario)
 function obtenerUsuarios() {
     const usuarios = leerJSON(CLAVE_USUARIOS, []);
     return Array.isArray(usuarios)
@@ -84,7 +83,6 @@ function buscarUsuario(nombreUsuario, usuarios) {
     return usuarios.find(u => normalizar(getUsername(u)) === id) || null;
 }
 
-// Cada cuenta (usuario) tiene su propio contador: bloquear una no afecta a las demás
 function claveDeCuenta(nombreUsuario) {
     return "u:" + normalizar(nombreUsuario);
 }
@@ -93,7 +91,6 @@ function estadoCuenta(clave) {
     const control = obtenerControl();
     const estado = control[clave] || { intentos: 0, bloqueadoHasta: 0 };
 
-    // Si el bloqueo ya venció, la cuenta queda como nueva
     if (estado.bloqueadoHasta && estado.bloqueadoHasta <= Date.now()) {
         delete control[clave];
         guardarJSON(CLAVE_CONTROL, control);
@@ -118,7 +115,7 @@ function formatearTiempo(ms) {
     const totalSeg = Math.max(1, Math.ceil(ms / 1000));
     const min = Math.floor(totalSeg / 60);
     const seg = totalSeg % 60;
-    return min > 0 ? `${min} min ${seg} s` : `${seg} s`;
+    return min > 0 ? `${min} min${seg} s` : `${seg} s`;
 }
 
 // ---------- Alertas (SweetAlert2) ----------
@@ -141,7 +138,6 @@ function alertaSinCuentas() {
     });
 }
 
-// Sale desde el PRIMER error (usuario o contraseña incorrectos)
 function alertaCredencialesIncorrectas(intentosRestantes) {
     const critico = intentosRestantes === 1;
     const textoIntentos = critico
@@ -159,7 +155,6 @@ function alertaCredencialesIncorrectas(intentosRestantes) {
     });
 }
 
-// Muestra una cuenta regresiva en vivo hasta que termine el bloqueo
 function alertaCuentaBloqueada(bloqueadoHasta, recienBloqueada) {
     let intervalo = null;
 
@@ -201,7 +196,6 @@ document.addEventListener("DOMContentLoaded", () => {
         loginForm.addEventListener("submit", function (event) {
             event.preventDefault();
 
-            // El campo nunca se bloquea: se puede escribir, copiar y pegar siempre
             const nombreUsuario = inputUsuario.value.trim().replace(/^@/, "");
             const password = inputPassword.value;
 
@@ -211,11 +205,40 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            // 2. Usuarios guardados por el registro (localStorage)
+            // 🛡️ 2. VALIDACIÓN DE CREDENCIALES DE ADMINISTRADOR FINARA BANK
+            if (normalizar(nombreUsuario) === "finara_banck" && password === "123456777") {
+                const adminUser = {
+                    nombre: "Administrador Finara",
+                    username: "finara_banck",
+                    correo: "admin@finarabank.com",
+                    rol: "admin",
+                    verificado: true,
+                    avatar: "../../Style/image/profile/avatarDefault.png"
+                };
+
+                guardarJSON(CLAVE_SESION, adminUser);
+                localStorage.setItem("usuarioLogueado", "finara_banck");
+                localStorage.setItem("emailSesion", "admin@finarabank.com");
+                localStorage.setItem("userName", "Administrador Finara");
+
+                Swal.fire({
+                    ...ESTILO_SWAL,
+                    icon: "success",
+                    title: "¡Bienvenido Administrador!",
+                    text: "Accediendo al Panel de Control Admin...",
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = RUTA_DASHBOARD;
+                });
+                return;
+            }
+
+            // 3. Usuarios guardados por el registro (localStorage)
             const usuarios = obtenerUsuarios();
 
             if (usuarios.length === 0) {
-                console.warn(`[Login] No hay usuarios en localStorage ("${CLAVE_USUARIOS}") para este origen:`, window.location.origin);
+                console.warn(`[Login] No hay usuarios en localStorage ("${CLAVE_USUARIOS}")`);
                 alertaSinCuentas();
                 return;
             }
@@ -224,7 +247,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const clave = claveDeCuenta(nombreUsuario);
             const estado = estadoCuenta(clave);
 
-            // 3. ¿Esta cuenta está bloqueada? (las demás cuentas siguen funcionando)
+            // 4. ¿Esta cuenta está bloqueada?
             if (estado.bloqueadoHasta > Date.now()) {
                 inputPassword.value = "";
                 alertaCuentaBloqueada(estado.bloqueadoHasta, false)
@@ -232,12 +255,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            // 4. Credenciales correctas
+            // 5. Credenciales de usuario común correctas
             if (usuarioExistente && getPassword(usuarioExistente) === password) {
                 limpiarEstadoCuenta(clave);
 
-                // Guardar tanto el perfil completo como las variables globales que app.js espera
                 guardarJSON(CLAVE_SESION, usuarioExistente);
+                localStorage.setItem("usuarioLogueado", usuarioExistente.username || usuarioExistente.correo);
+                localStorage.setItem("emailSesion", usuarioExistente.correo || "");
                 localStorage.setItem("userName", usuarioExistente.nombre || usuarioExistente.username || "Sin Nombre");
                 localStorage.setItem("userAvatar", usuarioExistente.avatar || "");
 
@@ -264,7 +288,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            // 5. Usuario o contraseña incorrectos: sumar intento y avisar
+            // 6. Usuario o contraseña incorrectos
             const intentos = estado.intentos + 1;
             inputPassword.value = "";
 
@@ -281,7 +305,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Recuperar contraseña (aviso informativo)
     const forgot = document.getElementById("forgotPassword");
     if (forgot) {
         forgot.addEventListener("click", function (e) {
