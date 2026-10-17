@@ -1,5 +1,3 @@
-import { initGlobalComponents } from './Global/app.js';
-import { initCampanaNotificaciones, actualizarCampana } from './notificaciones.js';
 import {
     TIPOS, formatoCOP, calcularDisponible, obtenerCuentasOrigen, buscarCuentaDestino,
     validarTransferencia, ejecutarTransferencia, SesionExpiradaError
@@ -10,14 +8,13 @@ const formatoFechaHora = new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium',
 function el(tag, clase, texto) {
     const n = document.createElement(tag);
     if (clase) n.className = clase;
-    if (texto !== undefined) n.textContent = texto; // textContent: evita inyección HTML
+    if (texto !== undefined) n.textContent = texto;
     return n;
 }
 
 const ultimos4 = numero => String(numero).replace(/\D/g, '').slice(-4);
-const textoCuenta = c => `${TIPOS[c.tipo]} · •••• ${ultimos4(c.numero)}`;
+const textoCuenta = c => `${TIPOS[c.tipo] || c.tipo} · •••• ${ultimos4(c.numero)}`;
 
-// Lista de filas "etiqueta / valor" para el resumen y el comprobante
 function filas(contenedor, items) {
     contenedor.replaceChildren(...items.map(({ label, valor, extra, destacado, negativo }) => {
         const fila = el('div', 'tr-fila-resumen');
@@ -29,62 +26,74 @@ function filas(contenedor, items) {
     }));
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Inicializa la hamburguesa, el menú de perfil y los datos compartidos
-    initGlobalComponents();
-    initCampanaNotificaciones();
+export async function initTransferenciasView() {
+    let modNotif = null;
+    try {
+        modNotif = await import('./notificaciones.js');
+        if (modNotif && modNotif.initCampanaNotificaciones) {
+            modNotif.initCampanaNotificaciones();
+        }
+    } catch {}
 
     const $ = id => document.getElementById(id);
     const form = $('formTransferencia');
-    const selOrigen = $('trOrigen'), selTipo = $('trTipoDestino');
-    const inpNumero = $('trNumeroDestino'), inpMonto = $('trMonto'), inpConcepto = $('trConcepto');
-    const hintOrigen = $('trOrigenHint'), boxDestino = $('trDestino');
-    const trOrigenCard = $('trOrigenCard'), trCardTipo = $('trCardTipo'), trCardSaldo = $('trCardSaldo'), trCardBadge = $('trCardBadge');
-    const btnTransferirTodo = $('btnTransferirTodo'), chipsMonto = $('chipsMonto');
-    const errOrigen = $('errOrigen'), errDestino = $('errDestino'), errMonto = $('errMonto');
-    const vistas = { 1: $('vistaForm'), 2: $('vistaResumen'), 3: $('vistaExito') };
+    
+    if (!form) return;
+
+    const selOrigen = $('trOrigen'), selTipo = $('trTipoDestino'), selBanco =$('bancoDestinoSelect');
+    const inpNumero = $('trNumeroDestino'), inpMonto = $('trMonto'), inpConcepto =$('trConcepto');
+    const hintOrigen = $('trOrigenHint'), boxDestino =$('trDestino');
+    const trOrigenCard = $('trOrigenCard'), trCardTipo =$('trCardTipo'), trCardSaldo = $('trCardSaldo'), trCardBadge =$('trCardBadge');
+    const btnTransferirTodo = $('btnTransferirTodo'), chipsMonto =$('chipsMonto');
+    const errOrigen = $('errOrigen'), errDestino = $('errDestino'), errMonto =$('errMonto');
+    const vistas = { 1: $('vistaForm'), 2: $('vistaResumen'), 3:$('vistaExito') };
     const pasos = document.querySelectorAll('.tr-paso');
-    const btnEditar = $('btnEditar'), btnConfirmar = $('btnConfirmar'), btnNueva = $('btnNueva');
-    const resumenError = $('resumenError'), resumenAlerta = $('resumenAlerta');
-    const estadoGlobal = $('trEstado'), toast = $('trToast');
+    const btnEditar = $('btnEditar'), btnConfirmar =$('btnConfirmar'), btnNueva = $('btnNueva'), btnContinuar =$('btnContinuar');
+    const resumenError = $('resumenError'), resumenAlerta =$('resumenAlerta');
+    const estadoGlobal = $('trEstado'), toast =$('trToast');
 
     let cuentas = [];
-    let destino = null;      // cuenta destino ya verificada
-    let datos = null;        // datos validados que se muestran en el resumen
-    let tokenDestino = 0;    // descarta verificaciones viejas si el usuario sigue escribiendo
+    let destino = null;
+    let datos = null;
+    let tokenDestino = 0;
     let temporizador = null;
     let enProceso = false;
 
     const irALogin = () => { window.location.href = '../index.html'; };
 
-    // ---------- Pasos ----------
     function irAPaso(n) {
-        Object.entries(vistas).forEach(([k, v]) => v.classList.toggle('hidden', Number(k) !== n));
+        Object.entries(vistas).forEach(([k, v]) => {
+            if (v) v.classList.toggle('hidden', Number(k) !== n);
+        });
         pasos.forEach(p => {
             const num = Number(p.dataset.paso);
             p.classList.toggle('activo', num === n);
             p.classList.toggle('completo', num < n);
             p.setAttribute('aria-current', num === n ? 'step' : 'false');
         });
-        const titulo = vistas[n].querySelector('h2');
-        titulo.tabIndex = -1;
-        titulo.focus();
+        if (vistas[n]) {
+            const titulo = vistas[n].querySelector('h2');
+            if (titulo) {
+                titulo.tabIndex = -1;
+                titulo.focus();
+            }
+        }
     }
 
     function mostrarToast(mensaje) {
+        if (!toast) return;
         toast.textContent = mensaje;
         toast.classList.add('visible');
         setTimeout(() => toast.classList.remove('visible'), 3500);
     }
 
-    // ---------- Punto 1 y 2: formulario y saldo ----------
     const cuentaSeleccionada = () => cuentas.find(c => String(c.id) === selOrigen.value);
     const leerMonto = () => Number(inpMonto.value.replace(/\D/g, '')) || 0;
 
     function pintarHint() {
         const c = cuentaSeleccionada();
         if (!c) {
-            hintOrigen.textContent = '';
+            if (hintOrigen) hintOrigen.textContent = '';
             if (trOrigenCard) trOrigenCard.style.display = 'none';
             return;
         }
@@ -96,22 +105,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (estaBloqueada) {
             badgeTexto = 'Bloqueada';
-            hintOrigen.textContent = `Cuenta o tarjeta bloqueada temporalmente. Desbloquéala desde Saldos para transferir.`;
+            if (hintOrigen) hintOrigen.textContent = `Cuenta o tarjeta bloqueada temporalmente. Desbloquéala desde Saldos para transferir.`;
         } else if (c.tipo === 'TARJETA_CREDITO') {
-            hintOrigen.textContent = `Cupo Total: ${formatoCOP.format(c.saldo)} · Avance permitido (hasta 50%): ${formatoCOP.format(disponible)}`;
-            badgeTexto = 'Cupo Avance';
+            if (hintOrigen) hintOrigen.textContent = `Cupo total de compras: ${formatoCOP.format(c.saldo)} · Avance permitido (50% del cupo): ${formatoCOP.format(disponible)}`;
+            badgeTexto = 'Cupo Avance (50%)';
         } else if (c.tipo === 'CORRIENTE') {
             const extra = ' (incluye sobregiro del 20%)';
-            hintOrigen.textContent = `Saldo: ${formatoCOP.format(c.saldo)} · Disponible: ${formatoCOP.format(disponible)}${extra}`;
+            if (hintOrigen) hintOrigen.textContent = `Saldo: ${formatoCOP.format(c.saldo)} · Disponible: ${formatoCOP.format(disponible)}${extra}`;
             badgeTexto = 'Disponible + Sobregiro';
         } else {
-            hintOrigen.textContent = `Saldo: ${formatoCOP.format(c.saldo)} · Disponible: ${formatoCOP.format(disponible)}`;
+            if (hintOrigen) hintOrigen.textContent = `Saldo: ${formatoCOP.format(c.saldo)} · Disponible: ${formatoCOP.format(disponible)}`;
             badgeTexto = 'Disponible';
         }
 
         if (trOrigenCard) {
             trOrigenCard.style.display = 'flex';
-            if (trCardTipo) trCardTipo.textContent = `${TIPOS[c.tipo]} · •••• ${ultimos4(c.numero)}`;
+            if (trCardTipo) trCardTipo.textContent = `${TIPOS[c.tipo] || c.tipo} · •••• ${ultimos4(c.numero)}`;
             if (trCardSaldo) trCardSaldo.textContent = saldoStr;
             if (trCardBadge) {
                 trCardBadge.textContent = badgeTexto;
@@ -126,36 +135,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function cargarCuentas() {
-        const previa = selOrigen.value;
+        const previa = selOrigen ? selOrigen.value : '';
+        if (estadoGlobal) estadoGlobal.classList.add('hidden');
+
         try {
             const rawCuentas = await obtenerCuentasOrigen();
-            // Desduplicar estrictamente por número y tipo
-            const cuentasUnicas = [];
-            const vistos = new Set();
-            for (const c of rawCuentas) {
-                const clave = `${c.tipo}_${String(c.numero || '').replace(/\D/g, '')}`;
-                if (!vistos.has(clave)) {
-                    vistos.add(clave);
-                    cuentasUnicas.push(c);
+            cuentas = rawCuentas;
+            
+            if (cuentas.length === 0) {
+                if (estadoGlobal) {
+                    estadoGlobal.replaceChildren(el('p', '', 'No tienes cuentas o productos activos guardados en tu perfil. Solicitado uno desde la sección Solicitar Producto.'));
+                    estadoGlobal.classList.remove('hidden');
                 }
+                if (selOrigen) selOrigen.replaceChildren();
+                pintarHint();
+                return;
             }
-            cuentas = cuentasUnicas;
         } catch (err) {
             if (err instanceof SesionExpiradaError) return irALogin();
-            estadoGlobal.replaceChildren(el('p', '', 'No pudimos cargar tus cuentas. Intenta de nuevo.'));
-            const b = el('button', 'tr-btn tr-btn--primary', 'Reintentar');
-            b.type = 'button';
-            b.addEventListener('click', () => { estadoGlobal.classList.add('hidden'); cargarCuentas(); });
-            estadoGlobal.append(b);
-            estadoGlobal.classList.remove('hidden');
+            if (estadoGlobal) {
+                estadoGlobal.replaceChildren(el('p', '', 'Ocurrió un problema leyendo los datos de tu navegador.'));
+                estadoGlobal.classList.remove('hidden');
+            }
             return;
         }
-        selOrigen.replaceChildren(...cuentas.map(c => {
-            const o = el('option', '', textoCuenta(c));
-            o.value = c.id;
-            return o;
-        }));
-        if (previa && cuentas.some(c => String(c.id) === previa)) selOrigen.value = previa;
+
+        if (selOrigen && cuentas.length > 0) {
+            selOrigen.replaceChildren(...cuentas.map(c => {
+                const o = el('option', '', textoCuenta(c));
+                o.value = c.id;
+                return o;
+            }));
+            if (previa && cuentas.some(c => String(c.id) === previa)) {
+                selOrigen.value = previa;
+            } else {
+                selOrigen.selectedIndex = 0;
+            }
+        }
+
         pintarHint();
     }
 
@@ -167,22 +184,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    inpMonto.addEventListener('input', () => {
-        const digitos = inpMonto.value.replace(/\D/g, '').slice(0, 12);
-        const num = Number(digitos) || 0;
-        inpMonto.value = digitos ? new Intl.NumberFormat('es-CO').format(num) : '';
-        errMonto.textContent = '';
-        actualizarChipsActivos(num);
-    });
+    if (inpMonto) {
+        inpMonto.addEventListener('input', () => {
+            const digitos = inpMonto.value.replace(/\D/g, '').slice(0, 12);
+            const num = Number(digitos) || 0;
+            inpMonto.value = digitos ? new Intl.NumberFormat('es-CO').format(num) : '';
+            if (errMonto) errMonto.textContent = '';
+            actualizarChipsActivos(num);
+        });
+    }
 
     if (chipsMonto) {
         chipsMonto.querySelectorAll('.tr-chip').forEach(btn => {
             btn.addEventListener('click', () => {
                 const monto = Number(btn.dataset.monto);
-                inpMonto.value = new Intl.NumberFormat('es-CO').format(monto);
-                errMonto.textContent = '';
+                if (inpMonto) inpMonto.value = new Intl.NumberFormat('es-CO').format(monto);
+                if (errMonto) errMonto.textContent = '';
                 actualizarChipsActivos(monto);
-                inpMonto.focus();
+                if (inpMonto) inpMonto.focus();
             });
         });
     }
@@ -192,21 +211,27 @@ document.addEventListener('DOMContentLoaded', () => {
             const c = cuentaSeleccionada();
             if (!c) return;
             const disp = Math.max(0, calcularDisponible(c));
-            if (disp > 0) {
+            if (disp > 0 && inpMonto) {
                 inpMonto.value = new Intl.NumberFormat('es-CO').format(disp);
-                errMonto.textContent = '';
+                if (errMonto) errMonto.textContent = '';
                 actualizarChipsActivos(disp);
                 inpMonto.focus();
             }
         });
     }
 
-    selOrigen.addEventListener('change', () => { pintarHint(); errOrigen.textContent = ''; errMonto.textContent = ''; });
+    if (selOrigen) {
+        selOrigen.addEventListener('change', () => { 
+            pintarHint(); 
+            if (errOrigen) errOrigen.textContent = ''; 
+            if (errMonto) errMonto.textContent = ''; 
+        });
+    }
 
-    // ---------- Punto 3: validar cuenta destino y mostrar titular ----------
     function pintarDestino(estado, dato) {
+        if (!boxDestino) return;
         boxDestino.replaceChildren();
-        errDestino.textContent = '';
+        if (errDestino) errDestino.textContent = '';
         if (!estado) { boxDestino.classList.add('hidden'); return; }
 
         boxDestino.className = `tr-destino tr-destino--${estado}`;
@@ -228,7 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
             texto.append(
                 el('span', 'tr-destino__label', 'Titular de la cuenta'),
                 headerTitular,
-                el('span', 'tr-destino__sub', `${TIPOS[dato.tipo]} · •••• ${ultimos4(dato.numero)}${dato.esPropia ? ' · Tu cuenta' : ''}${estaBloqueada ? ' · No disponible para transferencias' : ''}`)
+                el('span', 'tr-destino__sub', `${TIPOS[dato.tipo] || dato.tipo} · •••• ${ultimos4(dato.numero)}${dato.esPropia ? ' · Tu cuenta' : ''}${estaBloqueada ? ' · No disponible para transferencias' : ''}`)
             );
             if (estaBloqueada) {
                 boxDestino.classList.add('tr-destino--bloqueada');
@@ -242,17 +267,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function verificar() {
         const mio = ++tokenDestino;
-        const numero = inpNumero.value.replace(/\D/g, '');
+        const numero = inpNumero ? inpNumero.value.replace(/\D/g, '') : '';
         destino = null;
         if (!numero) { pintarDestino(null); return; }
 
         pintarDestino('cargando', 'Verificando cuenta…');
         try {
-            const r = await buscarCuentaDestino(numero, selTipo.value);
+            const r = await buscarCuentaDestino(numero, selTipo ? selTipo.value : 'AHORROS');
             if (mio !== tokenDestino) return;
             destino = r;
             if (r) pintarDestino('ok', r);
-            else pintarDestino('error', 'No encontramos una cuenta de ese tipo con ese número.');
+            else pintarDestino('error', 'No encontramos una cuenta con ese número.');
         } catch (err) {
             if (mio !== tokenDestino) return;
             if (err instanceof SesionExpiradaError) return irALogin();
@@ -261,158 +286,189 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function programarVerificacion() {
-        tokenDestino++;           // invalida cualquier consulta en curso
+        tokenDestino++;
         destino = null;
         clearTimeout(temporizador);
-        if (!inpNumero.value.replace(/\D/g, '')) { pintarDestino(null); return; }
+        if (!inpNumero || !inpNumero.value.replace(/\D/g, '')) { pintarDestino(null); return; }
         pintarDestino('cargando', 'Verificando cuenta…');
         temporizador = setTimeout(verificar, 450);
     }
 
-    inpNumero.addEventListener('input', () => {
-        inpNumero.value = inpNumero.value.replace(/\D/g, '').slice(0, 16);
-        programarVerificacion();
-    });
-    selTipo.addEventListener('change', programarVerificacion);
+    if (inpNumero) {
+        inpNumero.addEventListener('input', () => {
+            inpNumero.value = inpNumero.value.replace(/\D/g, '').slice(0, 16);
+            programarVerificacion();
+        });
+    }
+    if (selTipo) selTipo.addEventListener('change', programarVerificacion);
 
-    // ---------- Continuar: valida y pasa al resumen ----------
     function mostrarErrorCampo(campo, mensaje) {
         const mapa = { origen: [errOrigen, selOrigen], destino: [errDestino, inpNumero], monto: [errMonto, inpMonto] };
-        const [msg, input] = mapa[campo];
-        msg.textContent = mensaje;
-        input.focus();
+        const [msg, input] = mapa[campo] || [];
+        if (msg) msg.textContent = mensaje;
+        if (input) input.focus();
     }
 
-    form.addEventListener('submit', async e => {
-        e.preventDefault();
-        [errOrigen, errDestino, errMonto].forEach(m => { m.textContent = ''; });
+    async function procesarEnvioFormulario(e) {
+        if (e) e.preventDefault();
+        [errOrigen, errDestino, errMonto].forEach(m => { if (m) m.textContent = ''; });
 
-        if (!destino && inpNumero.value.trim()) { clearTimeout(temporizador); await verificar(); }
+        if (!destino && inpNumero && inpNumero.value.trim()) { 
+            clearTimeout(temporizador); 
+            await verificar(); 
+        }
 
         const origen = cuentaSeleccionada();
         const monto = leerMonto();
         const v = validarTransferencia({ origen, destino, monto });
         if (!v.ok) {
-            const esPorBloqueoOrigen = origen && (origen.bloqueada || origen.estado === 'BLOQUEADA' || (origen.tarjetaAsociada && origen.tarjetaAsociada.bloqueada));
-            const esPorBloqueoDestino = destino && (destino.bloqueada || destino.estado === 'BLOQUEADA');
-            
-            if (esPorBloqueoOrigen) {
-                if (window.Swal) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Tarjeta o Producto Bloqueado',
-                        text: 'El producto o tarjeta de origen se encuentra bloqueada temporalmente. Desbloquéala desde Saldos para operar.',
-                        background: '#12151c',
-                        color: '#ffffff',
-                        showCancelButton: true,
-                        confirmButtonColor: '#e5a93c',
-                        cancelButtonColor: '#64748b',
-                        confirmButtonText: '<i class="fa-solid fa-arrow-right"></i> Ir a Saldos',
-                        cancelButtonText: 'Entendido'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = './Saldos.html';
-                        }
-                    });
-                } else {
-                    alert('El producto o tarjeta de origen se encuentra bloqueada temporalmente. Desbloquéala desde Saldos para operar.');
-                }
-            } else if (esPorBloqueoDestino) {
-                if (window.Swal) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Cuenta Destino Bloqueada',
-                        text: `La cuenta de ${destino.titular} se encuentra bloqueada temporalmente y no puede recibir transferencias en este momento.`,
-                        background: '#12151c',
-                        color: '#ffffff',
-                        confirmButtonColor: '#e5a93c',
-                        confirmButtonText: 'Entendido'
-                    });
-                } else {
-                    alert(`La cuenta de destino se encuentra bloqueada temporalmente y no puede recibir transferencias.`);
-                }
-            } else {
-                mostrarErrorCampo(v.campo, v.mensaje);
-            }
+            mostrarErrorCampo(v.campo, v.mensaje);
             return;
         }
 
-        datos = { origen, destino, monto, concepto: inpConcepto.value.trim(), usaSobregiro: v.usaSobregiro };
+        datos = { origen, destino, monto, concepto: inpConcepto ? inpConcepto.value.trim() : '', usaSobregiro: v.usaSobregiro, esAvanceTC: v.esAvanceTC };
         pintarResumen();
         irAPaso(2);
-    });
+    }
 
-    // ---------- Punto 4: resumen y confirmación ----------
+    form.addEventListener('submit', procesarEnvioFormulario);
+    if (btnContinuar) {
+        btnContinuar.addEventListener('click', procesarEnvioFormulario);
+    }
+
     function pintarResumen() {
         const { origen, destino: d, monto, concepto, usaSobregiro, esAvanceTC } = datos;
-        const saldoFinal = origen.saldo - monto;
+        
+        // Limpieza de saldo y cálculo matemático directo
+        const saldoActualNum = typeof origen.saldo === 'number'
+            ? origen.saldo
+            : Number(String(origen.saldo || 0).replace(/[^0-9.-]+/g, "")) || 0;
+
+        const saldoCalculado = saldoActualNum - monto;
         const labelSaldoFinal = origen.tipo === 'TARJETA_CREDITO' ? 'Cupo restante después del avance' : 'Saldo después de la operación';
-        filas($('resumenLista'), [
-            { label: 'Producto de origen', valor: textoCuenta(origen) },
-            { label: 'Cuenta de destino', valor: d.titular, extra: `${TIPOS[d.tipo]} · •••• ${ultimos4(d.numero)}` },
-            { label: esAvanceTC ? 'Monto del avance' : 'Monto a transferir', valor: formatoCOP.format(monto), destacado: true },
-            { label: 'Concepto', valor: concepto || '—' },
-            { label: labelSaldoFinal, valor: formatoCOP.format(saldoFinal), negativo: saldoFinal < 0 },
-            { label: 'Costo', valor: 'Sin costo' }
-        ]);
-        resumenError.classList.add('hidden');
-        resumenAlerta.classList.toggle('hidden', !usaSobregiro && !esAvanceTC);
-        if (usaSobregiro) {
-            resumenAlerta.textContent = `Atención: esta transferencia usa ${formatoCOP.format(monto - origen.saldo)} de tu sobregiro (hasta 20% sobre el saldo). Úsalo con cuidado.`;
-        } else if (esAvanceTC) {
-            resumenAlerta.textContent = `Operación de Avance: Se desembolsará el monto de tu Tarjeta de Crédito y se acreditará inmediatamente a la cuenta de destino.`;
+        
+        const resumenLista = $('resumenLista');
+        if (resumenLista) {
+            filas(resumenLista, [
+                { label: 'Producto de origen', valor: textoCuenta(origen) },
+                { label: 'Cuenta de destino', valor: d.titular, extra: `${TIPOS[d.tipo] || d.tipo} · •••• ${ultimos4(d.numero)}` },
+                { label: esAvanceTC ? 'Monto del avance' : 'Monto a transferir', valor: formatoCOP.format(monto), destacado: true },
+                { label: 'Concepto', valor: concepto || '—' },
+                { label: labelSaldoFinal, valor: formatoCOP.format(saldoCalculado), negativo: saldoCalculado < 0 },
+                { label: 'Costo', valor: 'Sin costo' }
+            ]);
+        }
+        if (resumenError) resumenError.classList.add('hidden');
+        if (resumenAlerta) {
+            resumenAlerta.classList.toggle('hidden', !usaSobregiro && !esAvanceTC);
+            if (usaSobregiro) {
+                resumenAlerta.textContent = `Atención: esta transferencia usa ${formatoCOP.format(monto - saldoActualNum)} de tu sobregiro. Úsalo con cuidado.`;
+            } else if (esAvanceTC) {
+                resumenAlerta.textContent = `Operación de Avance: Se desembolsará el monto de tu Tarjeta de Crédito y se acreditará inmediatamente.`;
+            }
         }
     }
 
-    btnEditar.addEventListener('click', () => irAPaso(1));
+    if (btnEditar) btnEditar.addEventListener('click', () => irAPaso(1));
 
-    // ---------- Punto 5 y 6: ejecutar, descontar saldo, registrar movimiento y notificar ----------
-    btnConfirmar.addEventListener('click', async () => {
-        if (enProceso) return;          // evita doble envío
-        enProceso = true;
-        btnConfirmar.disabled = btnEditar.disabled = true;
-        btnConfirmar.textContent = 'Procesando…';
-        resumenError.classList.add('hidden');
+    if (btnConfirmar) {
+        btnConfirmar.addEventListener('click', async () => {
+            if (enProceso) return;
+            enProceso = true;
+            btnConfirmar.disabled = btnEditar.disabled = true;
+            btnConfirmar.textContent = 'Procesando…';
+            if (resumenError) resumenError.classList.add('hidden');
 
-        try {
-            const r = await ejecutarTransferencia({
-                origenId: datos.origen.id, destinoNumero: datos.destino.numero,
-                destinoTipo: datos.destino.tipo, monto: datos.monto, concepto: datos.concepto
-            });
-            pintarExito(r);
-            irAPaso(3);
-            actualizarCampana();        // la notificación ya quedó guardada en localStorage
-            mostrarToast('Transferencia exitosa. Revisa tus notificaciones.');
-        } catch (err) {
-            if (err instanceof SesionExpiradaError) return irALogin();
-            resumenError.textContent = err.message || 'No se pudo completar la transferencia. Intenta de nuevo.';
-            resumenError.classList.remove('hidden');
-        } finally {
-            enProceso = false;
-            btnConfirmar.disabled = btnEditar.disabled = false;
-            btnConfirmar.textContent = 'Confirmar transferencia';
-        }
-    });
+            try {
+                const r = await ejecutarTransferencia({
+                    origenId: datos.origen.id, destinoNumero: datos.destino.numero,
+                    destinoTipo: datos.destino.tipo, monto: datos.monto, concepto: datos.concepto
+                });
+
+                // GUARDA AMBOS MOVIMIENTOS EN `finara_movimientos` PARA QUE APAREZCAN EN LA TABLA
+                try {
+                    let movimientos = JSON.parse(localStorage.getItem('finara_movimientos')) || [];
+                    const perfilActivo = JSON.parse(localStorage.getItem('userProfile')) || {};
+                    const usuarioActual = perfilActivo.username || datos.origen.username || 'maria17';
+
+                    // 1. Registro del Egreso para la Cuenta Origen
+                    movimientos.unshift({
+                        id: `MOV-OUT-${Date.now()}`,
+                        fecha: new Date().toISOString(),
+                        descripcion: `Transferencia enviada a ${datos.destino.titular}`,
+                        categoria: 'Transferencia',
+                        tipo: 'EGRESO',
+                        valor: datos.monto,
+                        cuentaId: datos.origen.id,
+                        numeroCuenta: datos.origen.numero,
+                        usuario: usuarioActual
+                    });
+
+                    // 2. Registro del Ingreso para la Cuenta Destino
+                    movimientos.unshift({
+                        id: `MOV-IN-${Date.now()}`,
+                        fecha: new Date().toISOString(),
+                        descripcion: `Transferencia recibida de ${usuarioActual}`,
+                        categoria: 'Transferencia',
+                        tipo: 'INGRESO',
+                        valor: datos.monto,
+                        cuentaId: datos.destino.id || 'CTA-DESTINO',
+                        numeroCuenta: datos.destino.numero,
+                        usuario: datos.destino.titular || 'Destino'
+                    });
+
+                    localStorage.setItem('finara_movimientos', JSON.stringify(movimientos));
+                } catch (e) {
+                    console.error("Error guardando movimiento:", e);
+                }
+
+                pintarExito(r);
+                irAPaso(3);
+                if (modNotif && modNotif.actualizarCampana) {
+                    try { modNotif.actualizarCampana(); } catch {}
+                }
+                mostrarToast('Transferencia exitosa. Revisa tus notificaciones.');
+            } catch (err) {
+                if (err instanceof SesionExpiradaError) return irALogin();
+                if (resumenError) {
+                    resumenError.textContent = err.message || 'No se pudo completar la transferencia. Intenta de nuevo.';
+                    resumenError.classList.remove('hidden');
+                }
+            } finally {
+                enProceso = false;
+                btnConfirmar.disabled = btnEditar.disabled = false;
+                btnConfirmar.textContent = 'Confirmar transferencia';
+            }
+        });
+    }
 
     function pintarExito(r) {
-        filas($('exitoLista'), [
+        const exitoLista = $('exitoLista');
+        if (!exitoLista) return;
+        filas(exitoLista, [
             { label: 'Referencia', valor: r.referencia },
-            { label: 'Enviado a', valor: r.destino.titular, extra: `${TIPOS[r.destino.tipo]} · •••• ${ultimos4(r.destino.numero)}` },
+            { label: 'Enviado a', valor: r.destino.titular, extra: `${TIPOS[r.destino.tipo] || r.destino.tipo} · •••• ${ultimos4(r.destino.numero)}` },
             { label: 'Monto', valor: formatoCOP.format(r.monto), destacado: true },
             { label: 'Nuevo saldo de la cuenta de origen', valor: formatoCOP.format(r.saldoOrigen), negativo: r.saldoOrigen < 0 },
             { label: 'Fecha', valor: formatoFechaHora.format(new Date(r.fecha)) }
         ]);
     }
 
-    btnNueva.addEventListener('click', async () => {
-        form.reset();
-        tokenDestino++;
-        destino = null; datos = null;
-        pintarDestino(null);
-        [errOrigen, errMonto].forEach(m => { m.textContent = ''; });
-        await cargarCuentas();          // trae los saldos ya actualizados
-        irAPaso(1);
-    });
+    if (btnNueva) {
+        btnNueva.addEventListener('click', async () => {
+            form.reset();
+            tokenDestino++;
+            destino = null; datos = null;
+            pintarDestino(null);
+            [errOrigen, errMonto].forEach(m => { if (m) m.textContent = ''; });
+            await cargarCuentas();
+            irAPaso(1);
+        });
+    }
 
-    cargarCuentas();
+    await cargarCuentas();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initTransferenciasView();
 });

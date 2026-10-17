@@ -1,10 +1,25 @@
 // Vanilla/componentes/CuentaCard.js
-// Componente visual de una cuenta: tipo, número parcial y saldo.
+// Componente visual de una cuenta con diseño de plástico físico (3D index style).
 
-import { guardarNotificacion, actualizarCampana } from './notificaciones.js';
+function registrarNotificacionLocal({ titulo, mensaje, tipo = 'info' }) {
+    try {
+        const notifs = JSON.parse(localStorage.getItem('finara_notificaciones')) || [];
+        notifs.unshift({
+            id: `NOTIF-${Date.now()}`,
+            titulo,
+            mensaje,
+            tipo,
+            fecha: new Date().toISOString(),
+            leida: false
+        });
+        localStorage.setItem('finara_notificaciones', JSON.stringify(notifs.slice(0, 30)));
+    } catch {
+        // Ignorar excepciones de cuota
+    }
+}
 
 const TIPOS = {
-    AHORROS: { etiqueta: 'Cuenta de Ahorros', icono: 'fa-piggy-bank', clase: 'ahorros', saldoLabel: 'Saldo disponible' },
+    AHORROS: { etiqueta: 'Cuenta de Débito', icono: 'fa-piggy-bank', clase: 'ahorros', saldoLabel: 'Saldo disponible' },
     CORRIENTE: { etiqueta: 'Cuenta Corriente', icono: 'fa-building-columns', clase: 'corriente', saldoLabel: 'Saldo disponible' },
     TARJETA_CREDITO: { etiqueta: 'Tarjeta de Crédito', icono: 'fa-credit-card', clase: 'tarjeta', saldoLabel: 'Cupo disponible' }
 };
@@ -13,57 +28,87 @@ const formatoCOP = new Intl.NumberFormat('es-CO', {
     style: 'currency', currency: 'COP', maximumFractionDigits: 0
 });
 
-// Formatea el número de cuenta completo (ej. 4021 5877 0123 4) o enmascarado si está oculto
 export function formatearNumeroCuenta(numero, ocultar = false) {
     const digitos = String(numero ?? '').replace(/\D/g, '');
     if (ocultar) {
         return '•••• •••• •••• ••••';
     }
-    // Si no está oculto, muestra el número completo agrupado en bloques de 4 para lectura fácil
     return digitos.replace(/(\d{4})(?=\d)/g, '$1 ');
 }
 
 function el(tag, clase, texto) {
     const nodo = document.createElement(tag);
     if (clase) nodo.className = clase;
-    if (texto !== undefined) nodo.textContent = texto; // textContent: evita inyección HTML
+    if (texto !== undefined) nodo.textContent = texto;
     return nodo;
 }
 
 export function crearCuentaCard(cuenta, { ocultarSaldo = false } = {}) {
-    const tipo = TIPOS[cuenta.tipo] ?? { etiqueta: 'Producto', icono: 'fa-wallet', clase: 'otro', saldoLabel: 'Saldo disponible' };
-
+    const tipoInfo = TIPOS[cuenta.tipo] ?? { etiqueta: 'Producto', icono: 'fa-wallet', clase: 'otro', saldoLabel: 'Saldo disponible' };
     const numeroTexto = formatearNumeroCuenta(cuenta.numero, ocultarSaldo);
-    const card = el('article', `cuenta-card cuenta-card--${tipo.clase}`);
-    card.setAttribute('aria-label', `${tipo.etiqueta} ${numeroTexto}`);
+    
+    const card = el('article', `cuenta-card cuenta-card--${tipoInfo.clase}`);
+    card.setAttribute('aria-label', `${tipoInfo.etiqueta} ${numeroTexto}`);
 
-    const cabecera = el('div', 'cuenta-card__head');
-    const icono = el('div', 'cuenta-card__icon');
-    const i = el('i', `fa-solid ${tipo.icono}`);
-    i.setAttribute('aria-hidden', 'true');
-    icono.appendChild(i);
+    // Determinar diseño de plástico según el tipo de cuenta/tarjeta
+    let clasePlastico = 'tarjeta-negra';
+    let logoPath = '../Style/image/Logo_finara.svg';
+    let tagTexto = 'Crédito';
 
-    const titulos = el('div', 'cuenta-card__titles');
-    titulos.append(el('h3', 'cuenta-card__tipo', tipo.etiqueta), el('span', 'cuenta-card__numero', numeroTexto));
-
-    if (cuenta.tipo === 'TARJETA_CREDITO') {
-        const badgeCredito = el('span', 'cuenta-card__badge-credito', 'Crédito');
-        titulos.querySelector('.cuenta-card__tipo').appendChild(badgeCredito);
+    if (cuenta.tipo === 'AHORROS') {
+        clasePlastico = 'tarjeta-dorada';
+        logoPath = '../Style/image/Logo_finara_black.svg';
+        tagTexto = 'Débito';
+    } else if (cuenta.tipo === 'CORRIENTE') {
+        clasePlastico = 'tarjeta-platino';
+        logoPath = '../Style/image/Logo_finara_black.svg';
+        tagTexto = 'Corriente';
+    } else if (cuenta.tipo === 'TARJETA_CREDITO') {
+        clasePlastico = 'tarjeta-negra';
+        logoPath = '../Style/image/Logo_finara.svg';
+        tagTexto = 'Crédito';
     }
 
-    const estado = el('span', `cuenta-card__estado${cuenta.estado === 'ACTIVA' ? '' : ' cuenta-card__estado--inactiva'}`,
+    // 1. Tarjeta Plástica Física (Estilo Index)
+    const plasticoCard = document.createElement('div');
+    plasticoCard.className = `tarjeta-plastico ${clasePlastico}`;
+    plasticoCard.innerHTML = `
+        <div class="head-tarjeta">
+            <img src="${logoPath}" alt="Finara Logo" class="logo-svg">
+            <i class="fa-solid fa-wifi card-contactless"></i>
+        </div>
+        <div class="card-chip-area">
+            <div class="chip"></div>
+            <span class="card-tag">${tagTexto}</span>
+        </div>
+        <div class="foot-tarjeta">
+            <span class="card-number">${numeroTexto}</span>
+            <span class="card-type">VISA</span>
+        </div>
+    `;
+
+    // 2. Metadatos de Estado y Saldo
+    const metaContainer = el('div', 'cuenta-card__meta-container');
+    
+    const estadoHeader = el('div', 'cuenta-card__estado-header');
+    const tituloTipo = el('h3', 'cuenta-card__tipo', tipoInfo.etiqueta);
+    if (cuenta.tipo === 'TARJETA_CREDITO') {
+        const badgeCredito = el('span', 'cuenta-card__badge-credito', 'Crédito');
+        tituloTipo.appendChild(badgeCredito);
+    }
+    const estadoBadge = el('span', `cuenta-card__estado${cuenta.estado === 'ACTIVA' ? '' : ' cuenta-card__estado--inactiva'}`,
         cuenta.estado === 'ACTIVA' ? 'Activa' : 'Inactiva');
+    estadoHeader.append(tituloTipo, estadoBadge);
 
-    cabecera.append(icono, titulos, estado);
+    const saldoBox = el('div', 'cuenta-card__saldo');
+    const valorSaldo = el('strong', 'cuenta-card__valor', ocultarSaldo ? '$ ••••••' : formatoCOP.format(Number(cuenta.saldo) || 0));
+    valorSaldo.dataset.valor = formatoCOP.format(Number(cuenta.saldo) || 0);
+    saldoBox.append(el('span', 'cuenta-card__saldo-label', tipoInfo.saldoLabel), valorSaldo);
 
-    const saldo = el('div', 'cuenta-card__saldo');
-    const valor = el('strong', 'cuenta-card__valor', ocultarSaldo ? '$ ••••••' : formatoCOP.format(Number(cuenta.saldo) || 0));
-    valor.dataset.valor = formatoCOP.format(Number(cuenta.saldo) || 0);
-    saldo.append(el('span', 'cuenta-card__saldo-label', tipo.saldoLabel), valor);
+    metaContainer.append(estadoHeader, saldoBox);
+    card.append(plasticoCard, metaContainer);
 
-    card.append(cabecera, saldo);
-
-    // Si tiene tarjeta asociada (Débito en Ahorros o Tarjeta en Corriente)
+    // 3. Tarjeta Asociada o Botón de Activación (si aplica)
     if (cuenta.tarjetaAsociada) {
         const tarjetaBox = el('div', 'cuenta-card__tarjeta-vinculada');
         const numTarjeta = cuenta.tarjetaAsociada.numero || '4532 0000 0000 0000';
@@ -152,7 +197,7 @@ export function crearCuentaCard(cuenta, { ocultarSaldo = false } = {}) {
     if (cuenta.tipo === 'TARJETA_CREDITO') {
         const estaBloqueadaTC = Boolean(cuenta.bloqueada || cuenta.estado === 'BLOQUEADA');
         const contAccionesTC = el('div', 'tarjeta-vinculada__acciones');
-        contAccionesTC.style.marginTop = '-0.4rem';
+        contAccionesTC.style.marginTop = '0.5rem';
 
         contAccionesTC.innerHTML = `
             <button type="button" class="btn-tarjeta-accion btn-ver-detalles" title="Ver número completo, vencimiento y CVV">
@@ -214,7 +259,6 @@ function mostrarModalDetallesTarjeta(cuenta, ocultarSaldo = false) {
                 </button>
             </div>
 
-            <!-- ESTADO BADGE -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                 <span style="font-size: 0.85rem; color: #94a3b8;">Estado de la tarjeta:</span>
                 <span class="tarjeta-vinculada__badge ${estaBloqueada ? 'badge--bloqueada' : 'badge--activa'}">
@@ -222,7 +266,6 @@ function mostrarModalDetallesTarjeta(cuenta, ocultarSaldo = false) {
                 </span>
             </div>
 
-            <!-- TARJETA VISUAL 3D VIRTUAL -->
             <div style="background: linear-gradient(135deg, #1b202c 0%, #0d0f14 100%); border: 1px solid ${estaBloqueada ? 'rgba(248,113,113,0.5)' : 'rgba(229,169,60,0.5)'}; border-radius: 14px; padding: 1.4rem; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.5); margin-bottom: 1.5rem; opacity: ${estaBloqueada ? '0.75' : '1'};">
                 ${estaBloqueada ? '<div style="position: absolute; top: 10px; right: 12px; background: rgba(248,113,113,0.2); color: #f87171; font-size: 0.75rem; font-weight: bold; padding: 3px 8px; border-radius: 4px; border: 1px solid #f87171;"><i class="fa-solid fa-lock"></i> BLOQUEADA</div>' : ''}
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
@@ -309,7 +352,6 @@ function mostrarModalDetallesTarjeta(cuenta, ocultarSaldo = false) {
 }
 
 async function confirmarBloqueoTarjeta(datosTarjeta, onConfirmar) {
-    const accion = datosTarjeta.bloqueada ? 'desbloquear' : 'bloquear';
     const tituloModal = datosTarjeta.bloqueada ? '¿Deseas desbloquear esta tarjeta?' : '¿Deseas bloquear esta tarjeta temporalmente?';
     const textoModal = datosTarjeta.bloqueada
         ? `Al desbloquear tu ${datosTarjeta.titulo || 'tarjeta'}, podrás volver a realizar transferencias, compras y avances con normalidad.`
@@ -351,7 +393,6 @@ function ejecutarCambioEstadoBloqueo(datosTarjeta) {
     const nuevoEstadoBloqueada = !datosTarjeta.bloqueada;
     const numLimpio = String(datosTarjeta.numero || '').replace(/\D/g, '');
 
-    // 1. Actualizar en userProfile
     let usuarioActual = JSON.parse(localStorage.getItem('userProfile')) || {};
     if (Array.isArray(usuarioActual.tarjetasAprobadas)) {
         usuarioActual.tarjetasAprobadas.forEach(t => {
@@ -363,7 +404,6 @@ function ejecutarCambioEstadoBloqueo(datosTarjeta) {
         localStorage.setItem('userProfile', JSON.stringify(usuarioActual));
     }
 
-    // 2. Actualizar en finara_usuarios_local
     let listaUsuarios = JSON.parse(localStorage.getItem('finara_usuarios_local')) || [];
     listaUsuarios = listaUsuarios.map(u => {
         if (Array.isArray(u.tarjetasAprobadas)) {
@@ -378,7 +418,6 @@ function ejecutarCambioEstadoBloqueo(datosTarjeta) {
     });
     localStorage.setItem('finara_usuarios_local', JSON.stringify(listaUsuarios));
 
-    // 3. Actualizar en finara_cuentas
     let todasLasCuentas = JSON.parse(localStorage.getItem('finara_cuentas')) || [];
     todasLasCuentas = todasLasCuentas.map(cta => {
         if (cta.tarjetaAsociada) {
@@ -398,7 +437,6 @@ function ejecutarCambioEstadoBloqueo(datosTarjeta) {
     });
     localStorage.setItem('finara_cuentas', JSON.stringify(todasLasCuentas));
 
-    // Notificación y alerta en pantalla en siguiente commit
     notificarYConfirmarBloqueo(datosTarjeta, nuevoEstadoBloqueada);
 }
 
@@ -412,20 +450,12 @@ function notificarYConfirmarBloqueo(datosTarjeta, nuevoEstadoBloqueada) {
         ? `Has bloqueado temporalmente tu ${tituloTarjeta}${sufijoNumero}. Tus transacciones y retiros quedan protegidos.`
         : `Has desbloqueado tu ${tituloTarjeta}${sufijoNumero}. Ya puedes utilizarla nuevamente para todas tus operaciones.`;
 
-    // 1. Guardar en finara_notificaciones (localStorage)
-    guardarNotificacion({
+    registrarNotificacionLocal({
         titulo: tituloNotif,
         mensaje: mensajeNotif,
         tipo: nuevoEstadoBloqueada ? 'alerta' : 'exito'
     });
 
-    try {
-        actualizarCampana();
-    } catch {
-        // En caso de que no esté instanciada la campana
-    }
-
-    // 2. Confirmación en pantalla
     if (window.Swal) {
         Swal.fire({
             icon: nuevoEstadoBloqueada ? 'warning' : 'success',

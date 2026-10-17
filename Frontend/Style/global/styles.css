@@ -1,8 +1,13 @@
-/* 1. IMPORTACIÓN DE FUENTES E ÍCONOS */
+/* ==========================================
+   1. IMPORTACIÓN DE FUENTES, ÍCONOS Y VISTAS
+   ========================================== */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+@import url('../Dashboard.css');
 
-/* 2. VARIABLES GLOBALES */
+/* ==========================================
+   2. VARIABLES GLOBALES FINARA BANK
+   ========================================== */
 :root {
   --bg-fondo: #05080d;
   --bg-dark: #0a0c10;
@@ -17,7 +22,9 @@
   --radius-btn: 24px;
 }
 
-/* 3. RESET GENERAL Y CLASE DARK-THEME */
+/* ==========================================
+   3. RESET GENERAL
+   ========================================== */
 * {
   margin: 0;
   padding: 0;
@@ -30,149 +37,117 @@ body.dark-theme {
   background-color: var(--bg-fondo);
   color: var(--text-white);
   min-height: 100vh;
-}
-
-body.dark-theme {
-  display: flex;
-  flex-direction: column;
   overflow-x: hidden;
 }
-
-/* ==========================================
-   ESTILOS DE LA BARRA DE NAVEGACIÓN LANDING (HEADER)
-   ========================================== */
-
-.navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 80px;
-  background-color: rgba(10, 12, 16, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 5rem;
-  border-bottom: 1px solid var(--border-dark);
-  z-index: 1000;
-  box-sizing: border-box;
-}
-
-.logo-container {
-  display: flex;
-  align-items: center;
-}
-
-.logo-container .logo-svg {
-  height: 90px;
-  width: auto;
-  max-width: 180px;
-  object-fit: contain;
-}
-
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 2.2rem;
-}
-
-.nav-links a {
-  color: var(--text-muted);
-  text-decoration: none;
-  font-size: 0.92rem;
-  font-weight: 500;
-  transition: color 0.25s ease;
-}
-
-.nav-links a:hover,
-.nav-links a.active {
-  color: var(--text-white);
-}
-
-.nav-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-}
-
-.btn-register {
-  background-color: var(--gold-main);
-  color: #000000;
-  padding: 0.55rem 1.3rem;
-  border-radius: var(--radius-btn);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.88rem;
-  transition: all 0.25s ease;
-}
-
-.btn-register {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #e5a93c 0%, #d4982b 100%);
-    color: #000000 !important;
-    font-family: var(--font-main);
-    font-size: 0.88rem;
-    font-weight: 600;
-    padding: 0.6rem 1.4rem;
-    border: 1px solid #fce09b;
-    border-radius: var(--radius-btn); /* 24px */
-    text-decoration: none;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(229, 169, 60, 0.25);
-    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-    box-sizing: border-box;
-}
-
-.btn-register:hover {
-    background: linear-gradient(135deg, #f0b448 0%, #e5a93c 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(229, 169, 60, 0.45);
-}
-
-.btn-login {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(255, 255, 255, 0.03);
-    color: var(--text-white) !important;
-    font-family: var(--font-main);
-    font-size: 0.88rem;
-    font-weight: 500;
-    padding: 0.6rem 1.3rem;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: var(--radius-btn); /* 24px */
-    text-decoration: none;
-    cursor: pointer;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-    box-sizing: border-box;
-}
-
-.btn-login:hover {
-    background-color: rgba(229, 169, 60, 0.1);
-    border-color: rgba(229, 169, 60, 0.6);
-    color: var(--gold-main) !important;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-}
-
-/* ==========================================
-   ESTRUCTURA GENERAL DEL DASHBOARD Y SIDEBAR
-   ========================================== */
 
 .general-body {
   display: flex;
   min-height: 100vh;
+  width: 100%;
   background-color: var(--bg-fondo);
   color: var(--text-white);
   font-family: var(--font-main);
 }
 
+/* ==========================================
+   CORRECCIÓN INTEGRAL DEL NAVBAR EN INDEX
+   ========================================== */
+
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 80px;
+    background-color: rgba(5, 8, 13, 0.95);
+    border-bottom: 1px solid var(--border-dark);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 4rem;
+    z-index: 1000;
+    box-sizing: border-box;
+}
+
+/* Control estricto del tamaño del Logo */
+.logo-container {
+    display: flex;
+    align-items: center;
+    max-height: 50px;
+}
+
+.logo-container .logo-svg {
+    height: 48px !important;
+    max-height: 48px !important;
+    width: auto !important;
+    max-width: 180px !important;
+    object-fit: contain;
+    display: block;
+}
+
+/* Estilos de los Enlaces del Menú */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.nav-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.92rem;
+    font-weight: 500;
+    transition: color 0.25s ease;
+}
+
+.nav-links a:hover {
+    color: var(--gold-main);
+}
+
+/* Acciones a la derecha (Botones Registrarse / Iniciar Sesión) */
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.btn-register {
+    color: var(--text-white);
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 500;
+    padding: 8px 16px;
+    transition: color 0.2s ease;
+}
+
+.btn-register:hover {
+    color: var(--gold-main);
+}
+
+.btn-login {
+    background: linear-gradient(135deg, #e5a93c 0%, #d4982b 100%);
+    color: #000000 !important;
+    font-weight: 700;
+    font-size: 0.88rem;
+    padding: 9px 20px;
+    border-radius: 24px;
+    text-decoration: none;
+    border: 1px solid #fce09b;
+    box-shadow: 0 4px 14px rgba(229, 169, 60, 0.25);
+    transition: all 0.25s ease;
+}
+
+.btn-login:hover {
+    background: linear-gradient(135deg, #f0b448 0%, #e5a93c 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(229, 169, 60, 0.4);
+}
+
+/* ==========================================
+   4. ESTRUCTURA Y NAVEGACIÓN DEL SIDEBAR
+   ========================================== */
 .sidebar {
   width: 240px;
   height: 100vh;
@@ -186,15 +161,12 @@ body.dark-theme {
   z-index: 100;
   transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1), transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
   overflow: visible !important;
-  /* Permite que el botón circular en el borde sobresalga */
 }
 
-/* BOTÓN CÍRCULO EN EL BORDE (EDGE TOGGLE) */
 .sidebar-edge-toggle {
   position: absolute;
   top: 25px;
   right: -13px;
-  /* Ubicado exactamente al centro del borde vertical */
   width: 26px;
   height: 26px;
   border-radius: 50%;
@@ -223,30 +195,36 @@ body.dark-theme {
   transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* ROTACIÓN DE LA FLECHA AL COLAPSAR (< pasa a ser >) */
 .sidebar.collapsed .sidebar-edge-toggle i {
   transform: rotate(180deg);
 }
 
 .sidebar-header {
-  padding: 1.8rem 1.5rem 1.2rem;
+  padding: 1.5rem 1.2rem 1rem;
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  max-width: 100%;
+  overflow: hidden;
 }
 
-/* LOGO COMPLETO E ISOTIPO EN MODO COLAPSADO */
 .sidebar-logo {
-  height: 42px;
-  width: auto;
+  height: 52px !important;
+  max-height: 52px !important;
+  width: auto !important;
+  max-width: 190px !important;
+  object-fit: contain;
+  display: block;
   transition: opacity 0.25s ease;
 }
 
 .sidebar-logo-small {
-  height: 32px;
-  width: auto;
+  height: 34px !important;
+  max-height: 34px !important;
+  width: auto !important;
+  max-width: 32px !important;
   display: none;
-  /* Oculto por defecto en modo expandido */
+  object-fit: contain;
   transition: opacity 0.25s ease;
 }
 
@@ -300,23 +278,127 @@ body.dark-theme {
   background-color: rgba(255, 255, 255, 0.04);
 }
 
-.sidebar .nav-link.active {
-  color: var(--text-white);
-  background: linear-gradient(90deg, rgba(229, 169, 60, 0.25) 0%, rgba(229, 169, 60, 0.05) 100%);
-  border-color: rgba(229, 169, 60, 0.3);
+.sidebar .nav-link.active,
+.sidebar .nav-link.is-active,
+.btn-solicitar-sidebar.active,
+.btn-solicitar-sidebar.is-active {
+  color: var(--text-white) !important;
+  background: linear-gradient(90deg, rgba(229, 169, 60, 0.25) 0%, rgba(229, 169, 60, 0.05) 100%) !important;
+  border-color: rgba(229, 169, 60, 0.4) !important;
 }
 
-.sidebar .nav-link.active i {
+.sidebar .nav-link.active i,
+.sidebar .nav-link.is-active i {
   color: var(--gold-main);
 }
 
+/* ==========================================
+   5. SECCIÓN INFERIOR DEL SIDEBAR (BOTONES)
+   ========================================== */
+.sidebar-footer {
+  padding: 1rem 0.8rem 1.2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: var(--bg-fondo);
+}
+
+.btn-solicitar-sidebar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #e5a93c 0%, #c48b28 100%);
+  color: #000000 !important;
+  font-weight: 700;
+  font-size: 0.84rem;
+  padding: 11px 16px;
+  border-radius: 24px;
+  text-decoration: none;
+  box-shadow: 0 4px 18px rgba(229, 169, 60, 0.35);
+  border: 1px solid #fce09b;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  cursor: pointer;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.btn-solicitar-sidebar:hover {
+  background: linear-gradient(135deg, #f0b448 0%, #e5a93c 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(229, 169, 60, 0.55);
+}
+
+.btn-solicitar-sidebar i {
+  font-size: 0.95rem;
+  transition: transform 0.25s ease;
+}
+
+.btn-solicitar-sidebar:hover i {
+  transform: rotate(90deg);
+}
+
+.btn-solicitar-sidebar span {
+  white-space: nowrap;
+}
+
+/* BOTÓN CERRAR SESIÓN EN SIDEBAR */
+.btn-logout-sidebar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #f87171 !important;
+  font-weight: 600;
+  font-size: 0.82rem;
+  padding: 10px 16px;
+  border-radius: 20px;
+  text-decoration: none;
+  transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.btn-logout-sidebar:hover {
+  background: #ef4444;
+  color: #ffffff !important;
+  border-color: #ef4444;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-logout-sidebar i {
+  font-size: 0.9rem;
+  transition: transform 0.2s ease;
+}
+
+.btn-logout-sidebar:hover i {
+  transform: translateX(-2px);
+}
+
+.btn-logout-sidebar span {
+  white-space: nowrap;
+}
+
+/* ==========================================
+   6. LAYOUT Y WRAPPER PRINCIPAL
+   ========================================== */
 .main-wrapper {
   margin-left: 240px;
-  flex: 1;
+  width: calc(100% - 240px);
+  flex: 1 1 auto;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  transition: margin-left 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  box-sizing: border-box;
+  transition:
+    margin-left 0.3s cubic-bezier(0.25, 1, 0.5, 1),
+    width 0.3s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .dashboard-navbar {
@@ -330,9 +412,10 @@ body.dark-theme {
   position: sticky;
   top: 0;
   z-index: 90;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* BOTÓN MENÚ MÓVIL EN NAVBAR */
 .mobile-menu-btn {
   display: none;
   background: transparent;
@@ -341,11 +424,6 @@ body.dark-theme {
   font-size: 1.25rem;
   cursor: pointer;
   padding: 4px;
-  transition: color 0.2s ease;
-}
-
-.mobile-menu-btn:hover {
-  color: var(--gold-main);
 }
 
 .user-greeting h2 {
@@ -359,142 +437,77 @@ body.dark-theme {
   font-weight: 600;
 }
 
-.navbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  position: relative;
-}
-
-.icon-btn {
-  background: #07090e;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #8a8f99;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-}
-
-.icon-btn:hover {
-  color: var(--text-white);
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-.profile-menu-container {
-  position: relative;
-}
-
-.profile-btn {
-  background: transparent;
-  border: none;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  color: #8a8f99;
-  padding: 4px;
-  border-radius: 20px;
-}
-
-.avatar-placeholder {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background-color: #141a29;
-  border: 1.5px solid var(--gold-main);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.profile-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.profile-icon {
-  font-size: 0.95rem;
-  color: var(--gold-main);
-}
-
-.profile-dropdown {
-  position: absolute;
-  top: 50px;
-  right: 0;
-  background: #0d1017;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  width: 200px;
-  padding: 8px 0;
-  display: none;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-  z-index: 100;
-}
-
-.profile-dropdown.active {
-  display: flex;
-  flex-direction: column;
-}
-
-.dropdown-header {
-  padding: 10px 16px;
-  display: flex;
-  flex-direction: column;
-}
-
-.dropdown-header strong {
-  font-size: 0.85rem;
-  color: var(--text-white);
-}
-
-.dropdown-header span {
-  font-size: 0.7rem;
-  color: #8a8f99;
-}
-
-.profile-dropdown hr {
-  border: 0;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.08);
-  margin: 6px 0;
-}
-
-.dropdown-item {
-  padding: 10px 16px;
-  color: #cbd5e1;
-  text-decoration: none;
-  font-size: 0.8rem;
+/* BOTÓN VER PERFIL (NAVBAR SUPERIOR) */
+.btn-perfil-navbar {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: transparent;
-  border: none;
-  width: 100%;
+  padding: 6px 14px 6px 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  text-decoration: none;
+  transition: all 0.25s ease;
   cursor: pointer;
-  font-family: inherit;
-  text-align: left;
 }
 
-.dropdown-item:hover {
-  background: rgba(255, 255, 255, 0.05);
+.btn-perfil-navbar:hover {
+  background: rgba(229, 169, 60, 0.12);
+  border-color: rgba(229, 169, 60, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.navbar-user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(229, 169, 60, 0.15);
+  border: 1.5px solid var(--gold-main);
+  color: var(--gold-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.navbar-user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.navbar-user-info strong {
   color: var(--text-white);
+  font-size: 0.82rem;
+  font-weight: 600;
 }
 
-.logout-item {
-  color: #ef4444 !important;
+.navbar-user-info span {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+}
+
+.navbar-user-arrow {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  margin-left: 2px;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.btn-perfil-navbar:hover .navbar-user-arrow {
+  color: var(--gold-main);
+  transform: translateX(2px);
 }
 
 .main-content {
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  margin: 0;
   padding: 2rem 2.5rem;
+  box-sizing: border-box;
 }
 
 .hidden {
@@ -502,354 +515,18 @@ body.dark-theme {
 }
 
 /* ==========================================
-   BOTÓN CHATBOT NAVBAR SUPERIOR
+   7. MODO ESCRITORIO COLAPSADO (.collapsed)
    ========================================== */
-
-.navbar-chatbot-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 16px;
-  background: linear-gradient(135deg, rgba(229, 169, 60, 0.15) 0%, rgba(229, 169, 60, 0.05) 100%);
-  border: 1px solid rgba(229, 169, 60, 0.4);
-  border-radius: 20px;
-  color: var(--gold-main);
-  font-size: 0.82rem;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-
-.navbar-chatbot-btn:hover {
-  background: var(--gold-main);
-  color: #000000;
-  box-shadow: 0 4px 12px rgba(229, 169, 60, 0.25);
-}
-
-/* ==========================================
-   VENTANA DEL CHATBOT EN FONDO DORADO
-   ========================================== */
-
-#chatWidgetContainer {
-  position: fixed;
-  bottom: 25px;
-  right: 25px;
-  z-index: 1050;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.chatbot-float-btn {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #e5a93c 0%, #a8741a 100%);
-  border: 2px solid #fff3d1;
-  padding: 0;
-  cursor: pointer;
-  box-shadow: 0 8px 25px rgba(229, 169, 60, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.float-btn-img {
-  width: 85%;
-  height: 85%;
-  object-fit: contain;
-  transition: transform 0.3s ease;
-}
-
-.chatbot-float-btn:hover {
-  transform: scale(1.08);
-  box-shadow: 0 12px 30px rgba(229, 169, 60, 0.75);
-}
-
-.chatbot-float-btn:hover .float-btn-img {
-  transform: scale(1.1);
-}
-
-.chatbot-window {
-  width: 350px;
-  height: 490px;
-  background: linear-gradient(165deg, #e5a93c 0%, #be821f 100%);
-  border: 2px solid #ffe399;
-  border-radius: 20px;
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.85), 0 0 30px rgba(229, 169, 60, 0.4);
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 14px;
-  overflow: hidden;
-  transition: all 0.3s ease;
-}
-
-.chatbot-header {
-  background: #0f121a;
-  padding: 12px 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid rgba(229, 169, 60, 0.3);
-}
-
-.chatbot-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.bot-avatar-container {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #0a0c10;
-  border: 1.5px solid var(--gold-main);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.bot-avatar-img {
-  width: 90%;
-  height: 90%;
-  object-fit: contain;
-}
-
-.chatbot-info h6 {
-  margin: 0;
-  font-size: 0.92rem;
-  font-weight: 700;
-  color: #ffffff;
-}
-
-.status-online {
-  font-size: 0.7rem;
-  color: #34d399;
-  font-weight: 600;
-}
-
-.close-chat-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border: none;
-  color: #8a8f99;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.close-chat-btn:hover {
-  background: var(--gold-main);
-  color: #000000;
-}
-
-.chatbot-body {
-  flex: 1;
-  padding: 16px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  background: linear-gradient(180deg, rgba(229, 169, 60, 0.15) 0%, rgba(15, 18, 26, 0.95) 100%), #12151c;
-}
-
-.chat-bubble {
-  background: #0d1017;
-  color: #ffffff;
-  padding: 12px 15px;
-  border-radius: 16px 16px 16px 4px;
-  font-size: 0.85rem;
-  max-width: 90%;
-  line-height: 1.45;
-  border: 1px solid rgba(229, 169, 60, 0.4);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.chat-bubble strong {
-  color: var(--gold-main);
-}
-
-.chatbot-footer {
-  padding: 12px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  justify-content: center;
-  background: #0f121a;
-  border-top: 1px solid rgba(229, 169, 60, 0.3);
-}
-
-.option-btn {
-  background: #181d29;
-  border: 1px solid rgba(229, 169, 60, 0.4);
-  color: #fce09b;
-  padding: 7px 13px;
-  border-radius: 20px;
-  font-size: 0.76rem;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.option-btn:hover {
-  border-color: var(--gold-main);
-  color: #000000;
-  background: var(--gold-main);
-  font-weight: 600;
-  transform: translateY(-1px);
-}
-
-.option-btn.highlight-btn {
-  border-color: var(--gold-main);
-  color: #000000;
-  background: var(--gold-main);
-  font-weight: 600;
-}
-
-/* ==========================================
-   ESTILOS RESPUESTA HORARIOS DE ATENCIÓN (HU-36)
-   ========================================== */
-.chat-horarios-respuesta {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.horario-seccion-item {
-  background: rgba(10, 14, 23, 0.7);
-  border-radius: 12px;
-  padding: 10px 12px;
-  border-left: 3px solid var(--gold-main);
-}
-
-.horario-seccion-item.virtual {
-  border-left-color: #34d399;
-}
-
-.horario-seccion-item.presencial {
-  border-left-color: var(--gold-main);
-}
-
-.horario-badge {
-  font-size: 0.82rem;
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 6px;
-}
-
-.horario-seccion-item.virtual .horario-badge i {
-  color: #34d399;
-}
-
-.horario-seccion-item.presencial .horario-badge i {
-  color: var(--gold-main);
-}
-
-.horario-tiempo {
-  margin: 0 0 6px 0;
-  font-size: 0.8rem;
-  color: #e2e8f0;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.horario-tiempo i {
-  color: #94a3b8;
-  font-size: 0.75rem;
-}
-
-.horario-lista {
-  margin: 0;
-  padding-left: 18px;
-  font-size: 0.76rem;
-  color: #94a3b8;
-  line-height: 1.4;
-}
-
-.horario-lista li {
-  margin-bottom: 3px;
-}
-
-.horario-footer-tip {
-  margin: 4px 0 0 0;
-  font-size: 0.78rem;
-  color: #cbd5e1;
-  border-top: 1px dashed rgba(229, 169, 60, 0.3);
-  padding-top: 8px;
-}
-
-.horario-footer-tip i {
-  color: var(--gold-main);
-}
-
-/* Input para escribir preguntas directamente al chatbot */
-.chat-input-bar {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  background: #090c12;
-  border-top: 1px solid rgba(229, 169, 60, 0.2);
-}
-
-.chat-input-field {
-  flex: 1;
-  background: #141923;
-  border: 1px solid rgba(229, 169, 60, 0.3);
-  color: #fff;
-  border-radius: 20px;
-  padding: 7px 12px;
-  font-size: 0.78rem;
-  outline: none;
-}
-
-.chat-input-field:focus {
-  border-color: var(--gold-main);
-}
-
-.chat-send-btn {
-  background: var(--gold-main);
-  color: #000;
-  border: none;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8rem;
-  transition: transform 0.2s;
-}
-
-.chat-send-btn:hover {
-  transform: scale(1.08);
-}
-
-/* ==========================================
-   REGLAS DEL MINI SIDEBAR COLAPSADO EN ESCRITORIO (> 992px)
-   ========================================== */
-
 @media (min-width: 993px) {
   .sidebar.collapsed {
     width: 70px !important;
-    transform: none !important;
   }
 
-  /* Oculta el logo completo y muestra el isotipo favicon.svg */
+  .sidebar.collapsed .sidebar-header {
+    justify-content: center;
+    padding: 1.5rem 0;
+  }
+
   .sidebar.collapsed .sidebar-logo {
     display: none !important;
   }
@@ -858,16 +535,8 @@ body.dark-theme {
     display: block !important;
   }
 
-  /* Oculta los textos de navegación */
   .sidebar.collapsed .nav-link span {
-    opacity: 0;
     display: none !important;
-  }
-
-  /* Centra la cabecera y las opciones */
-  .sidebar.collapsed .sidebar-header {
-    justify-content: center;
-    padding: 1.5rem 0;
   }
 
   .sidebar.collapsed .nav-link {
@@ -875,27 +544,51 @@ body.dark-theme {
     padding: 12px 0;
   }
 
-  .sidebar.collapsed .nav-link i {
-    font-size: 1.2rem;
-    margin: 0;
+  .sidebar.collapsed .sidebar-footer {
+    padding: 1rem 0.4rem;
+    align-items: center;
+    gap: 10px;
   }
 
-  /* Ajusta el contenido principal para aprovechar el espacio libre */
+  /* Botón Solicitar Producto colapsado a círculo */
+  .sidebar.collapsed .btn-solicitar-sidebar {
+    width: 42px !important;
+    height: 42px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    justify-content: center !important;
+  }
+
+  .sidebar.collapsed .btn-solicitar-sidebar span {
+    display: none !important;
+  }
+
+  /* Botón Cerrar Sesión colapsado a círculo */
+  .sidebar.collapsed .btn-logout-sidebar {
+    width: 42px !important;
+    height: 42px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    justify-content: center !important;
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+
+  .sidebar.collapsed .btn-logout-sidebar span {
+    display: none !important;
+  }
+
   .main-wrapper.expanded {
     margin-left: 70px !important;
+    width: calc(100% - 70px) !important;
   }
 }
 
 /* ==========================================
-   ADAPTACIÓN FULL RESPONSIVE (MÓVILES Y TABLETS)
+   8. RESPONSIVE DISPOSITIVOS MÓVILES
    ========================================== */
-
-/* Tablets / Laptops pequeñas (<= 992px) */
 @media (max-width: 992px) {
   .mobile-menu-btn {
     display: flex !important;
-    align-items: center;
-    justify-content: center;
   }
 
   .sidebar {
@@ -903,18 +596,17 @@ body.dark-theme {
     box-shadow: 10px 0 25px rgba(0, 0, 0, 0.8);
   }
 
-  .sidebar.open {
+  .sidebar.is-open {
     transform: translateX(0);
   }
 
-  /* Oculta el botón de colapso en el borde en dispositivos táctiles/móviles */
   .sidebar-edge-toggle {
     display: none !important;
   }
 
   .main-wrapper {
     margin-left: 0 !important;
-    width: 100%;
+    width: 100% !important;
   }
 
   .dashboard-navbar {
@@ -923,45 +615,5 @@ body.dark-theme {
 
   .main-content {
     padding: 1.5rem 1.2rem;
-  }
-}
-
-/* Móviles en posición vertical (<= 576px) */
-@media (max-width: 576px) {
-  .dashboard-navbar {
-    height: 60px;
-    padding: 0 1rem;
-  }
-
-  .user-greeting h2 {
-    font-size: 0.95rem;
-  }
-
-  /* Oculta el texto del botón del chatbot en navbar para ahorrar espacio */
-  .navbar-chatbot-btn span {
-    display: none;
-  }
-
-  .navbar-chatbot-btn {
-    padding: 8px 10px;
-    border-radius: 50%;
-  }
-
-  .navbar-actions {
-    gap: 10px;
-  }
-
-  #chatWidgetContainer {
-    bottom: 15px;
-    right: 15px;
-  }
-
-  .chatbot-window {
-    width: calc(100vw - 30px);
-    height: 440px;
-  }
-
-  .main-content {
-    padding: 1rem;
   }
 }

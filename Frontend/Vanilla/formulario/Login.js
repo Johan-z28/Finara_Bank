@@ -4,7 +4,7 @@ const MINUTOS_BLOQUEO = 50;        // duración del bloqueo
 const CLAVE_USUARIOS = "finara_usuarios_local";   // lo escribe signup.js
 const CLAVE_SESION = "userProfile";               // lo leen Dashboard/Perfil
 const CLAVE_CONTROL = "finara_login_control";     // { cuenta: { intentos, bloqueadoHasta } }
-const RUTA_DASHBOARD = "../Dashboard.html";       // Pages/formulario -> Pages/Dashboard.html
+const RUTA_DASHBOARD = "../app.html";       // Pages/formulario -> Pages/Dashboard.html
 
 // Estilo base de todas las alertas (igual al formulario de registro)
 const ESTILO_SWAL = {

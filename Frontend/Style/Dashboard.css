@@ -1,1 +1,289 @@
-@import url('global/styles.css');
+/* ==========================================
+   DASHBOARD / PANORAMA GENERAL
+   ========================================== */
+
+.dash-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    box-sizing: border-box !important;
+}
+
+/* --- TARJETAS DE MÉTRICAS PRINCIPALES --- */
+.dash-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.2rem;
+    width: 100%;
+}
+
+.dash-card-metric {
+    background: linear-gradient(145deg, #101319 0%, #0a0c10 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    padding: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.dash-card-metric:hover {
+    border-color: rgba(229, 169, 60, 0.3);
+    transform: translateY(-2px);
+}
+
+.dash-card-metric--highlight {
+    background: linear-gradient(135deg, rgba(229, 169, 60, 0.12) 0%, #101319 100%);
+    border: 1px solid rgba(229, 169, 60, 0.3);
+}
+
+.dash-metric-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    font-weight: 500;
+}
+
+.dash-metric-header i {
+    font-size: 1.15rem;
+    color: var(--gold-main);
+}
+
+.dash-metric-value {
+    font-size: 1.65rem;
+    font-weight: 700;
+    color: var(--text-white);
+    letter-spacing: -0.5px;
+}
+
+.dash-metric-sub {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dash-metric-sub--ok {
+    color: #34d399;
+}
+
+/* --- BOTONES DE ACCIONES RÁPIDAS --- */
+.dash-quick-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+    flex-wrap: wrap;
+}
+
+.dash-btn-action {
+    flex: 1;
+    min-width: 100px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.dash-btn-action--transfer {
+    background: rgba(229, 169, 60, 0.1);
+    border: 1px solid rgba(229, 169, 60, 0.3);
+    color: var(--gold-main);
+}
+
+.dash-btn-action--transfer:hover {
+    background: rgba(229, 169, 60, 0.2);
+}
+
+.dash-btn-action--deposit {
+    background: rgba(52, 211, 153, 0.1);
+    border: 1px solid rgba(52, 211, 153, 0.3);
+    color: #34d399;
+}
+
+.dash-btn-action--deposit:hover {
+    background: rgba(52, 211, 153, 0.2);
+}
+
+/* --- LAYOUT PRINCIPAL (DOS COLUMNAS) --- */
+.dash-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.8fr) minmax(280px, 1.2fr);
+    gap: 1.5rem;
+    align-items: start;
+    width: 100%;
+}
+
+.dash-panel {
+    background: linear-gradient(145deg, #101319 0%, #0a0c10 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+}
+
+.dash-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+}
+
+.dash-panel-header h3 {
+    color: var(--text-white);
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.dash-panel-link {
+    color: var(--gold-main);
+    font-size: 0.8rem;
+    text-decoration: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: opacity 0.2s ease;
+}
+
+.dash-panel-link:hover {
+    opacity: 0.8;
+}
+
+/* --- LISTA DE PRODUCTOS --- */
+.dash-accounts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.dash-account-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    transition: background 0.2s ease;
+}
+
+.dash-account-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.dash-account-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dash-account-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: rgba(229, 169, 60, 0.12);
+    color: var(--gold-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+}
+
+.dash-account-details strong {
+    display: block;
+    color: var(--text-white);
+    font-size: 0.85rem;
+}
+
+.dash-account-details span {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
+.dash-account-balance {
+    color: var(--gold-main);
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+/* --- LISTA DE ÚLTIMOS MOVIMIENTOS --- */
+.dash-movs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dash-mov-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.dash-mov-item:last-child {
+    border-bottom: none;
+}
+
+.dash-mov-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dash-mov-icon {
+    font-size: 0.85rem;
+}
+
+.dash-mov-icon--ingreso { color: #34d399; }
+.dash-mov-icon--egreso { color: #f87171; }
+
+.dash-mov-desc strong {
+    display: block;
+    color: var(--text-white);
+    font-size: 0.82rem;
+    font-weight: 500;
+}
+
+.dash-mov-desc small {
+    color: var(--text-muted);
+    font-size: 0.72rem;
+}
+
+.dash-mov-value {
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.dash-mov-value--ingreso { color: #34d399; }
+.dash-mov-value--egreso { color: #f87171; }
+
+.dash-empty {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    padding: 8px 0;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 992px) {
+    .dash-grid {
+        grid-template-columns: 1fr;
+    }
+}

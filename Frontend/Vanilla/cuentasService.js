@@ -108,8 +108,19 @@ export async function obtenerCuentas() {
         todasLasCuentas = [];
     }
 
-    // Filtrar estrictamente las cuentas del usuario actual
-    let cuentasUsuario = todasLasCuentas.filter(c => c && (c.username === usernameActual || (!c.username && usernameActual === 'maria17')));
+    // Identificadores reales del usuario activo (username, correo y alias)
+    const correoActual = usuario.correo || '';
+    const usernameNorm = String(usernameActual || '').trim().toLowerCase();
+    const correoNorm = String(correoActual || '').trim().toLowerCase();
+
+    // Filtrar estrictamente las cuentas reales del usuario actual
+    let cuentasUsuario = todasLasCuentas.filter(c => {
+        if (!c) return false;
+        const cUser = String(c.username || '').trim().toLowerCase();
+        if (cUser === usernameNorm || (correoNorm && cUser === correoNorm)) return true;
+        if (!c.username && usernameNorm === 'maria17') return true;
+        return false;
+    });
 
     // Si el usuario es nuevo y no tiene ninguna cuenta registrada en finara_cuentas,
     // configurar sus cuentas iniciales según su perfil (Ahorros y Corriente por defecto para maria17)
@@ -200,16 +211,46 @@ export async function obtenerCuentas() {
         }
     }
 
-    // Evitar duplicados por id o número en la vista del usuario
-    const cuentasUnicas = [];
-    const idsVistos = new Set();
+    // Depurar y consolidar cuentas para evitar duplicidad de productos del mismo tipo:
+    // 1) Si una cuenta tiene tipo AHORROS o CORRIENTE y su número empieza con 4532 (número de tarjeta)
+    //    mientras ya existe la cuenta original 4021..., descartar el registro huérfano.
+    // 2) Mantener como máximo una Cuenta de Ahorros y una Cuenta Corriente por usuario.
+    const cuentasConsolidadas = [];
+    const tiposCuentasVistos = new Set();
+
+    // Priorizar cuentas bancarias reales (número 4021 o saldos con dinero)
+    cuentasUsuario.sort((a, b) => {
+        const aEsCuentaReal = String(a.numero).startsWith('4021') ? 1 : 0;
+        const bEsCuentaReal = String(b.numero).startsWith('4021') ? 1 : 0;
+        if (aEsCuentaReal !== bEsCuentaReal) return bEsCuentaReal - aEsCuentaReal;
+        return (Number(b.saldo) || 0) - (Number(a.saldo) || 0);
+    });
+
     for (const c of cuentasUsuario) {
-        const clave = `${c.tipo}_${c.numero}`;
-        if (!idsVistos.has(clave)) {
-            idsVistos.add(clave);
-            cuentasUnicas.push(c);
+        if (c.tipo === 'AHORROS' || c.tipo === 'CORRIENTE') {
+            if (!tiposCuentasVistos.has(c.tipo)) {
+                tiposCuentasVistos.add(c.tipo);
+                cuentasConsolidadas.push(c);
+            }
+        } else {
+            // Tarjetas de crédito u otros productos
+            const clave = `${c.tipo}_${c.numero}`;
+            if (!tiposCuentasVistos.has(clave)) {
+                tiposCuentasVistos.add(clave);
+                cuentasConsolidadas.push(c);
+            }
         }
     }
 
-    return cuentasUnicas;
+    // Actualizar storage si se eliminaron cuentas huérfanas duplicadas
+    if (cuentasConsolidadas.length !== cuentasUsuario.length) {
+        const cuentasOtrosUsuarios = todasLasCuentas.filter(c => c && !(c.username === usernameActual || (!c.username && usernameActual === 'maria17')));
+        try {
+            localStorage.setItem('finara_cuentas', JSON.stringify([...cuentasOtrosUsuarios, ...cuentasConsolidadas]));
+        } catch {
+            // Manejo de cuota
+        }
+    }
+
+    return cuentasConsolidadas;
 }

@@ -17,102 +17,151 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 2. LÓGICA DEL MODAL DE CREATE (Validación de usuarios pendientes)
+    // 2. LÓGICA DEL MODAL DE CREATE (CREACIÓN DIRECTA DE USUARIOS)
     // ==========================================
     const modal = document.getElementById('adminModal');
     const btnOpenCreate = document.querySelector('[data-accion="Create"]');
     const btnCloseModal = document.getElementById('closeAdminModal');
     const listaPendientesContainer = document.getElementById('usuariosPendientesList');
     const detalleContainer = document.getElementById('detalleUsuarioContainer');
+
     if (btnOpenCreate) {
         btnOpenCreate.addEventListener('click', () => {
             modal.classList.add('active');
-            cargarUsuariosPendientes();
+            renderizarFormularioCreacion();
         });
     }
+
     if (btnCloseModal) {
         btnCloseModal.addEventListener('click', () => {
             modal.classList.remove('active');
         });
     }
-    function cargarUsuariosPendientes() {
-        listaPendientesContainer.innerHTML = '';
+
+    function renderizarFormularioCreacion() {
+        // Columna izquierda: Información o instrucciones
+        listaPendientesContainer.innerHTML = `
+           <div style="padding: 1rem; color: var(--text-muted); font-size: 0.9rem;">
+               <h4 style="color: var(--gold-main); margin-bottom: 0.5rem;"><i class="fa-solid fa-user-plus"></i> Alta Directa</h4>
+               <p>Completa los campos obligatorios para registrar un nuevo usuario en el sistema con estado activo de inmediato.</p>
+           </div>
+       `;
+
+        // Columna derecha: Formulario de creación de usuario
         detalleContainer.innerHTML = `
-          <div class="placeholder-detalle">
-              <i class="fa-solid fa-hand-pointer"></i>
-              <p>Selecciona un usuario de la izquierda para gestionar su verificación.</p>
-          </div>
-      `;
-        let usuarios = JSON.parse(localStorage.getItem("finara_usuarios_local")) || [];
-        const pendientes = usuarios.map((user, index) => ({ ...user, originalIndex: index }))
-            .filter(u => u.verificado === false || u.verificado === undefined);
-        if (pendientes.length === 0) {
-            listaPendientesContainer.innerHTML = `<p class="empty-list-text">No hay usuarios pendientes por validar.</p>`;
+           <div class="detalle-info-card" style="max-height: 480px; overflow-y: auto; padding-right: 5px;">
+               <h4 style="margin-bottom: 1rem;">Formulario de Nuevo Usuario</h4>
+               <form id="formCrearUsuarioAdmin" style="display: flex; flex-direction: column; gap: 0.8rem;">
+                   <div>
+                       <label style="font-size: 0.8rem; color: var(--text-muted);">Nombre Completo *</label>
+                       <input type="text" id="adminNuevoNombre" class="swal2-input" placeholder="Ej. Carlos Pérez" style="width: 100%; margin: 0; background: #0a0c10; color: #fff; border: 1px solid var(--border-dark); padding: 0.6rem; border-radius: 8px;" required>
+                   </div>
+                   <div>
+                       <label style="font-size: 0.8rem; color: var(--text-muted);">Correo Electrónico *</label>
+                       <input type="email" id="adminNuevoCorreo" class="swal2-input" placeholder="Ej. carlos@email.com" style="width: 100%; margin: 0; background: #0a0c10; color: #fff; border: 1px solid var(--border-dark); padding: 0.6rem; border-radius: 8px;" required>
+                   </div>
+                   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                       <div>
+                           <label style="font-size: 0.8rem; color: var(--text-muted);">Tipo Documento</label>
+                           <select id="adminNuevoTipoDoc" style="width: 100%; background: #0a0c10; color: #fff; border: 1px solid var(--border-dark); padding: 0.6rem; border-radius: 8px;">
+                               <option value="CC">Cédula de Ciudadanía</option>
+                               <option value="CE">Cédula de Extranjería</option>
+                               <option value="Pasaporte">Pasaporte</option>
+                           </select>
+                       </div>
+                       <div>
+                           <label style="font-size: 0.8rem; color: var(--text-muted);">Nro Documento *</label>
+                           <input type="text" id="adminNuevoDoc" placeholder="Ej. 1023456789" style="width: 100%; background: #0a0c10; color: #fff; border: 1px solid var(--border-dark); padding: 0.6rem; border-radius: 8px;" required>
+                       </div>
+                   </div>
+                   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                       <div>
+                           <label style="font-size: 0.8rem; color: var(--text-muted);">Usuario (@) *</label>
+                           <input type="text" id="adminNuevoUsername" placeholder="Ej. carlos_p" style="width: 100%; background: #0a0c10; color: #fff; border: 1px solid var(--border-dark); padding: 0.6rem; border-radius: 8px;" required>
+                       </div>
+                       <div>
+                           <label style="font-size: 0.8rem; color: var(--text-muted);">Contraseña *</label>
+                           <input type="password" id="adminNuevoPassword" placeholder="Mínimo 8 caracteres" style="width: 100%; background: #0a0c10; color: #fff; border: 1px solid var(--border-dark); padding: 0.6rem; border-radius: 8px;" required>
+                       </div>
+                   </div>
+                   <button type="submit" class="btn-aprobar" style="margin-top: 1rem; width: 100%;">
+                       <i class="fa-solid fa-check"></i> Registrar Usuario
+                   </button>
+               </form>
+           </div>
+       `;
+
+        document.getElementById('formCrearUsuarioAdmin').addEventListener('submit', (e) => {
+            e.preventDefault();
+            ejecutarCreacionUsuarioAdmin();
+        });
+    }
+
+    function ejecutarCreacionUsuarioAdmin() {
+        const nombre = document.getElementById('adminNuevoNombre').value.trim();
+        const correo = document.getElementById('adminNuevoCorreo').value.trim();
+        const tipoDocumento = document.getElementById('adminNuevoTipoDoc').value;
+        const documento = document.getElementById('adminNuevoDoc').value.trim();
+        const username = document.getElementById('adminNuevoUsername').value.trim();
+        const password = document.getElementById('adminNuevoPassword').value;
+
+        if (password.length < 8) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Contraseña muy corta',
+                text: 'La contraseña debe tener al menos 8 caracteres.',
+                background: '#12161f',
+                color: '#fff',
+                confirmButtonColor: '#d4af37'
+            });
             return;
         }
-        pendientes.forEach(user => {
-            const card = document.createElement('div');
-            card.className = 'usuario-item-card';
-            card.innerHTML = `
-              <h5>${user.nombre}</h5>
-              <span>@${user.username} - ${user.correo}</span>
-          `;
-            card.addEventListener('click', () => {
-                document.querySelectorAll('#usuariosPendientesList .usuario-item-card').forEach(c => c.classList.remove('selected'));
-                card.classList.add('selected');
-                mostrarDetalleUsuario(user);
-            });
-            listaPendientesContainer.appendChild(card);
-        });
-    }
-    function mostrarDetalleUsuario(user) {
-        detalleContainer.innerHTML = `
-          <div class="detalle-info-card">
-              <h4>Detalles de la Solicitud</h4>
-              <p><strong>Nombre completo:</strong> ${user.nombre}</p>
-              <p><strong>Correo electrónico:</strong> ${user.correo}</p>
-              <p><strong>Tipo de Documento:</strong> ${user.tipoDocumento || 'No especificado'}</p>
-              <p><strong>Número de Documento:</strong> ${user.documento || 'No especificado'}</p>
-              <p><strong>Teléfono:</strong> ${user.telefono || 'No especificado'}</p>
-              <p><strong>Nombre de Usuario:</strong> @${user.username}</p>
-           
-              <div class="acciones-btns-container">
-                  <button class="btn-aprobar" id="btnAprobar">Verificar (Aprobar)</button>
-                  <button class="btn-rechazar" id="btnRechazar">Marcar / Derivar</button>
-              </div>
-          </div>
-      `;
-        document.getElementById('btnAprobar').addEventListener('click', () => {
-            actualizarEstadoUsuario(user.originalIndex, true);
-        });
-        document.getElementById('btnRechazar').addEventListener('click', () => {
-            actualizarEstadoUsuario(user.originalIndex, 'pendiente_revision');
-        });
-    }
-    function actualizarEstadoUsuario(index, accion) {
-        let usuarios = JSON.parse(localStorage.getItem("finara_usuarios_local")) || [];
-        if (accion === true) {
-            usuarios[index].verificado = true;
-            Swal.fire({
-                icon: 'success',
-                title: '¡Usuario Verificado!',
-                text: `El usuario ${usuarios[index].nombre} ha sido aprobado exitosamente.`,
-                background: '#12161f',
-                color: '#fff',
-                confirmButtonColor: '#d4af37'
-            });
-        } else {
-            Swal.fire({
-                icon: 'info',
-                title: 'Acción Registrada',
-                text: 'El estado del usuario se mantiene en seguimiento.',
-                background: '#12161f',
-                color: '#fff',
-                confirmButtonColor: '#d4af37'
-            });
+
+        let usuariosLocales = JSON.parse(localStorage.getItem("finara_usuarios_local")) || [];
+
+        // Verificar duplicados
+        if (usuariosLocales.some(u => u.correo === correo)) {
+            Swal.fire({ icon: 'error', title: 'Correo en uso', text: 'Este correo ya se encuentra registrado.', background: '#12161f', color: '#fff', confirmButtonColor: '#ef4444' });
+            return;
         }
-        localStorage.setItem("finara_usuarios_local", JSON.stringify(usuarios));
-        cargarUsuariosPendientes();
+        if (usuariosLocales.some(u => u.username === username)) {
+            Swal.fire({ icon: 'error', title: 'Usuario no disponible', text: 'El nombre de usuario ya está ocupado.', background: '#12161f', color: '#fff', confirmButtonColor: '#ef4444' });
+            return;
+        }
+
+        const nuevoUsuario = {
+            nombre,
+            correo,
+            tipoDocumento,
+            documento,
+            telefono: "Por definir",
+            fecha: new Date().toISOString().split('T')[0],
+            username,
+            password,
+            direccion: "Por definir",
+            rol: "Cliente",
+            productosActivos: 0,
+            saldoDisponible: "$ 0",
+            ultimaActividad: "Creado por Administrador",
+            avatar: "../../Style/image/profile/avatarDefault.png",
+            verificado: true, // Creado directamente como verificado/activo
+            tarjetasAprobadas: [],
+            cuentas: []
+        };
+
+        usuariosLocales.push(nuevoUsuario);
+        localStorage.setItem("finara_usuarios_local", JSON.stringify(usuariosLocales));
+
+        Swal.fire({
+            icon: 'success',
+            title: '¡Usuario Creado Exitosamente!',
+            text: `El usuario @${username} ha sido registrado y activado en el sistema.`,
+            background: '#12161f',
+            color: '#fff',
+            confirmButtonColor: '#d4af37'
+        }).then(() => {
+            modal.classList.remove('active');
+        });
     }
 
     // ==========================================
@@ -493,6 +542,30 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                     }
                 }
+            });
+        });
+    }
+    // ==========================================
+    // 7. ALERTA PARA MÓDULO CHATBOT NO DISPONIBLE
+    // ==========================================
+    const btnChatbotAdmin = document.querySelector('[data-accion="Chatbot"]');
+    if (btnChatbotAdmin) {
+        btnChatbotAdmin.addEventListener('click', () => {
+            Swal.fire({
+                title: '<strong style="color: #d4af37;">Módulo en Desarrollo</strong>',
+                html: `
+                   <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 10px 0;">
+                       <i class="fa-solid fa-comments" style="font-size: 50px; color: #8b5cf6;"></i>
+                       <p style="color: #b3b3b3; font-size: 14px; text-align: center; margin: 0;">
+                           La configuración y gestión de respuestas preestablecidas del <strong>asistente virtual</strong> estará disponible próximamente en una futura actualización.
+                       </p>
+                   </div>
+               `,
+                background: '#12161f',
+                color: '#ffffff',
+                confirmButtonText: 'Entendido',
+                confirmButtonColor: '#d4af37',
+                width: '430px'
             });
         });
     }
