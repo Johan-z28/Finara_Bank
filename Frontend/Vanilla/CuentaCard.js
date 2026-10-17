@@ -1,7 +1,23 @@
 // Vanilla/componentes/CuentaCard.js
 // Componente visual de una cuenta: tipo, número parcial y saldo.
 
-import { guardarNotificacion, actualizarCampana } from './notificaciones.js';
+// Helper seguro para registrar notificaciones en localStorage sin romper módulos
+function registrarNotificacionLocal({ titulo, mensaje, tipo = 'info' }) {
+    try {
+        const notifs = JSON.parse(localStorage.getItem('finara_notificaciones')) || [];
+        notifs.unshift({
+            id: `NOTIF-${Date.now()}`,
+            titulo,
+            mensaje,
+            tipo,
+            fecha: new Date().toISOString(),
+            leida: false
+        });
+        localStorage.setItem('finara_notificaciones', JSON.stringify(notifs.slice(0, 30)));
+    } catch {
+        // Ignorar excepciones de cuota
+    }
+}
 
 const TIPOS = {
     AHORROS: { etiqueta: 'Cuenta de Ahorros', icono: 'fa-piggy-bank', clase: 'ahorros', saldoLabel: 'Saldo disponible' },
@@ -413,17 +429,11 @@ function notificarYConfirmarBloqueo(datosTarjeta, nuevoEstadoBloqueada) {
         : `Has desbloqueado tu ${tituloTarjeta}${sufijoNumero}. Ya puedes utilizarla nuevamente para todas tus operaciones.`;
 
     // 1. Guardar en finara_notificaciones (localStorage)
-    guardarNotificacion({
+    registrarNotificacionLocal({
         titulo: tituloNotif,
         mensaje: mensajeNotif,
         tipo: nuevoEstadoBloqueada ? 'alerta' : 'exito'
     });
-
-    try {
-        actualizarCampana();
-    } catch {
-        // En caso de que no esté instanciada la campana
-    }
 
     // 2. Confirmación en pantalla
     if (window.Swal) {

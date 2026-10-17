@@ -3,7 +3,21 @@
 // Con USAR_DATOS_DE_PRUEBA = true, localStorage hace de "base de datos" (el proyecto
 // opera en modo simulación local). Con false, se usa el API del Backend.
 
-import { guardarNotificacion } from './notificaciones.js';
+// Helper seguro para guardar notificaciones en localStorage
+function guardarNotificacion(notif) {
+    try {
+        const notifs = JSON.parse(localStorage.getItem('finara_notificaciones')) || [];
+        notifs.unshift({
+            id: `NOTIF-${Date.now()}`,
+            ...notif,
+            fecha: new Date().toISOString(),
+            leida: false
+        });
+        localStorage.setItem('finara_notificaciones', JSON.stringify(notifs.slice(0, 30)));
+    } catch {
+        // Ignorar excepciones de cuota
+    }
+}
 import { obtenerCuentas as obtenerCuentasUsuario, obtenerUsernameActivo } from './cuentasService.js';
 
 const USAR_DATOS_DE_PRUEBA = true;

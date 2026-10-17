@@ -571,14 +571,19 @@ function obtenerUsuarioActivo() {
     const perfilDirecto = JSON.parse(localStorage.getItem("userProfile"));
     if (perfilDirecto) return perfilDirecto;
 
-    const emailLogueado = localStorage.getItem("usuarioLogueado") || localStorage.getItem("emailSesion");
+    const emailLogueado = localStorage.getItem("usuarioLogueado") || localStorage.getItem("emailSesion") || localStorage.getItem("userName");
     const listaUsuarios = JSON.parse(localStorage.getItem("finara_usuarios_local")) || [];
     if (emailLogueado) {
-        const encontrado = listaUsuarios.find(u => u.correo === emailLogueado || u.username === emailLogueado);
+        const encontrado = listaUsuarios.find(u => u.correo === emailLogueado || u.username === emailLogueado || u.nombre === emailLogueado);
         if (encontrado) return encontrado;
     }
     const userDirecto = JSON.parse(localStorage.getItem("usuarioActivo"));
     if (userDirecto) return userDirecto;
+
+    const nombreSimple = localStorage.getItem("userName");
+    if (nombreSimple) {
+        return { username: nombreSimple, nombre: nombreSimple, verificado: true };
+    }
     return null;
 }
 
@@ -812,18 +817,26 @@ function mostrarModalSolicitud(tarjetaObj, usuarioActivo) {
             // Si es tarjeta de crédito aprobada, sincronizarla inmediatamente con finara_cuentas
             if (tarjetaObj.tipo === 'credito') {
                 const cupoCalculado = Math.min(20000000, Math.max(1000000, Math.round(((ingresos || 2000000) * 1.5) / 100000) * 100000));
+                let cuentasPersistentes = [];
+                try {
+                    cuentasPersistentes = JSON.parse(localStorage.getItem('finara_cuentas')) || [];
+                } catch {
+                    cuentasPersistentes = [];
+                }
                 const nuevaTC = {
-                    id: `TC-${numeroGenerado}`,
+                    id: `TC-${numeroGenerado.replace(/\s+/g, '')}`,
                     tipo: 'TARJETA_CREDITO',
                     numero: numeroGenerado,
+                    fechaVencimiento: '09/29',
+                    cvv: String(Math.floor(100 + Math.random() * 900)),
                     saldo: cupoCalculado,
                     estado: 'ACTIVA',
                     username: usernameActual,
                     fechaAprobacion: datosTarjetaAprobada.fechaAprobacion
                 };
-                todasLasCuentas.push(nuevaTC);
+                cuentasPersistentes.push(nuevaTC);
                 try {
-                    localStorage.setItem('finara_cuentas', JSON.stringify(todasLasCuentas));
+                    localStorage.setItem('finara_cuentas', JSON.stringify(cuentasPersistentes));
                 } catch (e) {}
             }
 

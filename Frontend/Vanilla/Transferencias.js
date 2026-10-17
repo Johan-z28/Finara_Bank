@@ -8,8 +8,7 @@ import('./notificaciones.js')
             actualizarCampana = modNotif.actualizarCampana || actualizarCampana;
         }
     })
-    .catch(() => {
-        // Operar sin bloquear si el archivo fue desacoplado
+        // Si el módulo está desacoplado, opera normalmente sin bloquear transferencias
     });
 import {
     TIPOS, formatoCOP, calcularDisponible, obtenerCuentasOrigen, buscarCuentaDestino,
