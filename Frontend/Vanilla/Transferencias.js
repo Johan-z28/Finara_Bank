@@ -1,3 +1,5 @@
+// Vanilla/Transferencias.js
+
 import {
     TIPOS, formatoCOP, calcularDisponible, obtenerCuentasOrigen, buscarCuentaDestino,
     validarTransferencia, ejecutarTransferencia, SesionExpiradaError
@@ -13,6 +15,7 @@ function el(tag, clase, texto) {
 }
 
 const ultimos4 = numero => String(numero).replace(/\D/g, '').slice(-4);
+const soloDigitos = v => String(v ?? '').replace(/\D/g, '');
 const textoCuenta = c => `${TIPOS[c.tipo] || c.tipo} · •••• ${ultimos4(c.numero)}`;
 
 function filas(contenedor, items) {
@@ -132,6 +135,10 @@ export async function initTransferenciasView() {
                 iconEl.className = estaBloqueada ? 'fa-solid fa-lock' : 'fa-solid fa-building-columns';
             }
         }
+
+        if (inpNumero && inpNumero.value.trim()) {
+            verificar();
+        }
     }
 
     async function cargarCuentas() {
@@ -144,7 +151,7 @@ export async function initTransferenciasView() {
             
             if (cuentas.length === 0) {
                 if (estadoGlobal) {
-                    estadoGlobal.replaceChildren(el('p', '', 'No tienes cuentas o productos activos guardados en tu perfil. Solicitado uno desde la sección Solicitar Producto.'));
+                    estadoGlobal.replaceChildren(el('p', '', 'No tienes cuentas o productos activos guardados en tu perfil. Solicita uno desde la sección Solicitar Producto.'));
                     estadoGlobal.classList.remove('hidden');
                 }
                 if (selOrigen) selOrigen.replaceChildren();
@@ -228,46 +235,68 @@ export async function initTransferenciasView() {
         });
     }
 
-    function pintarDestino(estado, dato) {
+    function pintarDestino(estado, dato, mensajeInvalido = null) {
         if (!boxDestino) return;
         boxDestino.replaceChildren();
         if (errDestino) errDestino.textContent = '';
         if (!estado) { boxDestino.classList.add('hidden'); return; }
 
-        boxDestino.className = `tr-destino tr-destino--${estado}`;
+        boxDestino.classList.remove('hidden');
+
+        const esInvalida = Boolean(mensajeInvalido);
+        const estadoFinal = esInvalida ? 'error' : estado;
+
+        boxDestino.className = `tr-destino tr-destino--${estadoFinal}`;
+        
+        if (estadoFinal === 'error' || esInvalida) {
+            boxDestino.style.background = 'rgba(239, 68, 68, 0.1)';
+            boxDestino.style.border = '1px solid #ef4444';
+            boxDestino.style.color = '#f87171';
+        } else if (estadoFinal === 'ok') {
+            boxDestino.style.background = 'rgba(16, 185, 129, 0.1)';
+            boxDestino.style.border = '1px solid #10b981';
+            boxDestino.style.color = '#34d399';
+        } else {
+            boxDestino.style.background = '';
+            boxDestino.style.border = '';
+            boxDestino.style.color = '';
+        }
+
         const iconos = { cargando: 'fa-spinner fa-spin', ok: 'fa-circle-check', error: 'fa-circle-xmark' };
-        const i = el('i', `fa-solid ${iconos[estado]}`);
+        const i = el('i', `fa-solid ${esInvalida ? 'fa-triangle-exclamation' : iconos[estadoFinal]}`);
         i.setAttribute('aria-hidden', 'true');
         const texto = el('div', 'tr-destino__texto');
 
         if (estado === 'ok') {
             const estaBloqueada = Boolean(dato.bloqueada || dato.estado === 'BLOQUEADA');
-            const badgeBloqueo = estaBloqueada
-                ? el('span', 'tr-destino__badge-bloqueada', 'Bloqueada')
-                : null;
-
             const headerTitular = el('div', 'tr-destino__header-titular');
             headerTitular.append(el('strong', '', dato.titular));
-            if (badgeBloqueo) headerTitular.append(badgeBloqueo);
+
+            if (estaBloqueada) {
+                const badgeBloqueo = el('span', 'tr-destino__badge-bloqueada', 'Bloqueada');
+                badgeBloqueo.style.cssText = 'background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; margin-left: 8px;';
+                headerTitular.append(badgeBloqueo);
+            }
 
             texto.append(
                 el('span', 'tr-destino__label', 'Titular de la cuenta'),
                 headerTitular,
-                el('span', 'tr-destino__sub', `${TIPOS[dato.tipo] || dato.tipo} · •••• ${ultimos4(dato.numero)}${dato.esPropia ? ' · Tu cuenta' : ''}${estaBloqueada ? ' · No disponible para transferencias' : ''}`)
+                el('span', 'tr-destino__sub', `${TIPOS[dato.tipo] || dato.tipo} · •••• ${ultimos4(dato.numero)}${dato.esPropia ? ' · Tu cuenta' : ''}`)
             );
-            if (estaBloqueada) {
-                boxDestino.classList.add('tr-destino--bloqueada');
-                i.className = 'fa-solid fa-lock';
+
+            if (esInvalida && errDestino) {
+                errDestino.textContent = mensajeInvalido;
             }
         } else {
             texto.append(el('span', '', dato));
         }
+
         boxDestino.append(i, texto);
     }
 
     async function verificar() {
         const mio = ++tokenDestino;
-        const numero = inpNumero ? inpNumero.value.replace(/\D/g, '') : '';
+        const numero = inpNumero ? soloDigitos(inpNumero.value) : '';
         destino = null;
         if (!numero) { pintarDestino(null); return; }
 
@@ -276,8 +305,25 @@ export async function initTransferenciasView() {
             const r = await buscarCuentaDestino(numero, selTipo ? selTipo.value : 'AHORROS');
             if (mio !== tokenDestino) return;
             destino = r;
-            if (r) pintarDestino('ok', r);
-            else pintarDestino('error', 'No encontramos una cuenta con ese número.');
+
+            if (r) {
+                const origenActual = cuentaSeleccionada();
+                const numOrigenLimpio = origenActual ? soloDigitos(origenActual.numero) : '';
+                const numDestinoLimpio = soloDigitos(r.numero);
+                const estaBloqueada = Boolean(r.bloqueada || r.estado === 'BLOQUEADA');
+
+                let mensajeInvalido = null;
+
+                if (numOrigenLimpio === numDestinoLimpio || (origenActual && origenActual.id === r.id)) {
+                    mensajeInvalido = 'No puedes transferir al mismo producto de origen.';
+                } else if (estaBloqueada) {
+                    mensajeInvalido = 'La cuenta de destino se encuentra bloqueada temporalmente. No es posible recibir transferencias.';
+                }
+
+                pintarDestino('ok', r, mensajeInvalido);
+            } else {
+                pintarDestino('error', 'No encontramos una cuenta con ese número.');
+            }
         } catch (err) {
             if (mio !== tokenDestino) return;
             if (err instanceof SesionExpiradaError) return irALogin();
@@ -289,17 +335,30 @@ export async function initTransferenciasView() {
         tokenDestino++;
         destino = null;
         clearTimeout(temporizador);
-        if (!inpNumero || !inpNumero.value.replace(/\D/g, '')) { pintarDestino(null); return; }
+        if (!inpNumero || !soloDigitos(inpNumero.value)) { pintarDestino(null); return; }
         pintarDestino('cargando', 'Verificando cuenta…');
         temporizador = setTimeout(verificar, 450);
     }
 
+    // 🚀 INTERCEPCIÓN DE PEGADO (PASTE) E INPUT MANUAL
     if (inpNumero) {
+        inpNumero.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const textoPegado = (e.clipboardData || window.clipboardData).getData('text');
+            const soloNumeros = soloDigitos(textoPegado).slice(0, 16);
+            const formateado = soloNumeros.replace(/(\d{4})(?=\d)/g, '$1 ');
+            inpNumero.value = formateado;
+            programarVerificacion();
+        });
+
         inpNumero.addEventListener('input', () => {
-            inpNumero.value = inpNumero.value.replace(/\D/g, '').slice(0, 16);
+            const soloNumeros = soloDigitos(inpNumero.value).slice(0, 16);
+            const formateado = soloNumeros.replace(/(\d{4})(?=\d)/g, '$1 ');
+            inpNumero.value = formateado;
             programarVerificacion();
         });
     }
+
     if (selTipo) selTipo.addEventListener('change', programarVerificacion);
 
     function mostrarErrorCampo(campo, mensaje) {
@@ -321,12 +380,35 @@ export async function initTransferenciasView() {
         const origen = cuentaSeleccionada();
         const monto = leerMonto();
         const v = validarTransferencia({ origen, destino, monto });
+
         if (!v.ok) {
             mostrarErrorCampo(v.campo, v.mensaje);
+
+            if (window.Swal) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Operación no permitida',
+                    text: v.mensaje,
+                    background: '#12151c',
+                    color: '#ffffff',
+                    confirmButtonColor: '#e5a93c',
+                    confirmButtonText: 'Entendido'
+                });
+            } else {
+                alert(v.mensaje);
+            }
             return;
         }
 
-        datos = { origen, destino, monto, concepto: inpConcepto ? inpConcepto.value.trim() : '', usaSobregiro: v.usaSobregiro, esAvanceTC: v.esAvanceTC };
+        datos = { 
+            origen, 
+            destino, 
+            monto, 
+            concepto: inpConcepto ? inpConcepto.value.trim() : '', 
+            usaSobregiro: v.usaSobregiro, 
+            esAvanceTC: v.esAvanceTC 
+        };
+        
         pintarResumen();
         irAPaso(2);
     }
@@ -339,7 +421,6 @@ export async function initTransferenciasView() {
     function pintarResumen() {
         const { origen, destino: d, monto, concepto, usaSobregiro, esAvanceTC } = datos;
         
-        // Limpieza de saldo y cálculo matemático directo
         const saldoActualNum = typeof origen.saldo === 'number'
             ? origen.saldo
             : Number(String(origen.saldo || 0).replace(/[^0-9.-]+/g, "")) || 0;
@@ -385,13 +466,11 @@ export async function initTransferenciasView() {
                     destinoTipo: datos.destino.tipo, monto: datos.monto, concepto: datos.concepto
                 });
 
-                // GUARDA AMBOS MOVIMIENTOS EN `finara_movimientos` PARA QUE APAREZCAN EN LA TABLA
                 try {
                     let movimientos = JSON.parse(localStorage.getItem('finara_movimientos')) || [];
                     const perfilActivo = JSON.parse(localStorage.getItem('userProfile')) || {};
                     const usuarioActual = perfilActivo.username || datos.origen.username || 'maria17';
 
-                    // 1. Registro del Egreso para la Cuenta Origen
                     movimientos.unshift({
                         id: `MOV-OUT-${Date.now()}`,
                         fecha: new Date().toISOString(),
@@ -404,7 +483,6 @@ export async function initTransferenciasView() {
                         usuario: usuarioActual
                     });
 
-                    // 2. Registro del Ingreso para la Cuenta Destino
                     movimientos.unshift({
                         id: `MOV-IN-${Date.now()}`,
                         fecha: new Date().toISOString(),
