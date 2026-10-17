@@ -82,17 +82,48 @@ function updateUserData() {
     let storedUserName = localStorage.getItem('userName');
     let storedUserAvatar = localStorage.getItem('userAvatar');
 
-    if (!storedUserName || storedUserName === 'Sin Nombre') {
+    if (!storedUserName || storedUserName === 'Sin Nombre' || storedUserName === 'Usuario') {
         try {
             const perfil = JSON.parse(localStorage.getItem('userProfile'));
-            if (perfil) {
-                storedUserName = perfil.nombre || perfil.username || storedUserName;
+            if (perfil && (perfil.nombre || perfil.username)) {
+                storedUserName = perfil.nombre || perfil.username;
                 if (!storedUserAvatar) storedUserAvatar = perfil.avatar;
             }
         } catch {}
     }
 
-    if (!storedUserName) {
+    if (!storedUserName || storedUserName === 'Sin Nombre' || storedUserName === 'Usuario') {
+        try {
+            const usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo'));
+            if (usuarioActivo && (usuarioActivo.nombre || usuarioActivo.username)) {
+                storedUserName = usuarioActivo.nombre || usuarioActivo.username;
+                if (!storedUserAvatar) storedUserAvatar = usuarioActivo.avatar;
+            }
+        } catch {}
+    }
+
+    if (!storedUserName || storedUserName === 'Sin Nombre' || storedUserName === 'Usuario') {
+        try {
+            const emailLogueado = localStorage.getItem('usuarioLogueado') || localStorage.getItem('emailSesion');
+            const usuarios = JSON.parse(localStorage.getItem('finara_usuarios_local')) || [];
+            if (emailLogueado && usuarios.length > 0) {
+                const encontrado = usuarios.find(u => u.correo === emailLogueado || u.username === emailLogueado);
+                if (encontrado && (encontrado.nombre || encontrado.username)) {
+                    storedUserName = encontrado.nombre || encontrado.username;
+                    if (!storedUserAvatar) storedUserAvatar = encontrado.avatar;
+                }
+            } else if (usuarios.length > 0) {
+                // Último usuario registrado en el sistema local
+                const ultimo = usuarios[usuarios.length - 1];
+                if (ultimo && (ultimo.nombre || ultimo.username)) {
+                    storedUserName = ultimo.nombre || ultimo.username;
+                    if (!storedUserAvatar) storedUserAvatar = ultimo.avatar;
+                }
+            }
+        } catch {}
+    }
+
+    if (!storedUserName || storedUserName === 'Sin Nombre') {
         storedUserName = 'Usuario';
     }
 

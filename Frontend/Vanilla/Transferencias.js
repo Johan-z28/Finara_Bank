@@ -8,6 +8,7 @@ import('./notificaciones.js')
             actualizarCampana = modNotif.actualizarCampana || actualizarCampana;
         }
     })
+    .catch(() => {
         // Si el módulo está desacoplado, opera normalmente sin bloquear transferencias
     });
 import {
