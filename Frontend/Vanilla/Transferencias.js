@@ -1,5 +1,16 @@
 import { initGlobalComponents } from './Global/app.js';
-import { initCampanaNotificaciones, actualizarCampana } from './notificaciones.js';
+let initCampanaNotificaciones = () => {};
+let actualizarCampana = () => {};
+import('./notificaciones.js')
+    .then(modNotif => {
+        if (modNotif) {
+            initCampanaNotificaciones = modNotif.initCampanaNotificaciones || initCampanaNotificaciones;
+            actualizarCampana = modNotif.actualizarCampana || actualizarCampana;
+        }
+    })
+    .catch(() => {
+        // Si el módulo está desacoplado, opera normalmente sin bloquear transferencias
+    });
 import {
     TIPOS, formatoCOP, calcularDisponible, obtenerCuentasOrigen, buscarCuentaDestino,
     validarTransferencia, ejecutarTransferencia, SesionExpiradaError

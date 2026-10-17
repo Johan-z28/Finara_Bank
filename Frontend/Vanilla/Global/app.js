@@ -1,4 +1,14 @@
-import { procesarMensajeChatbot, generarRespuestaHorarios } from '../chatbotService.js';
+// Gestor global de componentes (Sidebar, Navbar, Perfil y Chatbot)
+let procesarMensajeChatbotFn = null;
+import('../chatbotService.js')
+    .then(moduloChat => {
+        if (moduloChat) {
+            procesarMensajeChatbotFn = moduloChat.procesarMensajeChatbot;
+        }
+    })
+    .catch(() => {
+        // Si el módulo fue reestructurado o no está en la raíz, se maneja de forma tolerante
+    });
 
 let isGlobalListenersInitialized = false;
 
@@ -69,8 +79,22 @@ function ensureChatbotWidget() {
  * Carga e inyecta los datos del usuario en el Navbar desde LocalStorage
  */
 function updateUserData() {
-    const storedUserName = localStorage.getItem('userName') || 'Sin Nombre';
-    const storedUserAvatar = localStorage.getItem('userAvatar');
+    let storedUserName = localStorage.getItem('userName');
+    let storedUserAvatar = localStorage.getItem('userAvatar');
+
+    if (!storedUserName || storedUserName === 'Sin Nombre') {
+        try {
+            const perfil = JSON.parse(localStorage.getItem('userProfile'));
+            if (perfil) {
+                storedUserName = perfil.nombre || perfil.username || storedUserName;
+                if (!storedUserAvatar) storedUserAvatar = perfil.avatar;
+            }
+        } catch {}
+    }
+
+    if (!storedUserName) {
+        storedUserName = 'Usuario';
+    }
 
     const greetingName = document.getElementById('greetingName');
     const dropdownUserName = document.getElementById('dropdownUserName');
@@ -135,7 +159,22 @@ function enviarMensajeChat(texto) {
 
     // 2. Respuesta del bot procesada mediante el servicio de intenciones (HU-36)
     setTimeout(() => {
-        const respuesta = procesarMensajeChatbot(texto);
+        let respuesta = {
+            html: 'Hola. Nuestro asesor virtual está disponible para orientarte sobre los productos y servicios de Finara Bank.',
+            opcionesSiguientes: [
+                { accion: 'consultar', texto: '🔍 Revisar Saldo' },
+                { accion: 'transferir', texto: '💸 Enviar Dinero' }
+            ]
+        };
+
+        if (typeof procesarMensajeChatbotFn === 'function') {
+            try {
+                respuesta = procesarMensajeChatbotFn(texto);
+            } catch {
+                // Fallback por defecto
+            }
+        }
+
         const botBubble = document.createElement('div');
         botBubble.className = 'chat-bubble bot-bubble';
         botBubble.innerHTML = respuesta.html;

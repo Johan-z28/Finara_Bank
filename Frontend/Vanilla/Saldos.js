@@ -136,7 +136,15 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const pintarCuentas = () => {
-        lista.replaceChildren(...cuentas.map(c => crearCuentaCard(c, { ocultarSaldo: ocultar })));
+        const nodos = cuentas.map(c => {
+            try {
+                return crearCuentaCard(c, { ocultarSaldo: ocultar });
+            } catch (err) {
+                console.error('[Saldos] Error al pintar tarjeta de cuenta:', c, err);
+                return null;
+            }
+        }).filter(Boolean);
+        lista.replaceChildren(...nodos);
         actualizarAnalitica();
     };
 
