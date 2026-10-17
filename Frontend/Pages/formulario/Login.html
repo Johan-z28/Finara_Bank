@@ -33,19 +33,30 @@
                     </a>
                 </div>
 
+                <!-- Selector de modalidad de acceso (Cliente / Administrador) -->
+                <div class="login-role-tabs" role="tablist">
+                    <button type="button" class="login-role-tab activo" id="tabCliente" role="tab" aria-selected="true">
+                        <i class="fa-solid fa-user"></i> Cliente
+                    </button>
+                    <button type="button" class="login-role-tab" id="tabAdmin" role="tab" aria-selected="false">
+                        <i class="fa-solid fa-user-shield"></i> Administrador
+                    </button>
+                </div>
+
                 <!-- Encabezado -->
                 <div class="form-header">
-                    <div class="form-icon">
+                    <div class="form-icon" id="formHeaderIcon">
                         <i class="fa-solid fa-right-to-bracket"></i>
                     </div>
                     <div>
-                        <h1>Iniciar sesión</h1>
-                        <p>Ingresa tu usuario y contraseña para acceder a tu cuenta.</p>
+                        <h1 id="formHeaderTitle">Iniciar sesión</h1>
+                        <p id="formHeaderSubtitle">Ingresa tu usuario y contraseña para acceder a tu cuenta.</p>
                     </div>
                 </div>
 
                 <!-- Formulario -->
                 <form id="loginForm" novalidate>
+                    <input type="hidden" id="loginRole" value="CLIENTE">
 
                     <!-- USUARIO -->
                     <div class="input-group">

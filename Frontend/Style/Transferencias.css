@@ -178,6 +178,43 @@
     outline: none;
 }
 
+/* Modalidad de transferencia: Finara vs Otro Banco (HU-07) */
+.tr-modalidad-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1.2rem;
+    padding: 4px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-dark);
+    border-radius: 12px;
+}
+.tr-tab-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+.tr-tab-btn:hover {
+    color: var(--text-white);
+    background: rgba(255, 255, 255, 0.04);
+}
+.tr-tab-btn.activo {
+    background: rgba(229, 169, 60, 0.15);
+    color: var(--gold-main);
+    border-color: rgba(229, 169, 60, 0.35);
+    box-shadow: 0 4px 12px rgba(229, 169, 60, 0.15);
+}
+
 /* Tarjeta visual de cuenta origen */
 .tr-origen-card {
     display: flex;
