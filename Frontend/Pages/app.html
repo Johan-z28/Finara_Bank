@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finara Bank | Banca Digital</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="../Style/image/favicon.svg">
+    <link rel="stylesheet" href="../Style/global/styles.css">
+    <link rel="stylesheet" href="../Style/admin.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body class="general-body">
+    <div class="sidebar-backdrop hidden" id="sidebarBackdrop"></div>
+
+    <!-- ======= SIDEBAR ÚNICO Y PERSISTENTE ======= -->
+    <aside class="sidebar" id="sidebar">
+        <!-- BOTÓN CÍRCULO EN EL BORDE DERECHO -->
+        <button class="sidebar-edge-toggle" id="sidebarCollapseBtn" aria-label="Colapsar menú" title="Alternar menú">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
+        <div class="sidebar-header">
+            <img src="../Style/image/Logo_finara.svg" alt="Finara Logo" class="sidebar-logo">
+            <img src="../Style/image/favicon.svg" alt="Finara Icon" class="sidebar-logo-small">
+        </div>
+
+        <!-- MENÚ DE NAVEGACIÓN PRINCIPAL -->
+        <nav class="sidebar-nav">
+            <ul>
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" data-view="dashboard" title="Dashboard">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-view="saldos" title="Saldos">
+                        <i class="fa-regular fa-credit-card"></i>
+                        <span>Saldos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-view="transferencias" title="Transferencias">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <span>Transferencias</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-view="consignar" title="Consignar">
+                        <i class="fa-solid fa-wallet"></i>
+                        <span>Consignar</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-view="retiros" title="Retiros">
+                        <i class="fa-solid fa-money-bill-transfer"></i>
+                        <span>Retiros</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-view="movimientos" title="Movimientos">
+                        <i class="fa-solid fa-list-ul"></i>
+                        <span>Movimientos</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- SECCIÓN INFERIOR DEL SIDEBAR (SOLICITAR PRODUCTO + CERRAR SESIÓN) -->
+        <div class="sidebar-footer">
+            <a href="#" class="btn-solicitar-sidebar" data-view="solicitarProductos" title="Solicitar Producto">
+                <i class="fa-solid fa-plus"></i>
+                <span>Solicitar Producto</span>
+            </a>
+
+            <a href="#" class="btn-logout-sidebar" id="btnCerrarSesion" title="Cerrar sesión">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Cerrar sesión</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- ======= WRAPPER PRINCIPAL ======= -->
+    <div class="main-wrapper">
+        <header class="dashboard-navbar">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <button class="mobile-menu-btn" id="menuToggle" aria-label="Abrir menú navegación">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="user-greeting">
+                    <h2>Hola, <span id="greetingName">Johan Zapata</span></h2>
+                </div>
+            </div>
+
+            <div class="navbar-actions">
+                <a href="#" class="btn-perfil-navbar" data-view="perfil" title="Mi perfil">
+                    <div class="navbar-user-avatar">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <div class="navbar-user-info">
+                        <strong id="sidebarUserName">Johan Zapata</strong>
+                        <span>Ver perfil</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right navbar-user-arrow"></i>
+                </a>
+            </div>
+        </header>
+
+        <!-- CONTENEDOR DINÁMICO SPA -->
+        <main class="main-content" id="mainContent">
+            <!-- Vistas inyectadas por app.js -->
+        </main>
+    </div>
+
+    <script type="module" src="../Vanilla/Global/app.js"></script>
+</body>
+
+</html>

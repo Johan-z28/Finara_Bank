@@ -1,4 +1,3 @@
-import { initGlobalComponents } from './Global/app.js';
 import { PERIODOS, obtenerCuentasFiltro, obtenerMovimientos, SesionExpiradaError } from './movimientosService.js';
 
 // Helper seguro para guardar notificaciones en localStorage
@@ -26,7 +25,7 @@ const formatoHora = new Intl.DateTimeFormat('es-CO', { hour: '2-digit', minute: 
 function el(tag, clase, texto) {
     const nodo = document.createElement(tag);
     if (clase) nodo.className = clase;
-    if (texto !== undefined) nodo.textContent = texto; // textContent: evita inyección HTML
+    if (texto !== undefined) nodo.textContent = texto;
     return nodo;
 }
 
@@ -67,28 +66,31 @@ function crearFila(mov) {
     return fila;
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-    // Inicializa la hamburguesa, el menú de perfil y los datos compartidos
-    initGlobalComponents();
-
+export async function initMovimientosView() {
     const $ = id => document.getElementById(id);
-    const selCuenta = $('filtroCuenta'), selPeriodo = $('filtroPeriodo');
-    const selTipo = $('filtroTipo'), selOrden = $('filtroOrden');
-    const cuerpo = $('movCuerpo'), estado = $('movEstado'), tablaWrap = $('movTablaWrap');
-    const btnPrev = $('pagPrev'), btnNext = $('pagNext'), pagInfo = $('pagInfo'), pagResumen = $('pagResumen');
-    const totIngresos = $('totIngresos'), totEgresos = $('totEgresos');
+    const selCuenta = $('filtroCuenta'), selPeriodo =$('filtroPeriodo');
+    const selTipo = $('filtroTipo'), selOrden =$('filtroOrden');
+    const cuerpo = $('movCuerpo'), estado = $('movEstado'), tablaWrap =$('movTablaWrap');
+    const btnPrev = $('pagPrev'), btnNext =$('pagNext'), pagInfo = $('pagInfo'), pagResumen =$('pagResumen');
+    const totIngresos = $('totIngresos'), totEgresos =$('totEgresos');
+
+    if (!cuerpo) return; // Si no está en el DOM, abortar
 
     const filtros = { cuentaId: null, periodo: '30d', tipo: 'todos', orden: 'desc', pagina: 1 };
-    let peticion = 0; // descarta respuestas viejas si el usuario cambia filtros rápido
+    let peticion = 0;
 
-    PERIODOS.forEach(p => {
-        const o = el('option', '', p.etiqueta);
-        o.value = p.valor;
-        selPeriodo.append(o);
-    });
-    selPeriodo.value = filtros.periodo;
+    if (selPeriodo) {
+        selPeriodo.replaceChildren();
+        PERIODOS.forEach(p => {
+            const o = el('option', '', p.etiqueta);
+            o.value = p.valor;
+            selPeriodo.append(o);
+        });
+        selPeriodo.value = filtros.periodo;
+    }
 
     const mostrarEstado = (mensaje, { reintentar = false, restablecer = false } = {}) => {
+        if (!estado) return;
         estado.replaceChildren();
         const p = el('p', '', mensaje);
         estado.append(p);
@@ -100,15 +102,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         estado.classList.remove('hidden');
-        tablaWrap.classList.add('hidden');
+        if (tablaWrap) tablaWrap.classList.add('hidden');
     };
 
     async function cargar() {
         const mia = ++peticion;
-        estado.classList.add('hidden');
-        tablaWrap.classList.remove('hidden');
-        tablaWrap.setAttribute('aria-busy', 'true');
-        [btnPrev, btnNext].forEach(b => b.disabled = true);
+        if (estado) estado.classList.add('hidden');
+        if (tablaWrap) {
+            tablaWrap.classList.remove('hidden');
+            tablaWrap.setAttribute('aria-busy', 'true');
+        }
+        [btnPrev, btnNext].forEach(b => { if (b) b.disabled = true; });
+        
         cuerpo.replaceChildren(...Array.from({ length: 5 }, () => {
             const tr = el('tr', 'mov-skeleton');
             const td = el('td'); td.colSpan = 4;
@@ -121,54 +126,57 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (mia !== peticion) return;
 
             filtros.pagina = r.pagina;
-            totIngresos.textContent = formatoCOP.format(r.resumen.ingresos);
-            totEgresos.textContent = formatoCOP.format(r.resumen.egresos);
+            if (totIngresos) totIngresos.textContent = formatoCOP.format(r.resumen.ingresos);
+            if (totEgresos) totEgresos.textContent = formatoCOP.format(r.resumen.egresos);
 
             if (!r.items.length) {
-                pagResumen.textContent = '';
-                pagInfo.textContent = '';
+                if (pagResumen) pagResumen.textContent = '';
+                if (pagInfo) pagInfo.textContent = '';
                 mostrarEstado('No hay movimientos registrados en este periodo.', { restablecer: filtros.periodo !== 'todo' });
                 return;
             }
 
             cuerpo.replaceChildren(...r.items.map(crearFila));
             const ini = (r.pagina - 1) * TAMANO_PAGINA + 1;
-            pagResumen.textContent = `Mostrando ${ini}–${ini + r.items.length - 1} de ${r.total}`;
-            pagInfo.textContent = `Página ${r.pagina} de ${r.totalPaginas}`;
-            btnPrev.disabled = r.pagina <= 1;
-            btnNext.disabled = r.pagina >= r.totalPaginas;
+            if (pagResumen) pagResumen.textContent = `Mostrando ${ini}–${ini + r.items.length - 1} de ${r.total}`;
+            if (pagInfo) pagInfo.textContent = `Página ${r.pagina} de ${r.totalPaginas}`;
+            if (btnPrev) btnPrev.disabled = r.pagina <= 1;
+            if (btnNext) btnNext.disabled = r.pagina >= r.totalPaginas;
         } catch (err) {
             if (mia !== peticion) return;
             if (err instanceof SesionExpiradaError) { window.location.href = '../index.html'; return; }
             mostrarEstado('No pudimos cargar los movimientos. Intenta de nuevo.', { reintentar: true });
         } finally {
-            if (mia === peticion) tablaWrap.setAttribute('aria-busy', 'false');
+            if (mia === peticion && tablaWrap) tablaWrap.setAttribute('aria-busy', 'false');
         }
     }
 
-    // Cualquier cambio de filtro vuelve a la página 1
     const alCambiarFiltro = () => {
-        filtros.cuentaId = selCuenta.value;
-        filtros.periodo = selPeriodo.value;
+        if (selCuenta) filtros.cuentaId = selCuenta.value;
+        if (selPeriodo) filtros.periodo = selPeriodo.value;
         filtros.tipo = selTipo ? selTipo.value : 'todos';
-        filtros.orden = selOrden.value;
+        if (selOrden) filtros.orden = selOrden.value;
         filtros.pagina = 1;
         cargar();
     };
-    [selCuenta, selPeriodo, selTipo, selOrden].filter(Boolean).forEach(s => s.addEventListener('change', alCambiarFiltro));
-    btnPrev.addEventListener('click', () => { filtros.pagina--; cargar(); });
-    btnNext.addEventListener('click', () => { filtros.pagina++; cargar(); });
 
-    // Carga inicial: primero las cuentas del selector, luego los movimientos
+    [selCuenta, selPeriodo, selTipo, selOrden].filter(Boolean).forEach(s => s.addEventListener('change', alCambiarFiltro));
+    if (btnPrev) btnPrev.addEventListener('click', () => { filtros.pagina--; cargar(); });
+    if (btnNext) btnNext.addEventListener('click', () => { filtros.pagina++; cargar(); });
+
     try {
         const cuentas = await obtenerCuentasFiltro();
         if (!cuentas.length) { mostrarEstado('Aún no tienes cuentas asociadas.'); return; }
-        cuentas.forEach(c => {
-            const o = el('option', '', `${c.nombre} · •••• ${String(c.numero).replace(/\D/g, '').slice(-4)}`);
-            o.value = c.id;
-            selCuenta.append(o);
-        });
-        // Poblar selector del modal de extractos
+        if (selCuenta) {
+            selCuenta.replaceChildren();
+            cuentas.forEach(c => {
+                const o = el('option', '', `${c.nombre} · •••• ${String(c.numero).replace(/\D/g, '').slice(-4)}`);
+                o.value = c.id;
+                selCuenta.append(o);
+            });
+            filtros.cuentaId = selCuenta.value;
+        }
+
         const selExtractoCuenta = $('extractoCuentaSelect');
         if (selExtractoCuenta) {
             selExtractoCuenta.replaceChildren();
@@ -179,14 +187,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
 
-        filtros.cuentaId = selCuenta.value;
         cargar();
     } catch (err) {
         if (err instanceof SesionExpiradaError) { window.location.href = '../index.html'; return; }
         mostrarEstado('No pudimos cargar tus cuentas. Intenta de nuevo.', { reintentar: true });
     }
 
-    // ----- Manejo de Modal de Extractos Bancarios (HU-19) -----
+    // Modal de Extractos Bancarios
     const modalExtracto = $('modalExtractoBancario');
     const btnAbrirModal = $('btnAbrirModalExtracto');
     const btnCerrarModal = $('btnCerrarModalExtracto');
@@ -195,18 +202,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const selMes = $('extractoMesSelect');
     const selAnio = $('extractoAnioSelect');
 
-    // Seleccionar por defecto el mes actual
     if (selMes) selMes.value = String(new Date().getMonth() + 1);
 
-    const abrirModal = () => {
-        if (!modalExtracto) return;
-        modalExtracto.classList.remove('hidden');
-    };
-
-    const cerrarModal = () => {
-        if (!modalExtracto) return;
-        modalExtracto.classList.add('hidden');
-    };
+    const abrirModal = () => modalExtracto && modalExtracto.classList.remove('hidden');
+    const cerrarModal = () => modalExtracto && modalExtracto.classList.add('hidden');
 
     if (btnAbrirModal) btnAbrirModal.addEventListener('click', abrirModal);
     if (btnCerrarModal) btnCerrarModal.addEventListener('click', cerrarModal);
@@ -226,19 +225,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             try {
                 let modExtracto = null;
-                try {
-                    modExtracto = await import('./extractoService.js');
-                } catch {
-                    // Si el módulo no existe o fue movido
-                }
+                try { modExtracto = await import('./extractoService.js'); } catch {}
 
                 if (modExtracto && typeof modExtracto.obtenerDatosExtracto === 'function') {
                     const datosDoc = await modExtracto.obtenerDatosExtracto(cuentaId, mes, anio);
                     if (typeof modExtracto.descargarExtractoPDF === 'function') {
                         modExtracto.descargarExtractoPDF(datosDoc);
                     }
-
-                    // Requisito 4: Notificación - Guardar en localStorage
                     guardarNotificacionLocal({
                         titulo: 'Extracto bancario generado',
                         mensaje: `Se descargó exitosamente el extracto de ${datosDoc.cuenta.tipo} (terminada en ${String(datosDoc.cuenta.numero).slice(-4)}) para el periodo ${datosDoc.periodoTexto}. Folio: ${datosDoc.folioCertificado}.`,
@@ -256,7 +249,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 if (window.Swal) {
                     Swal.fire({
-                        icon: 'success',
                         title: '¡Extracto Solicitado!',
                         text: 'Tu extracto bancario ha sido procesado correctamente.',
                         background: '#12151c',
@@ -280,4 +272,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
     }
+}
+
+// Soporte para ejecución tradicional cuando se abre directamente
+document.addEventListener('DOMContentLoaded', () => {
+    initMovimientosView();
 });

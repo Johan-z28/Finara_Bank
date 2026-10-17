@@ -1,38 +1,27 @@
-import { initGlobalComponents } from './Global/app.js';
+// Vanilla/Saldos.js
 import { obtenerCuentas, SesionExpiradaError } from './cuentasService.js';
 import { crearCuentaCard } from './CuentaCard.js';
 
 const CLAVE_PRIVACIDAD = 'saldosOcultos';
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Inicializa componentes globales (menú, perfil, etc.)
-    initGlobalComponents();
-
+export async function initSaldosView() {
     const lista = document.getElementById('cuentasLista');
     const estado = document.getElementById('cuentasEstado');
-    const btnOjo = document.getElementById('toggleSaldos');
+    
+    if (!lista) return;
+
     let ocultar = localStorage.getItem(CLAVE_PRIVACIDAD) === 'true';
     let cuentas = [];
 
     const pintarOjo = () => {
-        btnOjo.querySelector('i').className = ocultar ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye';
+        const btnOjo = document.getElementById('toggleSaldos');
+        if (!btnOjo) return;
+        const icono = btnOjo.querySelector('i');
+        if (icono) {
+            icono.className = ocultar ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye';
+        }
         btnOjo.setAttribute('aria-pressed', String(ocultar));
         btnOjo.setAttribute('aria-label', ocultar ? 'Mostrar saldos' : 'Ocultar saldos');
-    };
-
-    const mostrarEstado = (mensaje, { reintentar = false } = {}) => {
-        estado.replaceChildren();
-        const p = document.createElement('p');
-        p.textContent = mensaje;
-        estado.appendChild(p);
-        if (reintentar) {
-            const b = document.createElement('button');
-            b.className = 'btn-reintentar';
-            b.textContent = 'Reintentar';
-            b.addEventListener('click', cargar);
-            estado.appendChild(b);
-        }
-        estado.classList.remove('hidden');
     };
 
     const formatoCOP = new Intl.NumberFormat('es-CO', {
@@ -40,13 +29,32 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const actualizarAnalitica = () => {
-        const ahorros = cuentas.find(c => c.tipo === 'AHORROS') || { saldo: 0 };
-        const corriente = cuentas.find(c => c.tipo === 'CORRIENTE') || { saldo: 0 };
-        const credito = cuentas.find(c => c.tipo === 'TARJETA_CREDITO') || null;
+        const ahorros = cuentas.find(c => {
+            const t = String(c.tipo || '').toUpperCase();
+            return t.includes('AHORRO') || t.includes('DEBITO') || t.includes('DÉBITO');
+        }) || { saldo: 0 };
 
-        const saldoAhorros = Number(ahorros.saldo) || 0;
-        const saldoCorriente = Number(corriente.saldo) || 0;
-        const cupoCredito = credito ? (Number(credito.saldo) || 0) : 0;
+        const corriente = cuentas.find(c => {
+            const t = String(c.tipo || '').toUpperCase();
+            return t.includes('CORRIENTE');
+        }) || { saldo: 0 };
+
+        const credito = cuentas.find(c => {
+            const t = String(c.tipo || '').toUpperCase();
+            return t.includes('CREDITO') || t.includes('CRÉDITO');
+        }) || null;
+
+        const limpiarSaldo = (val) => {
+            if (typeof val === 'number') return val;
+            if (!val) return 0;
+            const num = Number(String(val).replace(/[^0-9.-]+/g, ""));
+            return isNaN(num) ? 0 : num;
+        };
+
+        const saldoAhorros = limpiarSaldo(ahorros.saldo);
+        const saldoCorriente = limpiarSaldo(corriente.saldo);
+        const cupoCredito = credito ? limpiarSaldo(credito.saldo || credito.cupoDisponible) : 0;
+        
         const total = saldoAhorros + saldoCorriente;
 
         const elAhorrosTotal = document.getElementById('montoAhorrosTotal');
@@ -55,11 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const elSaldoConsolidado = document.getElementById('saldoTotalConsolidado');
         const elPorcentajeAhorros = document.getElementById('porcentajeAhorros');
         const elPorcentajeCorriente = document.getElementById('porcentajeCorriente');
-        const elPorcentajeCredito = document.getElementById('porcentajeCredito');
         const segAhorros = document.getElementById('segAhorros');
         const segCorriente = document.getElementById('segCorriente');
-        const segCredito = document.getElementById('segCredito');
-        const itemLeyendaCredito = document.getElementById('itemLeyendaCredito');
 
         if (ocultar) {
             if (elAhorrosTotal) elAhorrosTotal.textContent = '$ ••••••';
@@ -73,65 +78,47 @@ document.addEventListener('DOMContentLoaded', () => {
             if (elSaldoConsolidado) elSaldoConsolidado.textContent = formatoCOP.format(total);
         }
 
-        const tieneAhorros = Boolean(cuentas.find(c => c.tipo === 'AHORROS'));
-        const tieneCorriente = Boolean(cuentas.find(c => c.tipo === 'CORRIENTE'));
+        const tieneAhorros = saldoAhorros > 0 || Boolean(cuentas.find(c => {
+            const t = String(c.tipo || '').toUpperCase();
+            return t.includes('AHORRO') || t.includes('DEBITO');
+        }));
+        
+        const tieneCorriente = saldoCorriente > 0 || Boolean(cuentas.find(c => {
+            const t = String(c.tipo || '').toUpperCase();
+            return t.includes('CORRIENTE');
+        }));
+
         const itemLeyendaAhorros = document.getElementById('itemLeyendaAhorros');
         const itemLeyendaCorriente = document.getElementById('itemLeyendaCorriente');
 
-        if (itemLeyendaAhorros) {
-            if (tieneAhorros) itemLeyendaAhorros.classList.remove('hidden');
-            else itemLeyendaAhorros.classList.add('hidden');
+        if (itemLeyendaAhorros) itemLeyendaAhorros.classList.toggle('hidden', !tieneAhorros);
+        if (itemLeyendaCorriente) itemLeyendaCorriente.classList.toggle('hidden', !tieneCorriente);
+
+        let pctAhorros = 0;
+        let pctCorriente = 0;
+
+        if (total > 0) {
+            pctAhorros = Math.round((saldoAhorros / total) * 100);
+            pctCorriente = 100 - pctAhorros;
+
+            if (saldoCorriente > 0 && pctCorriente === 0) {
+                pctCorriente = 1;
+                pctAhorros = 99;
+            }
+        } else if (tieneAhorros) {
+            pctAhorros = 100;
         }
-        if (itemLeyendaCorriente) {
-            if (tieneCorriente) itemLeyendaCorriente.classList.remove('hidden');
-            else itemLeyendaCorriente.classList.add('hidden');
+
+        if (elPorcentajeAhorros) elPorcentajeAhorros.textContent = `${pctAhorros}%`;
+        if (elPorcentajeCorriente) elPorcentajeCorriente.textContent = `${pctCorriente}%`;
+
+        if (segAhorros) {
+            segAhorros.style.width = `${pctAhorros}%`;
+            segAhorros.classList.toggle('hidden', !tieneAhorros);
         }
-
-        // Si existe tarjeta de crédito aprobada, mostrar su indicador en la analítica
-        if (credito && itemLeyendaCredito) {
-            itemLeyendaCredito.classList.remove('hidden');
-            if (segCredito) segCredito.classList.remove('hidden');
-
-            const totalConCredito = total + cupoCredito;
-            if (totalConCredito > 0) {
-                const pctAhorros = Math.round((saldoAhorros / totalConCredito) * 100);
-                const pctCorriente = Math.round((saldoCorriente / totalConCredito) * 100);
-                const pctCredito = Math.max(0, 100 - pctAhorros - pctCorriente);
-
-                if (elPorcentajeAhorros) elPorcentajeAhorros.textContent = `${pctAhorros}%`;
-                if (elPorcentajeCorriente) elPorcentajeCorriente.textContent = `${pctCorriente}%`;
-                if (elPorcentajeCredito) elPorcentajeCredito.textContent = `${pctCredito}%`;
-                if (segAhorros) {
-                    segAhorros.style.width = tieneAhorros ? `${pctAhorros}%` : '0%';
-                    segAhorros.classList.toggle('hidden', !tieneAhorros);
-                }
-                if (segCorriente) {
-                    segCorriente.style.width = tieneCorriente ? `${pctCorriente}%` : '0%';
-                    segCorriente.classList.toggle('hidden', !tieneCorriente);
-                }
-                if (segCredito) segCredito.style.width = `${pctCredito}%`;
-            }
-        } else {
-            if (itemLeyendaCredito) itemLeyendaCredito.classList.add('hidden');
-            if (segCredito) {
-                segCredito.classList.add('hidden');
-                segCredito.style.width = '0%';
-            }
-
-            if (segAhorros) {
-                segAhorros.classList.toggle('hidden', !tieneAhorros);
-                segAhorros.style.width = tieneAhorros && !tieneCorriente ? '100%' : (tieneAhorros && total > 0 ? `${Math.round((saldoAhorros / total) * 100)}%` : '0%');
-            }
-            if (segCorriente) {
-                segCorriente.classList.toggle('hidden', !tieneCorriente);
-                segCorriente.style.width = tieneCorriente && !tieneAhorros ? '100%' : (tieneCorriente && total > 0 ? `${Math.round((saldoCorriente / total) * 100)}%` : '0%');
-            }
-
-            const pctAhorros = tieneAhorros ? (total > 0 ? Math.round((saldoAhorros / total) * 100) : (tieneCorriente ? 50 : 100)) : 0;
-            const pctCorriente = tieneCorriente ? (total > 0 ? 100 - pctAhorros : (tieneAhorros ? 50 : 100)) : 0;
-
-            if (elPorcentajeAhorros) elPorcentajeAhorros.textContent = `${pctAhorros}%`;
-            if (elPorcentajeCorriente) elPorcentajeCorriente.textContent = `${pctCorriente}%`;
+        if (segCorriente) {
+            segCorriente.style.width = `${pctCorriente}%`;
+            segCorriente.classList.toggle('hidden', !tieneCorriente);
         }
     };
 
@@ -140,51 +127,61 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 return crearCuentaCard(c, { ocultarSaldo: ocultar });
             } catch (err) {
-                console.error('[Saldos] Error al pintar tarjeta de cuenta:', c, err);
                 return null;
             }
         }).filter(Boolean);
+
         lista.replaceChildren(...nodos);
         actualizarAnalitica();
     };
 
     async function cargar() {
-        estado.classList.add('hidden');
+        if (estado) estado.classList.add('hidden');
         lista.setAttribute('aria-busy', 'true');
-        lista.replaceChildren(...Array.from({ length: 3 }, () => {
-            const s = document.createElement('div');
-            s.className = 'cuenta-card cuenta-card--skeleton';
-            return s;
-        }));
 
         try {
             cuentas = await obtenerCuentas();
-            if (!cuentas.length) {
-                lista.replaceChildren();
-                mostrarEstado('Aún no tienes cuentas asociadas.');
-                actualizarAnalitica();
-            } else {
-                pintarCuentas();
-            }
+            pintarCuentas();
         } catch (err) {
             lista.replaceChildren();
             if (err instanceof SesionExpiradaError) {
                 window.location.href = '../index.html';
                 return;
             }
-            mostrarEstado('No pudimos cargar tus cuentas. Intenta de nuevo.', { reintentar: true });
         } finally {
             lista.setAttribute('aria-busy', 'false');
         }
     }
 
-    btnOjo.addEventListener('click', () => {
-        ocultar = !ocultar;
-        localStorage.setItem(CLAVE_PRIVACIDAD, String(ocultar));
-        pintarOjo();
-        pintarCuentas();
+    document.addEventListener('click', (e) => {
+        const btnToggle = e.target.closest('#toggleSaldos');
+        if (btnToggle) {
+            e.preventDefault();
+            ocultar = !ocultar;
+            localStorage.setItem(CLAVE_PRIVACIDAD, String(ocultar));
+            pintarOjo();
+            pintarCuentas();
+            return;
+        }
+
+        // 🚀 Redirección hacia CreditoSimulador.html accionada por el botón destacado de la Tarjeta de Crédito
+        const btnSimular = e.target.closest('.btn-simular-compra');
+        if (btnSimular) {
+            e.preventDefault();
+            const linkSimulador = document.querySelector('[data-view="simuladortc"]') || 
+                                  document.querySelector('[data-view="SimuladorTC"]') ||
+                                  document.querySelector('a[href*="CreditoSimulador"]');
+            
+            if (linkSimulador) {
+                linkSimulador.click();
+            } else {
+                // Disparo de evento global en caso de no encontrar el enlace en la navegación
+                const eventoNav = new CustomEvent('navegarVista', { detail: { vista: 'simuladortc' } });
+                window.dispatchEvent(eventoNav);
+            }
+        }
     });
 
     pintarOjo();
-    cargar();
-});
+    await cargar();
+}

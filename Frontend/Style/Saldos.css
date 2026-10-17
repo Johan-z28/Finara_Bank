@@ -1,200 +1,309 @@
 @import url('global/styles.css');
 
 /* ==========================================
-   SALDOS Y CUENTAS ASOCIADAS
+   ESTILOS DE LA VISTA SALDOS (FINARA BANK)
    ========================================== */
 
-.main-content h1 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-bottom: 0.3rem;
-    color: var(--text-white);
+.saldos-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+    box-sizing: border-box !important;
 }
 
 .saldos-header {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    margin-bottom: 1.8rem;
+    width: 100%;
 }
 
-.saldos-header-acciones {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.saldos-header h1 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--text-white);
+    margin: 0;
 }
 
 .saldos-subtitle {
     color: var(--text-muted);
     font-size: 0.85rem;
+    margin-top: 4px;
 }
 
-/* Botón de acceso al Historial de Productos */
 .saldos-actions-group {
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
-.btn-historial-productos {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(229, 169, 60, 0.12);
-    color: var(--gold-main);
-    border: 1px solid rgba(229, 169, 60, 0.35);
-    border-radius: var(--radius-btn);
-    padding: 8px 16px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-decoration: none;
-    transition: all 0.25s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.btn-historial-productos:hover {
-    background: var(--gold-main);
-    color: #07090e;
-    border-color: var(--gold-main);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(229, 169, 60, 0.3);
-}
-
-.btn-historial-productos i {
-    font-size: 0.9rem;
-}
-
 .toggle-saldos {
-    background: #07090e;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: var(--text-muted);
-    width: 40px;
-    height: 40px;
-    flex-shrink: 0;
+    background: #0d1017;
+    border: 1px solid rgba(229, 169, 60, 0.3);
+    color: var(--gold-main);
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.toggle-saldos:hover {
-    color: var(--gold-main);
-    border-color: rgba(229, 169, 60, 0.4);
-}
-
-/* ----- Grilla ----- */
-.cuentas-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-    gap: 1.2rem;
-}
-
-/* ----- Card ----- */
-.cuenta-card {
-    --acento: var(--gold-main);
-    background: var(--bg-card-dark);
-    border: 1px solid rgba(229, 169, 60, 0.45);
-    border-radius: var(--radius-lg);
-    padding: 1.4rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.6rem;
-    position: relative;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35), inset 0 0 1px 1px rgba(229, 169, 60, 0.15);
-    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
-}
-
-.cuenta-card:hover {
-    transform: translateY(-4px);
-    border-color: var(--gold-main);
-    box-shadow: 0 8px 30px rgba(229, 169, 60, 0.2), inset 0 0 2px 1px rgba(229, 169, 60, 0.3);
-}
-
-.cuenta-card--ahorros { --acento: #34d399; }
-.cuenta-card--corriente { --acento: #60a5fa; }
-.cuenta-card--tarjeta { --acento: var(--gold-main); }
-
-.cuenta-card__head {
-    display: flex;
-    align-items: center;
-    gap: 0.9rem;
-}
-
-.cuenta-card__icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
+    transition: all 0.25s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--acento);
-    background: color-mix(in srgb, var(--acento) 14%, transparent);
-    font-size: 1.1rem;
+    font-size: 0.95rem;
 }
 
-.cuenta-card__titles {
+.toggle-saldos:hover {
+    background: var(--gold-main);
+    color: #000000;
+    box-shadow: 0 0 12px rgba(229, 169, 60, 0.4);
+}
+
+/* Grilla de Tarjetas de Cuentas */
+.cuentas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+/* Tarjeta Card Wrapper */
+.cuenta-card {
+    background: var(--bg-card-dark, #0f121a);
+    border: 1px solid rgba(229, 169, 60, 0.25);
+    border-radius: 16px;
+    padding: 1.5rem;
     display: flex;
     flex-direction: column;
-    flex: 1;
-    min-width: 0;
+    gap: 1.2rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+}
+
+.cuenta-card:hover {
+    border-color: var(--gold-main);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(229, 169, 60, 0.15);
+}
+
+/* ==========================================
+   ESTILOS DE PLÁSTICOS 100% IDÉNTICOS AL INDEX
+   ========================================== */
+
+.tarjeta-plastico {
+    width: 100%;
+    max-width: 320px;
+    height: 195px;
+    /* Altura fija para mantener la proporción exacta del plástico */
+    border-radius: 16px;
+    padding: 18px 22px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin: 0 auto 12px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease;
+}
+
+.tarjeta-plastico:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 16px 35px rgba(0, 0, 0, 0.7);
+}
+
+.head-tarjeta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.head-tarjeta .logo-svg {
+    height: 22px;
+    width: auto;
+    object-fit: contain;
+}
+
+.head-tarjeta .card-contactless {
+    font-size: 1.1rem;
+    color: #ffffff;
+    transform: rotate(90deg);
+    opacity: 0.9;
+}
+
+.card-chip-area {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 8px 0;
+}
+
+.card-chip-area .chip {
+    width: 38px;
+    height: 26px;
+    background: linear-gradient(135deg, #fce09b 0%, #8a6218 100%);
+    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+
+.card-tag {
+    font-size: 0.85rem;
+    color: #ffffff;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.foot-tarjeta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    width: 100%;
+}
+
+.foot-tarjeta .card-number {
+    font-size: 0.92rem;
+    letter-spacing: 2px;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.foot-tarjeta .card-type {
+    font-size: 1rem;
+    font-weight: 900;
+    font-style: italic;
+    color: #ffffff;
+    letter-spacing: 1px;
+}
+
+/* === COLORES Y TEXTOS DE CADA PLÁSTICO === */
+
+/* 1. Tarjeta Dorada (Ahorros / Débito) */
+.tarjeta-dorada {
+    background: linear-gradient(135deg, #e5a93c 0%, #9e6f1a 100%);
+    border: 1px solid #fce09b;
+}
+
+.tarjeta-dorada .card-number,
+.tarjeta-dorada .card-type,
+.tarjeta-dorada .card-tag,
+.tarjeta-dorada .card-contactless {
+    color: #000000 !important;
+}
+
+/* 2. Tarjeta Platino (Corriente) */
+.tarjeta-platino {
+    background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%);
+    border: 1px solid #ffffff;
+}
+
+.tarjeta-platino .card-number,
+.tarjeta-platino .card-type,
+.tarjeta-platino .card-tag,
+.tarjeta-platino .card-contactless {
+    color: #0f172a !important;
+}
+
+/* 3. Tarjeta Negra (Crédito Gold) */
+.tarjeta-negra {
+    background: linear-gradient(135deg, #1f2533 0%, #0d1017 100%);
+    border: 1px solid #2d3548;
+}
+
+.tarjeta-negra .card-number,
+.tarjeta-negra .card-type,
+.tarjeta-negra .card-tag,
+.tarjeta-negra .card-contactless {
+    color: #ffffff !important;
+}
+
+/* Metadatos y Saldo */
+.cuenta-card__meta-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.cuenta-card__estado-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .cuenta-card__tipo {
-    font-size: 0.95rem;
+    font-size: 1.1rem;
     font-weight: 600;
+    color: var(--text-white);
+    margin: 0;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
 }
 
 .cuenta-card__badge-credito {
-    font-size: 0.65rem;
-    background: rgba(229, 169, 60, 0.2);
+    background: rgba(229, 169, 60, 0.15);
     color: var(--gold-main);
-    border: 1px solid rgba(229, 169, 60, 0.4);
-    border-radius: 4px;
-    padding: 1px 6px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.cuenta-card__numero {
-    color: var(--text-muted);
-    font-size: 0.8rem;
-    letter-spacing: 0.08em;
-    font-variant-numeric: tabular-nums;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    border: 1px solid rgba(229, 169, 60, 0.3);
 }
 
 .cuenta-card__estado {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 500;
     padding: 3px 10px;
-    border-radius: 20px;
+    border-radius: 12px;
+    background: rgba(52, 211, 153, 0.15);
     color: #34d399;
-    background: rgba(52, 211, 153, 0.12);
+    border: 1px solid rgba(52, 211, 153, 0.3);
 }
 
 .cuenta-card__estado--inactiva {
-    color: #ef4444;
-    background: rgba(239, 68, 68, 0.12);
+    background: rgba(248, 113, 113, 0.15);
+    color: #f87171;
+    border-color: rgba(248, 113, 113, 0.3);
 }
 
 .cuenta-card__saldo {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 0.8rem 1rem;
+    border-radius: 10px;
 }
 
+.cuenta-card__saldo-label {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+
+.cuenta-card__valor {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--gold-main);
+}
+
+/* Tarjeta Vinculada / Acciones */
 .cuenta-card__tarjeta-vinculada {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: rgba(18, 21, 28, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 12px;
-    padding: 0.9rem;
+    padding: 1rem;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
-    margin-top: -0.4rem;
+    gap: 0.8rem;
 }
 
 .tarjeta-vinculada__head {
@@ -210,175 +319,105 @@
 }
 
 .tarjeta-vinculada__info i {
+    font-size: 1.2rem;
     color: var(--gold-main);
-    font-size: 1.15rem;
 }
 
 .tarjeta-vinculada__titulo {
     display: block;
-    font-size: 0.8rem;
-    color: #e2e8f0;
+    font-size: 0.88rem;
+    color: var(--text-white);
+    font-weight: 600;
 }
 
 .tarjeta-vinculada__numero {
-    font-size: 0.75rem;
+    font-size: 0.78rem;
     color: var(--text-muted);
     font-family: monospace;
-    letter-spacing: 0.05em;
 }
 
 .tarjeta-vinculada__badge {
-    font-size: 0.65rem;
-    font-weight: 600;
+    font-size: 0.72rem;
     padding: 2px 8px;
-    border-radius: 12px;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
+    border-radius: 8px;
+    font-weight: 500;
 }
 
 .badge--activa {
     background: rgba(52, 211, 153, 0.15);
     color: #34d399;
-    border: 1px solid rgba(52, 211, 153, 0.3);
 }
 
 .badge--bloqueada {
     background: rgba(248, 113, 113, 0.15);
     color: #f87171;
-    border: 1px solid rgba(248, 113, 113, 0.35);
 }
 
 .tarjeta-vinculada__acciones {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
-    width: 100%;
 }
 
 .btn-tarjeta-accion {
+    background: #161a23;
+    border: 1px solid rgba(229, 169, 60, 0.25);
+    color: var(--text-white);
+    padding: 0.6rem;
     border-radius: 8px;
-    padding: 8px 12px;
     font-size: 0.78rem;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
     transition: all 0.2s ease;
-    border: none;
-    font-family: inherit;
-    width: 100%;
 }
 
-.btn-ver-detalles {
+.btn-tarjeta-accion:hover {
     background: rgba(229, 169, 60, 0.12);
+    border-color: var(--gold-main);
     color: var(--gold-main);
-    border: 1px solid rgba(229, 169, 60, 0.35);
-}
-
-.btn-ver-detalles:hover {
-    background: var(--gold-main);
-    color: #07090e;
-}
-
-.btn-bloquear-tarjeta {
-    background: rgba(248, 113, 113, 0.12);
-    color: #f87171;
-    border: 1px solid rgba(248, 113, 113, 0.35);
 }
 
 .btn-bloquear-tarjeta:hover {
-    background: #f87171;
-    color: #07090e;
+    border-color: #f87171;
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.12);
 }
 
 .btn-desbloquear-tarjeta {
-    background: rgba(52, 211, 153, 0.12);
+    border-color: rgba(52, 211, 153, 0.4);
     color: #34d399;
-    border: 1px solid rgba(52, 211, 153, 0.35);
 }
 
 .btn-desbloquear-tarjeta:hover {
-    background: #34d399;
-    color: #07090e;
+    background: rgba(52, 211, 153, 0.15);
 }
 
-.cuenta-card__saldo-label {
-    color: var(--text-muted);
-    font-size: 0.75rem;
-}
-
-.cuenta-card__valor {
-    font-size: 1.6rem;
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
-    overflow-wrap: anywhere;
-}
-
-/* ----- Estados: carga / vacío / error ----- */
-.cuenta-card--skeleton {
-    min-height: 150px;
-    border-top-color: var(--border-dark);
-    animation: pulso 1.2s ease-in-out infinite;
-}
-
-@keyframes pulso {
-    50% { opacity: 0.45; }
-}
-
-.cuentas-estado {
-    text-align: center;
-    color: var(--text-muted);
-    padding: 2.5rem 1rem;
-    border: 1px dashed var(--border-dark);
-    border-radius: var(--radius-lg);
-}
-
-.btn-reintentar {
-    margin-top: 1rem;
-    background: var(--gold-main);
-    color: #07090e;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 8px;
-    font-family: inherit;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.btn-reintentar:hover { background: var(--gold-hover); }
-
-@media (prefers-reduced-motion: reduce) {
-    .cuenta-card, .cuenta-card--skeleton { transition: none; animation: none; }
-}
-
-@media (max-width: 576px) {
-    .cuenta-card__valor { font-size: 1.4rem; }
-}
-
-/* ==========================================
-   SECCIÓN DE ANALÍTICA Y DISTRIBUCIÓN PREMIUM
-   ========================================== */
-
+/* Grilla de Analítica en 2 columnas */
 .saldos-analitica-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 1.4rem;
-    margin-top: 2rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
 }
 
 .analitica-card {
-    background: var(--bg-card-dark);
+    width: 100%;
+    background: var(--bg-card-dark, #0f121a);
     border: 1px solid rgba(229, 169, 60, 0.35);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-lg, 16px);
     padding: 1.6rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     gap: 1.4rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    box-sizing: border-box;
 }
 
 .analitica-card__header {
@@ -392,12 +431,13 @@
     font-size: 1.1rem;
     font-weight: 600;
     color: var(--text-white);
-    margin-bottom: 0.2rem;
+    margin: 0;
 }
 
 .analitica-card__subtitle {
     font-size: 0.8rem;
     color: var(--text-muted);
+    margin-top: 2px;
 }
 
 .badge-gold {
@@ -417,7 +457,6 @@
     gap: 1.2rem;
 }
 
-/* Barra de progreso múltiple elegante */
 .barra-distribucion {
     display: flex;
     height: 14px;
@@ -426,7 +465,8 @@
     border-radius: 10px;
     overflow: hidden;
     padding: 2px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-sizing: border-box;
 }
 
 .barra-segmento {
@@ -452,7 +492,7 @@
 .distribucion-leyenda {
     display: flex;
     flex-direction: column;
-    gap: 0.9rem;
+    gap: 0.8rem;
 }
 
 .leyenda-item {
@@ -460,7 +500,7 @@
     align-items: center;
     gap: 0.8rem;
     background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     padding: 0.75rem 1rem;
     border-radius: 10px;
 }
@@ -472,9 +512,17 @@
     flex-shrink: 0;
 }
 
-.leyenda-dot--ahorros { background: #34d399; }
-.leyenda-dot--corriente { background: #60a5fa; }
-.leyenda-dot--credito { background: #fbbf24; }
+.leyenda-dot--ahorros {
+    background: #34d399;
+}
+
+.leyenda-dot--corriente {
+    background: #60a5fa;
+}
+
+.leyenda-dot--credito {
+    background: #fbbf24;
+}
 
 .leyenda-info {
     display: flex;
@@ -484,11 +532,21 @@
     font-size: 0.85rem;
 }
 
-.leyenda-nombre { color: var(--text-white); font-weight: 500; }
-.leyenda-monto { color: var(--gold-main); font-weight: 600; }
-.leyenda-porcentaje { color: var(--text-muted); font-size: 0.75rem; }
+.leyenda-nombre {
+    color: var(--text-white);
+    font-weight: 500;
+}
 
-/* Tarjeta patrimonio y accesos rápidos */
+.leyenda-monto {
+    color: var(--gold-main);
+    font-weight: 600;
+}
+
+.leyenda-porcentaje {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
 .icono-oro-circulo {
     width: 38px;
     height: 38px;
@@ -509,7 +567,7 @@
     padding: 1.1rem;
     background: linear-gradient(145deg, rgba(229, 169, 60, 0.08) 0%, rgba(18, 21, 28, 0.5) 100%);
     border: 1px solid rgba(229, 169, 60, 0.25);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-lg, 16px);
 }
 
 .patrimonio-label {
@@ -521,7 +579,6 @@
     font-size: 1.8rem;
     font-weight: 700;
     color: var(--text-white);
-    letter-spacing: -0.02em;
 }
 
 .patrimonio-badge {
@@ -566,6 +623,7 @@
     font-size: 0.78rem;
     font-weight: 500;
     transition: all 0.2s ease;
+    cursor: pointer;
 }
 
 .btn-acceso-rapido i {
@@ -575,7 +633,13 @@
 
 .btn-acceso-rapido:hover {
     border-color: var(--gold-main);
-    background: rgba(229, 169, 60, 0.1);
+    background: rgba(229, 169, 60, 0.12);
     transform: translateY(-2px);
     color: var(--gold-main);
+}
+
+@media (max-width: 1000px) {
+    .saldos-analitica-grid {
+        grid-template-columns: 1fr;
+    }
 }

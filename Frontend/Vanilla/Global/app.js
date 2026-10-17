@@ -1,341 +1,307 @@
-// Gestor global de componentes (Sidebar, Navbar, Perfil y Chatbot)
-let procesarMensajeChatbotFn = null;
-import('../chatbotService.js')
-    .then(moduloChat => {
-        if (moduloChat) {
-            procesarMensajeChatbotFn = moduloChat.procesarMensajeChatbot;
+// Vanilla/Global/app.js
+document.addEventListener("DOMContentLoaded", async () => {
+    const getSesion = (key) => {
+        const val = localStorage.getItem(key) || sessionStorage.getItem(key);
+        return (val && val !== "undefined" && val !== "null") ? val : null;
+    };
+
+    const userProfileRaw = getSesion("userProfile");
+    const emailSesion = getSesion("emailSesion");
+    const usuarioLogueadoDirecto = getSesion("usuarioLogueado");
+
+    let usuarioActivo = null;
+    if (userProfileRaw) {
+        try {
+            usuarioActivo = JSON.parse(userProfileRaw);
+        } catch (e) {
+            console.error("Error al parsear userProfile:", e);
         }
-    })
-    .catch(() => {
-        // Si el módulo fue reestructurado o no está en la raíz, se maneja de forma tolerante
-    });
-
-let isGlobalListenersInitialized = false;
-
-export function initGlobalComponents() {
-    updateUserData();
-    highlightActiveMenu();
-    ensureChatbotWidget();
-
-    if (!isGlobalListenersInitialized) {
-        setupGlobalEvents();
-        isGlobalListenersInitialized = true;
     }
-}
 
-/**
- * Asegura que el widget del Chatbot esté presente en cualquier página del ecosistema.
- */
-function ensureChatbotWidget() {
-    if (document.getElementById('chatWidgetContainer')) return;
+    if (!usuarioActivo && !emailSesion && !usuarioLogueadoDirecto) {
+        window.location.href = "../index.html";
+        return;
+    }
 
-    const widgetHTML = `
-    <div id="chatWidgetContainer">
-        <div id="windowChat" class="chatbot-window hidden">
-            <div class="chatbot-header">
-                <div class="chatbot-info">
-                    <div class="bot-avatar-container">
-                        <img src="../Style/image/bot_finara.png" alt="Finara Bot" class="bot-avatar-img">
+    // Identificar si el usuario es Administrador
+    const esAdmin = Boolean(
+        usuarioActivo && (
+            usuarioActivo.username === "finara_banck" ||
+            usuarioActivo.correo === "finara_banck" ||
+            usuarioActivo.rol === "admin"
+        )
+    );
+
+    const nombreUsuario = usuarioActivo?.nombre ||
+        usuarioActivo?.username ||
+        (typeof emailSesion === 'string' ? emailSesion.split('@')[0] : "Usuario");
+
+    const greetingName = document.getElementById("greetingName");
+    if (greetingName) greetingName.textContent = esAdmin ? `${nombreUsuario}` : nombreUsuario;
+
+    const sidebarUserName = document.getElementById("sidebarUserName");
+    if (sidebarUserName) sidebarUserName.textContent = nombreUsuario;
+
+    const mainContent = document.getElementById("mainContent");
+    const sidebar = document.getElementById("sidebar");
+    const menuToggle = document.getElementById("menuToggle");
+    const sidebarBackdrop = document.getElementById("sidebarBackdrop");
+    const sidebarCollapseBtn = document.getElementById("sidebarCollapseBtn");
+    const mainWrapper = document.querySelector(".main-wrapper");
+
+    // 🛡️ RECONFIGURACIÓN DEL MENÚ SIDEBAR Y NAVBAR SEGÚN ROL
+    const sidebarNavUl = document.querySelector(".sidebar-nav ul");
+    if (sidebarNavUl) {
+        if (esAdmin) {
+            // 1. Ocultar todas las opciones de usuario cliente del menú
+            const vistasOcultar = ["dashboard", "saldos", "transferencias", "consignar", "retiros", "movimientos", "simuladortc"];
+            vistasOcultar.forEach(vista => {
+                const item = sidebarNavUl.querySelector(`[data-view="${vista}"]`)?.closest('li');
+                if (item) item.style.display = 'none';
+            });
+
+            // 2. Ocultar el botón "Solicitar Producto" del footer del Sidebar
+            const btnSolicitar = document.querySelector('.btn-solicitar-sidebar');
+            if (btnSolicitar) btnSolicitar.style.display = 'none';
+
+            // 3. Ocultar opción de "Ver perfil" en el navbar superior para el Admin
+            const btnPerfilNavbar = document.querySelector('.btn-perfil-navbar');
+            if (btnPerfilNavbar) {
+                btnPerfilNavbar.style.display = 'none';
+            }
+
+            // 4. Crear e insertar el botón "Administración" como la única opción disponible
+            if (!document.querySelector('[data-view="admindashboard"]')) {
+                const adminLi = document.createElement("li");
+                adminLi.className = "nav-item";
+                adminLi.innerHTML = `
+                    <a href="#" class="nav-link active" data-view="admindashboard" title="Administración">
+                        <i class="fa-solid fa-users-gear" style="color: #e5a93c;"></i>
+                        <span>Administración</span>
+                    </a>
+                `;
+                sidebarNavUl.insertBefore(adminLi, sidebarNavUl.firstChild);
+            }
+        }
+    }
+
+    if (sidebarCollapseBtn && sidebar && mainWrapper) {
+        sidebarCollapseBtn.addEventListener("click", () => {
+            sidebar.classList.toggle("collapsed");
+            mainWrapper.classList.toggle("expanded");
+        });
+    }
+
+    const cargarVista = async (nombreVista) => {
+        try {
+            const vistaMin = nombreVista.toLowerCase();
+
+            // Protección de rutas: Acceso a Administración
+            if ((vistaMin === "admindashboard" || vistaMin === "admin-dashboard") && !esAdmin) {
+                mainContent.innerHTML = `
+                    <div style="text-align: center; padding: 4rem 1rem;">
+                        <i class="fa-solid fa-user-shield" style="font-size: 3.5rem; color: #f87171; margin-bottom: 1rem;"></i>
+                        <h2 style="color: var(--text-white); margin-bottom: 0.5rem;">Acceso Restringido</h2>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Esta sección requiere privilegios de administrador.</p>
                     </div>
-                    <div>
-                        <h6>Asistente Finara</h6>
-                        <small class="status-online">• En línea</small>
+                `;
+                return;
+            }
+
+            // Bloquear acceso a perfil si es Admin
+            if (vistaMin === "perfil" && esAdmin) {
+                mainContent.innerHTML = `
+                    <div style="text-align: center; padding: 4rem 1rem;">
+                        <i class="fa-solid fa-user-gear" style="font-size: 3.5rem; color: #e5a93c; margin-bottom: 1rem;"></i>
+                        <h2 style="color: var(--text-white); margin-bottom: 0.5rem;">Panel de Administración Activo</h2>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">La cuenta de Administrador gestiona el sistema globalmente y no requiere un perfil de cliente.</p>
                     </div>
-                </div>
-                <button id="btnCloseChat" class="close-chat-btn" aria-label="Cerrar chat">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-
-            <div id="chatBody" class="chatbot-body">
-                <div class="chat-bubble bot-bubble">
-                    ¡Hola! 👋 Soy tu asistente virtual de <strong>Finara Bank</strong>. ¿En qué puedo orientarte hoy?
-                </div>
-            </div>
-
-            <div class="chat-input-bar">
-                <input type="text" id="chatInputText" class="chat-input-field" placeholder="Escribe tu consulta (ej: horarios)..." />
-                <button id="chatSendBtn" class="chat-send-btn" title="Enviar"><i class="fa-solid fa-paper-plane"></i></button>
-            </div>
-
-            <div class="chatbot-footer" id="chatOptions">
-                <button class="option-btn highlight-btn" data-action="horarios">🕒 Horarios de Atención</button>
-                <button class="option-btn" data-action="consultar">🔍 Revisar Saldo</button>
-                <button class="option-btn" data-action="transferir">💸 Enviar Dinero</button>
-                <button class="option-btn" data-action="menu_principal">🔄 Ayuda General</button>
-            </div>
-        </div>
-
-        <button id="btnToggleChat" class="chatbot-float-btn" title="Asistente Virtual Finara">
-            <img src="../Style/image/bot_finara.png" alt="Finara Bot" class="float-btn-img">
-        </button>
-    </div>
-    `;
-
-    document.body.insertAdjacentHTML('beforeend', widgetHTML);
-}
-
-/**
- * Carga e inyecta los datos del usuario en el Navbar desde LocalStorage
- */
-function updateUserData() {
-    let storedUserName = localStorage.getItem('userName');
-    let storedUserAvatar = localStorage.getItem('userAvatar');
-
-    if (!storedUserName || storedUserName === 'Sin Nombre' || storedUserName === 'Usuario') {
-        try {
-            const perfil = JSON.parse(localStorage.getItem('userProfile'));
-            if (perfil && (perfil.nombre || perfil.username)) {
-                storedUserName = perfil.nombre || perfil.username;
-                if (!storedUserAvatar) storedUserAvatar = perfil.avatar;
+                `;
+                return;
             }
-        } catch {}
-    }
 
-    if (!storedUserName || storedUserName === 'Sin Nombre' || storedUserName === 'Usuario') {
-        try {
-            const usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo'));
-            if (usuarioActivo && (usuarioActivo.nombre || usuarioActivo.username)) {
-                storedUserName = usuarioActivo.nombre || usuarioActivo.username;
-                if (!storedUserAvatar) storedUserAvatar = usuarioActivo.avatar;
-            }
-        } catch {}
-    }
-
-    if (!storedUserName || storedUserName === 'Sin Nombre' || storedUserName === 'Usuario') {
-        try {
-            const emailLogueado = localStorage.getItem('usuarioLogueado') || localStorage.getItem('emailSesion');
-            const usuarios = JSON.parse(localStorage.getItem('finara_usuarios_local')) || [];
-            if (emailLogueado && usuarios.length > 0) {
-                const encontrado = usuarios.find(u => u.correo === emailLogueado || u.username === emailLogueado);
-                if (encontrado && (encontrado.nombre || encontrado.username)) {
-                    storedUserName = encontrado.nombre || encontrado.username;
-                    if (!storedUserAvatar) storedUserAvatar = encontrado.avatar;
-                }
-            } else if (usuarios.length > 0) {
-                // Último usuario registrado en el sistema local
-                const ultimo = usuarios[usuarios.length - 1];
-                if (ultimo && (ultimo.nombre || ultimo.username)) {
-                    storedUserName = ultimo.nombre || ultimo.username;
-                    if (!storedUserAvatar) storedUserAvatar = ultimo.avatar;
-                }
-            }
-        } catch {}
-    }
-
-    if (!storedUserName || storedUserName === 'Sin Nombre') {
-        storedUserName = 'Usuario';
-    }
-
-    const greetingName = document.getElementById('greetingName');
-    const dropdownUserName = document.getElementById('dropdownUserName');
-
-    if (greetingName) greetingName.textContent = storedUserName;
-    if (dropdownUserName) dropdownUserName.textContent = storedUserName;
-
-    const userAvatarImg = document.getElementById('userAvatarImg');
-    const userAvatarIcon = document.getElementById('userAvatarIcon');
-
-    if (userAvatarImg && userAvatarIcon) {
-        if (storedUserAvatar && storedUserAvatar.trim() !== '') {
-            userAvatarImg.src = storedUserAvatar;
-            userAvatarImg.classList.remove('hidden');
-            userAvatarIcon.classList.add('hidden');
-        } else {
-            userAvatarImg.classList.add('hidden');
-            userAvatarIcon.classList.remove('hidden');
-        }
-    }
-}
-
-/**
- * Detecta en qué archivo .html está el navegador y resalta el enlace activo en el Sidebar
- */
-function highlightActiveMenu() {
-    const currentPage = window.location.pathname.split('/').pop().toLowerCase();
-
-    document.querySelectorAll('.sidebar-nav a').forEach(link => {
-        const linkPage = link.getAttribute('href').split('/').pop().toLowerCase();
-        if (linkPage === currentPage) {
-            link.classList.add('active');
-        } else {
-            link.classList.remove('active');
-        }
-    });
-}
-
-/**
- * Maneja el envío y procesamiento de mensajes del Chatbot (HU-36)
- */
-function enviarMensajeChat(texto) {
-    if (!texto || !texto.trim()) return;
-
-    const chatBody = document.getElementById('chatBody');
-    const chatInput = document.getElementById('chatInputText');
-    const chatOptions = document.getElementById('chatOptions');
-    if (!chatBody) return;
-
-    // 1. Mensaje del usuario
-    const userBubble = document.createElement('div');
-    userBubble.className = 'chat-bubble';
-    userBubble.style.alignSelf = 'flex-end';
-    userBubble.style.background = 'var(--gold-main)';
-    userBubble.style.color = '#000000';
-    userBubble.style.fontWeight = '600';
-    userBubble.textContent = texto.trim();
-    chatBody.appendChild(userBubble);
-    chatBody.scrollTop = chatBody.scrollHeight;
-
-    if (chatInput) chatInput.value = '';
-
-    // 2. Respuesta del bot procesada mediante el servicio de intenciones (HU-36)
-    setTimeout(() => {
-        let respuesta = {
-            html: 'Hola. Nuestro asesor virtual está disponible para orientarte sobre los productos y servicios de Finara Bank.',
-            opcionesSiguientes: [
-                { accion: 'consultar', texto: '🔍 Revisar Saldo' },
-                { accion: 'transferir', texto: '💸 Enviar Dinero' }
-            ]
-        };
-
-        if (typeof procesarMensajeChatbotFn === 'function') {
-            try {
-                respuesta = procesarMensajeChatbotFn(texto);
-            } catch {
-                // Fallback por defecto
-            }
-        }
-
-        const botBubble = document.createElement('div');
-        botBubble.className = 'chat-bubble bot-bubble';
-        botBubble.innerHTML = respuesta.html;
-        chatBody.appendChild(botBubble);
-        chatBody.scrollTop = chatBody.scrollHeight;
-
-        // Actualizar opciones rápidas disponibles
-        if (chatOptions && respuesta.opcionesSiguientes) {
-            chatOptions.innerHTML = respuesta.opcionesSiguientes.map(op => `
-                <button class="option-btn ${op.accion === 'horarios' ? 'highlight-btn' : ''}" data-action="${op.accion}">${op.texto}</button>
-            `).join('');
-        }
-    }, 300);
-}
-
-/**
- * Eventos del Layout (Sidebar, Navbar, Perfil y Chatbot)
- */
-function setupGlobalEvents() {
-    document.addEventListener('click', (e) => {
-        const sidebar = document.querySelector('.sidebar');
-        const mainWrapper = document.querySelector('.main-wrapper');
-        const profileDropdown = document.getElementById('profileDropdown');
-        const windowChat = document.getElementById('windowChat');
-
-        // A. Toggle Sidebar (Escritorio / Móvil)
-        const sidebarCollapseBtn = e.target.closest('#sidebarCollapseBtn');
-        if (sidebarCollapseBtn) {
-            e.preventDefault();
-            if (sidebar) {
-                if (window.innerWidth > 992) {
-                    sidebar.classList.toggle('collapsed');
-                    if (mainWrapper) mainWrapper.classList.toggle('expanded');
-                } else {
-                    sidebar.classList.toggle('open');
-                }
-            }
-            return;
-        }
-
-        // B. Botón Hamburguesa Móvil
-        const mobileMenuBtn = e.target.closest('#mobileMenuBtn');
-        if (mobileMenuBtn) {
-            e.preventDefault();
-            if (sidebar) sidebar.classList.toggle('open');
-            return;
-        }
-
-        // C. Abrir / Cerrar Desplegable de Perfil
-        const profileBtn = e.target.closest('#profileMenuBtn');
-        if (profileBtn) {
-            e.preventDefault();
-            if (profileDropdown) profileDropdown.classList.toggle('active');
-            return;
-        }
-
-        // Clic fuera del perfil para cerrarlo
-        if (profileDropdown && profileDropdown.classList.contains('active')) {
-            if (!e.target.closest('.profile-menu-container')) {
-                profileDropdown.classList.remove('active');
-            }
-        }
-
-        // D. Abrir / Cerrar Chatbot
-        const openChatNavBtn = e.target.closest('#openChatbotNavBtn');
-        const floatChatBtn = e.target.closest('#btnToggleChat');
-        const closeChatBtn = e.target.closest('#btnCloseChat');
-
-        if (openChatNavBtn || floatChatBtn) {
-            e.preventDefault();
-            if (windowChat) {
-                windowChat.classList.toggle('hidden');
-                if (!windowChat.classList.contains('hidden')) {
-                    const inp = document.getElementById('chatInputText');
-                    if (inp) inp.focus();
-                }
-            }
-            return;
-        }
-
-        if (closeChatBtn) {
-            e.preventDefault();
-            if (windowChat) windowChat.classList.add('hidden');
-            return;
-        }
-
-        // E. Opciones rápidas del Chatbot (HU-36)
-        const btnOpcionChat = e.target.closest('.option-btn');
-        if (btnOpcionChat && btnOpcionChat.closest('#chatWidgetContainer')) {
-            e.preventDefault();
-            const action = btnOpcionChat.getAttribute('data-action');
-            if (action === 'horarios') {
-                enviarMensajeChat('¿Cuáles son los horarios de atención?');
-            } else if (action === 'consultar') {
-                enviarMensajeChat('¿Cómo consulto mi saldo?');
-            } else if (action === 'transferir') {
-                enviarMensajeChat('¿Cómo realizar una transferencia?');
-            } else if (action === 'menu_principal') {
-                enviarMensajeChat('Hola');
+            // Mapeo dinámico de vistas HTML
+            let urlFetch = "";
+            if (vistaMin === "admindashboard" || vistaMin === "admin-dashboard") {
+                urlFetch = "/Frontend/Pages/Admin/admin-dashboard.html";
             } else {
-                enviarMensajeChat(btnOpcionChat.textContent);
+                const mapaVistas = {
+                    dashboard: 'views/Dashboard.html',
+                    saldos: 'views/Saldos.html',
+                    transferencias: 'views/Transferencias.html',
+                    consignar: 'views/Consignar.html',
+                    retiros: 'views/Retiros.html',
+                    solicitarproductos: 'views/SolicitarProductos.html',
+                    movimientos: 'views/Movimientos.html',
+                    perfil: 'views/Perfil.html',
+                    simuladortc: 'views/CreditoSimulador.html'
+                };
+                const archivoVista = mapaVistas[vistaMin] || `views/${nombreVista}.html`;
+                urlFetch = `/Frontend/Pages/${archivoVista}`;
             }
-            return;
-        }
 
-        // F. Botón Enviar mensaje del Chatbot
-        const chatSendBtn = e.target.closest('#chatSendBtn');
-        if (chatSendBtn) {
+            const respuesta = await fetch(urlFetch);
+
+            if (!respuesta.ok) {
+                throw new Error(`No se encontró la vista en: ${urlFetch}`);
+            }
+
+            const htmlContenido = await respuesta.text();
+            mainContent.innerHTML = htmlContenido;
+
+            // Inicialización de controladores JS según la vista activa
+            switch (vistaMin) {
+                case "dashboard":
+                    try {
+                        const modDash = await import('../Dashboard.js');
+                        if (modDash.initDashboardView) await modDash.initDashboardView();
+                    } catch (err) { }
+                    break;
+
+                case "saldos":
+                    try {
+                        const modSaldos = await import('../Saldos.js');
+                        if (modSaldos.initSaldosView) await modSaldos.initSaldosView();
+                    } catch (err) { }
+                    break;
+
+                case "admindashboard":
+                case "admin-dashboard":
+                    try {
+                        const modAdmin = await import('../AdminCall/Admin.js');
+                        if (modAdmin.initAdminView) await modAdmin.initAdminView();
+                    } catch (err) {
+                        console.warn("Módulo Admin.js:", err);
+                    }
+                    break;
+
+                case "solicitarproductos":
+                    try {
+                        const modSolicitar = await import('../newCard.js');
+                        if (modSolicitar.initSolicitarProductosView) await modSolicitar.initSolicitarProductosView();
+                    } catch (err) { }
+                    break;
+
+                case "perfil":
+                    try {
+                        const modPerfil = await import('../Perfil.js');
+                        if (modPerfil.initPerfilView) await modPerfil.initPerfilView();
+                    } catch (err) {
+                        console.warn("Módulo Perfil.js:", err);
+                    }
+                    break;
+
+                case "consignar":
+                    try {
+                        const modConsignar = await import('../Consignar.js');
+                        if (modConsignar.initConsignarView) await modConsignar.initConsignarView();
+                    } catch (err) {
+                        console.warn("Módulo Consignar.js:", err);
+                    }
+                    break;
+
+                case "movimientos":
+                    try {
+                        const modMovimientos = await import('../Movimientos.js');
+                        if (modMovimientos.initMovimientosView) await modMovimientos.initMovimientosView();
+                    } catch (err) {
+                        console.warn("Módulo Movimientos.js:", err);
+                    }
+                    break;
+
+                case "retiros":
+                    try {
+                        const modRetiros = await import('../Retiros.js');
+                        if (modRetiros.initRetirosView) await modRetiros.initRetirosView();
+                    } catch (err) {
+                        console.warn("Módulo Retiros.js:", err);
+                    }
+                    break;
+
+                case "transferencias":
+                    try {
+                        const modTransferencias = await import('../Transferencias.js');
+                        if (modTransferencias.initTransferenciasView) await modTransferencias.initTransferenciasView();
+                    } catch (err) {
+                        console.warn("Módulo Transferencias.js:", err);
+                    }
+                    break;
+
+                case "simuladortc":
+                    try {
+                        const modSim = await import('../SimuladorTC.js');
+                        if (modSim.initSimuladorTCView) await modSim.initSimuladorTCView();
+                    } catch (err) {
+                        console.warn("Módulo SimuladorTC.js:", err);
+                    }
+                    break;
+            }
+
+        } catch (error) {
+            console.error("Error Router SPA:", error);
+            mainContent.innerHTML = `
+                <div style="text-align: center; padding: 4rem 1rem;">
+                    <i class="fa-solid fa-triangle-exclamation" style="font-size: 3rem; color: #f87171; margin-bottom: 1rem;"></i>
+                    <h2 style="color: var(--text-white); margin-bottom: 0.5rem;">Módulo en construcción</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">El módulo (${nombreVista}) estará disponible próximamente.</p>
+                </div>
+            `;
+        }
+    };
+
+    const marcarItemActivo = (vistaDestino) => {
+        document.querySelectorAll("[data-view]").forEach(el => {
+            el.classList.remove("active", "is-active");
+        });
+
+        document.querySelectorAll(`[data-view="${vistaDestino}"]`).forEach(el => {
+            el.classList.add("active", "is-active");
+        });
+    };
+
+    document.addEventListener("click", (e) => {
+        const link = e.target.closest("[data-view]");
+        if (link) {
             e.preventDefault();
-            const input = document.getElementById('chatInputText');
-            if (input) enviarMensajeChat(input.value);
-            return;
-        }
+            const vistaDestino = link.getAttribute("data-view");
+            if (!vistaDestino) return;
 
-        // G. Clic fuera del sidebar en móviles
-        if (window.innerWidth <= 992 && sidebar && sidebar.classList.contains('open')) {
-            if (!sidebar.contains(e.target) && !e.target.closest('#mobileMenuBtn')) {
-                sidebar.classList.remove('open');
-            }
+            marcarItemActivo(vistaDestino);
+            cargarVista(vistaDestino);
         }
     });
 
-    // Enter para enviar mensaje en el Chatbot
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            const chatInput = document.getElementById('chatInputText');
-            if (chatInput && document.activeElement === chatInput) {
-                e.preventDefault();
-                enviarMensajeChat(chatInput.value);
-            }
-        }
-    });
-}
+    if (menuToggle && sidebar && sidebarBackdrop) {
+        menuToggle.addEventListener("click", () => {
+            const isOpen = sidebar.classList.toggle("is-open");
+            sidebarBackdrop.classList.toggle("hidden", !isOpen);
+        });
+        sidebarBackdrop.addEventListener("click", () => {
+            sidebar.classList.remove("is-open");
+            sidebarBackdrop.classList.add("hidden");
+        });
+    }
+
+    // 🔒 CIERRE DE SESIÓN SEGURO
+    const btnCerrarSesion = document.getElementById("btnCerrarSesion");
+    if (btnCerrarSesion) {
+        btnCerrarSesion.addEventListener("click", (e) => {
+            e.preventDefault();
+
+            localStorage.removeItem("userProfile");
+            localStorage.removeItem("emailSesion");
+            localStorage.removeItem("usuarioLogueado");
+
+            sessionStorage.removeItem("userProfile");
+            sessionStorage.removeItem("emailSesion");
+            sessionStorage.removeItem("usuarioLogueado");
+
+            window.location.href = "../index.html";
+        });
+    }
+
+    // Inicializar directo en Administración si es Admin
+    const vistaInicial = esAdmin ? "admindashboard" : "dashboard";
+    marcarItemActivo(vistaInicial);
+    cargarVista(vistaInicial);
+});
