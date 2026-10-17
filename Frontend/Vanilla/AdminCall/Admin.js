@@ -1,4 +1,32 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // 0. GUARDIA DE SEGURIDAD (HU-02.2): Impedir acceso directo sin login previo
+    const CLAVE_ADMIN_AUTH = 'finara_admin_auth';
+    let sesionAdmin = null;
+    try {
+        sesionAdmin = JSON.parse(localStorage.getItem(CLAVE_ADMIN_AUTH));
+    } catch {
+        sesionAdmin = null;
+    }
+
+    if (!sesionAdmin || sesionAdmin.rol !== 'ADMIN') {
+        if (window.Swal) {
+            Swal.fire({
+                background: '#12151c',
+                color: '#ffffff',
+                confirmButtonColor: '#e5a93c',
+                icon: 'warning',
+                title: 'Acceso Restringido',
+                text: 'Debes iniciar sesión con credenciales de administrador para ingresar al panel de control.',
+                confirmButtonText: 'Ir al Login de Admin'
+            }).then(() => {
+                window.location.href = '../formulario/Login.html?admin=true';
+            });
+        } else {
+            window.location.href = '../formulario/Login.html?admin=true';
+        }
+        return;
+    }
+
     // 1. Comportamiento del Sidebar
     const sidebar = document.getElementById('sidebar');
     const mainWrapper = document.getElementById('mainWrapper');
@@ -415,7 +443,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (cerrarSesionBtn) {
         cerrarSesionBtn.addEventListener('click', () => {
-            window.location.href = '../../index.html';
+            // Eliminar token de sesión de administrador
+            localStorage.removeItem('finara_admin_auth');
+            if (window.Swal) {
+                Swal.fire({
+                    background: '#12151c',
+                    color: '#ffffff',
+                    confirmButtonColor: '#e5a93c',
+                    icon: 'info',
+                    title: 'Sesión Finalizada',
+                    text: 'Has cerrado la sesión de administración de forma segura.',
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = '../formulario/Login.html?admin=true';
+                });
+            } else {
+                window.location.href = '../formulario/Login.html?admin=true';
+            }
         });
     }
 
