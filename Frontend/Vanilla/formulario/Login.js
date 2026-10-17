@@ -5,6 +5,14 @@ const CLAVE_USUARIOS = "finara_usuarios_local";   // lo escribe signup.js
 const CLAVE_SESION = "userProfile";               // lo leen Dashboard/Perfil
 const CLAVE_CONTROL = "finara_login_control";     // { cuenta: { intentos, bloqueadoHasta } }
 const RUTA_DASHBOARD = "../Dashboard.html";       // Pages/formulario -> Pages/Dashboard.html
+const RUTA_ADMIN_DASHBOARD = "../Admin/admin-dashboard.html"; // Pages/formulario -> Pages/Admin/admin-dashboard.html
+const CLAVE_ADMIN_AUTH = "finara_admin_auth";
+
+// Credenciales fijas de administración (HU-02.2)
+const ADMIN_CREDENTIALS = {
+    username: "finara_banck",
+    password: "123456777"
+};
 
 // Estilo base de todas las alertas (igual al formulario de registro)
 const ESTILO_SWAL = {
@@ -196,6 +204,76 @@ document.addEventListener("DOMContentLoaded", () => {
     const loginForm = document.getElementById("loginForm");
     const inputUsuario = document.getElementById("usuario");
     const inputPassword = document.getElementById("password");
+    const loginRole = document.getElementById("loginRole");
+    const tabCliente = document.getElementById("tabCliente");
+    const tabAdmin = document.getElementById("tabAdmin");
+    const formHeaderIcon = document.getElementById("formHeaderIcon");
+    const formHeaderTitle = document.getElementById("formHeaderTitle");
+    const formHeaderSubtitle = document.getElementById("formHeaderSubtitle");
+    const submitBtn = loginForm ? loginForm.querySelector(".login-button") : null;
+    const registerLinkWrapper = document.querySelector(".register-link");
+    const forgotPasswordLink = document.getElementById("forgotPassword");
+
+    // Modalidad de acceso: CLIENTE vs ADMINISTRADOR (HU-02.2)
+    function cambiarModalidadAcceso(rol) {
+        if (!loginRole) return;
+        loginRole.value = rol;
+
+        const esAdmin = rol === "ADMIN";
+
+        if (tabCliente && tabAdmin) {
+            tabCliente.classList.toggle("activo", !esAdmin);
+            tabCliente.setAttribute("aria-selected", !esAdmin ? "true" : "false");
+            tabAdmin.classList.toggle("activo", esAdmin);
+            tabAdmin.setAttribute("aria-selected", esAdmin ? "true" : "false");
+        }
+
+        if (formHeaderIcon) {
+            formHeaderIcon.className = esAdmin ? "form-icon form-icon--admin" : "form-icon";
+            formHeaderIcon.innerHTML = esAdmin
+                ? '<i class="fa-solid fa-user-shield"></i>'
+                : '<i class="fa-solid fa-right-to-bracket"></i>';
+        }
+
+        if (formHeaderTitle) {
+            formHeaderTitle.textContent = esAdmin ? "Acceso de Administrador" : "Iniciar sesión";
+        }
+
+        if (formHeaderSubtitle) {
+            formHeaderSubtitle.textContent = esAdmin
+                ? "Ingresa tus credenciales maestras de administración Finara Bank."
+                : "Ingresa tu usuario y contraseña para acceder a tu cuenta.";
+        }
+
+        if (submitBtn) {
+            submitBtn.className = esAdmin ? "login-button login-button--admin" : "login-button";
+            submitBtn.querySelector("span").textContent = esAdmin ? "Ingresar al Panel Admin" : "Iniciar sesión";
+        }
+
+        if (registerLinkWrapper) {
+            registerLinkWrapper.style.display = esAdmin ? "none" : "flex";
+        }
+
+        if (forgotPasswordLink) {
+            forgotPasswordLink.style.display = esAdmin ? "none" : "block";
+        }
+
+        inputUsuario.value = "";
+        inputPassword.value = "";
+        inputUsuario.placeholder = esAdmin ? "Ej. finara_banck" : "Ej. yull_mesa";
+        inputUsuario.focus();
+    }
+
+    if (tabCliente && tabAdmin) {
+        tabCliente.addEventListener("click", () => cambiarModalidadAcceso("CLIENTE"));
+        tabAdmin.addEventListener("click", () => cambiarModalidadAcceso("ADMIN"));
+    }
+
+    // Si viene con parámetro ?admin=true en la URL, abrir pestaña de admin directamente
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("admin") === "true") {
+        cambiarModalidadAcceso("ADMIN");
+    }
 
     if (loginForm) {
         loginForm.addEventListener("submit", function (event) {
@@ -204,6 +282,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // El campo nunca se bloquea: se puede escribir, copiar y pegar siempre
             const nombreUsuario = inputUsuario.value.trim().replace(/^@/, "");
             const password = inputPassword.value;
+            const esModoAdmin = loginRole ? loginRole.value === "ADMIN" : false;
 
             // 1. Campos vacíos
             if (!nombreUsuario || !password) {
@@ -211,7 +290,48 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            // 2. Usuarios guardados por el registro (localStorage)
+            // =========================================================
+            // 2. ACCESO EXCLUSIVO ADMINISTRADOR (HU-02.2)
+            // =========================================================
+            if (esModoAdmin) {
+                if (nombreUsuario === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+                    // Guardar token/sesión de autenticación de administrador
+                    const sesionAdmin = {
+                        rol: "ADMIN",
+                        username: ADMIN_CREDENTIALS.username,
+                        nombre: "Administrador Finara",
+                        fechaLogin: new Date().toISOString()
+                    };
+                    guardarJSON(CLAVE_ADMIN_AUTH, sesionAdmin);
+
+                    Swal.fire({
+                        ...ESTILO_SWAL,
+                        icon: "success",
+                        title: "¡Credenciales de Administrador Válidas!",
+                        text: "Accediendo al Panel de Control y Administración...",
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = RUTA_ADMIN_DASHBOARD;
+                    });
+                } else {
+                    inputPassword.value = "";
+                    Swal.fire({
+                        ...ESTILO_SWAL,
+                        icon: "error",
+                        title: "Credenciales de Administrador Incorrectas",
+                        text: "El usuario o la contraseña de administración son inválidos. Por favor, verifica tus datos de acceso.",
+                        confirmButtonText: "Intentar de nuevo"
+                    }).then(() => {
+                        inputPassword.focus();
+                    });
+                }
+                return;
+            }
+
+            // =========================================================
+            // 3. ACCESO CLIENTE CONVENCIONAL
+            // =========================================================
             const usuarios = obtenerUsuarios();
 
             if (usuarios.length === 0) {
@@ -224,7 +344,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const clave = claveDeCuenta(nombreUsuario);
             const estado = estadoCuenta(clave);
 
-            // 3. ¿Esta cuenta está bloqueada? (las demás cuentas siguen funcionando)
+            // ¿Esta cuenta está bloqueada? (las demás cuentas siguen funcionando)
             if (estado.bloqueadoHasta > Date.now()) {
                 inputPassword.value = "";
                 alertaCuentaBloqueada(estado.bloqueadoHasta, false)
@@ -232,7 +352,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            // 4. Credenciales correctas
+            // Credenciales correctas
             if (usuarioExistente && getPassword(usuarioExistente) === password) {
                 limpiarEstadoCuenta(clave);
 
@@ -264,7 +384,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            // 5. Usuario o contraseña incorrectos: sumar intento y avisar
+            // Usuario o contraseña incorrectos: sumar intento y avisar
             const intentos = estado.intentos + 1;
             inputPassword.value = "";
 
