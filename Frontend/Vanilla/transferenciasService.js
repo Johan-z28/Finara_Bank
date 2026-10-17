@@ -25,6 +25,8 @@ export const TIPOS = {
 const SOBREGIRO = 0.20; // 20% adicional sobre el saldo, solo en Cuenta Corriente
 const TOPE_AVANCE_CREDITO = 0.50; // Hasta 50% del cupo disponible para avances de TC
 
+export const COMISION_INTERBANCARIA = 6500; // Comisión estándar red interbancaria (ACH)
+
 export const formatoCOP = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
 
 // Lo que el usuario puede mover:
@@ -41,7 +43,7 @@ export function calcularDisponible(cuenta) {
 }
 
 // ----- Validación (función pura: se usa antes de confirmar y otra vez al ejecutar) -----
-export function validarTransferencia({ origen, destino, monto }) {
+export function validarTransferencia({ origen, destino, monto, esInterbancaria = false }) {
     if (!origen) return { ok: false, campo: 'origen', mensaje: 'Selecciona la cuenta de origen.' };
     if (origen.bloqueada || origen.estado === 'BLOQUEADA' || (origen.tarjetaAsociada && origen.tarjetaAsociada.bloqueada)) {
         return {
@@ -51,28 +53,49 @@ export function validarTransferencia({ origen, destino, monto }) {
         };
     }
     if (!destino) return { ok: false, campo: 'destino', mensaje: 'Ingresa y valida la cuenta de destino antes de continuar.' };
-    if (destino.bloqueada || destino.estado === 'BLOQUEADA') {
-        return {
-            ok: false,
-            campo: 'destino',
-            mensaje: 'La cuenta de destino se encuentra bloqueada temporalmente y no puede recibir transferencias.'
-        };
-    }
-    if (!Number.isFinite(monto) || monto <= 0) return { ok: false, campo: 'monto', mensaje: 'Ingresa un monto mayor a cero.' };
-    if (destino.id === origen.id && destino.esPropia) {
-        return { ok: false, campo: 'destino', mensaje: 'No puedes transferir al mismo producto de origen.' };
-    }
-    const disponible = calcularDisponible(origen);
-    if (monto > disponible) {
-        if (origen.tipo === 'TARJETA_CREDITO') {
-            return { ok: false, campo: 'monto', mensaje: `Excede el cupo máximo para avances (50% del cupo: ${formatoCOP.format(disponible)}).` };
+
+    if (esInterbancaria) {
+        if (!destino.banco) return { ok: false, campo: 'banco', mensaje: 'Selecciona la entidad bancaria de destino.' };
+        if (!destino.titular || destino.titular.trim().length < 3) {
+            return { ok: false, campo: 'beneficiario', mensaje: 'Ingresa el nombre completo del beneficiario.' };
         }
-        return { ok: false, campo: 'monto', mensaje: `Saldo insuficiente. Disponible: ${formatoCOP.format(disponible)}.` };
+        if (!destino.documento || destino.documento.trim().length < 5) {
+            return { ok: false, campo: 'documento', mensaje: 'Ingresa un documento de identidad válido del beneficiario.' };
+        }
+    } else {
+        if (destino.bloqueada || destino.estado === 'BLOQUEADA') {
+            return {
+                ok: false,
+                campo: 'destino',
+                mensaje: 'La cuenta de destino se encuentra bloqueada temporalmente y no puede recibir transferencias.'
+            };
+        }
+        if (destino.id === origen.id && destino.esPropia) {
+            return { ok: false, campo: 'destino', mensaje: 'No puedes transferir al mismo producto de origen.' };
+        }
     }
+
+    if (!Number.isFinite(monto) || monto <= 0) return { ok: false, campo: 'monto', mensaje: 'Ingresa un monto mayor a cero.' };
+
+    const comision = esInterbancaria ? COMISION_INTERBANCARIA : 0;
+    const totalADebitar = monto + comision;
+    const disponible = calcularDisponible(origen);
+
+    if (totalADebitar > disponible) {
+        const detalleComision = comision > 0 ? ` (incluyendo comisión de ${formatoCOP.format(comision)})` : '';
+        if (origen.tipo === 'TARJETA_CREDITO') {
+            return { ok: false, campo: 'monto', mensaje: `Excede el cupo máximo para avances${detalleComision}. Disponible: ${formatoCOP.format(disponible)}.` };
+        }
+        return { ok: false, campo: 'monto', mensaje: `Saldo insuficiente para cubrir el monto y la comisión${detalleComision}. Disponible: ${formatoCOP.format(disponible)}.` };
+    }
+
     return {
         ok: true,
-        usaSobregiro: origen.tipo === 'CORRIENTE' && monto > origen.saldo,
-        esAvanceTC: origen.tipo === 'TARJETA_CREDITO'
+        comision,
+        totalADebitar,
+        usaSobregiro: origen.tipo === 'CORRIENTE' && totalADebitar > origen.saldo,
+        esAvanceTC: origen.tipo === 'TARJETA_CREDITO',
+        esInterbancaria
     };
 }
 
@@ -265,10 +288,10 @@ export async function buscarCuentaDestino(numero, tipo) {
     }
 }
 
-export async function ejecutarTransferencia({ origenId, destinoNumero, destinoTipo, monto, concepto = '' }) {
+export async function ejecutarTransferencia({ origenId, destinoNumero, destinoTipo, monto, concepto = '', esInterbancaria = false, destinoInterbancario = null }) {
     if (!USAR_DATOS_DE_PRUEBA) {
-        const r = await pedir(`${API_BASE}/transferencias`, { method: 'POST', body: { origenId, destinoNumero, destinoTipo, monto, concepto } });
-        registrarNotificaciones(r.monto, r.destino.titular, r.referencia, r.usaSobregiro, r.esAvanceTC);
+        const r = await pedir(`${API_BASE}/transferencias`, { method: 'POST', body: { origenId, destinoNumero, destinoTipo, monto, concepto, esInterbancaria, destinoInterbancario } });
+        registrarNotificaciones(r.monto, r.destino.titular, r.referencia, r.usaSobregiro, r.esAvanceTC, r.esInterbancaria, r.comision);
         return r;
     }
 
@@ -284,13 +307,16 @@ export async function ejecutarTransferencia({ origenId, destinoNumero, destinoTi
     const origen = cuentas.find(c => String(c.id) === String(origenId));
     if (!origen) throw new Error('No se encontró el producto de origen.');
 
-    const destino = resolverDestinoMock(destinoNumero, destinoTipo, cuentas, terceros);
+    const destino = esInterbancaria ? destinoInterbancario : resolverDestinoMock(destinoNumero, destinoTipo, cuentas, terceros);
 
-    const v = validarTransferencia({ origen, destino, monto });
+    const v = validarTransferencia({ origen, destino, monto, esInterbancaria });
     if (!v.ok) throw new Error(v.mensaje);
 
-    // Descontar del producto origen (si es crédito, reduce el cupo disponible)
-    origen.saldo -= monto;
+    const comision = v.comision || 0;
+    const totalADebitar = v.totalADebitar || (monto + comision);
+
+    // Descontar del producto origen (monto transferido + comisión interbancaria)
+    origen.saldo -= totalADebitar;
     
     // Si el origen era Tarjeta de Crédito, sincronizar también en el perfil del usuario
     if (origen.tipo === 'TARJETA_CREDITO') {
@@ -298,25 +324,31 @@ export async function ejecutarTransferencia({ origenId, destinoNumero, destinoTi
         if (perfilUsuario && Array.isArray(perfilUsuario.tarjetasAprobadas)) {
             perfilUsuario.tarjetasAprobadas.forEach(t => {
                 if (t.tipo === 'credito' && (t.numeroTarjeta === origen.numero || !t.numeroTarjeta)) {
-                    t.cupoDisponible = Math.max(0, (Number(t.cupoDisponible || origen.saldo + monto)) - monto);
+                    t.cupoDisponible = Math.max(0, (Number(t.cupoDisponible || origen.saldo + totalADebitar)) - totalADebitar);
                 }
             });
             localStorage.setItem('userProfile', JSON.stringify(perfilUsuario));
         }
     }
 
-    const receptor = destino.esPropia ? cuentas.find(c => c.id === destino.id) : terceros.find(c => c.id === destino.id);
+    const receptor = !esInterbancaria && destino.esPropia ? cuentas.find(c => c.id === destino.id) : (!esInterbancaria ? terceros.find(c => c.id === destino.id) : null);
     if (receptor) {
         receptor.saldo = (Number(receptor.saldo) || 0) + monto;
     }
 
     // Registrar movimientos (mismo formato integral que usa el historial de movimientos)
     const fecha = new Date().toISOString();
-    const referencia = `FIN-${Math.floor(100000 + Math.random() * 900000)}`;
+    const prefijoRef = esInterbancaria ? 'ACH' : 'FIN';
+    const referencia = `${prefijoRef}-${Math.floor(100000 + Math.random() * 900000)}`;
     const nota = concepto ? ` · ${concepto}` : '';
-    const descEgreso = origen.tipo === 'TARJETA_CREDITO'
-        ? `Avance de Tarjeta de Crédito transferido a ${destino.titular}${nota}`
-        : `Transferencia enviada a ${destino.titular}${nota}`;
+    let descEgreso = '';
+    if (esInterbancaria) {
+        descEgreso = `Transferencia interbancaria a ${destino.titular} (${destino.banco})${nota} [Comisión: ${formatoCOP.format(comision)}]`;
+    } else {
+        descEgreso = origen.tipo === 'TARJETA_CREDITO'
+            ? `Avance de Tarjeta de Crédito transferido a ${destino.titular}${nota}`
+            : `Transferencia enviada a ${destino.titular}${nota}`;
+    }
 
     const numOrigenLimpio = soloDigitos(origen.numero);
     const numDestinoLimpio = soloDigitos(destino.numero);
@@ -409,11 +441,15 @@ export async function ejecutarTransferencia({ origenId, destinoNumero, destinoTi
 
     guardar(K.terceros, terceros);
     guardar(K.movimientos, movimientos);
-    registrarNotificaciones(monto, destino.titular, referencia, v.usaSobregiro, v.esAvanceTC);
+    registrarNotificaciones(monto, destino.titular, referencia, v.usaSobregiro, v.esAvanceTC, esInterbancaria, comision);
 
     return {
         referencia, fecha, monto, concepto,
-        origen: { ...origen, saldo: origen.saldo + monto },
+        comision,
+        totalDebitado: totalADebitar,
+        esInterbancaria,
+        bancoDestino: esInterbancaria ? destino.banco : 'Finara Bank',
+        origen: { ...origen, saldo: origen.saldo + totalADebitar },
         destino, saldoOrigen: origen.saldo,
         usaSobregiro: v.usaSobregiro,
         esAvanceTC: v.esAvanceTC
@@ -421,11 +457,18 @@ export async function ejecutarTransferencia({ origenId, destinoNumero, destinoTi
 }
 
 // Registro de notificaciones de transferencias y avances
-function registrarNotificaciones(monto, titular, referencia, usaSobregiro, esAvanceTC) {
-    const titulo = esAvanceTC ? 'Avance de tarjeta de crédito exitoso' : 'Transferencia exitosa';
-    const mensaje = esAvanceTC
-        ? `Realizaste un avance por ${formatoCOP.format(monto)} transferido a ${titular}. Referencia ${referencia}.`
-        : `Enviaste ${formatoCOP.format(monto)} a ${titular}. Referencia ${referencia}.`;
+function registrarNotificaciones(monto, titular, referencia, usaSobregiro, esAvanceTC, esInterbancaria = false, comision = 0) {
+    let titulo = 'Transferencia exitosa';
+    let mensaje = '';
+    if (esInterbancaria) {
+        titulo = 'Transferencia interbancaria enviada (ACH)';
+        mensaje = `Transferiste ${formatoCOP.format(monto)} a ${titular} a través de la red ACH. Comisión: ${formatoCOP.format(comision)}. Ref: ${referencia}.`;
+    } else if (esAvanceTC) {
+        titulo = 'Avance de tarjeta de crédito exitoso';
+        mensaje = `Realizaste un avance por ${formatoCOP.format(monto)} transferido a ${titular}. Referencia ${referencia}.`;
+    } else {
+        mensaje = `Enviaste ${formatoCOP.format(monto)} a ${titular}. Referencia ${referencia}.`;
+    }
 
     guardarNotificacion({
         titulo,
