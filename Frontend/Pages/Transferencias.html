@@ -198,6 +198,39 @@
                             <p class="tr-error" id="errOrigen" role="alert"></p>
                         </div>
 
+                        <!-- Pestañas de modalidad: Finara o Interbancaria (HU-07) -->
+                        <div class="tr-modalidad-tabs" role="tablist">
+                            <button type="button" class="tr-tab-btn activo" id="tabFinara" role="tab" aria-selected="true">
+                                <i class="fa-solid fa-building-columns"></i> Cuentas Finara
+                            </button>
+                            <button type="button" class="tr-tab-btn" id="tabOtroBanco" role="tab" aria-selected="false">
+                                <i class="fa-solid fa-network-wired"></i> A Otro Banco
+                            </button>
+                        </div>
+                        <input type="hidden" id="trModalidad" value="FINARA">
+
+                        <!-- Campo adicional para Banco Destino (Interbancario) -->
+                        <div class="tr-campo hidden" id="campoBancoDestino">
+                            <label for="trBancoDestino">Banco de destino</label>
+                            <select id="trBancoDestino">
+                                <option value="" disabled selected>Selecciona una entidad bancaria...</option>
+                                <option value="Bancolombia">Bancolombia</option>
+                                <option value="Banco de Bogotá">Banco de Bogotá</option>
+                                <option value="Davivienda">Davivienda</option>
+                                <option value="BBVA Colombia">BBVA Colombia</option>
+                                <option value="Banco de Occidente">Banco de Occidente</option>
+                                <option value="Banco Popular">Banco Popular</option>
+                                <option value="Scotiabank Colpatria">Scotiabank Colpatria</option>
+                                <option value="Banco Caja Social">Banco Caja Social</option>
+                                <option value="Banco AV Villas">Banco AV Villas</option>
+                                <option value="Nequi">Nequi</option>
+                                <option value="Daviplata">Daviplata</option>
+                                <option value="Lulo Bank">Lulo Bank</option>
+                                <option value="Nu Colombia">Nu Colombia</option>
+                            </select>
+                            <p class="tr-error" id="errBancoDestino" role="alert"></p>
+                        </div>
+
                         <div class="tr-fila-campos">
                             <div class="tr-campo">
                                 <label for="trTipoDestino">Tipo de cuenta destino</label>
@@ -209,9 +242,26 @@
                             <div class="tr-campo">
                                 <label for="trNumeroDestino">Número de cuenta destino</label>
                                 <input id="trNumeroDestino" type="text" inputmode="numeric" autocomplete="off"
-                                    maxlength="16" placeholder="Ej: 4021599900111">
+                                    maxlength="20" placeholder="Ej: 4021599900111">
                             </div>
                         </div>
+
+                        <!-- Campos para Beneficiario Interbancario (HU-07) -->
+                        <div class="tr-fila-campos hidden" id="camposBeneficiarioInterbancario">
+                            <div class="tr-campo">
+                                <label for="trBeneficiarioNombre">Nombre del beneficiario</label>
+                                <input id="trBeneficiarioNombre" type="text" autocomplete="off" maxlength="80"
+                                    placeholder="Nombre completo del titular">
+                                <p class="tr-error" id="errBeneficiarioNombre" role="alert"></p>
+                            </div>
+                            <div class="tr-campo">
+                                <label for="trBeneficiarioDocumento">Documento de identidad</label>
+                                <input id="trBeneficiarioDocumento" type="text" inputmode="numeric" autocomplete="off"
+                                    maxlength="15" placeholder="Ej: 1020304050">
+                                <p class="tr-error" id="errBeneficiarioDocumento" role="alert"></p>
+                            </div>
+                        </div>
+
                         <div class="tr-destino hidden" id="trDestino" role="status" aria-live="polite"></div>
                         <p class="tr-error" id="errDestino" role="alert"></p>
 
