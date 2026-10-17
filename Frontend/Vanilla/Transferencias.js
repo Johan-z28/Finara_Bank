@@ -1,8 +1,19 @@
 import { initGlobalComponents } from './Global/app.js';
-import { initCampanaNotificaciones, actualizarCampana } from './notificaciones.js';
+let initCampanaNotificaciones = () => {};
+let actualizarCampana = () => {};
+import('./notificaciones.js')
+    .then(modNotif => {
+        if (modNotif) {
+            initCampanaNotificaciones = modNotif.initCampanaNotificaciones || initCampanaNotificaciones;
+            actualizarCampana = modNotif.actualizarCampana || actualizarCampana;
+        }
+    })
+    .catch(() => {
+        // Operar sin bloquear si el archivo fue desacoplado
+    });
 import {
     TIPOS, formatoCOP, calcularDisponible, obtenerCuentasOrigen, buscarCuentaDestino,
-    validarTransferencia, ejecutarTransferencia, SesionExpiradaError
+    validarTransferencia, ejecutarTransferencia, SesionExpiradaError, COMISION_INTERBANCARIA
 } from './transferenciasService.js';
 
 const formatoFechaHora = new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium', timeStyle: 'short' });
@@ -42,6 +53,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const trOrigenCard = $('trOrigenCard'), trCardTipo = $('trCardTipo'), trCardSaldo = $('trCardSaldo'), trCardBadge = $('trCardBadge');
     const btnTransferirTodo = $('btnTransferirTodo'), chipsMonto = $('chipsMonto');
     const errOrigen = $('errOrigen'), errDestino = $('errDestino'), errMonto = $('errMonto');
+    
+    // Elementos interbancarios (HU-07)
+    const tabFinara = $('tabFinara'), tabOtroBanco = $('tabOtroBanco'), trModalidad = $('trModalidad');
+    const campoBancoDestino = $('campoBancoDestino'), selBancoDestino = $('trBancoDestino'), errBancoDestino = $('errBancoDestino');
+    const camposBeneficiarioInterbancario = $('camposBeneficiarioInterbancario');
+    const inpBeneficiarioNombre = $('trBeneficiarioNombre'), errBeneficiarioNombre = $('errBeneficiarioNombre');
+    const inpBeneficiarioDocumento = $('trBeneficiarioDocumento'), errBeneficiarioDocumento = $('errBeneficiarioDocumento');
+
     const vistas = { 1: $('vistaForm'), 2: $('vistaResumen'), 3: $('vistaExito') };
     const pasos = document.querySelectorAll('.tr-paso');
     const btnEditar = $('btnEditar'), btnConfirmar = $('btnConfirmar'), btnNueva = $('btnNueva');
@@ -56,6 +75,111 @@ document.addEventListener('DOMContentLoaded', () => {
     let enProceso = false;
 
     const irALogin = () => { window.location.href = '../index.html'; };
+
+    // ---------- Manejo de Pestañas Finara vs Interbancario (HU-07) ----------
+    function esModoInterbancario() {
+        return trModalidad ? trModalidad.value === 'INTERBANCARIO' : false;
+    }
+
+    function cambiarModalidad(modo) {
+        if (!trModalidad) return;
+        trModalidad.value = modo;
+
+        const esInter = modo === 'INTERBANCARIO';
+        if (tabFinara && tabOtroBanco) {
+            tabFinara.classList.toggle('activo', !esInter);
+            tabFinara.setAttribute('aria-selected', !esInter ? 'true' : 'false');
+            tabOtroBanco.classList.toggle('activo', esInter);
+            tabOtroBanco.setAttribute('aria-selected', esInter ? 'true' : 'false');
+        }
+
+        if (campoBancoDestino) campoBancoDestino.classList.toggle('hidden', !esInter);
+        if (camposBeneficiarioInterbancario) camposBeneficiarioInterbancario.classList.toggle('hidden', !esInter);
+
+        // Limpiar errores y reseteo de destino
+        limpiarErrores();
+        tokenDestino++;
+        destino = null;
+
+        if (esInter) {
+            actualizarPreviewInterbancario();
+        } else {
+            pintarDestino(null);
+            if (inpNumero.value.trim()) {
+                programarVerificacion();
+            }
+        }
+    }
+
+    if (tabFinara && tabOtroBanco) {
+        tabFinara.addEventListener('click', () => cambiarModalidad('FINARA'));
+        tabOtroBanco.addEventListener('click', () => cambiarModalidad('INTERBANCARIO'));
+    }
+
+    function actualizarPreviewInterbancario() {
+        if (!esModoInterbancario()) return;
+        const banco = selBancoDestino ? selBancoDestino.value : '';
+        const num = inpNumero.value.replace(/\D/g, '');
+        const titular = inpBeneficiarioNombre ? inpBeneficiarioNombre.value.trim() : '';
+
+        if (!banco && !num && !titular) {
+            pintarDestino(null);
+            return;
+        }
+
+        boxDestino.replaceChildren();
+        boxDestino.className = 'tr-destino tr-destino--ok';
+        const i = el('i', 'fa-solid fa-building-columns');
+        i.setAttribute('aria-hidden', 'true');
+        const texto = el('div', 'tr-destino__texto');
+
+        const header = el('div', 'tr-destino__header-titular');
+        header.append(el('strong', '', titular || 'Beneficiario interbancario'));
+        if (banco) {
+            const badgeBanco = el('span', 'tr-destino__badge-bloqueada', banco);
+            badgeBanco.style.background = 'rgba(229, 169, 60, 0.15)';
+            badgeBanco.style.borderColor = 'rgba(229, 169, 60, 0.4)';
+            badgeBanco.style.color = '#e5a93c';
+            header.append(badgeBanco);
+        }
+
+        const tipoTxt = TIPOS[selTipo.value] || 'Cuenta';
+        const numTxt = num ? `•••• ${ultimos4(num)}` : '••••';
+        texto.append(
+            el('span', 'tr-destino__label', `Red Interbancaria ACH · ${banco || 'Selecciona un banco'}`),
+            header,
+            el('span', 'tr-destino__sub', `${tipoTxt} · ${numTxt} · Tarifa ACH: ${formatoCOP.format(COMISION_INTERBANCARIA)}`)
+        );
+        boxDestino.append(i, texto);
+    }
+
+    if (selBancoDestino) {
+        selBancoDestino.addEventListener('change', () => {
+            if (errBancoDestino) errBancoDestino.textContent = '';
+            actualizarPreviewInterbancario();
+        });
+    }
+
+    if (inpBeneficiarioNombre) {
+        inpBeneficiarioNombre.addEventListener('input', () => {
+            if (errBeneficiarioNombre) errBeneficiarioNombre.textContent = '';
+            actualizarPreviewInterbancario();
+        });
+    }
+
+    if (inpBeneficiarioDocumento) {
+        inpBeneficiarioDocumento.addEventListener('input', () => {
+            inpBeneficiarioDocumento.value = inpBeneficiarioDocumento.value.replace(/\D/g, '').slice(0, 15);
+            if (errBeneficiarioDocumento) errBeneficiarioDocumento.textContent = '';
+        });
+    }
+
+    function limpiarErrores() {
+        [errOrigen, errDestino, errMonto].forEach(m => { if (m) m.textContent = ''; });
+        if (errBancoDestino) errBancoDestino.textContent = '';
+        if (errBeneficiarioNombre) errBeneficiarioNombre.textContent = '';
+        if (errBeneficiarioDocumento) errBeneficiarioDocumento.textContent = '';
+    }
 
     // ---------- Pasos ----------
     function irAPaso(n) {
@@ -191,7 +315,8 @@ document.addEventListener('DOMContentLoaded', () => {
         btnTransferirTodo.addEventListener('click', () => {
             const c = cuentaSeleccionada();
             if (!c) return;
-            const disp = Math.max(0, calcularDisponible(c));
+            const comision = esModoInterbancario() ? COMISION_INTERBANCARIA : 0;
+            const disp = Math.max(0, calcularDisponible(c) - comision);
             if (disp > 0) {
                 inpMonto.value = new Intl.NumberFormat('es-CO').format(disp);
                 errMonto.textContent = '';
@@ -241,6 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function verificar() {
+        if (esModoInterbancario()) return;
         const mio = ++tokenDestino;
         const numero = inpNumero.value.replace(/\D/g, '');
         destino = null;
@@ -261,6 +387,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function programarVerificacion() {
+        if (esModoInterbancario()) {
+            actualizarPreviewInterbancario();
+            return;
+        }
         tokenDestino++;           // invalida cualquier consulta en curso
         destino = null;
         clearTimeout(temporizador);
@@ -270,32 +400,77 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     inpNumero.addEventListener('input', () => {
-        inpNumero.value = inpNumero.value.replace(/\D/g, '').slice(0, 16);
+        inpNumero.value = inpNumero.value.replace(/\D/g, '').slice(0, 20);
         programarVerificacion();
     });
     selTipo.addEventListener('change', programarVerificacion);
 
     // ---------- Continuar: valida y pasa al resumen ----------
     function mostrarErrorCampo(campo, mensaje) {
-        const mapa = { origen: [errOrigen, selOrigen], destino: [errDestino, inpNumero], monto: [errMonto, inpMonto] };
-        const [msg, input] = mapa[campo];
-        msg.textContent = mensaje;
-        input.focus();
+        const mapa = {
+            origen: [errOrigen, selOrigen],
+            destino: [errDestino, inpNumero],
+            banco: [errBancoDestino, selBancoDestino],
+            beneficiario: [errBeneficiarioNombre, inpBeneficiarioNombre],
+            documento: [errBeneficiarioDocumento, inpBeneficiarioDocumento],
+            monto: [errMonto, inpMonto]
+        };
+        const [msg, input] = mapa[campo] || [errDestino, inpNumero];
+        if (msg) msg.textContent = mensaje;
+        if (input) input.focus();
     }
 
     form.addEventListener('submit', async e => {
         e.preventDefault();
-        [errOrigen, errDestino, errMonto].forEach(m => { m.textContent = ''; });
+        limpiarErrores();
 
-        if (!destino && inpNumero.value.trim()) { clearTimeout(temporizador); await verificar(); }
+        const esInterbancaria = esModoInterbancario();
+        const numero = inpNumero.value.replace(/\D/g, '');
+
+        if (esInterbancaria) {
+            const banco = selBancoDestino ? selBancoDestino.value : '';
+            const titular = inpBeneficiarioNombre ? inpBeneficiarioNombre.value.trim() : '';
+            const documento = inpBeneficiarioDocumento ? inpBeneficiarioDocumento.value.trim() : '';
+
+            if (!banco) {
+                mostrarErrorCampo('banco', 'Selecciona la entidad bancaria receptora.');
+                return;
+            }
+            if (!numero || numero.length < 5) {
+                mostrarErrorCampo('destino', 'Ingresa un número de cuenta destino válido.');
+                return;
+            }
+            if (!titular || titular.length < 3) {
+                mostrarErrorCampo('beneficiario', 'Ingresa el nombre completo del beneficiario.');
+                return;
+            }
+            if (!documento || documento.length < 5) {
+                mostrarErrorCampo('documento', 'Ingresa el documento de identidad del beneficiario.');
+                return;
+            }
+
+            destino = {
+                banco,
+                titular,
+                documento,
+                tipo: selTipo.value,
+                numero,
+                esPropia: false
+            };
+        } else {
+            if (!destino && numero) {
+                clearTimeout(temporizador);
+                await verificar();
+            }
+        }
 
         const origen = cuentaSeleccionada();
         const monto = leerMonto();
-        const v = validarTransferencia({ origen, destino, monto });
+        const v = validarTransferencia({ origen, destino, monto, esInterbancaria });
         if (!v.ok) {
             const esPorBloqueoOrigen = origen && (origen.bloqueada || origen.estado === 'BLOQUEADA' || (origen.tarjetaAsociada && origen.tarjetaAsociada.bloqueada));
-            const esPorBloqueoDestino = destino && (destino.bloqueada || destino.estado === 'BLOQUEADA');
-            
+            const esPorBloqueoDestino = !esInterbancaria && destino && (destino.bloqueada || destino.estado === 'BLOQUEADA');
+
             if (esPorBloqueoOrigen) {
                 if (window.Swal) {
                     Swal.fire({
@@ -337,27 +512,59 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        datos = { origen, destino, monto, concepto: inpConcepto.value.trim(), usaSobregiro: v.usaSobregiro };
+        datos = {
+            origen,
+            destino,
+            monto,
+            concepto: inpConcepto.value.trim(),
+            usaSobregiro: v.usaSobregiro,
+            esAvanceTC: v.esAvanceTC,
+            esInterbancaria,
+            comision: v.comision || 0,
+            totalADebitar: v.totalADebitar || (monto + (v.comision || 0))
+        };
         pintarResumen();
         irAPaso(2);
     });
 
-    // ---------- Punto 4: resumen y confirmación ----------
+    // ---------- Punto 4: resumen y desglose de costos previo a la confirmación (HU-07) ----------
     function pintarResumen() {
-        const { origen, destino: d, monto, concepto, usaSobregiro, esAvanceTC } = datos;
-        const saldoFinal = origen.saldo - monto;
-        const labelSaldoFinal = origen.tipo === 'TARJETA_CREDITO' ? 'Cupo restante después del avance' : 'Saldo después de la operación';
-        filas($('resumenLista'), [
-            { label: 'Producto de origen', valor: textoCuenta(origen) },
-            { label: 'Cuenta de destino', valor: d.titular, extra: `${TIPOS[d.tipo]} · •••• ${ultimos4(d.numero)}` },
-            { label: esAvanceTC ? 'Monto del avance' : 'Monto a transferir', valor: formatoCOP.format(monto), destacado: true },
-            { label: 'Concepto', valor: concepto || '—' },
-            { label: labelSaldoFinal, valor: formatoCOP.format(saldoFinal), negativo: saldoFinal < 0 },
-            { label: 'Costo', valor: 'Sin costo' }
-        ]);
+        const { origen, destino: d, monto, concepto, usaSobregiro, esAvanceTC, esInterbancaria, comision, totalADebitar } = datos;
+        const saldoFinal = origen.saldo - totalADebitar;
+        const labelSaldoFinal = origen.tipo === 'TARJETA_CREDITO' ? 'Cupo restante después de la operación' : 'Saldo después de la operación';
+
+        const filasResumen = [
+            { label: 'Producto de origen', valor: textoCuenta(origen) }
+        ];
+
+        if (esInterbancaria) {
+            filasResumen.push(
+                { label: 'Entidad bancaria destino', valor: d.banco },
+                { label: 'Beneficiario', valor: d.titular, extra: `Doc: ${d.documento}` },
+                { label: 'Cuenta destino', valor: `${TIPOS[d.tipo]} · •••• ${ultimos4(d.numero)}` },
+                { label: 'Monto a transferir', valor: formatoCOP.format(monto), destacado: true },
+                { label: 'Comisión red interbancaria (ACH)', valor: formatoCOP.format(comision) },
+                { label: 'Total a debitar', valor: formatoCOP.format(totalADebitar), destacado: true },
+                { label: 'Concepto', valor: concepto || '—' },
+                { label: labelSaldoFinal, valor: formatoCOP.format(saldoFinal), negativo: saldoFinal < 0 }
+            );
+        } else {
+            filasResumen.push(
+                { label: 'Cuenta de destino', valor: d.titular, extra: `${TIPOS[d.tipo]} · •••• ${ultimos4(d.numero)}` },
+                { label: esAvanceTC ? 'Monto del avance' : 'Monto a transferir', valor: formatoCOP.format(monto), destacado: true },
+                { label: 'Concepto', valor: concepto || '—' },
+                { label: labelSaldoFinal, valor: formatoCOP.format(saldoFinal), negativo: saldoFinal < 0 },
+                { label: 'Costo de transferencia', valor: 'Sin costo (Cuentas Finara)' }
+            );
+        }
+
+        filas($('resumenLista'), filasResumen);
         resumenError.classList.add('hidden');
-        resumenAlerta.classList.toggle('hidden', !usaSobregiro && !esAvanceTC);
-        if (usaSobregiro) {
+        resumenAlerta.classList.toggle('hidden', !usaSobregiro && !esAvanceTC && !esInterbancaria);
+
+        if (esInterbancaria) {
+            resumenAlerta.textContent = `Operación Interbancaria ACH: Se transferirá a través de la red ACH a ${d.banco}. Costo de red de ${formatoCOP.format(comision)} liquidado en el total a debitar.`;
+        } else if (usaSobregiro) {
             resumenAlerta.textContent = `Atención: esta transferencia usa ${formatoCOP.format(monto - origen.saldo)} de tu sobregiro (hasta 20% sobre el saldo). Úsalo con cuidado.`;
         } else if (esAvanceTC) {
             resumenAlerta.textContent = `Operación de Avance: Se desembolsará el monto de tu Tarjeta de Crédito y se acreditará inmediatamente a la cuenta de destino.`;
@@ -366,23 +573,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnEditar.addEventListener('click', () => irAPaso(1));
 
-    // ---------- Punto 5 y 6: ejecutar, descontar saldo, registrar movimiento y notificar ----------
+    // ---------- Punto 5 y 6: ejecutar transferencia interbancaria o Finara ----------
     btnConfirmar.addEventListener('click', async () => {
         if (enProceso) return;          // evita doble envío
         enProceso = true;
         btnConfirmar.disabled = btnEditar.disabled = true;
-        btnConfirmar.textContent = 'Procesando…';
+        btnConfirmar.textContent = 'Procesando en red interbancaria…';
         resumenError.classList.add('hidden');
 
         try {
             const r = await ejecutarTransferencia({
-                origenId: datos.origen.id, destinoNumero: datos.destino.numero,
-                destinoTipo: datos.destino.tipo, monto: datos.monto, concepto: datos.concepto
+                origenId: datos.origen.id,
+                destinoNumero: datos.destino.numero,
+                destinoTipo: datos.destino.tipo,
+                monto: datos.monto,
+                concepto: datos.concepto,
+                esInterbancaria: datos.esInterbancaria,
+                destinoInterbancario: datos.esInterbancaria ? datos.destino : null
             });
             pintarExito(r);
             irAPaso(3);
             actualizarCampana();        // la notificación ya quedó guardada en localStorage
-            mostrarToast('Transferencia exitosa. Revisa tus notificaciones.');
+            mostrarToast(datos.esInterbancaria
+                ? 'Transferencia interbancaria procesada con éxito a través de ACH.'
+                : 'Transferencia exitosa. Revisa tus notificaciones.');
         } catch (err) {
             if (err instanceof SesionExpiradaError) return irALogin();
             resumenError.textContent = err.message || 'No se pudo completar la transferencia. Intenta de nuevo.';
@@ -394,14 +608,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // ---------- Comprobante de transferencia (HU-07) ----------
     function pintarExito(r) {
-        filas($('exitoLista'), [
-            { label: 'Referencia', valor: r.referencia },
-            { label: 'Enviado a', valor: r.destino.titular, extra: `${TIPOS[r.destino.tipo]} · •••• ${ultimos4(r.destino.numero)}` },
-            { label: 'Monto', valor: formatoCOP.format(r.monto), destacado: true },
-            { label: 'Nuevo saldo de la cuenta de origen', valor: formatoCOP.format(r.saldoOrigen), negativo: r.saldoOrigen < 0 },
-            { label: 'Fecha', valor: formatoFechaHora.format(new Date(r.fecha)) }
-        ]);
+        const items = [
+            { label: 'Número de comprobante', valor: r.referencia }
+        ];
+
+        if (r.esInterbancaria) {
+            items.push(
+                { label: 'Red de procesamiento', valor: 'Red ACH Colombia / Pasarela Interbancaria' },
+                { label: 'Banco receptor', valor: r.bancoDestino || r.destino.banco },
+                { label: 'Beneficiario', valor: r.destino.titular, extra: `Doc: ${r.destino.documento || 'No informado'}` },
+                { label: 'Cuenta de destino', valor: `${TIPOS[r.destino.tipo]} · •••• ${ultimos4(r.destino.numero)}` },
+                { label: 'Monto transferido', valor: formatoCOP.format(r.monto), destacado: true },
+                { label: 'Comisión de red ACH', valor: formatoCOP.format(r.comision || COMISION_INTERBANCARIA) },
+                { label: 'Total debitado de tu cuenta', valor: formatoCOP.format(r.totalDebitado || (r.monto + (r.comision || 0))) },
+                { label: 'Nuevo saldo disponible', valor: formatoCOP.format(r.saldoOrigen), negativo: r.saldoOrigen < 0 },
+                { label: 'Fecha y hora de transmisión', valor: formatoFechaHora.format(new Date(r.fecha)) }
+            );
+        } else {
+            items.push(
+                { label: 'Enviado a', valor: r.destino.titular, extra: `${TIPOS[r.destino.tipo]} · •••• ${ultimos4(r.destino.numero)}` },
+                { label: 'Monto', valor: formatoCOP.format(r.monto), destacado: true },
+                { label: 'Nuevo saldo de la cuenta de origen', valor: formatoCOP.format(r.saldoOrigen), negativo: r.saldoOrigen < 0 },
+                { label: 'Fecha', valor: formatoFechaHora.format(new Date(r.fecha)) }
+            );
+        }
+
+        filas($('exitoLista'), items);
     }
 
     btnNueva.addEventListener('click', async () => {
@@ -409,7 +643,8 @@ document.addEventListener('DOMContentLoaded', () => {
         tokenDestino++;
         destino = null; datos = null;
         pintarDestino(null);
-        [errOrigen, errMonto].forEach(m => { m.textContent = ''; });
+        limpiarErrores();
+        cambiarModalidad('FINARA');
         await cargarCuentas();          // trae los saldos ya actualizados
         irAPaso(1);
     });
