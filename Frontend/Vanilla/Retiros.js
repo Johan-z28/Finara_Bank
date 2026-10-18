@@ -19,6 +19,13 @@ import('./notificaciones.js')
 
 const ultimos4 = numero => String(numero).replace(/\D/g, '').slice(-4);
 
+// Función para formatear el número ingresado con puntos de miles (es-CO)
+const formatearNumeroConPuntos = (val) => {
+    const soloNumeros = String(val).replace(/\D/g, '');
+    if (!soloNumeros) return '';
+    return new Intl.NumberFormat('es-CO').format(Number(soloNumeros));
+};
+
 export async function initRetirosView() {
     const usuarioActivo = obtenerUsuarioAutenticado();
     if (!usuarioActivo) {
@@ -95,7 +102,12 @@ export async function initRetirosView() {
 
             selectCuenta.innerHTML = '<option value="" disabled selected>Selecciona tu cuenta...</option>';
             cuentas.forEach(c => {
-                const tipoTexto = c.tipo === 'CORRIENTE' ? 'Cuenta Corriente' : (c.tipo === 'AHORROS' || c.tipo === 'DEBITO' ? 'Cuenta de Ahorros' : c.tipo);
+                const tipoUpper = String(c.tipo || '').toUpperCase();
+                let tipoTexto = c.tipo;
+                if (tipoUpper.includes('CORRIENTE')) tipoTexto = 'Cuenta Corriente';
+                else if (tipoUpper.includes('CREDITO') || tipoUpper.includes('CRÉDITO')) tipoTexto = 'Tarjeta de Crédito';
+                else if (tipoUpper.includes('AHORRO') || tipoUpper.includes('DEBITO')) tipoTexto = 'Cuenta de Ahorros';
+
                 const saldoVal = Number(c.saldo !== undefined ? c.saldo : 0);
                 const opt = document.createElement('option');
                 opt.value = c.id || c.numero;
@@ -113,6 +125,7 @@ export async function initRetirosView() {
         }
     }
 
+    // Punto 1: Actualizar badge y reglas según el tipo exacto (Tarjeta de Crédito, Corriente o Ahorros)
     function actualizarDetallesCuenta() {
         const id = selectCuenta.value;
         cuentaSeleccionada = cuentas.find(c => String(c.id) === String(id) || String(c.numero) === String(id));
@@ -128,7 +141,11 @@ export async function initRetirosView() {
         const saldo = Number(cuentaSeleccionada.saldo) || 0;
         const disponible = calcularDisponibleRetiro(cuentaSeleccionada);
 
-        if (tipo.includes('CORRIENTE')) {
+        if (tipo.includes('CREDITO') || tipo.includes('CRÉDITO')) {
+            if (badgeTipo) { badgeTipo.textContent = 'Tarjeta de Crédito'; badgeTipo.className = 'account-badge account-badge--credito'; }
+            if (rowSobregiro) rowSobregiro.style.display = 'none';
+            if (txtReglaHint) txtReglaHint.textContent = 'Avance de efectivo permitido de hasta el 50% de tu cupo disponible.';
+        } else if (tipo.includes('CORRIENTE')) {
             if (badgeTipo) { badgeTipo.textContent = 'Cuenta Corriente'; badgeTipo.className = 'account-badge account-badge--corriente'; }
             if (rowSobregiro) rowSobregiro.style.display = 'flex';
             if (txtSobregiroLimite) txtSobregiroLimite.textContent = formatoCOP.format(Math.max(saldo, 0) * 0.20);
@@ -136,7 +153,7 @@ export async function initRetirosView() {
         } else {
             if (badgeTipo) { badgeTipo.textContent = 'Cuenta de Ahorros'; badgeTipo.className = 'account-badge'; }
             if (rowSobregiro) rowSobregiro.style.display = 'none';
-            if (txtReglaHint) txtReglaHint.textContent = 'Al retirar, se liquida y abona el interés del 1.5% mensual sobre tu saldo.';
+            if (txtReglaHint) txtReglaHint.textContent = '¡Beneficio de Ahorro! Se abona un rendimiento del 1.5% mensual sobre tu saldo actual al realizar retiros.';
         }
 
         if (txtSaldoActual) txtSaldoActual.textContent = formatoCOP.format(saldo);
@@ -147,8 +164,11 @@ export async function initRetirosView() {
 
     selectCuenta.onchange = actualizarDetallesCuenta;
 
+    // Obtener siempre el valor numérico limpio del input
     function leerMonto() {
-        return Number(inputMonto.value) || 0;
+        if (!inputMonto) return 0;
+        const numLimpio = String(inputMonto.value).replace(/\D/g, '');
+        return Number(numLimpio) || 0;
     }
 
     function actualizarChipsActivos(montoActual) {
@@ -159,9 +179,18 @@ export async function initRetirosView() {
     }
 
     if (inputMonto) {
+        // Punto 2: Desactivar scroll sobre el campo para evitar cambio accidental del valor
+        inputMonto.addEventListener('wheel', (e) => e.preventDefault(), { passive: false });
+
+        // Punto 3: Formatear con puntos de miles en tiempo real mientras se escribe
         inputMonto.oninput = () => {
-            const monto = leerMonto();
-            actualizarChipsActivos(monto);
+            const montoVal = leerMonto();
+            if (montoVal > 0) {
+                inputMonto.value = formatearNumeroConPuntos(montoVal);
+            } else {
+                inputMonto.value = '';
+            }
+            actualizarChipsActivos(montoVal);
             actualizarBreakdown();
         };
     }
@@ -170,7 +199,7 @@ export async function initRetirosView() {
         chip.onclick = () => {
             const monto = Number(chip.dataset.monto);
             if (inputMonto) {
-                inputMonto.value = monto;
+                inputMonto.value = formatearNumeroConPuntos(monto);
                 actualizarChipsActivos(monto);
                 actualizarBreakdown();
                 inputMonto.focus();
@@ -183,7 +212,7 @@ export async function initRetirosView() {
             if (!cuentaSeleccionada) return;
             const disponible = calcularDisponibleRetiro(cuentaSeleccionada);
             if (disponible > 0 && inputMonto) {
-                inputMonto.value = disponible;
+                inputMonto.value = formatearNumeroConPuntos(disponible);
                 actualizarChipsActivos(disponible);
                 actualizarBreakdown();
                 inputMonto.focus();
@@ -203,9 +232,13 @@ export async function initRetirosView() {
         const liq = liquidarRetiro(cuentaSeleccionada, monto);
 
         if (bdMontoSolicitado) bdMontoSolicitado.textContent = formatoCOP.format(monto);
+        
         if (liq.interesGenerado > 0) {
             if (bdRowInteres) bdRowInteres.style.display = 'flex';
-            if (bdInteresGenerado) bdInteresGenerado.textContent = `+ ${formatoCOP.format(liq.interesGenerado)}`;
+            if (bdInteresGenerado) {
+                bdInteresGenerado.textContent = `+ ${formatoCOP.format(liq.interesGenerado)} (Abono Rendimiento 1.5%)`;
+                bdInteresGenerado.style.color = '#10b981';
+            }
         } else if (bdRowInteres) {
             bdRowInteres.style.display = 'none';
         }
@@ -220,7 +253,10 @@ export async function initRetirosView() {
         if (bdTotalDebitado) bdTotalDebitado.textContent = formatoCOP.format(monto);
 
         if (liq.valido) {
-            if (bdNuevoSaldo) { bdNuevoSaldo.textContent = formatoCOP.format(liq.nuevoSaldo); bdNuevoSaldo.style.color = liq.nuevoSaldo < 0 ? '#f87171' : '#10b981'; }
+            if (bdNuevoSaldo) { 
+                bdNuevoSaldo.textContent = formatoCOP.format(liq.nuevoSaldo); 
+                bdNuevoSaldo.style.color = liq.nuevoSaldo < 0 ? '#f87171' : '#10b981'; 
+            }
             if (helperMonto) { helperMonto.textContent = 'Monto válido para procesar.'; helperMonto.style.color = '#10b981'; }
         } else {
             if (bdNuevoSaldo) { bdNuevoSaldo.textContent = 'Fondos insuficientes'; bdNuevoSaldo.style.color = '#f87171'; }

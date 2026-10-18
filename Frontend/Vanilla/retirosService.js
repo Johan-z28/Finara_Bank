@@ -1,15 +1,9 @@
 // Frontend/Vanilla/retirosService.js
 // Capa de servicio y lógica de negocio para retiros (HU-41)
-// Criterios de Aceptación:
-// 1. Regla Cuenta de Ahorros: calcular y aplicar interés del 1.5% mensual al momento del retiro.
-// 2. Regla Cuenta Corriente: permitir sobregiro de hasta el 20% sobre el saldo actual.
-// 3. Validar disponibilidad de fondos (saldo o saldo + sobregiro del 20%).
-// 4. Actualizar saldo en base de datos (localStorage finara_cuentas y perfil de usuario),
-//    generar comprobante de transacción, movimiento y notificación.
 
 import { obtenerCuentas as obtenerCuentasUsuario, obtenerUsernameActivo, obtenerUsuarioAutenticado } from './cuentasService.js';
 
-export const TASA_INTERES_AHORROS = 0.015; // 1.5% mensual al momento del retiro
+export const TASA_INTERES_AHORROS = 0.015; // 1.5% mensual abonado al saldo
 export const TOPE_SOBREGIRO_CORRIENTE = 0.20; // 20% sobre el saldo en Cuenta Corriente
 export const TOPE_AVANCE_CREDITO = 0.50; // Hasta 50% de avance para Tarjetas de Crédito
 
@@ -46,7 +40,6 @@ export function calcularDisponibleRetiro(cuenta) {
         return Math.max(0, Math.round(saldo * TOPE_AVANCE_CREDITO));
     }
 
-    // Ahorros y otras cuentas de depósito
     return Math.max(0, saldo);
 }
 
@@ -86,20 +79,18 @@ export function liquidarRetiro(cuenta, montoSolicitado) {
     let interesGenerado = 0;
     let usaSobregiro = false;
     let sobregiroUsado = 0;
-    let nuevoSaldo = saldoActual - monto;
 
-    if (tipo.includes('AHORRO')) {
-        // Regla HU-41: Aplicar y calcular el interés del 1.5% mensual al momento del retiro
-        // El interés generado sobre el saldo previo se liquida y abona al nuevo saldo
+    if (tipo.includes('AHORRO') || tipo.includes('DEBITO') || tipo.includes('DÉBITO')) {
+        // Cálculo del 1.5% de interés abonado a la cuenta
         interesGenerado = Math.round(saldoActual * TASA_INTERES_AHORROS);
-        nuevoSaldo = (saldoActual + interesGenerado) - monto;
     } else if (tipo.includes('CORRIENTE')) {
-        // Regla HU-41: Permitir sobregiro de hasta el 20% sobre el saldo actual
         if (monto > saldoActual) {
             usaSobregiro = true;
             sobregiroUsado = monto - saldoActual;
         }
     }
+
+    const nuevoSaldo = (saldoActual + interesGenerado) - monto;
 
     return {
         valido: true,
@@ -147,8 +138,7 @@ export function validarRetiro({ cuenta, monto }) {
 }
 
 /**
- * Procesa el retiro financiero, debita el saldo en finara_cuentas, sincroniza perfil,
- * registra el movimiento contable y genera notificación.
+ * Procesa el retiro registrando dos movimientos separados (Ingreso por Rendimiento y Egreso por Retiro)
  */
 export async function ejecutarRetiro({ cuentaId, monto, concepto = '' }) {
     const usuarioActivo = obtenerUsuarioAutenticado();
@@ -180,7 +170,7 @@ export async function ejecutarRetiro({ cuentaId, monto, concepto = '' }) {
     const { liquidacion } = v;
     const nuevoSaldo = liquidacion.nuevoSaldo;
 
-    // Actualizar cuenta en el listado global
+    // Actualizar saldo de la cuenta
     cuenta.saldo = nuevoSaldo;
     const idx = todasLasCuentas.findIndex(c => String(c.id) === String(cuenta.id) || soloDigitos(c.numero) === soloDigitos(cuenta.numero));
     if (idx !== -1) {
@@ -190,10 +180,9 @@ export async function ejecutarRetiro({ cuentaId, monto, concepto = '' }) {
     }
     localStorage.setItem(K.cuentas, JSON.stringify(todasLasCuentas));
 
-    // Sincronizar en userProfile y usuarios locales si corresponde
-    let perfil = null;
+    // Sincronizar en userProfile
     try {
-        perfil = JSON.parse(localStorage.getItem(K.perfil));
+        let perfil = JSON.parse(localStorage.getItem(K.perfil));
         if (perfil) {
             const numLimpio = soloDigitos(cuenta.numero);
             if (Array.isArray(perfil.tarjetasAprobadas)) {
@@ -212,7 +201,6 @@ export async function ejecutarRetiro({ cuentaId, monto, concepto = '' }) {
                 });
             }
 
-            // Recalcular saldo total del perfil
             const total = todasLasCuentas
                 .filter(c => c && (c.username === username || !c.username))
                 .reduce((acc, c) => acc + Math.max(0, Number(c.saldo) || 0), 0);
@@ -220,7 +208,6 @@ export async function ejecutarRetiro({ cuentaId, monto, concepto = '' }) {
             perfil.ultimaActividad = 'Hace un momento (Retiro)';
             localStorage.setItem(K.perfil, JSON.stringify(perfil));
 
-            // Sincronizar en finara_usuarios_local
             let listaUsuarios = JSON.parse(localStorage.getItem(K.usuarios)) || [];
             listaUsuarios = listaUsuarios.map(u => (u.username === perfil.username || u.correo === perfil.correo) ? { ...u, ...perfil } : u);
             localStorage.setItem(K.usuarios, JSON.stringify(listaUsuarios));
@@ -229,17 +216,11 @@ export async function ejecutarRetiro({ cuentaId, monto, concepto = '' }) {
         console.error('Error sincronizando perfil en retiro:', e);
     }
 
-    // Registrar Movimiento Contable
     const fecha = new Date().toISOString();
-    const referencia = `RET-${Math.floor(100000 + Math.random() * 900000)}`;
+    const referenciaBase = Math.floor(100000 + Math.random() * 900000);
+    const refIngreso = `INT-${referenciaBase}`;
+    const refEgreso = `RET-${referenciaBase}`;
     const notaConcepto = concepto ? ` · ${concepto}` : '';
-    let detalleMovimiento = `Retiro de efectivo de ${cuenta.tipo || 'Cuenta'}${notaConcepto}`;
-    if (liquidacion.interesGenerado > 0) {
-        detalleMovimiento += ` [Interés 1.5% T.M. liquidado: ${formatoCOP.format(liquidacion.interesGenerado)}]`;
-    }
-    if (liquidacion.usaSobregiro) {
-        detalleMovimiento += ` [Uso de sobregiro: ${formatoCOP.format(liquidacion.sobregiroUsado)}]`;
-    }
 
     let movimientos = [];
     try {
@@ -248,23 +229,48 @@ export async function ejecutarRetiro({ cuentaId, monto, concepto = '' }) {
         movimientos = [];
     }
 
+    // 1. REGISTRO DE INGRESO: Abono del interés del 1.5%
+    if (liquidacion.interesGenerado > 0) {
+        movimientos.push({
+            id: `${refIngreso}-I`,
+            cuentaId: String(cuenta.id),
+            cuentaNumero: soloDigitos(cuenta.numero),
+            cuentaOrigen: 'ABONO-INTERESES',
+            cuentaDestino: soloDigitos(cuenta.numero),
+            username: cuenta.username || username,
+            fecha,
+            referencia: refIngreso,
+            categoria: 'Intereses / Rendimientos',
+            tipo: 'INGRESO',
+            valor: liquidacion.interesGenerado,
+            descripcion: `Abono de interés del 1.5% T.M. al realizar retiro (${cuenta.tipo || 'Cuenta'})`
+        });
+    }
+
+    // 2. REGISTRO DE EGRESO: Salida del dinero por retiro
+    let detalleEgreso = `Retiro de efectivo de ${cuenta.tipo || 'Cuenta'}${notaConcepto}`;
+    if (liquidacion.usaSobregiro) {
+        detalleEgreso += ` [Uso de sobregiro: ${formatoCOP.format(liquidacion.sobregiroUsado)}]`;
+    }
+
     movimientos.push({
-        id: `${referencia}-E`,
+        id: `${refEgreso}-E`,
         cuentaId: String(cuenta.id),
         cuentaNumero: soloDigitos(cuenta.numero),
         cuentaOrigen: soloDigitos(cuenta.numero),
         cuentaDestino: 'RETIRO-EFECTIVO',
         username: cuenta.username || username,
         fecha,
-        referencia,
+        referencia: refEgreso,
         categoria: 'Retiro',
         tipo: 'EGRESO',
         valor: monto,
-        descripcion: detalleMovimiento
+        descripcion: detalleEgreso
     });
+
     localStorage.setItem(K.movimientos, JSON.stringify(movimientos));
 
-    // Registrar Notificación en LocalStorage
+    // Registrar Notificación
     let notifs = [];
     try {
         notifs = JSON.parse(localStorage.getItem(K.notificaciones)) || [];
@@ -274,12 +280,12 @@ export async function ejecutarRetiro({ cuentaId, monto, concepto = '' }) {
 
     let textoNotif = `Retiraste ${formatoCOP.format(monto)} de tu cuenta terminada en ${String(cuenta.numero).slice(-4)}.`;
     if (liquidacion.interesGenerado > 0) {
-        textoNotif += ` Rendimiento del 1.5% acreditado: ${formatoCOP.format(liquidacion.interesGenerado)}.`;
+        textoNotif += ` Se acreditó un ingreso por rendimiento del 1.5%: ${formatoCOP.format(liquidacion.interesGenerado)}.`;
     }
     notifs.unshift({
         id: `NOTIF-${Date.now()}`,
         titulo: 'Retiro de dinero exitoso',
-        mensaje: `${textoNotif} Ref: ${referencia}.`,
+        mensaje: `${textoNotif} Ref: ${refEgreso}.`,
         tipo: 'exito',
         fecha,
         leida: false
@@ -287,7 +293,8 @@ export async function ejecutarRetiro({ cuentaId, monto, concepto = '' }) {
     localStorage.setItem(K.notificaciones, JSON.stringify(notifs.slice(0, 30)));
 
     return {
-        referencia,
+        referencia: refEgreso,
+        referenciaInteres: liquidacion.interesGenerado > 0 ? refIngreso : null,
         fecha,
         cuenta,
         monto,
