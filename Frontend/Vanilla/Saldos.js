@@ -31,17 +31,17 @@ export async function initSaldosView() {
     const actualizarAnalitica = () => {
         const ahorros = cuentas.find(c => {
             const t = String(c.tipo || '').toUpperCase();
-            return t.includes('AHORRO') || t.includes('DEBITO') || t.includes('DÉBITO');
+            return (t.includes('AHORRO') || t.includes('DEBITO') || t.includes('DÉBITO')) && c.estado !== 'INACTIVA';
         }) || { saldo: 0 };
 
         const corriente = cuentas.find(c => {
             const t = String(c.tipo || '').toUpperCase();
-            return t.includes('CORRIENTE');
+            return t.includes('CORRIENTE') && c.estado !== 'INACTIVA';
         }) || { saldo: 0 };
 
         const credito = cuentas.find(c => {
             const t = String(c.tipo || '').toUpperCase();
-            return t.includes('CREDITO') || t.includes('CRÉDITO');
+            return (t.includes('CREDITO') || t.includes('CRÉDITO')) && c.estado !== 'INACTIVA';
         }) || null;
 
         const limpiarSaldo = (val) => {
@@ -55,77 +55,60 @@ export async function initSaldosView() {
         const saldoCorriente = limpiarSaldo(corriente.saldo);
         const cupoCredito = credito ? limpiarSaldo(credito.saldo || credito.cupoDisponible) : 0;
         
-        const total = saldoAhorros + saldoCorriente;
+        const totalConsolidado = saldoAhorros + saldoCorriente;
+        const sumaTotalConCredito = saldoAhorros + saldoCorriente + cupoCredito;
 
+        const elCreditoTotal = document.getElementById('montoCreditoTotal');
         const elAhorrosTotal = document.getElementById('montoAhorrosTotal');
         const elCorrienteTotal = document.getElementById('montoCorrienteTotal');
-        const elCreditoTotal = document.getElementById('montoCreditoTotal');
         const elSaldoConsolidado = document.getElementById('saldoTotalConsolidado');
-        const elPorcentajeAhorros = document.getElementById('porcentajeAhorros');
-        const elPorcentajeCorriente = document.getElementById('porcentajeCorriente');
+
+        const elPctCredito = document.getElementById('porcentajeCredito');
+        const elPctAhorros = document.getElementById('porcentajeAhorros');
+        const elPctCorriente = document.getElementById('porcentajeCorriente');
+
+        const segCredito = document.getElementById('segCredito');
         const segAhorros = document.getElementById('segAhorros');
         const segCorriente = document.getElementById('segCorriente');
 
         if (ocultar) {
+            if (elCreditoTotal) elCreditoTotal.textContent = '$ ••••••';
             if (elAhorrosTotal) elAhorrosTotal.textContent = '$ ••••••';
             if (elCorrienteTotal) elCorrienteTotal.textContent = '$ ••••••';
-            if (elCreditoTotal) elCreditoTotal.textContent = '$ ••••••';
             if (elSaldoConsolidado) elSaldoConsolidado.textContent = '$ ••••••';
         } else {
+            if (elCreditoTotal) elCreditoTotal.textContent = formatoCOP.format(cupoCredito);
             if (elAhorrosTotal) elAhorrosTotal.textContent = formatoCOP.format(saldoAhorros);
             if (elCorrienteTotal) elCorrienteTotal.textContent = formatoCOP.format(saldoCorriente);
-            if (elCreditoTotal) elCreditoTotal.textContent = formatoCOP.format(cupoCredito);
-            if (elSaldoConsolidado) elSaldoConsolidado.textContent = formatoCOP.format(total);
+            if (elSaldoConsolidado) elSaldoConsolidado.textContent = formatoCOP.format(totalConsolidado);
         }
 
-        const tieneAhorros = saldoAhorros > 0 || Boolean(cuentas.find(c => {
-            const t = String(c.tipo || '').toUpperCase();
-            return t.includes('AHORRO') || t.includes('DEBITO');
-        }));
-        
-        const tieneCorriente = saldoCorriente > 0 || Boolean(cuentas.find(c => {
-            const t = String(c.tipo || '').toUpperCase();
-            return t.includes('CORRIENTE');
-        }));
-
-        const itemLeyendaAhorros = document.getElementById('itemLeyendaAhorros');
-        const itemLeyendaCorriente = document.getElementById('itemLeyendaCorriente');
-
-        if (itemLeyendaAhorros) itemLeyendaAhorros.classList.toggle('hidden', !tieneAhorros);
-        if (itemLeyendaCorriente) itemLeyendaCorriente.classList.toggle('hidden', !tieneCorriente);
-
+        let pctCredito = 0;
         let pctAhorros = 0;
         let pctCorriente = 0;
 
-        if (total > 0) {
-            pctAhorros = Math.round((saldoAhorros / total) * 100);
-            pctCorriente = 100 - pctAhorros;
-
-            if (saldoCorriente > 0 && pctCorriente === 0) {
-                pctCorriente = 1;
-                pctAhorros = 99;
-            }
-        } else if (tieneAhorros) {
-            pctAhorros = 100;
+        if (sumaTotalConCredito > 0) {
+            pctCredito = Math.round((cupoCredito / sumaTotalConCredito) * 100);
+            pctAhorros = Math.round((saldoAhorros / sumaTotalConCredito) * 100);
+            pctCorriente = Math.max(0, 100 - (pctCredito + pctAhorros));
         }
 
-        if (elPorcentajeAhorros) elPorcentajeAhorros.textContent = `${pctAhorros}%`;
-        if (elPorcentajeCorriente) elPorcentajeCorriente.textContent = `${pctCorriente}%`;
+        if (elPctCredito) elPctCredito.textContent = `${pctCredito}%`;
+        if (elPctAhorros) elPctAhorros.textContent = `${pctAhorros}%`;
+        if (elPctCorriente) elPctCorriente.textContent = `${pctCorriente}%`;
 
-        if (segAhorros) {
-            segAhorros.style.width = `${pctAhorros}%`;
-            segAhorros.classList.toggle('hidden', !tieneAhorros);
-        }
-        if (segCorriente) {
-            segCorriente.style.width = `${pctCorriente}%`;
-            segCorriente.classList.toggle('hidden', !tieneCorriente);
-        }
+        if (segCredito) segCredito.style.width = `${pctCredito}%`;
+        if (segAhorros) segAhorros.style.width = `${pctAhorros}%`;
+        if (segCorriente) segCorriente.style.width = `${pctCorriente}%`;
     };
 
     const pintarCuentas = () => {
         const nodos = cuentas.map(c => {
             try {
-                return crearCuentaCard(c, { ocultarSaldo: ocultar });
+                return crearCuentaCard(c, { 
+                    ocultarSaldo: ocultar,
+                    onEstadoCambiado: cargar
+                });
             } catch (err) {
                 return null;
             }
@@ -162,23 +145,6 @@ export async function initSaldosView() {
             pintarOjo();
             pintarCuentas();
             return;
-        }
-
-        // 🚀 Redirección hacia CreditoSimulador.html accionada por el botón destacado de la Tarjeta de Crédito
-        const btnSimular = e.target.closest('.btn-simular-compra');
-        if (btnSimular) {
-            e.preventDefault();
-            const linkSimulador = document.querySelector('[data-view="simuladortc"]') || 
-                                  document.querySelector('[data-view="SimuladorTC"]') ||
-                                  document.querySelector('a[href*="CreditoSimulador"]');
-            
-            if (linkSimulador) {
-                linkSimulador.click();
-            } else {
-                // Disparo de evento global en caso de no encontrar el enlace en la navegación
-                const eventoNav = new CustomEvent('navegarVista', { detail: { vista: 'simuladortc' } });
-                window.dispatchEvent(eventoNav);
-            }
         }
     });
 
