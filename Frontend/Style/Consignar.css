@@ -1,167 +1,136 @@
 @import url('global/styles.css');
 
-/* =========================================
-   ESTILOS ESPECÍFICOS - VISTA CONSIGNAR
-========================================= */
-.main-content {
-    padding: 35px 42px;
-    color: #f5f5f5;
+/* ==========================================
+   ESTILOS ESPECÍFICOS - VISTA CONSIGNAR (FINARA)
+   ========================================== */
+
+.tr-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    box-sizing: border-box !important;
 }
 
-/* ENCABEZADO DE LA VISTA */
 .deposit-page-header {
-    margin-bottom: 30px;
-}
-.deposit-page-header h1 {
-    margin: 0;
-    font-size: 32px;
-    font-weight: 700;
-    color: #ffffff;
-}
-.deposit-page-header p {
-    margin-top: 6px;
-    color: #a9adb5;
-    font-size: 15px;
+    margin-bottom: 0.5rem;
+    width: 100%;
 }
 
-/* GRID PRINCIPAL */
+.deposit-page-header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    color: #1e293b !important;
+}
+
+.deposit-page-header p {
+    color: #64748b !important;
+    font-size: 0.9rem;
+}
+
+/* Layout principal idéntico a transferencias */
 .deposit-container-grid {
     display: grid;
-    grid-template-columns: 1.4fr 1fr;
-    gap: 25px;
+    grid-template-columns: minmax(0, 1.8fr) minmax(300px, 1fr);
+    gap: 1.5rem;
     align-items: start;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-/* TARJETA DE FORMULARIO */
-.deposit-card-form {
-    background: linear-gradient(145deg, #111317, #0c0d10);
-    border: 1px solid #303238;
-    border-radius: 18px;
-    padding: 30px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+.deposit-card-form, .deposit-sidebar-info > .info-widget {
+    background: var(--bg-card-dark-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--bg-card-border);
+    border-radius: var(--radius-card);
+    padding: 1.8rem;
+    box-shadow: var(--shadow-card);
+    box-sizing: border-box;
 }
 
 .card-title-box {
     display: flex;
     align-items: center;
     gap: 15px;
-    margin-bottom: 25px;
-    padding-bottom: 15px;
+    margin-bottom: 1.4rem;
+    padding-bottom: 1rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .card-icon-gold {
-    width: 50px;
-    height: 50px;
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     background: rgba(229, 169, 60, 0.15);
     color: #e5a93c;
-    font-size: 20px;
+    font-size: 1.1rem;
 }
 
 .card-title-box h3 {
     margin: 0;
-    font-size: 20px;
-    color: #ffffff;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-white);
 }
 
 .card-title-box span {
-    font-size: 13px;
-    color: #8a8f99;
+    font-size: 0.8rem;
+    color: var(--text-muted);
 }
 
-/* FORMULARIO */
+/* Formulario */
 .deposit-form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 1.2rem;
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
 }
 
 .form-group label {
-    font-size: 0.85rem;
-    color: #c9cbd0;
+    font-size: 0.8rem;
+    color: var(--text-muted);
     font-weight: 500;
 }
 
 .form-group select,
 .form-group input {
-    width: 100%;
-    padding: 12px 16px;
-    background: #0a0c10;
-    border: 1px solid #1f2430;
-    border-radius: 10px;
-    color: #ffffff;
+    background: rgba(0, 0, 0, 0.4);
+    color: var(--text-white);
+    border: 1px solid var(--bg-card-border);
+    border-radius: 12px;
+    padding: 12px 14px;
     font-family: inherit;
-    font-size: 0.9rem;
-    transition: all 0.25s ease;
-}
-
-.form-group select:focus,
-.form-group input:focus {
-    outline: none;
-    border-color: #e5a93c;
-    box-shadow: 0 0 10px rgba(229, 169, 60, 0.2);
-}
-
-/* MÉTODOS DE PAGO GRID */
-.payment-methods-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-}
-
-.method-option {
-    background: #0a0c10;
-    border: 1px solid #1f2430;
-    border-radius: 10px;
-    padding: 12px 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
+    font-size: 0.92rem;
+    width: 100%;
+    box-sizing: border-box;
     transition: all 0.2s ease;
-    text-align: center;
 }
 
-.method-option input {
-    display: none;
+.form-group select option {
+    background: #11141d;
+    color: #ffffff;
 }
 
-.method-option i {
-    font-size: 1.2rem;
-    color: #8a8f99;
+.form-group select:hover, .form-group select:focus,
+.form-group input:hover, .form-group input:focus {
+    border-color: var(--gold-main);
+    box-shadow: 0 0 0 3px rgba(229, 169, 60, 0.15);
+    outline: none;
 }
 
-.method-option span {
-    font-size: 0.78rem;
-    color: #c9cbd0;
-}
-
-.method-option:hover {
-    border-color: rgba(229, 169, 60, 0.5);
-}
-
-.method-option input:checked + i,
-.method-option input:checked ~ span {
-    color: #e5a93c;
-}
-
-.method-option:has(input:checked) {
-    background: rgba(229, 169, 60, 0.08);
-    border-color: #e5a93c;
-}
-
-/* INPUT DE MONTO */
 .amount-input-wrapper {
     position: relative;
     display: flex;
@@ -171,135 +140,201 @@
 .amount-input-wrapper span {
     position: absolute;
     left: 16px;
-    color: #e5a93c;
-    font-weight: 600;
+    color: var(--gold-main);
+    font-weight: 700;
+    font-size: 1.25rem;
 }
 
 .amount-input-wrapper input {
-    padding-left: 35px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #38bdf8;
+    padding-left: 36px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--gold-main);
 }
 
 .helper-text {
-    font-size: 0.75rem;
-    color: #8a8f99;
+    font-size: 0.78rem;
+    color: var(--text-muted);
 }
 
-/* BOTÓN DE ENVÍO */
+/* Botón de envío */
 .btn-submit-deposit {
-    background: linear-gradient(135deg, #e5a93c, #b8821f);
-    color: #0a0c10;
-    border: none;
-    border-radius: 24px;
-    padding: 14px;
-    font-size: 0.95rem;
-    font-weight: 600;
+    font-family: inherit;
+    font-size: 0.92rem;
+    font-weight: 700;
+    padding: 12px 26px;
+    border-radius: 12px;
     cursor: pointer;
-    display: flex;
+    border: none;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    box-shadow: 0 4px 15px rgba(229, 169, 60, 0.3);
-    transition: all 0.3s ease;
-    margin-top: 10px;
+    gap: 10px;
+    background: linear-gradient(135deg, #e5a93c 0%, #c48b28 100%);
+    color: #07090e;
+    box-shadow: 0 4px 16px rgba(229, 169, 60, 0.25);
+    transition: all 0.25s ease;
+    margin-top: 0.5rem;
 }
 
 .btn-submit-deposit:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(229, 169, 60, 0.5);
+    box-shadow: 0 6px 20px rgba(229, 169, 60, 0.4);
 }
 
-/* SIDEBAR DERECHO DE INFORMACIÓN */
+/* Sidebar lateral idéntica a transferencias */
 .deposit-sidebar-info {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 1.2rem;
 }
 
-.info-widget {
-    background: #101216;
-    border: 1px solid #303238;
-    border-radius: 18px;
-    padding: 24px;
+.tr-side-card {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(229, 169, 60, 0.25);
+    border-radius: 14px;
+    padding: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
+
+.tr-side-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tr-side-card__label {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.tr-side-card__badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 12px;
+    text-transform: uppercase;
+}
+
+.badge--activa {
+    background: rgba(52, 211, 153, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.badge--bloqueada {
+    background: rgba(248, 113, 113, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+.tr-side-card__monto {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gold-main);
+}
+
+.tr-side-card__sub {
+    font-size: 0.8rem;
+    color: #cbd5e1;
+}
+
+.tr-side-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+.tr-side-summary h4 {
+    font-size: 0.85rem;
+    color: var(--text-white);
+    margin-bottom: 4px;
+}
+
+.tr-side-summary__row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+
+.tr-side-summary__row strong {
+    color: var(--text-white);
+}
+
+.gold-text { color: var(--gold-main) !important; }
+.green-text { color: #34d399 !important; }
 
 .widget-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 12px;
+    gap: 10px;
+    margin-bottom: 8px;
 }
 
 .widget-header i {
-    font-size: 1.3rem;
-    color: #e5a93c;
+    font-size: 1.2rem;
+    color: var(--gold-main);
 }
 
 .widget-header h4 {
     margin: 0;
-    font-size: 1.1rem;
-    color: #ffffff;
+    font-size: 1rem;
+    color: var(--text-white);
 }
 
 .info-widget p {
-    color: #989ba2;
-    font-size: 0.88rem;
-    line-height: 1.5;
-    margin-bottom: 15px;
-}
-
-.security-benefits {
-    list-style: none;
-    padding: 0;
+    color: var(--text-muted);
+    font-size: 0.84rem;
+    line-height: 1.4;
     margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    font-size: 0.85rem;
-    color: #c9cbd0;
 }
 
-.security-benefits i {
-    color: #10b981;
-    margin-right: 8px;
+/* ==========================================
+   ESTILOS DE IMPRESIÓN OFICIAL (COMPROBANTE)
+   ========================================== */
+@page {
+    size: A4 portrait;
+    margin: 0;
 }
 
-.btn-support {
-    background: rgba(229, 169, 60, 0.12);
-    border: 1px solid rgba(229, 169, 60, 0.3);
-    color: #e5a93c;
-    width: 100%;
-    padding: 10px;
-    border-radius: 10px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
+@media print {
+    html, body {
+        width: 100% !important;
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background-color: #0d1017 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    body * {
+        visibility: hidden !important;
+    }
+
+    #impresionVoucher, #impresionVoucher * {
+        visibility: visible !important;
+    }
+
+    #impresionVoucher {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        min-height: 100vh !important;
+        padding: 25mm 15mm !important;
+        background: #0d1017 !important;
+        box-sizing: border-box !important;
+    }
 }
 
-.btn-support:hover {
-    background: #e5a93c;
-    color: #0a0c10;
-}
-
-/* =========================================
-   RESPONSIVE DESIGN
-========================================= */
 @media (max-width: 992px) {
-    .deposit-container-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 576px) {
-    .main-content {
-        padding: 1.2rem;
-    }
-    .payment-methods-grid {
-        grid-template-columns: 1fr;
-    }
-    .deposit-card-form {
-        padding: 20px;
-    }
+    .deposit-container-grid { grid-template-columns: 1fr; }
 }
