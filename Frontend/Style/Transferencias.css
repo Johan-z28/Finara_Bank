@@ -27,22 +27,22 @@
 }
 
 .tr-header h1 {
-    font-size: 1.6rem;
-    font-weight: 600;
+    font-size: 1.8rem;
+    font-weight: 700;
     margin-bottom: 0.3rem;
-    color: var(--text-white);
+    color: #1e293b !important;
 }
 
 .tr-subtitle { 
-    color: var(--text-muted); 
-    font-size: 0.85rem; 
+    color: #64748b !important; 
+    font-size: 0.9rem; 
 }
 
-/* Indicador de pasos */
+/* Indicador de pasos estilizado */
 .tr-pasos {
     list-style: none;
     display: flex;
-    gap: 0.6rem;
+    gap: 0.8rem;
     margin-bottom: 1.4rem;
     flex-wrap: wrap;
     padding: 0;
@@ -53,54 +53,59 @@
     align-items: center;
     gap: 10px;
     font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--text-muted);
-    padding: 8px 16px 8px 8px;
-    border: 1px solid var(--border-dark);
-    border-radius: 28px;
-    background: rgba(18, 21, 28, 0.7);
-    backdrop-filter: blur(8px);
+    font-weight: 600;
+    color: #94a3b8;
+    padding: 8px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 30px;
+    background: #11141d;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     transition: all 0.25s ease;
 }
 
 .tr-paso span {
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.78rem;
+    font-size: 0.8rem;
     font-weight: 700;
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text-muted);
-    transition: all 0.25s ease;
+    background: rgba(255, 255, 255, 0.08);
+    color: #cbd5e1;
 }
 
+/* Estado activo */
 .tr-paso.activo {
-    color: var(--text-white);
-    border-color: var(--gold-main);
-    background: rgba(229, 169, 60, 0.06);
-    box-shadow: 0 4px 14px rgba(229, 169, 60, 0.12);
-}
-.tr-paso.activo span {
-    background: var(--gold-main);
-    color: #07090e;
-    box-shadow: 0 0 10px rgba(229, 169, 60, 0.5);
-}
-.tr-paso.completo {
-    color: var(--text-white);
-    border-color: rgba(52, 211, 153, 0.3);
-}
-.tr-paso.completo span {
-    background: rgba(52, 211, 153, 0.2);
-    color: var(--ingreso);
+    color: #ffffff !important;
+    border-color: rgba(229, 169, 60, 0.6);
+    background: linear-gradient(135deg, #1f2533 0%, #151924 100%) !important;
+    box-shadow: 0 4px 16px rgba(229, 169, 60, 0.25);
 }
 
-/* Layout de Transferencias */
+.tr-paso.activo span {
+    background: linear-gradient(135deg, #e5a93c 0%, #b8860b 100%) !important;
+    color: #000000 !important;
+    font-weight: 800;
+}
+
+.tr-paso.completo {
+    color: #ffffff;
+    border-color: rgba(229, 169, 60,) !important;
+    background: linear-gradient(135deg, #e5a93c 0%, #b8860b 100%) !important;
+}
+
+.tr-paso.completo span {
+    background: var(--bg-card-dark-glass)!important;
+    color: #ffffff !important;
+    font-weight: 800;
+}
+
+/* Layout principal */
 .tr-layout {
     display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+    grid-template-columns: minmax(0, 1.8fr) minmax(300px, 1fr);
     gap: 1.5rem;
     align-items: start;
     width: 100%;
@@ -108,12 +113,14 @@
 }
 
 .tr-card, .tr-info {
-    background: linear-gradient(145deg, #101319 0%, #0a0c10 100%);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-top: 3px solid var(--gold-main);
-    border-radius: 16px;
+    background: var(--bg-card-dark-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--bg-card-border);
+    border-top: none !important;
+    border-radius: var(--radius-card);
     padding: 1.8rem;
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+    box-shadow: var(--shadow-card);
     box-sizing: border-box;
 }
 
@@ -122,153 +129,155 @@
     font-weight: 700;
     margin-bottom: 1.4rem;
     color: var(--text-white);
-    letter-spacing: -0.2px;
 }
 
 .tr-info {
     display: flex;
     flex-direction: column;
-    gap: 1.3rem;
-    border-top-color: rgba(229, 169, 60, 0.4);
+    gap: 1.2rem;
 }
+
 .tr-info h3 {
-    font-size: 1rem;
+    font-size: 1.05rem;
     font-weight: 700;
     color: var(--text-white);
 }
-.tr-info ul { list-style: none; display: flex; flex-direction: column; gap: 1.1rem; padding: 0; }
-.tr-info li { display: flex; gap: 0.9rem; align-items: flex-start; }
-.tr-info li i {
-    width: 40px; height: 40px; flex-shrink: 0;
+
+/* ELIMINACIÓN DEL ESPACIO DE TARJETA DUPLICADA DEBAJO DEL SELECTOR */
+.tr-origen-card {
+    display: none !important;
+}
+
+/* Tarjeta lateral */
+.tr-side-card {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(229, 169, 60, 0.25);
+    border-radius: 14px;
+    padding: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.tr-side-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tr-side-card__label {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.tr-side-card__badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 12px;
+    text-transform: uppercase;
+}
+
+.badge--activa {
+    background: rgba(52, 211, 153, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.badge--bloqueada {
+    background: rgba(248, 113, 113, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+.tr-side-card__monto {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gold-main);
+}
+
+.tr-side-card__sub {
+    font-size: 0.8rem;
+    color: #cbd5e1;
+}
+
+/* Resumen dinámico lateral */
+.tr-side-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+.tr-side-summary h4 {
+    font-size: 0.85rem;
+    color: var(--text-white);
+    margin-bottom: 4px;
+}
+
+.tr-side-summary__row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+
+.tr-side-summary__row strong {
+    color: var(--text-white);
+}
+
+.gold-text { color: var(--gold-main) !important; }
+.green-text { color: #34d399 !important; }
+
+.tr-divider {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    margin: 4px 0;
+}
+
+.tr-info-features { list-style: none; display: flex; flex-direction: column; gap: 1rem; padding: 0; }
+.tr-info-features li { display: flex; gap: 0.9rem; align-items: flex-start; }
+.tr-info-features li i {
+    width: 36px; height: 36px; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
-    border-radius: 12px; color: var(--gold-main);
+    border-radius: 10px; color: var(--gold-main);
     background: rgba(229, 169, 60, 0.12);
     border: 1px solid rgba(229, 169, 60, 0.2);
-    font-size: 1rem;
+    font-size: 0.95rem;
 }
-.tr-info strong { display: block; font-size: 0.9rem; color: var(--text-white); margin-bottom: 2px; }
-.tr-info span { color: var(--text-muted); font-size: 0.78rem; line-height: 1.4; }
+.tr-info-features strong { display: block; font-size: 0.88rem; color: var(--text-white); margin-bottom: 2px; }
+.tr-info-features span { color: var(--text-muted); font-size: 0.78rem; line-height: 1.4; }
 
 /* Campos del Formulario */
 .tr-campo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.1rem; flex: 1 1 200px; min-width: 0; }
 .tr-fila-campos { display: flex; flex-wrap: wrap; gap: 1rem; }
 
-.tr-campo label { color: var(--text-muted); font-size: 0.75rem; }
+.tr-campo label { color: var(--text-muted); font-size: 0.8rem; font-weight: 500; }
 
 .tr-campo select,
 .tr-campo input {
-    background: #07090e;
+    background: rgba(0, 0, 0, 0.4);
     color: var(--text-white);
-    border: 1px solid var(--border-dark);
+    border: 1px solid var(--bg-card-border);
     border-radius: 12px;
     padding: 12px 14px;
     font-family: inherit;
     font-size: 0.92rem;
     width: 100%;
     box-sizing: border-box;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s ease;
 }
 
 .tr-campo select { cursor: pointer; }
-.tr-campo input::placeholder { color: #5a606d; }
+.tr-campo input::placeholder { color: #64748b; }
 .tr-campo select:hover, .tr-campo select:focus,
 .tr-campo input:hover, .tr-campo input:focus {
     border-color: var(--gold-main);
     box-shadow: 0 0 0 3px rgba(229, 169, 60, 0.15);
     outline: none;
-}
-
-/* Modalidad de transferencia: Finara vs Otro Banco (HU-07) */
-.tr-modalidad-tabs {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 1.2rem;
-    padding: 4px;
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid var(--border-dark);
-    border-radius: 12px;
-}
-.tr-tab-btn {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px 14px;
-    border: 1px solid transparent;
-    border-radius: 9px;
-    background: transparent;
-    color: var(--text-muted);
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.25s ease;
-}
-.tr-tab-btn:hover {
-    color: var(--text-white);
-    background: rgba(255, 255, 255, 0.04);
-}
-.tr-tab-btn.activo {
-    background: rgba(229, 169, 60, 0.15);
-    color: var(--gold-main);
-    border-color: rgba(229, 169, 60, 0.35);
-    box-shadow: 0 4px 12px rgba(229, 169, 60, 0.15);
-}
-
-/* Tarjeta visual de cuenta origen */
-.tr-origen-card {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    background: linear-gradient(135deg, rgba(229, 169, 60, 0.08) 0%, rgba(13, 16, 23, 0.8) 100%);
-    border: 1px solid rgba(229, 169, 60, 0.25);
-    border-radius: 12px;
-    margin-top: 6px;
-    transition: all 0.25s ease;
-}
-.tr-origen-card:hover {
-    border-color: var(--gold-main);
-    box-shadow: 0 4px 15px rgba(229, 169, 60, 0.1);
-}
-.tr-origen-card__icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    background: rgba(229, 169, 60, 0.15);
-    color: var(--gold-main);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-    flex-shrink: 0;
-}
-.tr-origen-card__info {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-width: 0;
-}
-.tr-origen-card__tipo {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-}
-.tr-origen-card__saldo {
-    font-size: 1.15rem;
-    color: var(--text-white);
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-}
-.tr-origen-card__badge {
-    font-size: 0.7rem;
-    font-weight: 600;
-    padding: 4px 10px;
-    border-radius: 20px;
-    background: rgba(52, 211, 153, 0.15);
-    color: var(--ingreso);
-    border: 1px solid rgba(52, 211, 153, 0.3);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
 }
 
 .tr-monto-header {
@@ -277,18 +286,16 @@
     align-items: center;
     margin-bottom: 2px;
 }
+
 .tr-btn-maximo {
     background: transparent;
     border: none;
     color: var(--gold-main);
-    font-size: 0.75rem;
+    font-size: 0.78rem;
     font-weight: 600;
     cursor: pointer;
-    padding: 2px 6px;
-    border-radius: 6px;
 }
 .tr-btn-maximo:hover {
-    background: rgba(229, 169, 60, 0.12);
     text-decoration: underline;
 }
 
@@ -312,7 +319,7 @@
 }
 .tr-chip {
     background: rgba(255, 255, 255, 0.04);
-    border: 1px solid var(--border-dark);
+    border: 1px solid var(--bg-card-border);
     color: var(--text-muted);
     font-size: 0.78rem;
     font-weight: 500;
@@ -321,14 +328,14 @@
     cursor: pointer;
     transition: all 0.2s ease;
 }
-.tr-chip:hover {
+.tr-chip:hover, .tr-chip.activo {
     border-color: var(--gold-main);
     color: var(--gold-main);
-    background: rgba(229, 169, 60, 0.08);
+    background: rgba(229, 169, 60, 0.12);
 }
 
-.tr-hint { color: var(--text-muted); font-size: 0.75rem; display: none; }
-.tr-error { color: var(--egreso); font-size: 0.75rem; min-height: 0; font-weight: 500; }
+.tr-hint { color: var(--text-muted); font-size: 0.78rem; display: none; }
+.tr-error { color: var(--egreso); font-size: 0.78rem; font-weight: 500; }
 .tr-error:empty { display: none; }
 
 .tr-destino {
@@ -361,15 +368,15 @@
     transition: all 0.25s ease;
 }
 .tr-btn--primary {
-    background: linear-gradient(135deg, #e5a93c 0%, #d49323 100%);
+    background: linear-gradient(135deg, #e5a93c 0%, #c48b28 100%);
     color: #07090e;
     font-weight: 700;
     box-shadow: 0 4px 16px rgba(229, 169, 60, 0.25);
 }
 .tr-btn--ghost {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.04);
     color: var(--text-white);
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.12);
 }
 
 .tr-toast {
@@ -387,17 +394,12 @@
 }
 .tr-toast.visible { opacity: 1; }
 
-/* ==========================================
-   ESTILOS DEL PASO 2: REVISA Y CONFIRMA
-   ========================================== */
-
 .tr-lista {
     display: flex;
     flex-direction: column;
-    gap: 0;
     margin: 1.2rem 0;
     padding: 0;
-    background: rgba(7, 9, 14, 0.6);
+    background: rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 14px;
     overflow: hidden;
@@ -409,73 +411,122 @@
     align-items: center;
     padding: 14px 18px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    transition: background 0.2s ease;
 }
 
-.tr-fila-resumen:last-child {
-    border-bottom: none;
-}
+.tr-fila-resumen:last-child { border-bottom: none; }
 
-.tr-fila-resumen:hover {
-    background: rgba(255, 255, 255, 0.02);
-}
-
-.tr-fila-resumen dt {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    font-weight: 500;
-    margin: 0;
-}
-
+.tr-fila-resumen dt { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; margin: 0; }
 .tr-fila-resumen dd {
-    margin: 0;
-    text-align: right;
-    font-size: 0.92rem;
-    color: var(--text-white);
-    font-weight: 600;
+    margin: 0; text-align: right; font-size: 0.92rem; color: var(--text-white); font-weight: 600;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 2px;
+}
+
+.tr-valor--grande { font-size: 1.25rem !important; color: var(--gold-main) !important; font-weight: 700 !important; }
+
+/* ==========================================
+   PASO 3: VISTA DE ÉXITO Y VOUCHER
+   ========================================== */
+
+.tr-exito-header {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    gap: 2px;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 1.5rem;
 }
 
-.tr-valor--grande {
-    font-size: 1.25rem !important;
-    color: var(--gold-main) !important;
-    font-weight: 700 !important;
-}
-
-.tr-valor--negativo {
-    color: #e2e8f0;
-}
-
-.tr-valor-extra {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    font-weight: 400;
-}
-
-.tr-aviso {
-    background: rgba(251, 191, 36, 0.1);
-    border: 1px solid rgba(251, 191, 36, 0.3);
-    color: #fbbf24;
-    padding: 12px 16px;
-    border-radius: 10px;
-    font-size: 0.82rem;
-    margin-top: 1rem;
+.tr-exito-icono {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #e5a93c 0%, #b8860b 100%);
+    color: #0d1017;
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+    box-shadow: 0 0 25px rgba(229, 169, 60, 0.4);
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.tr-alerta-error {
-    background: rgba(248, 113, 113, 0.1);
-    border: 1px solid rgba(248, 113, 113, 0.3);
-    color: var(--egreso);
-    padding: 12px 16px;
-    border-radius: 10px;
-    font-size: 0.82rem;
-    margin-top: 1rem;
+@keyframes popIn {
+    0% { transform: scale(0.4); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.tr-badge-exito {
+    background: rgba(52, 211, 153, 0.12);
+    color: #34d399;
+    border: 1px solid rgba(52, 211, 153, 0.3);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 0.6rem;
+    letter-spacing: 0.5px;
+}
+
+.tr-exito-titulo {
+    font-size: 1.6rem !important;
+    color: #ffffff !important;
+    margin-bottom: 0.3rem !important;
+}
+
+.tr-exito-sub {
+    color: #94a3b8;
+    font-size: 0.88rem;
+    margin: 0;
+}
+
+.tr-acciones--exito {
+    justify-content: center;
+    gap: 1.2rem;
+    margin-top: 2rem;
+}
+
+/* ==========================================
+   ESTILOS DE IMPRESIÓN CORREGIDOS (FINARA)
+   ========================================== */
+
+@page {
+    size: A4 portrait;
+    margin: 0; /* Oculta encabezados, URL, fecha y pies del navegador */
+}
+
+@media print {
+    html, body {
+        width: 100% !important;
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background-color: #0d1017 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* Ocultar toda la interfaz original */
+    body * {
+        visibility: hidden !important;
+    }
+
+    /* Hacer visible únicamente el voucher y sus hijos respetando su display inline */
+    #impresionVoucher, #impresionVoucher * {
+        visibility: visible !important;
+    }
+
+    #impresionVoucher {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        min-height: 100vh !important;
+        padding: 25mm 15mm !important;
+        background: #0d1017 !important;
+        box-sizing: border-box !important;
+    }
 }
 
 @media (max-width: 992px) {

@@ -305,7 +305,7 @@ html, body, .general-body {
   font-weight: 700;
   color: #b88322;
   background: linear-gradient(135deg, #e5a93c 0%, #b88322 100%);
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 

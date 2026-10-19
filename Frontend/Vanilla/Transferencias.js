@@ -16,14 +16,22 @@ function el(tag, clase, texto) {
 
 const ultimos4 = numero => String(numero).replace(/\D/g, '').slice(-4);
 const soloDigitos = v => String(v ?? '').replace(/\D/g, '');
+const formatearNumeroConEspacios = numero => soloDigitos(numero).replace(/(\d{4})(?=\d)/g, '$1 ');
 const textoCuenta = c => `${TIPOS[c.tipo] || c.tipo} · •••• ${ultimos4(c.numero)}`;
 
 function filas(contenedor, items) {
-    contenedor.replaceChildren(...items.map(({ label, valor, extra, destacado, negativo }) => {
+    contenedor.replaceChildren(...items.map(({ label, valor, extra, htmlVal, destacado, negativo }) => {
         const fila = el('div', 'tr-fila-resumen');
-        const dd = el('dd', destacado ? 'tr-valor tr-valor--grande' : 'tr-valor', valor);
-        if (negativo) dd.classList.add('tr-valor--negativo');
-        if (extra) dd.append(el('span', 'tr-valor-extra', extra));
+        const dd = el('dd', destacado ? 'tr-valor tr-valor--grande' : 'tr-valor');
+
+        if (htmlVal) {
+            dd.innerHTML = htmlVal;
+        } else {
+            dd.textContent = valor;
+            if (negativo) dd.classList.add('tr-valor--negativo');
+            if (extra) dd.append(el('span', 'tr-valor-extra', extra));
+        }
+
         fila.append(el('dt', '', label), dd);
         return fila;
     }));
@@ -36,28 +44,33 @@ export async function initTransferenciasView() {
         if (modNotif && modNotif.initCampanaNotificaciones) {
             modNotif.initCampanaNotificaciones();
         }
-    } catch {}
+    } catch { }
 
     const $ = id => document.getElementById(id);
     const form = $('formTransferencia');
-    
     if (!form) return;
 
-    const selOrigen = $('trOrigen'), selTipo = $('trTipoDestino'), selBanco =$('bancoDestinoSelect');
+    const selOrigen = $('trOrigen'), selTipo =$('trTipoDestino');
     const inpNumero = $('trNumeroDestino'), inpMonto = $('trMonto'), inpConcepto =$('trConcepto');
     const hintOrigen = $('trOrigenHint'), boxDestino =$('trDestino');
-    const trOrigenCard = $('trOrigenCard'), trCardTipo =$('trCardTipo'), trCardSaldo = $('trCardSaldo'), trCardBadge =$('trCardBadge');
+
+    const sideInfo = document.querySelector('.tr-info');
+    const sideOrigenSaldo = $('sideOrigenSaldo'), sideOrigenSub = $('sideOrigenSub'), sideOrigenBadge =$('sideOrigenBadge');
+    const sideDestinoTxt = $('sideDestinoTxt'), sideMontoTxt =$('sideMontoTxt');
+
     const btnTransferirTodo = $('btnTransferirTodo'), chipsMonto =$('chipsMonto');
     const errOrigen = $('errOrigen'), errDestino = $('errDestino'), errMonto =$('errMonto');
     const vistas = { 1: $('vistaForm'), 2: $('vistaResumen'), 3:$('vistaExito') };
     const pasos = document.querySelectorAll('.tr-paso');
     const btnEditar = $('btnEditar'), btnConfirmar =$('btnConfirmar'), btnNueva = $('btnNueva'), btnContinuar =$('btnContinuar');
+    const btnDescargarPDF = $('btnDescargarPDF'), btnVerMovimientos =$('btnVerMovimientos');
     const resumenError = $('resumenError'), resumenAlerta =$('resumenAlerta');
     const estadoGlobal = $('trEstado'), toast =$('trToast');
 
     let cuentas = [];
     let destino = null;
     let datos = null;
+    let resultadoFinal = null;
     let tokenDestino = 0;
     let temporizador = null;
     let enProceso = false;
@@ -68,12 +81,23 @@ export async function initTransferenciasView() {
         Object.entries(vistas).forEach(([k, v]) => {
             if (v) v.classList.toggle('hidden', Number(k) !== n);
         });
+
         pasos.forEach(p => {
             const num = Number(p.dataset.paso);
             p.classList.toggle('activo', num === n);
             p.classList.toggle('completo', num < n);
             p.setAttribute('aria-current', num === n ? 'step' : 'false');
         });
+
+        if (sideInfo) {
+            sideInfo.style.display = n === 1 ? 'flex' : 'none';
+        }
+
+        const trLayout = document.querySelector('.tr-layout');
+        if (trLayout) {
+            trLayout.style.gridTemplateColumns = n === 1 ? 'minmax(0, 1.8fr) minmax(300px, 1fr)' : '1fr';
+        }
+
         if (vistas[n]) {
             const titulo = vistas[n].querySelector('h2');
             if (titulo) {
@@ -90,55 +114,77 @@ export async function initTransferenciasView() {
         setTimeout(() => toast.classList.remove('visible'), 3500);
     }
 
-    const cuentaSeleccionada = () => cuentas.find(c => String(c.id) === selOrigen.value);
+    const cuentaSeleccionada = () => cuentas.find(c => String(c.id) === selOrigen.value || soloDigitos(c.numero) === soloDigitos(selOrigen.value));
     const leerMonto = () => Number(inpMonto.value.replace(/\D/g, '')) || 0;
+
+    function actualizarResumenLateral() {
+        const monto = leerMonto();
+        if (sideMontoTxt) {
+            sideMontoTxt.textContent = formatoCOP.format(monto);
+        }
+        if (sideDestinoTxt) {
+            if (destino && destino.titular) {
+                const tipoTexto = TIPOS[destino.tipo] || destino.tipo || 'Cuenta de Ahorros';
+                const numConEspacios = formatearNumeroConEspacios(destino.numero);
+
+                sideDestinoTxt.innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px;">
+                        <span style="color: #ffffff; font-weight: 700;">${destino.titular}</span>
+                        <span style="color: #94a3b8; font-size: 0.78rem;">${tipoTexto}</span>
+                        <span style="color: #e5a93c; font-size: 0.82rem; font-family: monospace;">N° ${numConEspacios}</span>
+                    </div>
+                `;
+            } else if (inpNumero && inpNumero.value.trim()) {
+                const numIngresado = formatearNumeroConEspacios(inpNumero.value.trim());
+                const tipoSel = selTipo ? (TIPOS[selTipo.value] || 'Cuenta de Ahorros') : 'Cuenta de Ahorros';
+                sideDestinoTxt.innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px;">
+                        <span style="color: #94a3b8;">Por verificar</span>
+                        <span style="color: #64748b; font-size: 0.78rem;">${tipoSel}</span>
+                        <span style="color: #94a3b8; font-size: 0.82rem; font-family: monospace;">N° ${numIngresado}</span>
+                    </div>
+                `;
+            } else {
+                sideDestinoTxt.innerHTML = `<span style="color: #64748b;">Por definir</span>`;
+            }
+        }
+    }
 
     function pintarHint() {
         const c = cuentaSeleccionada();
         if (!c) {
             if (hintOrigen) hintOrigen.textContent = '';
-            if (trOrigenCard) trOrigenCard.style.display = 'none';
+            if (sideOrigenSaldo) sideOrigenSaldo.textContent = '$ 0';
+            if (sideOrigenSub) sideOrigenSub.textContent = 'Ninguna cuenta seleccionada';
             return;
         }
 
         const estaBloqueada = Boolean(c.bloqueada || c.estado === 'BLOQUEADA' || (c.tarjetaAsociada && c.tarjetaAsociada.bloqueada));
         const disponible = calcularDisponible(c);
-        let badgeTexto = 'Disponible';
         let saldoStr = formatoCOP.format(disponible);
 
         if (estaBloqueada) {
-            badgeTexto = 'Bloqueada';
             if (hintOrigen) hintOrigen.textContent = `Cuenta o tarjeta bloqueada temporalmente. Desbloquéala desde Saldos para transferir.`;
         } else if (c.tipo === 'TARJETA_CREDITO') {
             if (hintOrigen) hintOrigen.textContent = `Cupo total de compras: ${formatoCOP.format(c.saldo)} · Avance permitido (50% del cupo): ${formatoCOP.format(disponible)}`;
-            badgeTexto = 'Cupo Avance (50%)';
         } else if (c.tipo === 'CORRIENTE') {
             const extra = ' (incluye sobregiro del 20%)';
             if (hintOrigen) hintOrigen.textContent = `Saldo: ${formatoCOP.format(c.saldo)} · Disponible: ${formatoCOP.format(disponible)}${extra}`;
-            badgeTexto = 'Disponible + Sobregiro';
         } else {
             if (hintOrigen) hintOrigen.textContent = `Saldo: ${formatoCOP.format(c.saldo)} · Disponible: ${formatoCOP.format(disponible)}`;
-            badgeTexto = 'Disponible';
         }
 
-        if (trOrigenCard) {
-            trOrigenCard.style.display = 'flex';
-            if (trCardTipo) trCardTipo.textContent = `${TIPOS[c.tipo] || c.tipo} · •••• ${ultimos4(c.numero)}`;
-            if (trCardSaldo) trCardSaldo.textContent = saldoStr;
-            if (trCardBadge) {
-                trCardBadge.textContent = badgeTexto;
-                trCardBadge.classList.toggle('tr-origen-card__badge--bloqueada', estaBloqueada);
-            }
-            trOrigenCard.classList.toggle('tr-origen-card--bloqueada', estaBloqueada);
-            const iconEl = trOrigenCard.querySelector('.tr-origen-card__icon i');
-            if (iconEl) {
-                iconEl.className = estaBloqueada ? 'fa-solid fa-lock' : 'fa-solid fa-building-columns';
-            }
+        if (sideOrigenSaldo) sideOrigenSaldo.textContent = saldoStr;
+        if (sideOrigenSub) sideOrigenSub.textContent = `${TIPOS[c.tipo] || c.tipo} · •••• ${ultimos4(c.numero)}`;
+        if (sideOrigenBadge) {
+            sideOrigenBadge.textContent = estaBloqueada ? 'Bloqueada' : 'Activa';
+            sideOrigenBadge.className = `tr-side-card__badge ${estaBloqueada ? 'badge--bloqueada' : 'badge--activa'}`;
         }
 
         if (inpNumero && inpNumero.value.trim()) {
             verificar();
         }
+        actualizarResumenLateral();
     }
 
     async function cargarCuentas() {
@@ -148,36 +194,41 @@ export async function initTransferenciasView() {
         try {
             const rawCuentas = await obtenerCuentasOrigen();
             cuentas = rawCuentas;
-            
+
+            if (!selOrigen) return;
+
             if (cuentas.length === 0) {
+                selOrigen.innerHTML = '<option value="" disabled selected>No hay cuentas disponibles</option>';
                 if (estadoGlobal) {
-                    estadoGlobal.replaceChildren(el('p', '', 'No tienes cuentas o productos activos guardados en tu perfil. Solicita uno desde la sección Solicitar Producto.'));
+                    estadoGlobal.replaceChildren(el('p', '', 'No tienes cuentas o productos activos guardados en tu perfil. Solicita uno desde "Solicitar Producto".'));
                     estadoGlobal.classList.remove('hidden');
                 }
-                if (selOrigen) selOrigen.replaceChildren();
                 pintarHint();
                 return;
             }
+
+            selOrigen.replaceChildren(...cuentas.map(c => {
+                const o = el('option', '', textoCuenta(c));
+                o.value = c.id || c.numero;
+                return o;
+            }));
+
+            if (previa && cuentas.some(c => String(c.id) === previa || String(c.numero) === previa)) {
+                selOrigen.value = previa;
+            } else {
+                selOrigen.selectedIndex = 0;
+            }
+
         } catch (err) {
             if (err instanceof SesionExpiradaError) return irALogin();
+            if (selOrigen) {
+                selOrigen.innerHTML = '<option value="" disabled selected>Error al cargar cuentas</option>';
+            }
             if (estadoGlobal) {
                 estadoGlobal.replaceChildren(el('p', '', 'Ocurrió un problema leyendo los datos de tu navegador.'));
                 estadoGlobal.classList.remove('hidden');
             }
             return;
-        }
-
-        if (selOrigen && cuentas.length > 0) {
-            selOrigen.replaceChildren(...cuentas.map(c => {
-                const o = el('option', '', textoCuenta(c));
-                o.value = c.id;
-                return o;
-            }));
-            if (previa && cuentas.some(c => String(c.id) === previa)) {
-                selOrigen.value = previa;
-            } else {
-                selOrigen.selectedIndex = 0;
-            }
         }
 
         pintarHint();
@@ -198,6 +249,7 @@ export async function initTransferenciasView() {
             inpMonto.value = digitos ? new Intl.NumberFormat('es-CO').format(num) : '';
             if (errMonto) errMonto.textContent = '';
             actualizarChipsActivos(num);
+            actualizarResumenLateral();
         });
     }
 
@@ -208,6 +260,7 @@ export async function initTransferenciasView() {
                 if (inpMonto) inpMonto.value = new Intl.NumberFormat('es-CO').format(monto);
                 if (errMonto) errMonto.textContent = '';
                 actualizarChipsActivos(monto);
+                actualizarResumenLateral();
                 if (inpMonto) inpMonto.focus();
             });
         });
@@ -222,76 +275,55 @@ export async function initTransferenciasView() {
                 inpMonto.value = new Intl.NumberFormat('es-CO').format(disp);
                 if (errMonto) errMonto.textContent = '';
                 actualizarChipsActivos(disp);
+                actualizarResumenLateral();
                 inpMonto.focus();
             }
         });
     }
 
     if (selOrigen) {
-        selOrigen.addEventListener('change', () => { 
-            pintarHint(); 
-            if (errOrigen) errOrigen.textContent = ''; 
-            if (errMonto) errMonto.textContent = ''; 
+        selOrigen.addEventListener('change', () => {
+            pintarHint();
+            if (errOrigen) errOrigen.textContent = '';
+            if (errMonto) errMonto.textContent = '';
         });
     }
 
     function pintarDestino(estado, dato, mensajeInvalido = null) {
-        if (!boxDestino) return;
-        boxDestino.replaceChildren();
-        if (errDestino) errDestino.textContent = '';
-        if (!estado) { boxDestino.classList.add('hidden'); return; }
+        if (boxDestino) {
+            boxDestino.replaceChildren();
+            boxDestino.classList.add('hidden');
+        }
 
-        boxDestino.classList.remove('hidden');
+        if (errDestino) errDestino.textContent = '';
+
+        if (!estado) {
+            actualizarResumenLateral();
+            return;
+        }
+
+        if (estado === 'cargando') {
+            if (sideDestinoTxt) {
+                sideDestinoTxt.innerHTML = `<span style="color: #e5a93c;">Verificando cuenta…</span>`;
+            }
+            return;
+        }
 
         const esInvalida = Boolean(mensajeInvalido);
-        const estadoFinal = esInvalida ? 'error' : estado;
 
-        boxDestino.className = `tr-destino tr-destino--${estadoFinal}`;
-        
-        if (estadoFinal === 'error' || esInvalida) {
-            boxDestino.style.background = 'rgba(239, 68, 68, 0.1)';
-            boxDestino.style.border = '1px solid #ef4444';
-            boxDestino.style.color = '#f87171';
-        } else if (estadoFinal === 'ok') {
-            boxDestino.style.background = 'rgba(16, 185, 129, 0.1)';
-            boxDestino.style.border = '1px solid #10b981';
-            boxDestino.style.color = '#34d399';
-        } else {
-            boxDestino.style.background = '';
-            boxDestino.style.border = '';
-            boxDestino.style.color = '';
-        }
-
-        const iconos = { cargando: 'fa-spinner fa-spin', ok: 'fa-circle-check', error: 'fa-circle-xmark' };
-        const i = el('i', `fa-solid ${esInvalida ? 'fa-triangle-exclamation' : iconos[estadoFinal]}`);
-        i.setAttribute('aria-hidden', 'true');
-        const texto = el('div', 'tr-destino__texto');
-
-        if (estado === 'ok') {
-            const estaBloqueada = Boolean(dato.bloqueada || dato.estado === 'BLOQUEADA');
-            const headerTitular = el('div', 'tr-destino__header-titular');
-            headerTitular.append(el('strong', '', dato.titular));
-
-            if (estaBloqueada) {
-                const badgeBloqueo = el('span', 'tr-destino__badge-bloqueada', 'Bloqueada');
-                badgeBloqueo.style.cssText = 'background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; margin-left: 8px;';
-                headerTitular.append(badgeBloqueo);
-            }
-
-            texto.append(
-                el('span', 'tr-destino__label', 'Titular de la cuenta'),
-                headerTitular,
-                el('span', 'tr-destino__sub', `${TIPOS[dato.tipo] || dato.tipo} · •••• ${ultimos4(dato.numero)}${dato.esPropia ? ' · Tu cuenta' : ''}`)
-            );
-
-            if (esInvalida && errDestino) {
-                errDestino.textContent = mensajeInvalido;
+        if (estado === 'ok' && dato) {
+            if (esInvalida) {
+                if (sideDestinoTxt) {
+                    sideDestinoTxt.innerHTML = `<span style="color: #f87171;">Cuenta no permitida</span>`;
+                }
+            } else {
+                actualizarResumenLateral();
             }
         } else {
-            texto.append(el('span', '', dato));
+            if (sideDestinoTxt) {
+                sideDestinoTxt.innerHTML = `<span style="color: #f87171;">Cuenta no encontrada</span>`;
+            }
         }
-
-        boxDestino.append(i, texto);
     }
 
     async function verificar() {
@@ -340,20 +372,19 @@ export async function initTransferenciasView() {
         temporizador = setTimeout(verificar, 450);
     }
 
-    // 🚀 INTERCEPCIÓN DE PEGADO (PASTE) E INPUT MANUAL
     if (inpNumero) {
         inpNumero.addEventListener('paste', (e) => {
             e.preventDefault();
             const textoPegado = (e.clipboardData || window.clipboardData).getData('text');
             const soloNumeros = soloDigitos(textoPegado).slice(0, 16);
-            const formateado = soloNumeros.replace(/(\d{4})(?=\d)/g, '$1 ');
+            const formateado = formatearNumeroConEspacios(soloNumeros);
             inpNumero.value = formateado;
             programarVerificacion();
         });
 
         inpNumero.addEventListener('input', () => {
             const soloNumeros = soloDigitos(inpNumero.value).slice(0, 16);
-            const formateado = soloNumeros.replace(/(\d{4})(?=\d)/g, '$1 ');
+            const formateado = formatearNumeroConEspacios(soloNumeros);
             inpNumero.value = formateado;
             programarVerificacion();
         });
@@ -372,9 +403,9 @@ export async function initTransferenciasView() {
         if (e) e.preventDefault();
         [errOrigen, errDestino, errMonto].forEach(m => { if (m) m.textContent = ''; });
 
-        if (!destino && inpNumero && inpNumero.value.trim()) { 
-            clearTimeout(temporizador); 
-            await verificar(); 
+        if (!destino && inpNumero && inpNumero.value.trim()) {
+            clearTimeout(temporizador);
+            await verificar();
         }
 
         const origen = cuentaSeleccionada();
@@ -400,15 +431,15 @@ export async function initTransferenciasView() {
             return;
         }
 
-        datos = { 
-            origen, 
-            destino, 
-            monto, 
-            concepto: inpConcepto ? inpConcepto.value.trim() : '', 
-            usaSobregiro: v.usaSobregiro, 
-            esAvanceTC: v.esAvanceTC 
+        datos = {
+            origen,
+            destino,
+            monto,
+            concepto: inpConcepto ? inpConcepto.value.trim() : '',
+            usaSobregiro: v.usaSobregiro,
+            esAvanceTC: v.esAvanceTC
         };
-        
+
         pintarResumen();
         irAPaso(2);
     }
@@ -420,21 +451,32 @@ export async function initTransferenciasView() {
 
     function pintarResumen() {
         const { origen, destino: d, monto, concepto, usaSobregiro, esAvanceTC } = datos;
-        
+
         const saldoActualNum = typeof origen.saldo === 'number'
             ? origen.saldo
             : Number(String(origen.saldo || 0).replace(/[^0-9.-]+/g, "")) || 0;
 
         const saldoCalculado = saldoActualNum - monto;
         const labelSaldoFinal = origen.tipo === 'TARJETA_CREDITO' ? 'Cupo restante después del avance' : 'Saldo después de la operación';
-        
+
+        const numDestinoEspaciado = formatearNumeroConEspacios(d.numero);
+        const tipoDestinoTexto = TIPOS[d.tipo] || d.tipo || 'Cuenta de Ahorros';
+
+        const htmlDestino3Niveles = `
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 3px;">
+                <span style="color: #ffffff; font-weight: 700; font-size: 0.95rem;">${d.titular}</span>
+                <span style="color: #94a3b8; font-size: 0.82rem;">${tipoDestinoTexto}</span>
+                <span style="color: #e5a93c; font-size: 0.88rem; font-family: monospace; font-weight: 600;">N° ${numDestinoEspaciado}</span>
+            </div>
+        `;
+
         const resumenLista = $('resumenLista');
         if (resumenLista) {
             filas(resumenLista, [
                 { label: 'Producto de origen', valor: textoCuenta(origen) },
-                { label: 'Cuenta de destino', valor: d.titular, extra: `${TIPOS[d.tipo] || d.tipo} · •••• ${ultimos4(d.numero)}` },
+                { label: 'Cuenta de destino', htmlVal: htmlDestino3Niveles },
                 { label: esAvanceTC ? 'Monto del avance' : 'Monto a transferir', valor: formatoCOP.format(monto), destacado: true },
-                { label: 'Concepto', valor: concepto || '—' },
+                { label: 'Concepto', valor: concepto || 'Sin concepto' },
                 { label: labelSaldoFinal, valor: formatoCOP.format(saldoCalculado), negativo: saldoCalculado < 0 },
                 { label: 'Costo', valor: 'Sin costo' }
             ]);
@@ -462,23 +504,30 @@ export async function initTransferenciasView() {
 
             try {
                 const r = await ejecutarTransferencia({
-                    origenId: datos.origen.id, destinoNumero: datos.destino.numero,
-                    destinoTipo: datos.destino.tipo, monto: datos.monto, concepto: datos.concepto
+                    origenId: datos.origen.id || datos.origen.numero,
+                    destinoNumero: datos.destino.numero,
+                    destinoTipo: datos.destino.tipo,
+                    monto: datos.monto,
+                    concepto: datos.concepto
                 });
 
+                resultadoFinal = r;
+
+                // REGISTRO DE MOVIMIENTOS EN LOCALSTORAGE
                 try {
                     let movimientos = JSON.parse(localStorage.getItem('finara_movimientos')) || [];
                     const perfilActivo = JSON.parse(localStorage.getItem('userProfile')) || {};
-                    const usuarioActual = perfilActivo.username || datos.origen.username || 'maria17';
+                    const usuarioActual = perfilActivo.username || perfilActivo.nombre || datos.origen.username || 'Johan Zapata Cifuentes';
+                    const textoConcepto = datos.concepto ? ` - Concepto: ${datos.concepto}` : '';
 
                     movimientos.unshift({
                         id: `MOV-OUT-${Date.now()}`,
                         fecha: new Date().toISOString(),
-                        descripcion: `Transferencia enviada a ${datos.destino.titular}`,
+                        descripcion: `Transferencia enviada a ${datos.destino.titular}${textoConcepto}`,
                         categoria: 'Transferencia',
                         tipo: 'EGRESO',
                         valor: datos.monto,
-                        cuentaId: datos.origen.id,
+                        cuentaId: datos.origen.id || datos.origen.numero,
                         numeroCuenta: datos.origen.numero,
                         usuario: usuarioActual
                     });
@@ -486,7 +535,7 @@ export async function initTransferenciasView() {
                     movimientos.unshift({
                         id: `MOV-IN-${Date.now()}`,
                         fecha: new Date().toISOString(),
-                        descripcion: `Transferencia recibida de ${usuarioActual}`,
+                        descripcion: `Transferencia recibida de ${usuarioActual}${textoConcepto}`,
                         categoria: 'Transferencia',
                         tipo: 'INGRESO',
                         valor: datos.monto,
@@ -497,15 +546,15 @@ export async function initTransferenciasView() {
 
                     localStorage.setItem('finara_movimientos', JSON.stringify(movimientos));
                 } catch (e) {
-                    console.error("Error guardando movimiento:", e);
+                    console.error("Error al guardar movimientos en localStorage:", e);
                 }
 
                 pintarExito(r);
                 irAPaso(3);
                 if (modNotif && modNotif.actualizarCampana) {
-                    try { modNotif.actualizarCampana(); } catch {}
+                    try { modNotif.actualizarCampana(); } catch { }
                 }
-                mostrarToast('Transferencia exitosa. Revisa tus notificaciones.');
+                mostrarToast('Transferencia exitosa. Revisa tus movimientos.');
             } catch (err) {
                 if (err instanceof SesionExpiradaError) return irALogin();
                 if (resumenError) {
@@ -523,20 +572,138 @@ export async function initTransferenciasView() {
     function pintarExito(r) {
         const exitoLista = $('exitoLista');
         if (!exitoLista) return;
+
+        const numDestinoEspaciado = formatearNumeroConEspacios(r.destino.numero);
+        const tipoDestinoTexto = TIPOS[r.destino.tipo] || r.destino.tipo || 'Cuenta de Ahorros';
+
+        const htmlExitoDestino = `
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 3px;">
+                <span style="color: #ffffff; font-weight: 700; font-size: 0.95rem;">${r.destino.titular}</span>
+                <span style="color: #94a3b8; font-size: 0.82rem;">${tipoDestinoTexto}</span>
+                <span style="color: #e5a93c; font-size: 0.88rem; font-family: monospace; font-weight: 600;">N° ${numDestinoEspaciado}</span>
+            </div>
+        `;
+
         filas(exitoLista, [
             { label: 'Referencia', valor: r.referencia },
-            { label: 'Enviado a', valor: r.destino.titular, extra: `${TIPOS[r.destino.tipo] || r.destino.tipo} · •••• ${ultimos4(r.destino.numero)}` },
+            { label: 'Enviado a', htmlVal: htmlExitoDestino },
             { label: 'Monto', valor: formatoCOP.format(r.monto), destacado: true },
+            { label: 'Concepto', valor: datos.concepto || 'Sin concepto' },
             { label: 'Nuevo saldo de la cuenta de origen', valor: formatoCOP.format(r.saldoOrigen), negativo: r.saldoOrigen < 0 },
             { label: 'Fecha', valor: formatoFechaHora.format(new Date(r.fecha)) }
         ]);
+    }
+
+    // NAVEGACIÓN A MOVIMIENTOS
+    if (btnVerMovimientos) {
+        btnVerMovimientos.addEventListener('click', () => {
+            const enlaceMovimientos = document.querySelector('[data-view="movimientos"]') || document.querySelector('a[href*="movimientos"]');
+            if (enlaceMovimientos) {
+                enlaceMovimientos.click();
+            } else {
+                window.location.href = './app.html#movimientos';
+            }
+        });
+    }
+
+    // IMPRESIÓN Y DESCARGA DEL COMPROBANTE CON LOGO REAL Y SIN SUPERPOSICIONES
+    if (btnDescargarPDF) {
+        btnDescargarPDF.addEventListener('click', async () => {
+            if (!resultadoFinal) return;
+
+            // Limpiar cualquier voucher previo si existiera
+            const previo = document.getElementById('impresionVoucher');
+            if (previo) previo.remove();
+
+            const numDestinoEspaciado = formatearNumeroConEspacios(resultadoFinal.destino.numero);
+            const tipoDestinoTexto = TIPOS[resultadoFinal.destino.tipo] || resultadoFinal.destino.tipo || 'Cuenta de Ahorros';
+            const rutaLogo = '../Style/image/Logo_finara.svg';
+
+            // Convertir el SVG a DataURL para asegurar su visualización rápida
+            let logoDataUrl = rutaLogo;
+            try {
+                const resp = await fetch(rutaLogo);
+                if (resp.ok) {
+                    const svgTexto = await resp.text();
+                    logoDataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgTexto)}`;
+                }
+            } catch (e) {
+                console.warn("Cargando ruta del logo SVG...");
+            }
+
+            const voucher = document.createElement('div');
+            voucher.id = 'impresionVoucher';
+            voucher.innerHTML = `
+                <div style="background: #11141d; border: 1px solid rgba(229, 169, 60, 0.35); border-radius: 16px; padding: 2.2rem; width: 100%; max-width: 620px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); box-sizing: border-box;">
+                    
+                    <!-- Encabezado con Logo Oficial de Finara Bank -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 1.4rem; margin-bottom: 1.6rem;">
+                        <img src="${logoDataUrl}" alt="Finara Bank Logo" style="height: 38px; width: auto; max-width: 220px; display: block; object-fit: contain;">
+                        <div>
+                            <span style="font-size: 0.72rem; color: #34d399; font-weight: 700; background: rgba(52, 211, 153, 0.15); padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(52, 211, 153, 0.3); letter-spacing: 0.5px; text-transform: uppercase;">
+                                TRANSACCIÓN EXITOSA
+                            </span>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-bottom: 1.8rem; display: block !important;">
+                        <h2 style="font-size: 1.35rem; color: #ffffff; font-weight: 700; margin: 0 0 4px 0;">Comprobante de Transferencia</h2>
+                        <p style="font-size: 0.82rem; color: #64748b; margin: 0;">Finara Bank Digital · Certificación de Operación</p>
+                    </div>
+
+                    <!-- Detalles de la transferencia -->
+                    <div style="background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; overflow: hidden; margin-bottom: 1.5rem; display: block !important;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 13px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                            <span style="font-size: 0.82rem; color: #94a3b8;">Referencia</span>
+                            <strong style="font-size: 0.9rem; color: #ffffff; font-family: monospace;">${resultadoFinal.referencia}</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 13px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                            <span style="font-size: 0.82rem; color: #94a3b8;">Fecha y Hora</span>
+                            <strong style="font-size: 0.9rem; color: #ffffff;">${formatoFechaHora.format(new Date(resultadoFinal.fecha))}</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 13px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                            <span style="font-size: 0.82rem; color: #94a3b8;">Producto de Origen</span>
+                            <strong style="font-size: 0.9rem; color: #ffffff;">${textoCuenta(datos.origen)}</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 13px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                            <span style="font-size: 0.82rem; color: #94a3b8;">Destinatario</span>
+                            <div style="text-align: right; display: block !important;">
+                                <div style="font-size: 0.9rem; color: #ffffff; font-weight: 700;">${resultadoFinal.destino.titular}</div>
+                                <div style="font-size: 0.78rem; color: #94a3b8;">${tipoDestinoTexto}</div>
+                                <div style="font-size: 0.82rem; color: #e5a93c; font-family: monospace;">N° ${numDestinoEspaciado}</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 13px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                            <span style="font-size: 0.82rem; color: #94a3b8;">Concepto</span>
+                            <strong style="font-size: 0.9rem; color: #ffffff;">${datos.concepto || 'Sin concepto'}</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; background: rgba(229, 169, 60, 0.08);">
+                            <span style="font-size: 0.88rem; color: #ffffff; font-weight: 700;">Monto Transferido</span>
+                            <strong style="font-size: 1.4rem; color: #e5a93c; font-weight: 800;">${formatoCOP.format(resultadoFinal.monto)}</strong>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; font-size: 0.72rem; color: #64748b; margin-top: 1.8rem; border-top: 1px dashed rgba(255, 255, 255, 0.1); padding-top: 1rem; display: block !important;">
+                        Este documento es un comprobante digital válido emitido por Finara Bank S.A.
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(voucher);
+
+            // Ejecutar la impresión y limpiar el DOM tras cerrar el diálogo
+            setTimeout(() => {
+                window.print();
+                voucher.remove();
+            }, 150);
+        });
     }
 
     if (btnNueva) {
         btnNueva.addEventListener('click', async () => {
             form.reset();
             tokenDestino++;
-            destino = null; datos = null;
+            destino = null; datos = null; resultadoFinal = null;
             pintarDestino(null);
             [errOrigen, errMonto].forEach(m => { if (m) m.textContent = ''; });
             await cargarCuentas();

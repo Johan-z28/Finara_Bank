@@ -129,6 +129,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                 case "saldos":
                     try { const m = await import('../Saldos.js'); if (m.initSaldosView) await m.initSaldosView(); } catch (e) {}
                     break;
+                case "transferencias":
+                    try { const m = await import('../Transferencias.js'); if (m.initTransferenciasView) await m.initTransferenciasView(); } catch (e) {}
+                    break;
+                case "consignar":
+                    try { const m = await import('../Consignar.js'); if (m.initConsignarView) await m.initConsignarView(); } catch (e) {}
+                    break;
+                case "retiros":
+                    try { const m = await import('../Retiros.js'); if (m.initRetirosView) await m.initRetirosView(); } catch (e) {}
+                    break;
                 case "solicitarproductos":
                     try { const m = await import('../newCard.js'); if (m.initSolicitarProductosView) await m.initSolicitarProductosView(); } catch (e) {}
                     break;

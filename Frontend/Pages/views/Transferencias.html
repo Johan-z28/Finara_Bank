@@ -9,10 +9,11 @@
     <link rel="stylesheet" href="../Style/Transferencias.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Librería para la generación del PDF del Voucher -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 
 <body class="general-body">
-    <!-- ======= PRINCIPAL ======= -->
     <div class="tr-container">
         <div class="tr-header">
             <h1>Transferencias</h1>
@@ -29,23 +30,13 @@
         <div class="tr-estado hidden" id="trEstado" role="status"></div>
 
         <div class="tr-layout">
-            <!-- PASO 1: Formulario -->
+            <!-- PASO 1: Formulario principal -->
             <section class="tr-card" id="vistaForm">
                 <h2>Datos de la transferencia</h2>
                 <form id="formTransferencia" novalidate>
                     <div class="tr-campo">
                         <label for="trOrigen">Cuenta de origen</label>
                         <select id="trOrigen"></select>
-                        <div class="tr-origen-card" id="trOrigenCard">
-                            <div class="tr-origen-card__icon">
-                                <i class="fa-solid fa-wallet"></i>
-                            </div>
-                            <div class="tr-origen-card__info">
-                                <span class="tr-origen-card__tipo" id="trCardTipo">Cuenta Finara</span>
-                                <strong class="tr-origen-card__saldo" id="trCardSaldo">$ 0</strong>
-                            </div>
-                            <div class="tr-origen-card__badge" id="trCardBadge">Disponible</div>
-                        </div>
                         <p class="tr-hint" id="trOrigenHint"></p>
                         <p class="tr-error" id="errOrigen" role="alert"></p>
                     </div>
@@ -61,7 +52,7 @@
                         <div class="tr-campo">
                             <label for="trNumeroDestino">Número de cuenta destino</label>
                             <input id="trNumeroDestino" type="text" inputmode="numeric" autocomplete="off"
-                                maxlength="16" placeholder="Ej: 4021599900111">
+                                maxlength="19" placeholder="Ej: 4021 3767 8397 7068">
                         </div>
                     </div>
                     <div class="tr-destino hidden" id="trDestino" role="status" aria-live="polite"></div>
@@ -112,29 +103,74 @@
                 </div>
             </section>
 
-            <!-- PASO 3: Comprobante -->
+            <!-- PASO 3: Comprobante y Voucher -->
             <section class="tr-card hidden" id="vistaExito">
-                <div class="tr-exito-icono"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
-                <h2 class="tr-exito-titulo">¡Transferencia exitosa!</h2>
-                <p class="tr-exito-sub">Guardamos el movimiento y te enviamos una notificación.</p>
+                <div class="tr-exito-header">
+                    <div class="tr-exito-icono">
+                        <i class="fa-solid fa-check" aria-hidden="true"></i>
+                    </div>
+                    <span class="tr-badge-exito">Transferencia completada</span>
+                    <h2 class="tr-exito-titulo">¡Operación exitosa!</h2>
+                    <p class="tr-exito-sub">El dinero ha sido enviado correctamente y el recibo fue generado.</p>
+                </div>
+
                 <dl class="tr-lista" id="exitoLista"></dl>
-                <div class="tr-acciones">
-                    <a href="#" class="tr-btn tr-btn--ghost" data-view="movimientos">Ver movimientos</a>
-                    <button type="button" class="tr-btn tr-btn--primary" id="btnNueva">Nueva transferencia</button>
+
+                <div class="tr-acciones tr-acciones--exito">
+                    <button type="button" class="tr-btn tr-btn--primary" id="btnDescargarPDF">
+                        <i class="fa-solid fa-file-pdf"></i> Descargar comprobante (PDF)
+                    </button>
+                    <button type="button" class="tr-btn tr-btn--ghost" id="btnVerMovimientos">
+                        <i class="fa-solid fa-list-check"></i> Ver movimientos
+                    </button>
+                    <button type="button" class="tr-btn tr-btn--ghost" id="btnNueva">
+                        <i class="fa-solid fa-rotate-right"></i> Nueva transferencia
+                    </button>
                 </div>
             </section>
 
-            <!-- Panel informativo lateral -->
+            <!-- Panel informativo lateral paso 1 -->
             <aside class="tr-info" aria-label="Información">
                 <h3>Transfiere sin complicaciones</h3>
-                <ul>
-                    <li><i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+
+                <div class="tr-side-card">
+                    <div class="tr-side-card__header">
+                        <span class="tr-side-card__label">Saldo de la cuenta seleccionada</span>
+                        <span class="tr-side-card__badge" id="sideOrigenBadge">Activa</span>
+                    </div>
+                    <div class="tr-side-card__monto" id="sideOrigenSaldo">$ 0</div>
+                    <div class="tr-side-card__sub" id="sideOrigenSub">Cargando producto...</div>
+                </div>
+
+                <div class="tr-side-summary">
+                    <h4>Resumen previo</h4>
+                    <div class="tr-side-summary__row">
+                        <span>Destino:</span>
+                        <strong id="sideDestinoTxt">Por definir</strong>
+                    </div>
+                    <div class="tr-side-summary__row">
+                        <span>Monto:</span>
+                        <strong id="sideMontoTxt" class="gold-text">$ 0</strong>
+                    </div>
+                    <div class="tr-side-summary__row">
+                        <span>Comisión:</span>
+                        <strong class="green-text">Sin costo</strong>
+                    </div>
+                </div>
+
+                <hr class="tr-divider">
+
+                <ul class="tr-info-features">
+                    <li>
+                        <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
                         <div><strong>Seguro</strong><span>Revisas el resumen antes de enviar.</span></div>
                     </li>
-                    <li><i class="fa-solid fa-bolt" aria-hidden="true"></i>
+                    <li>
+                        <i class="fa-solid fa-bolt" aria-hidden="true"></i>
                         <div><strong>Rápido</strong><span>En minutos, sin filas.</span></div>
                     </li>
-                    <li><i class="fa-solid fa-tags" aria-hidden="true"></i>
+                    <li>
+                        <i class="fa-solid fa-tags" aria-hidden="true"></i>
                         <div><strong>Sin costos</strong><span>Entre cuentas Finara.</span></div>
                     </li>
                 </ul>
@@ -144,7 +180,6 @@
         <div class="tr-toast" id="trToast" role="status" aria-live="polite"></div>
     </div>
 
-    <!-- Módulo JS principal -->
     <script type="module" src="../../Vanilla/Transferencias.js"></script>
 </body>
 

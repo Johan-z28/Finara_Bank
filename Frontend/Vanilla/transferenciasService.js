@@ -34,6 +34,34 @@ export const formatoCOP = new Intl.NumberFormat('es-CO', { style: 'currency', cu
 
 const soloDigitos = v => String(v ?? '').replace(/\D/g, '');
 
+function obtenerUsuarioLocalFlex() {
+    try {
+        const perfil = JSON.parse(localStorage.getItem('userProfile'));
+        if (perfil) return perfil;
+
+        const usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo'));
+        if (usuarioActivo) return usuarioActivo;
+
+        const emailLogueado = localStorage.getItem('usuarioLogueado') || localStorage.getItem('emailSesion');
+        if (emailLogueado) {
+            const usuarios = JSON.parse(localStorage.getItem('finara_usuarios_local')) || [];
+            const encontrado = usuarios.find(u => u.correo === emailLogueado || u.username === emailLogueado);
+            if (encontrado) return encontrado;
+            return { username: emailLogueado, correo: emailLogueado };
+        }
+    } catch (e) {}
+    return { username: 'maria17' };
+}
+
+// 🚀 ENCRIPTACIÓN: Conserva las 3 primeras letras de cada palabra y oculta el resto con asteriscos
+function enmascarar3Iniciales(nombreCompleto) {
+    if (!nombreCompleto) return "Cli*** Fin***";
+    return nombreCompleto.trim().split(/\s+/).map(palabra => {
+        if (palabra.length <= 3) return palabra;
+        return palabra.substring(0, 3) + '***';
+    }).join(' ');
+}
+
 export function calcularDisponible(cuenta) {
     if (!cuenta) return 0;
     const saldoNum = typeof cuenta.saldo === 'number'
@@ -50,7 +78,6 @@ export function calcularDisponible(cuenta) {
 export function validarTransferencia({ origen, destino, monto, esInterbancaria = false }) {
     if (!origen) return { ok: false, campo: 'origen', mensaje: 'Selecciona la cuenta de origen.' };
     
-    // 🔴 1. Bloqueo estricto de Origen
     if (origen.bloqueada || origen.estado === 'BLOQUEADA' || (origen.tarjetaAsociada && origen.tarjetaAsociada.bloqueada)) {
         return {
             ok: false,
@@ -61,16 +88,7 @@ export function validarTransferencia({ origen, destino, monto, esInterbancaria =
     
     if (!destino) return { ok: false, campo: 'destino', mensaje: 'Ingresa y valida la cuenta de destino antes de continuar.' };
 
-    if (esInterbancaria) {
-        if (!destino.banco) return { ok: false, campo: 'banco', mensaje: 'Selecciona la entidad bancaria de destino.' };
-        if (!destino.titular || destino.titular.trim().length < 3) {
-            return { ok: false, campo: 'beneficiario', mensaje: 'Ingresa el nombre completo del beneficiario.' };
-        }
-        if (!destino.documento || destino.documento.trim().length < 5) {
-            return { ok: false, campo: 'documento', mensaje: 'Ingresa un documento de identidad válido.' };
-        }
-    } else {
-        // 🔴 2. Bloqueo estricto de Destino
+    if (!esInterbancaria) {
         if (destino.bloqueada || destino.estado === 'BLOQUEADA') {
             return {
                 ok: false,
@@ -79,7 +97,6 @@ export function validarTransferencia({ origen, destino, monto, esInterbancaria =
             };
         }
 
-        // 🔴 3. Validación exacta de mismo número de cuenta u origen
         const numOrigenLimpio = soloDigitos(origen.numero);
         const numDestinoLimpio = soloDigitos(destino.numero);
 
@@ -113,16 +130,6 @@ export function validarTransferencia({ origen, destino, monto, esInterbancaria =
     };
 }
 
-function enmascararNombre(nombreCompleto) {
-    if (!nombreCompleto) return "Cliente Finara";
-    return nombreCompleto.split(' ').map(palabra => {
-        if (palabra.length <= 2) return palabra[0] + '*';
-        const visibles = Math.ceil(palabra.length / 3);
-        return palabra.substring(0, visibles) + '*'.repeat(palabra.length - visibles);
-    }).join(' ');
-}
-
-// 🔴 RESOLVER DESTINO VALIDANDO NÚMERO Y TIPO STRICTAMENTE
 function resolverDestinoMock(numero, tipo) {
     const n = soloDigitos(numero);
     if (!n) return null;
@@ -131,8 +138,8 @@ function resolverDestinoMock(numero, tipo) {
 
     try {
         const todasLasCuentas = JSON.parse(localStorage.getItem('finara_cuentas')) || [];
+        const perfilActivo = JSON.parse(localStorage.getItem('userProfile')) || {};
         
-        // Buscar coincidencia exacta de número Y tipo de cuenta
         const cuentaEncontrada = todasLasCuentas.find(c => {
             if (!c) return false;
             const numCoincide = soloDigitos(c.numero) === n;
@@ -152,9 +159,11 @@ function resolverDestinoMock(numero, tipo) {
                 (cuentaEncontrada.tarjetaAsociada && cuentaEncontrada.tarjetaAsociada.bloqueada)
             );
 
+            const nombreReal = perfilActivo.nombre || cuentaEncontrada.titular || cuentaEncontrada.username || 'Cliente Finara';
+
             return {
                 id: cuentaEncontrada.id,
-                titular: enmascararNombre(cuentaEncontrada.titular || cuentaEncontrada.username || 'Cliente Finara'),
+                titular: enmascarar3Iniciales(nombreReal),
                 tipo: cuentaEncontrada.tipo,
                 numero: cuentaEncontrada.numero,
                 esPropia: true,
@@ -170,15 +179,46 @@ function resolverDestinoMock(numero, tipo) {
 }
 
 export async function obtenerCuentasOrigen() {
-    if (!USAR_DATOS_DE_PRUEBA) {
-        return pedir(`${API_BASE}/cuentas`);
-    }
-
     try {
-        const cuentas = await obtenerCuentasOficiales();
-        return (cuentas || []).filter(c => (c.tipo in TIPOS) && c.estado === 'ACTIVA' && !c.bloqueada);
+        let cuentas = [];
+        try {
+            cuentas = await obtenerCuentasOficiales();
+        } catch (e) {
+            cuentas = [];
+        }
+
+        if (!cuentas || cuentas.length === 0) {
+            const usuario = obtenerUsuarioLocalFlex();
+            const cuentasGlobales = JSON.parse(localStorage.getItem('finara_cuentas')) || [];
+            
+            const userNorm = String(usuario.username || '').trim().toLowerCase();
+            const mailNorm = String(usuario.correo || usuario.email || '').trim().toLowerCase();
+
+            cuentas = cuentasGlobales.filter(c => {
+                if (!c) return false;
+                const cUser = String(c.username || '').trim().toLowerCase();
+                const cMail = String(c.correo || '').trim().toLowerCase();
+                
+                if (userNorm && cUser === userNorm) return true;
+                if (mailNorm && (cUser === mailNorm || cMail === mailNorm)) return true;
+                if (!c.username && !c.correo) return true;
+                return false;
+            });
+
+            if (cuentas.length === 0 && Array.isArray(usuario.tarjetasAprobadas)) {
+                cuentas = usuario.tarjetasAprobadas.map((t, idx) => ({
+                    id: `TC-APROB-${idx}`,
+                    tipo: String(t.tipo || 'CREDITO').toLowerCase().includes('credito') ? 'TARJETA_CREDITO' : 'AHORROS',
+                    numero: t.numeroTarjeta || t.numero || '4021000011112222',
+                    saldo: Number(t.saldo !== undefined ? t.saldo : (t.cupoDisponible || 3000000)),
+                    estado: 'ACTIVA'
+                }));
+            }
+        }
+
+        return (cuentas || []).filter(c => c && c.estado !== 'INACTIVA' && c.estado !== 'CANCELADA');
     } catch (e) {
-        console.error("Error al obtener cuentas:", e);
+        console.error("Error al obtener cuentas de origen en Transferencias:", e);
         return [];
     }
 }
@@ -196,14 +236,8 @@ export async function buscarCuentaDestino(numero, tipo) {
 }
 
 export async function ejecutarTransferencia({ origenId, destinoNumero, destinoTipo, monto, concepto = '', esInterbancaria = false, destinoInterbancario = null }) {
-    if (!USAR_DATOS_DE_PRUEBA) {
-        const r = await pedir(`${API_BASE}/transferencias`, { method: 'POST', body: { origenId, destinoNumero, destinoTipo, monto, concepto, esInterbancaria, destinoInterbancario } });
-        registrarNotificaciones(r.monto, r.destino.titular, r.referencia, r.usaSobregiro, r.esAvanceTC, r.esInterbancaria, r.comision);
-        return r;
-    }
-
     let cuentas = await obtenerCuentasOrigen();
-    const origen = cuentas.find(c => String(c.id) === String(origenId));
+    const origen = cuentas.find(c => String(c.id) === String(origenId) || String(c.numero) === String(origenId) || soloDigitos(c.numero) === soloDigitos(origenId));
     if (!origen) throw new Error('No se encontró la cuenta de origen seleccionada.');
 
     const destino = esInterbancaria ? destinoInterbancario : resolverDestinoMock(destinoNumero, destinoTipo);
@@ -220,18 +254,15 @@ export async function ejecutarTransferencia({ origenId, destinoNumero, destinoTi
 
     origen.saldo = saldoOrigenAnterior - totalADebitar;
 
-    // ACTUALIZACIÓN GLOBAL DE SALDOS EN LOCALSTORAGE (`finara_cuentas`)
     try {
         let todasLasCuentas = JSON.parse(localStorage.getItem('finara_cuentas')) || [];
         
-        // 1. Restar a la cuenta de origen
-        const idxOrigen = todasLasCuentas.findIndex(c => String(c.id) === String(origen.id) || String(c.numero) === String(origen.numero));
+        const idxOrigen = todasLasCuentas.findIndex(c => String(c.id) === String(origen.id) || soloDigitos(c.numero) === soloDigitos(origen.numero));
         if (idxOrigen !== -1) {
             todasLasCuentas[idxOrigen].saldo = origen.saldo;
         }
 
-        // 2. Sumar a la cuenta de destino (si existe localmente en el ecosistema)
-        const idxDestino = todasLasCuentas.findIndex(c => String(c.numero) === String(destino.numero) || soloDigitos(c.numero) === soloDigitos(destino.numero));
+        const idxDestino = todasLasCuentas.findIndex(c => soloDigitos(c.numero) === soloDigitos(destino.numero));
         if (idxDestino !== -1) {
             const saldoDestinoAnterior = typeof todasLasCuentas[idxDestino].saldo === 'number'
                 ? todasLasCuentas[idxDestino].saldo
@@ -242,18 +273,10 @@ export async function ejecutarTransferencia({ origenId, destinoNumero, destinoTi
 
         localStorage.setItem('finara_cuentas', JSON.stringify(todasLasCuentas));
 
-        // 3. Sincronizar dentro del perfil activo userProfile
         let perfil = JSON.parse(localStorage.getItem('userProfile')) || {};
         if (Array.isArray(perfil.cuentas)) {
-            const pIdx = perfil.cuentas.findIndex(c => String(c.id) === String(origen.id) || String(c.numero) === String(origen.numero));
-            if (pIdx !== -1) {
-                perfil.cuentas[pIdx].saldo = origen.saldo;
-            }
-            const pDestIdx = perfil.cuentas.findIndex(c => String(c.numero) === String(destino.numero));
-            if (pDestIdx !== -1) {
-                const sDest = typeof perfil.cuentas[pDestIdx].saldo === 'number' ? perfil.cuentas[pDestIdx].saldo : Number(String(perfil.cuentas[pDestIdx].saldo || 0).replace(/\D/g, ''));
-                perfil.cuentas[pDestIdx].saldo = sDest + monto;
-            }
+            const pIdx = perfil.cuentas.findIndex(c => String(c.id) === String(origen.id) || soloDigitos(c.numero) === soloDigitos(origen.numero));
+            if (pIdx !== -1) perfil.cuentas[pIdx].saldo = origen.saldo;
             localStorage.setItem('userProfile', JSON.stringify(perfil));
         }
 
@@ -262,14 +285,13 @@ export async function ejecutarTransferencia({ origenId, destinoNumero, destinoTi
     }
 
     const fecha = new Date().toISOString();
-    const prefijoRef = esInterbancaria ? 'ACH' : 'FIN';
-    const referencia = `${prefijoRef}-${Math.floor(100000 + Math.random() * 900000)}`;
+    const referencia = `FIN-${Math.floor(100000 + Math.random() * 900000)}`;
 
     registrarNotificaciones(monto, destino ? destino.titular : 'Destino', referencia, v.usaSobregiro, v.esAvanceTC, esInterbancaria, comision);
 
     return {
         referencia, fecha, monto, concepto,
-        bancoDestino: esInterbancaria ? destino.banco : 'Finara Bank',
+        bancoDestino: 'Finara Bank',
         destino, saldoOrigen: origen.saldo,
         usaSobregiro: v.usaSobregiro,
         esAvanceTC: v.esAvanceTC

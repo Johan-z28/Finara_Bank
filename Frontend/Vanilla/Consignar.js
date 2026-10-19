@@ -83,7 +83,23 @@ function obtenerTarjetasDelUsuarioUnicas(usuario) {
     let cuentasValidas = [];
 
     try {
-        const cuentasGlobales = JSON.parse(localStorage.getItem('finara_cuentas')) || [];
+        let cuentasGlobales = JSON.parse(localStorage.getItem('finara_cuentas')) || [];
+        
+        // 🚀 CORRECCIÓN DE VINCULACIÓN: Si hay cuentas huérfanas o sin usuario, las asigna al usuario actual
+        let huboCambios = false;
+        cuentasGlobales = cuentasGlobales.map(c => {
+            if (!c.username && !c.correo && (usernameActivo || correoActivo)) {
+                c.username = usernameActivo || usuario.username;
+                c.correo = correoActivo || usuario.correo;
+                huboCambios = true;
+            }
+            return c;
+        });
+
+        if (huboCambios) {
+            localStorage.setItem('finara_cuentas', JSON.stringify(cuentasGlobales));
+        }
+
         cuentasValidas = cuentasGlobales.filter(c => {
             if (!c) return false;
             const cUser = String(c.username || c.correo || '').trim().toLowerCase();
@@ -172,18 +188,16 @@ function procesarRecargaPropia(usuarioActivo) {
     let esCredito = tipoProducto.includes("CREDITO") || tipoProducto.includes("CRÉDITO");
 
     let todasLasCuentas = JSON.parse(localStorage.getItem('finara_cuentas')) || [];
+    const usernameRef = usuarioActivo.username || usuarioActivo.correo || usuarioActivo.email || 'usuario';
+    const correoRef = usuarioActivo.correo || usuarioActivo.email || usuarioActivo.username || 'usuario@finara.com';
 
     if (esCredito) {
-        // 🚀 CONDICIONAL DE CONTROL DE CUPO MÁXIMO
         const cupoMaximoOriginal = parseFloat(cuentaSeleccionada?.cupoMaximo || cuentaSeleccionada?.cupoInicial) || 3000000;
-        
         let cupoActual = Number(cuentaSeleccionada?.saldo !== undefined ? cuentaSeleccionada.saldo : (cuentaSeleccionada?.cupoDisponible || cupoMaximoOriginal));
         if (isNaN(cupoActual)) cupoActual = cupoMaximoOriginal;
 
-        // Calcular la deuda pendiente real (Cupo Máximo Aprobado - Cupo Disponible Actual)
         const deudaPendienteReal = Math.max(0, cupoMaximoOriginal - cupoActual);
 
-        // 🔴 REGLA 1: Si no se registra ninguna deuda activa en la tarjeta
         if (deudaPendienteReal <= 0) {
             if (window.Swal) {
                 Swal.fire({
@@ -194,13 +208,10 @@ function procesarRecargaPropia(usuarioActivo) {
                     color: '#ffffff',
                     confirmButtonColor: '#e5a93c'
                 });
-            } else {
-                alert(`Tu tarjeta de crédito no tiene deuda pendiente ($ ${cupoMaximoOriginal.toLocaleString('es-CO')}). No es posible aumentar el cupo.`);
             }
             return;
         }
 
-        // 🔴 REGLA 2: Si el abono ingresado supera la deuda existente
         if (monto > deudaPendienteReal) {
             if (window.Swal) {
                 Swal.fire({
@@ -211,13 +222,10 @@ function procesarRecargaPropia(usuarioActivo) {
                     color: '#ffffff',
                     confirmButtonColor: '#e5a93c'
                 });
-            } else {
-                alert(`El monto excede la deuda pendiente. Lo máximo a abonar es $ ${deudaPendienteReal.toLocaleString('es-CO')}.`);
             }
             return;
         }
 
-        // Lógica de Abono Válido a Cuota / Liberación de Cupo
         let deudaActualRegistrada = parseFloat(cuentaSeleccionada?.deudaActual || deudaPendienteReal);
         let nuevaDeuda = Math.max(0, deudaActualRegistrada - monto);
         let nuevoCupo = Math.min(cupoMaximoOriginal, cupoActual + monto);
@@ -227,13 +235,15 @@ function procesarRecargaPropia(usuarioActivo) {
                 cta.saldo = nuevoCupo;
                 cta.cupoDisponible = nuevoCupo;
                 cta.deudaActual = nuevaDeuda;
+                cta.username = usernameRef;
+                cta.correo = correoRef;
             }
             return cta;
         });
-
         localStorage.setItem('finara_cuentas', JSON.stringify(todasLasCuentas));
 
-        if (usuarioActivo && Array.isArray(usuarioActivo.tarjetasAprobadas)) {
+        if (usuarioActivo) {
+            usuarioActivo.tarjetasAprobadas = usuarioActivo.tarjetasAprobadas || [];
             usuarioActivo.tarjetasAprobadas.forEach(t => {
                 if (soloDigitos(t.numeroTarjeta || t.numero) === numeroSeleccionado) {
                     t.saldo = nuevoCupo;
@@ -241,10 +251,26 @@ function procesarRecargaPropia(usuarioActivo) {
                     t.deudaActual = nuevaDeuda;
                 }
             });
+            localStorage.setItem('userProfile', JSON.stringify(usuarioActivo));
         }
-        localStorage.setItem('userProfile', JSON.stringify(usuarioActivo));
 
-        // Registrar en Movimientos
+        let listaUsuarios = JSON.parse(localStorage.getItem("finara_usuarios_local")) || [];
+        listaUsuarios = listaUsuarios.map(u => {
+            if (u.correo === correoRef || u.username === usernameRef) {
+                if (Array.isArray(u.tarjetasAprobadas)) {
+                    u.tarjetasAprobadas.forEach(t => {
+                        if (soloDigitos(t.numeroTarjeta || t.numero) === numeroSeleccionado) {
+                            t.saldo = nuevoCupo;
+                            t.cupoDisponible = nuevoCupo;
+                            t.deudaActual = nuevaDeuda;
+                        }
+                    });
+                }
+            }
+            return u;
+        });
+        localStorage.setItem("finara_usuarios_local", JSON.stringify(listaUsuarios));
+
         try {
             let movimientos = JSON.parse(localStorage.getItem('finara_movimientos')) || [];
             movimientos.unshift({
@@ -256,7 +282,7 @@ function procesarRecargaPropia(usuarioActivo) {
                 categoria: 'Pago Cuota TC',
                 tipo: 'INGRESO',
                 valor: monto,
-                usuario: usuarioActivo.correo || usuarioActivo.username
+                usuario: usernameRef
             });
             localStorage.setItem('finara_movimientos', JSON.stringify(movimientos));
         } catch (e) {
@@ -278,7 +304,6 @@ function procesarRecargaPropia(usuarioActivo) {
         });
 
     } else {
-        // Lógica Estándar de Consignación para Débito / Corriente
         let saldoActual = cuentaSeleccionada ? Number(cuentaSeleccionada.saldo || 0) : 0;
         let nuevoSaldo = saldoActual + monto;
         let cuentaEncontrada = false;
@@ -287,6 +312,8 @@ function procesarRecargaPropia(usuarioActivo) {
             const numCta = soloDigitos(cta.numero);
             if (numCta === numeroSeleccionado) {
                 cta.saldo = nuevoSaldo;
+                cta.username = usernameRef;
+                cta.correo = correoRef;
                 cuentaEncontrada = true;
             }
             return cta;
@@ -299,22 +326,41 @@ function procesarRecargaPropia(usuarioActivo) {
                 numero: numeroSeleccionado,
                 saldo: nuevoSaldo,
                 estado: 'ACTIVA',
-                username: usuarioActivo.username || usuarioActivo.correo || 'usuario',
+                username: usernameRef,
+                correo: correoRef,
                 fechaCreacion: new Date().toISOString()
             });
         }
 
         localStorage.setItem('finara_cuentas', JSON.stringify(todasLasCuentas));
 
-        if (usuarioActivo && Array.isArray(usuarioActivo.tarjetasAprobadas)) {
-            usuarioActivo.tarjetasAprobadas.forEach(t => {
-                if (soloDigitos(t.numeroTarjeta || t.numero) === numeroSeleccionado) {
-                    t.saldo = nuevoSaldo;
-                    t.cupoDisponible = nuevoSaldo;
-                }
-            });
+        if (usuarioActivo) {
+            if (Array.isArray(usuarioActivo.tarjetasAprobadas)) {
+                usuarioActivo.tarjetasAprobadas.forEach(t => {
+                    if (soloDigitos(t.numeroTarjeta || t.numero) === numeroSeleccionado) {
+                        t.saldo = nuevoSaldo;
+                        t.cupoDisponible = nuevoSaldo;
+                    }
+                });
+            }
+            localStorage.setItem('userProfile', JSON.stringify(usuarioActivo));
         }
-        localStorage.setItem('userProfile', JSON.stringify(usuarioActivo));
+
+        let listaUsuarios = JSON.parse(localStorage.getItem("finara_usuarios_local")) || [];
+        listaUsuarios = listaUsuarios.map(u => {
+            if (u.correo === correoRef || u.username === usernameRef) {
+                if (Array.isArray(u.tarjetasAprobadas)) {
+                    u.tarjetasAprobadas.forEach(t => {
+                        if (soloDigitos(t.numeroTarjeta || t.numero) === numeroSeleccionado) {
+                            t.saldo = nuevoSaldo;
+                            t.cupoDisponible = nuevoSaldo;
+                        }
+                    });
+                }
+            }
+            return u;
+        });
+        localStorage.setItem("finara_usuarios_local", JSON.stringify(listaUsuarios));
 
         try {
             let movimientos = JSON.parse(localStorage.getItem('finara_movimientos')) || [];
@@ -328,7 +374,7 @@ function procesarRecargaPropia(usuarioActivo) {
                 categoria: 'Consignación',
                 tipo: 'INGRESO',
                 valor: monto,
-                usuario: usuarioActivo.correo || usuarioActivo.username
+                usuario: usernameRef
             });
             localStorage.setItem('finara_movimientos', JSON.stringify(movimientos));
         } catch (e) {
