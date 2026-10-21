@@ -92,7 +92,7 @@
 
 .tr-paso.completo {
     color: #ffffff;
-    border-color: rgba(229, 169, 60,) !important;
+    border-color: rgba(229, 169, 60, 0.6) !important;
     background: linear-gradient(135deg, #e5a93c 0%, #b8860b 100%) !important;
 }
 
@@ -117,7 +117,6 @@
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--bg-card-border);
-    border-top: none !important;
     border-radius: var(--radius-card);
     padding: 1.8rem;
     box-shadow: var(--shadow-card);
@@ -257,7 +256,27 @@
 
 .tr-campo label { color: var(--text-muted); font-size: 0.8rem; font-weight: 500; }
 
-.tr-campo select,
+.tr-campo select {
+    background: rgba(0, 0, 0, 0.4);
+    color: var(--text-white);
+    border: 1px solid var(--bg-card-border);
+    border-radius: 12px;
+    padding: 12px 36px 12px 14px;
+    font-family: inherit;
+    font-size: 0.92rem;
+    width: 100%;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 16px;
+}
+
 .tr-campo input {
     background: rgba(0, 0, 0, 0.4);
     color: var(--text-white);
@@ -271,7 +290,6 @@
     transition: all 0.2s ease;
 }
 
-.tr-campo select { cursor: pointer; }
 .tr-campo input::placeholder { color: #64748b; }
 .tr-campo select:hover, .tr-campo select:focus,
 .tr-campo input:hover, .tr-campo input:focus {
@@ -485,48 +503,6 @@
     justify-content: center;
     gap: 1.2rem;
     margin-top: 2rem;
-}
-
-/* ==========================================
-   ESTILOS DE IMPRESIÓN CORREGIDOS (FINARA)
-   ========================================== */
-
-@page {
-    size: A4 portrait;
-    margin: 0; /* Oculta encabezados, URL, fecha y pies del navegador */
-}
-
-@media print {
-    html, body {
-        width: 100% !important;
-        height: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        background-color: #0d1017 !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-    }
-
-    /* Ocultar toda la interfaz original */
-    body * {
-        visibility: hidden !important;
-    }
-
-    /* Hacer visible únicamente el voucher y sus hijos respetando su display inline */
-    #impresionVoucher, #impresionVoucher * {
-        visibility: visible !important;
-    }
-
-    #impresionVoucher {
-        position: absolute !important;
-        left: 0 !important;
-        top: 0 !important;
-        width: 100% !important;
-        min-height: 100vh !important;
-        padding: 25mm 15mm !important;
-        background: #0d1017 !important;
-        box-sizing: border-box !important;
-    }
 }
 
 @media (max-width: 992px) {
