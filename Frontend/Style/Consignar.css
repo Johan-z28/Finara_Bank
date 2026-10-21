@@ -15,24 +15,24 @@
     box-sizing: border-box !important;
 }
 
-.deposit-page-header {
-    margin-bottom: 0.5rem;
+.tr-header { 
+    margin-bottom: 0.5rem; 
     width: 100%;
 }
 
-.deposit-page-header h1 {
+.tr-header h1 {
     font-size: 1.8rem;
     font-weight: 700;
     margin-bottom: 0.3rem;
     color: #1e293b !important;
 }
 
-.deposit-page-header p {
-    color: #64748b !important;
-    font-size: 0.9rem;
+.tr-subtitle { 
+    color: #64748b !important; 
+    font-size: 0.9rem; 
 }
 
-/* Layout principal idéntico a transferencias */
+/* Layout principal alineado idéntico a transferencias */
 .deposit-container-grid {
     display: grid;
     grid-template-columns: minmax(0, 1.8fr) minmax(300px, 1fr);
@@ -42,15 +42,20 @@
     box-sizing: border-box;
 }
 
-.deposit-card-form, .deposit-sidebar-info > .info-widget {
-    background: var(--bg-card-dark-glass);
+/* Tarjetas y contenedores principales unificados */
+.deposit-card-form, 
+.tr-side-card, 
+.tr-side-summary, 
+.deposit-sidebar-info > .info-widget {
+    background: var(--bg-card-dark-glass, rgba(17, 20, 29, 0.85)) !important;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--bg-card-border);
-    border-radius: var(--radius-card);
+    border: 1px solid var(--bg-card-border, rgba(255, 255, 255, 0.08)) !important;
+    border-radius: var(--radius-card, 16px);
     padding: 1.8rem;
-    box-shadow: var(--shadow-card);
+    box-shadow: var(--shadow-card, 0 10px 30px rgba(0, 0, 0, 0.4));
     box-sizing: border-box;
+    color: #ffffff !important;
 }
 
 .card-title-box {
@@ -78,12 +83,12 @@
     margin: 0;
     font-size: 1.15rem;
     font-weight: 700;
-    color: var(--text-white);
+    color: var(--text-white, #ffffff);
 }
 
 .card-title-box span {
     font-size: 0.8rem;
-    color: var(--text-muted);
+    color: var(--text-muted, #94a3b8);
 }
 
 /* Formulario */
@@ -101,15 +106,15 @@
 
 .form-group label {
     font-size: 0.8rem;
-    color: var(--text-muted);
+    color: var(--text-muted, #94a3b8);
     font-weight: 500;
 }
 
 .form-group select,
 .form-group input {
     background: rgba(0, 0, 0, 0.4);
-    color: var(--text-white);
-    border: 1px solid var(--bg-card-border);
+    color: var(--text-white, #ffffff);
+    border: 1px solid var(--bg-card-border, rgba(255, 255, 255, 0.1));
     border-radius: 12px;
     padding: 12px 14px;
     font-family: inherit;
@@ -126,7 +131,7 @@
 
 .form-group select:hover, .form-group select:focus,
 .form-group input:hover, .form-group input:focus {
-    border-color: var(--gold-main);
+    border-color: var(--gold-main, #e5a93c);
     box-shadow: 0 0 0 3px rgba(229, 169, 60, 0.15);
     outline: none;
 }
@@ -140,7 +145,7 @@
 .amount-input-wrapper span {
     position: absolute;
     left: 16px;
-    color: var(--gold-main);
+    color: var(--gold-main, #e5a93c);
     font-weight: 700;
     font-size: 1.25rem;
 }
@@ -149,12 +154,12 @@
     padding-left: 36px;
     font-size: 1.3rem;
     font-weight: 700;
-    color: var(--gold-main);
+    color: var(--gold-main, #e5a93c);
 }
 
 .helper-text {
     font-size: 0.78rem;
-    color: var(--text-muted);
+    color: var(--text-muted, #94a3b8);
 }
 
 /* Botón de envío */
@@ -182,7 +187,7 @@
     box-shadow: 0 6px 20px rgba(229, 169, 60, 0.4);
 }
 
-/* Sidebar lateral idéntica a transferencias */
+/* Sidebar lateral de resumen */
 .deposit-sidebar-info {
     display: flex;
     flex-direction: column;
@@ -190,10 +195,6 @@
 }
 
 .tr-side-card {
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(229, 169, 60, 0.25);
-    border-radius: 14px;
-    padding: 1.1rem;
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -207,7 +208,7 @@
 
 .tr-side-card__label {
     font-size: 0.78rem;
-    color: var(--text-muted);
+    color: var(--text-muted, #94a3b8) !important;
 }
 
 .tr-side-card__badge {
@@ -220,40 +221,36 @@
 
 .badge--activa {
     background: rgba(52, 211, 153, 0.15);
-    color: #34d399;
+    color: #34d399 !important;
     border: 1px solid rgba(52, 211, 153, 0.3);
 }
 
 .badge--bloqueada {
     background: rgba(248, 113, 113, 0.15);
-    color: #f87171;
+    color: #f87171 !important;
     border: 1px solid rgba(248, 113, 113, 0.3);
 }
 
 .tr-side-card__monto {
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--gold-main);
+    color: var(--gold-main, #e5a93c) !important;
 }
 
 .tr-side-card__sub {
     font-size: 0.8rem;
-    color: #cbd5e1;
+    color: #cbd5e1 !important;
 }
 
 .tr-side-summary {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
-    padding: 1rem;
 }
 
 .tr-side-summary h4 {
     font-size: 0.85rem;
-    color: var(--text-white);
+    color: var(--text-white, #ffffff) !important;
     margin-bottom: 4px;
 }
 
@@ -261,14 +258,14 @@
     display: flex;
     justify-content: space-between;
     font-size: 0.82rem;
-    color: var(--text-muted);
+    color: var(--text-muted, #94a3b8) !important;
 }
 
 .tr-side-summary__row strong {
-    color: var(--text-white);
+    color: var(--text-white, #ffffff) !important;
 }
 
-.gold-text { color: var(--gold-main) !important; }
+.gold-text { color: var(--gold-main, #e5a93c) !important; }
 .green-text { color: #34d399 !important; }
 
 .widget-header {
@@ -280,17 +277,17 @@
 
 .widget-header i {
     font-size: 1.2rem;
-    color: var(--gold-main);
+    color: var(--gold-main, #e5a93c);
 }
 
 .widget-header h4 {
     margin: 0;
     font-size: 1rem;
-    color: var(--text-white);
+    color: var(--text-white, #ffffff);
 }
 
 .info-widget p {
-    color: var(--text-muted);
+    color: var(--text-muted, #94a3b8);
     font-size: 0.84rem;
     line-height: 1.4;
     margin: 0;
