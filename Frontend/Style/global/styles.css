@@ -9,8 +9,11 @@
    ========================================== */
 :root {
   --bg-fondo: #E4E4E5;
+  --bg-card-dark: rgba(18, 22, 32, 0.92);
   --bg-card-dark-glass: rgba(18, 22, 32, 0.92);
   --bg-card-border: rgba(255, 255, 255, 0.12);
+  --border-dark: rgba(255, 255, 255, 0.12);
+  --radius-lg: 20px;
   --gold-main: #e5a93c;
   --gold-hover: #f1b84f;
   --text-white: #ffffff;
@@ -31,14 +34,43 @@
 
 html, body, .general-body {
   font-family: var(--font-main);
-  background: radial-gradient(circle at 80% 20%, rgba(229, 169, 60, 0.08) 0%, transparent 40%),
-              radial-gradient(circle at 10% 90%, rgba(56, 189, 248, 0.05) 0%, transparent 40%),
-              #f4f6f9 !important;
-  background-attachment: fixed !important;
+  background-color: #07090e !important;
   color: #1e293b;
   min-height: 100vh;
   width: 100%;
   display: flex;
+  position: relative;
+}
+
+/* Capa fija con la imagen de fondo con blur y contraste */
+.general-body::before {
+  content: "";
+  position: fixed;
+  top: -20px;
+  left: -20px;
+  right: -20px;
+  bottom: -20px;
+  background-image: url('../image/app_bg.png');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-color: rgba(7, 9, 14, 0.76);
+  background-blend-mode: darken;
+  filter: blur(8px);
+  -webkit-filter: blur(8px);
+  transform: scale(1.04);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* El contenido y wrappers se elevan para estar por encima del fondo */
+.sidebar {
+  z-index: 100;
+}
+
+.main-wrapper {
+  position: relative;
+  z-index: 1;
 }
 
 /* BACKDROP PARA MÓVIL */
@@ -60,10 +92,10 @@ html, body, .general-body {
 .sidebar {
   width: 250px;
   height: 100vh;
-  background-color: rgba(10, 13, 20, 0.96);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-right: 1px solid rgba(0, 0, 0, 0.08);
+  background-color: rgba(10, 13, 20, 0.78);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -134,7 +166,7 @@ html, body, .general-body {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .sidebar .nav-link {
@@ -142,30 +174,44 @@ html, body, .general-body {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 13px 16px;
+  padding: 11px 16px;
   color: #94a3b8;
   font-size: 0.92rem;
   font-weight: 500;
-  border-radius: 12px;
-  transition: all 0.2s ease;
+  border-radius: 14px;
+  background: rgba(18, 22, 32, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.25s ease;
 }
 
 .sidebar .nav-link i {
   font-size: 1.15rem;
   min-width: 22px;
   text-align: center;
+  color: #94a3b8;
+  transition: color 0.25s ease;
 }
 
 .sidebar .nav-link:hover {
   color: #ffffff;
-  background-color: rgba(255, 255, 255, 0.08);
+  background: rgba(22, 27, 40, 0.75);
+  border-color: rgba(229, 169, 60, 0.3);
+  transform: translateX(3px);
+}
+
+.sidebar .nav-link:hover i {
+  color: var(--gold-main);
 }
 
 .sidebar .nav-link.active,
 .sidebar .nav-link.is-active {
   color: #ffffff !important;
-  background: linear-gradient(90deg, rgba(229, 169, 60, 0.25) 0%, rgba(229, 169, 60, 0.05) 100%) !important;
-  border: 1px solid rgba(229, 169, 60, 0.4) !important;
+  background: rgba(22, 27, 40, 0.9) !important;
+  border: 1px solid rgba(229, 169, 60, 0.6) !important;
+  box-shadow: 0 4px 14px rgba(229, 169, 60, 0.2) !important;
 }
 
 .sidebar .nav-link.active i,
@@ -298,7 +344,7 @@ html, body, .general-body {
 .user-greeting h2 {
   font-size: 1.2rem;
   font-weight: 500;
-  color: #1e293b;
+  color: #ffffff;
 }
 
 .user-greeting h2 span#greetingName {
