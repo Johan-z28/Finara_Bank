@@ -14,6 +14,7 @@ async function cargarResumenSaldos() {
     const elSaldoTotal = document.getElementById('dashSaldoTotal');
     const elTotalProductos = document.getElementById('dashTotalProductos');
     const contCuentas = document.getElementById('dashListaCuentas');
+    const contTarjetasFisicas = document.getElementById('dashTarjetasFisicas');
 
     if (!contCuentas) return;
 
@@ -21,7 +22,9 @@ async function cargarResumenSaldos() {
         const cuentas = await obtenerCuentas();
         const activas = (cuentas || []).filter(c => c && c.estado !== 'INACTIVA');
 
+        // Calcular saldo consolidado excluyendo tarjetas de crédito para fondos líquidos
         const saldoConsolidado = activas.reduce((acc, c) => {
+            if (c.tipo === 'TARJETA_CREDITO') return acc;
             const num = typeof c.saldo === 'number' ? c.saldo : Number(String(c.saldo || 0).replace(/[^0-9.-]+/g, ""));
             return acc + (isNaN(num) ? 0 : num);
         }, 0);
@@ -29,6 +32,64 @@ async function cargarResumenSaldos() {
         if (elSaldoTotal) elSaldoTotal.textContent = formatoCOP.format(saldoConsolidado);
         if (elTotalProductos) elTotalProductos.textContent = activas.length;
 
+        // 1. RENDERIZAR MINIATURAS DE TARJETAS FÍSICAS EN EL DASHBOARD
+        if (contTarjetasFisicas) {
+            if (activas.length === 0) {
+                contTarjetasFisicas.removeAttribute('data-count');
+                contTarjetasFisicas.innerHTML = `
+                    <div class="dash-empty-card" data-view="solicitarproductos">
+                        <i class="fa-solid fa-plus-circle"></i>
+                        <span>Solicitar mi primera tarjeta Finara</span>
+                    </div>
+                `;
+            } else {
+                // Orden idéntico a Saldos: Crédito siempre al final (extremo derecho), Débito y Corriente a su izquierda
+                const cuentasOrdenadas = [...activas].sort((a, b) => {
+                    const esCreditoA = a.tipo === 'TARJETA_CREDITO';
+                    const esCreditoB = b.tipo === 'TARJETA_CREDITO';
+                    if (esCreditoA && !esCreditoB) return 1;
+                    if (!esCreditoA && esCreditoB) return -1;
+                    const ordenTipos = { AHORROS: 1, CORRIENTE: 2 };
+                    return (ordenTipos[a.tipo] || 99) - (ordenTipos[b.tipo] || 99);
+                });
+
+                contTarjetasFisicas.setAttribute('data-count', String(cuentasOrdenadas.length));
+
+                contTarjetasFisicas.innerHTML = cuentasOrdenadas.map(c => {
+                    const numLimpio = String(c.numero || '').replace(/\D/g, '').slice(-4);
+                    let claseColor = 'mini-card--gold';
+                    let tagTexto = 'Débito';
+                    let logo = '../Style/image/Logo_finara_black.svg';
+
+                    if (c.tipo === 'CORRIENTE') {
+                        claseColor = 'mini-card--platinum';
+                        tagTexto = 'Corriente';
+                    } else if (c.tipo === 'TARJETA_CREDITO') {
+                        claseColor = 'mini-card--black';
+                        tagTexto = 'Crédito';
+                        logo = '../Style/image/Logo_finara.svg';
+                    }
+
+                    const saldoVal = typeof c.saldo === 'number' ? c.saldo : Number(String(c.saldo || 0).replace(/[^0-9.-]+/g, ""));
+
+                    return `
+                        <div class="dash-mini-card ${claseColor}">
+                            <div class="mini-card-head">
+                                <img src="${logo}" alt="Logo Finara" class="mini-card-logo">
+                                <span class="mini-card-tag">${tagTexto}</span>
+                            </div>
+                            <div class="mini-card-chip"></div>
+                            <div class="mini-card-body">
+                                <span class="mini-card-number">•••• •••• •••• ${numLimpio}</span>
+                                <strong class="mini-card-amount">${formatoCOP.format(saldoVal)}</strong>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // 2. RENDERIZAR LISTA DE PRODUCTOS
         if (activas.length === 0) {
             contCuentas.innerHTML = `<p class="dash-empty">No tienes productos activos actualmente.</p>`;
             return;
@@ -65,7 +126,7 @@ async function cargarUltimosMovimientos() {
     if (!contMovs) return;
 
     try {
-        const res = await obtenerMovimientos({ periodo: '30d', tamano: 4, pagina: 1 });
+        const res = await obtenerMovimientos({ periodo: 'todo', tamano: 5, pagina: 1 });
         const items = res.items || [];
 
         if (items.length === 0) {
@@ -98,3 +159,5 @@ async function cargarUltimosMovimientos() {
         console.error("Error al cargar movimientos en el dashboard:", err);
     }
 }
+
+

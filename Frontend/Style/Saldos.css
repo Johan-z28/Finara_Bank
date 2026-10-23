@@ -8,7 +8,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
 }
 
 .saldos-header {
@@ -16,20 +16,21 @@
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 8px;
+    margin-bottom: -4px;
 }
 
 .saldos-header h1 {
-    font-size: 1.6rem;
+    font-size: 1.45rem;
     font-weight: 700;
-    color: #0f172a;
+    color: #ffffff;
     margin: 0;
 }
 
 .saldos-subtitle {
-    color: #64748b;
-    font-size: 0.85rem;
-    margin-top: 4px;
+    color: #94a3b8;
+    font-size: 0.82rem;
+    margin-top: 2px;
 }
 
 .saldos-actions-group {
@@ -69,12 +70,43 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-/* GRILLA DE TARJETAS ADAPTATIVA */
+/* GRILLA DE TARJETAS DE DERECHA A IZQUIERDA (3 COLUMNAS FIJAS) */
 .cuentas-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.25rem;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-areas: "pos1 pos2 pos3";
+    gap: 1.1rem;
     width: 100%;
+    align-items: stretch;
+}
+
+/* Llenado de derecha a izquierda:
+   - Con 1 tarjeta: se ubica en la posición 3 (extremo derecho)
+   - Con 2 tarjetas: se ubican en la posición 2 y posición 3 (lado derecho de la pantalla)
+   - Con 3 tarjetas: se ubican en posición 1, 2 y 3 (pantalla completa)
+*/
+.cuentas-grid[data-count="1"] .cuenta-card {
+    grid-area: pos3;
+}
+
+.cuentas-grid[data-count="2"] .cuenta-card:nth-child(1) {
+    grid-area: pos2;
+}
+
+.cuentas-grid[data-count="2"] .cuenta-card:nth-child(2) {
+    grid-area: pos3;
+}
+
+.cuentas-grid[data-count="3"] .cuenta-card:nth-child(1) {
+    grid-area: pos1;
+}
+
+.cuentas-grid[data-count="3"] .cuenta-card:nth-child(2) {
+    grid-area: pos2;
+}
+
+.cuentas-grid[data-count="3"] .cuenta-card:nth-child(3) {
+    grid-area: pos3;
 }
 
 .cuenta-card {
@@ -83,17 +115,39 @@
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--bg-card-border);
     border-radius: var(--radius-card);
-    padding: 1.25rem;
+    padding: 1rem 1.15rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    justify-content: space-between;
+    gap: 0.8rem;
     box-shadow: var(--shadow-card);
+    width: 100%;
+    box-sizing: border-box;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Forzar que la tarjeta de crédito siempre se posicione en la última posición (extremo derecho) */
+.cuenta-card--tarjeta {
+    order: 3;
+}
+
+.cuenta-card--ahorros {
+    order: 1;
+}
+
+.cuenta-card--corriente {
+    order: 2;
+}
+
+.cuenta-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
 }
 
 .cuenta-card__meta-container {
     display: flex;
     flex-direction: column;
-    gap: 0.8rem;
+    gap: 0.6rem;
 }
 
 .cuenta-card__estado-header {
@@ -103,9 +157,9 @@
 }
 
 .cuenta-card__estado-badge {
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 0.72rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -125,14 +179,16 @@
 
 .tarjeta-plastico {
     width: 100%;
-    height: 185px;
-    border-radius: 16px;
-    padding: 18px 20px;
+    aspect-ratio: 1.58 / 1;
+    height: auto;
+    max-height: 190px;
+    border-radius: 14px;
+    padding: 14px 16px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
 }
 
 .tarjeta-dorada {
@@ -208,13 +264,13 @@
 }
 
 .cuenta-card__tipo-titulo {
-    font-size: 1.05rem;
+    font-size: 0.95rem;
     font-weight: 600;
     color: #ffffff !important;
 }
 
 .cuenta-card__sub-numero {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: #94a3b8 !important;
     font-family: monospace;
 }
@@ -224,18 +280,18 @@
     justify-content: space-between;
     align-items: center;
     background: rgba(0, 0, 0, 0.4);
-    padding: 0.8rem 1rem;
-    border-radius: 12px;
+    padding: 0.6rem 0.85rem;
+    border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .cuenta-card__saldo-label {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: #94a3b8 !important;
 }
 
 .cuenta-card__valor-monto {
-    font-size: 1.15rem;
+    font-size: 1.05rem;
     font-weight: 700;
     color: var(--gold-main) !important;
 }
@@ -244,9 +300,9 @@
 .cuenta-card__acciones-grupo {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
     width: 100%;
-    margin-top: 4px;
+    margin-top: 2px;
 }
 
 .btn-simular-compra {
@@ -254,17 +310,17 @@
     background: linear-gradient(135deg, #e5a93c 0%, #c48b28 100%);
     border: none;
     color: #000000;
-    padding: 0.8rem;
-    border-radius: 12px;
+    padding: 0.65rem;
+    border-radius: 10px;
     font-weight: 700;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     box-shadow: 0 4px 14px rgba(229, 169, 60, 0.3);
-    margin-bottom: 2px;
+    margin-bottom: 0;
     transition: all 0.2s ease;
 }
 
@@ -276,16 +332,16 @@
 .acciones-doble-btn {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    gap: 8px;
 }
 
 .btn-tarjeta-accion {
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.12);
     color: #ffffff;
-    padding: 0.65rem;
-    border-radius: 10px;
-    font-size: 0.82rem;
+    padding: 0.55rem;
+    border-radius: 8px;
+    font-size: 0.78rem;
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -299,7 +355,7 @@
 .saldos-analitica-grid {
     display: grid;
     grid-template-columns: 1.3fr 1fr;
-    gap: 1.25rem;
+    gap: 1.1rem;
     width: 100%;
 }
 
@@ -308,26 +364,26 @@
     backdrop-filter: blur(16px);
     border: 1px solid var(--bg-card-border);
     border-radius: var(--radius-card);
-    padding: 1.25rem;
+    padding: 1rem 1.25rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.75rem;
 }
 
 .analitica-card__title {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
     color: #ffffff !important;
 }
 
 .analitica-card__subtitle {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     color: #cbd5e1 !important;
 }
 
 .barra-distribucion {
     display: flex;
-    height: 12px;
+    height: 10px;
     width: 100%;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 20px;
@@ -341,21 +397,21 @@
 .distribucion-leyenda-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 0.8rem;
+    gap: 0.6rem;
 }
 
 .leyenda-col-header {
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     color: #e2e8f0 !important;
     font-weight: 500;
 }
 
 .leyenda-dot {
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     display: inline-block;
     flex-shrink: 0;
@@ -366,7 +422,7 @@
 .leyenda-dot--corriente { background-color: #60a5fa; box-shadow: 0 0 8px rgba(96, 165, 250, 0.5); }
 
 .leyenda-monto-val {
-    font-size: 1rem;
+    font-size: 0.92rem;
     font-weight: 700;
     color: #ffffff !important;
     display: block;
@@ -374,29 +430,29 @@
 }
 
 .leyenda-pct-val {
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     color: #94a3b8 !important;
 }
 
 .patrimonio-monto-box {
-    padding: 1.2rem;
+    padding: 0.9rem 1.1rem;
     background: rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
+    border-radius: 14px;
 }
 
 .patrimonio-label {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: #cbd5e1 !important;
     font-weight: 500;
     display: block;
 }
 
 .patrimonio-valor {
-    font-size: 1.8rem;
+    font-size: 1.55rem;
     font-weight: 700;
     color: #ffffff !important;
-    margin-top: 4px;
+    margin-top: 2px;
 }
 
 /* CORRECCIÓN DE COLOR EN "Fondos disponibles para operaciones" */
@@ -419,11 +475,18 @@
 
 /* RESPONSIVE MÓVIL */
 @media (max-width: 900px) {
-    .cuentas-grid { grid-template-columns: 1fr; }
+    .cuentas-grid,
+    .cuentas-grid[data-count="1"],
+    .cuentas-grid[data-count="2"],
+    .cuentas-grid[data-count="3"] {
+        grid-template-columns: 1fr;
+    }
     .saldos-analitica-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 480px) {
+    .cuentas-grid { grid-template-columns: 1fr; }
+    .cuenta-card { max-width: 100%; }
     .saldos-container { gap: 1rem; }
     .saldos-header h1 { font-size: 1.3rem; }
     .btn-solicitar-cabecera span { display: none; }
@@ -436,7 +499,9 @@
     }
     .cuenta-card { padding: 1rem; }
     .tarjeta-plastico {
-        height: 165px;
+        height: auto;
+        min-height: 160px;
+        max-height: 220px;
         padding: 12px 14px;
     }
     .card-number {
