@@ -5,19 +5,74 @@
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
 
 /* ==========================================
-   2. VARIABLES GLOBALES
+   2. VARIABLES GLOBALES & SISTEMA DE TEMAS (OSCURO / CLARO)
    ========================================== */
 :root {
-  --bg-fondo: #E4E4E5;
+  /* Modo Oscuro por defecto (Finara Dark Luxury) */
+  --bg-body: #07090e;
+  --bg-body-radial-1: rgba(229, 169, 60, 0.08);
+  --bg-body-radial-2: rgba(56, 189, 248, 0.04);
+  --bg-surface: #0e1219;
+  --bg-surface-glass: rgba(14, 18, 25, 0.94);
+  --bg-card: linear-gradient(145deg, #121620, #0a0d13);
   --bg-card-dark-glass: rgba(18, 22, 32, 0.92);
-  --bg-card-border: rgba(255, 255, 255, 0.12);
-  --gold-main: #e5a93c;
-  --gold-hover: #f1b84f;
+  --bg-card-border: rgba(255, 255, 255, 0.10);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-focus: rgba(229, 169, 60, 0.5);
+
+  --text-main: #f8fafc;
+  --text-title: #ffffff;
   --text-white: #ffffff;
   --text-muted: #94a3b8;
+  --text-dim: #64748b;
+
+  --input-bg: rgba(0, 0, 0, 0.45);
+  --input-border: rgba(255, 255, 255, 0.12);
+  --input-text: #ffffff;
+
+  --sidebar-bg: rgba(10, 13, 20, 0.96);
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-link: #94a3b8;
+  --sidebar-link-hover: #ffffff;
+
+  --gold-main: #e5a93c;
+  --gold-hover: #f1b84f;
   --font-main: 'Poppins', sans-serif;
   --radius-card: 20px;
-  --shadow-card: 0 15px 35px rgba(0, 0, 0, 0.25);
+  --shadow-card: 0 15px 35px rgba(0, 0, 0, 0.35);
+}
+
+/* Modo Claro (Finara Pure Light) */
+html.light-theme,
+body.light-theme,
+.light-theme {
+  --bg-body: #f1f4f9;
+  --bg-body-radial-1: rgba(229, 169, 60, 0.12);
+  --bg-body-radial-2: rgba(56, 189, 248, 0.08);
+  --bg-surface: #ffffff;
+  --bg-surface-glass: rgba(255, 255, 255, 0.96);
+  --bg-card: linear-gradient(145deg, #ffffff, #f8fafc);
+  --bg-card-dark-glass: rgba(255, 255, 255, 0.96);
+  --bg-card-border: rgba(203, 213, 225, 0.85);
+  --border-subtle: rgba(226, 232, 240, 0.95);
+  --border-focus: rgba(229, 169, 60, 0.65);
+
+  --text-main: #1e293b;
+  --text-title: #0f172a;
+  --text-white: #0f172a;
+  --text-muted: #64748b;
+  --text-dim: #94a3b8;
+
+  --input-bg: #ffffff;
+  --input-border: rgba(203, 213, 225, 0.9);
+  --input-text: #0f172a;
+
+  --sidebar-bg: #ffffff;
+  --sidebar-border: rgba(226, 232, 240, 0.95);
+  --sidebar-link: #475569;
+  --sidebar-link-hover: #0f172a;
+
+  --shadow-card: 0 10px 25px rgba(15, 23, 42, 0.08);
 }
 
 /* ==========================================
@@ -31,14 +86,15 @@
 
 html, body, .general-body {
   font-family: var(--font-main);
-  background: radial-gradient(circle at 80% 20%, rgba(229, 169, 60, 0.08) 0%, transparent 40%),
-              radial-gradient(circle at 10% 90%, rgba(56, 189, 248, 0.05) 0%, transparent 40%),
-              #f4f6f9 !important;
+  background: radial-gradient(circle at 80% 20%, var(--bg-body-radial-1) 0%, transparent 40%),
+              radial-gradient(circle at 10% 90%, var(--bg-body-radial-2) 0%, transparent 40%),
+              var(--bg-body) !important;
   background-attachment: fixed !important;
-  color: #1e293b;
+  color: var(--text-main);
   min-height: 100vh;
   width: 100%;
   display: flex;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* BACKDROP PARA MÓVIL */
@@ -60,17 +116,17 @@ html, body, .general-body {
 .sidebar {
   width: 250px;
   height: 100vh;
-  background-color: rgba(10, 13, 20, 0.96);
+  background-color: var(--sidebar-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-right: 1px solid rgba(0, 0, 0, 0.08);
+  border-right: 1px solid var(--sidebar-border);
   display: flex;
   flex-direction: column;
   position: fixed;
   top: 0;
   left: 0;
   z-index: 100;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .sidebar-edge-toggle {
@@ -143,7 +199,7 @@ html, body, .general-body {
   align-items: center;
   gap: 14px;
   padding: 13px 16px;
-  color: #94a3b8;
+  color: var(--sidebar-link);
   font-size: 0.92rem;
   font-weight: 500;
   border-radius: 12px;
@@ -157,13 +213,13 @@ html, body, .general-body {
 }
 
 .sidebar .nav-link:hover {
-  color: #ffffff;
-  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--sidebar-link-hover);
+  background-color: var(--border-subtle);
 }
 
 .sidebar .nav-link.active,
 .sidebar .nav-link.is-active {
-  color: #ffffff !important;
+  color: var(--text-title) !important;
   background: linear-gradient(90deg, rgba(229, 169, 60, 0.25) 0%, rgba(229, 169, 60, 0.05) 100%) !important;
   border: 1px solid rgba(229, 169, 60, 0.4) !important;
 }
@@ -175,7 +231,7 @@ html, body, .general-body {
 
 .sidebar-footer {
   padding: 1rem 0.8rem 1.2rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--sidebar-border);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -298,7 +354,7 @@ html, body, .general-body {
 .user-greeting h2 {
   font-size: 1.2rem;
   font-weight: 500;
-  color: #1e293b;
+  color: var(--text-title);
 }
 
 .user-greeting h2 span#greetingName {
@@ -309,17 +365,62 @@ html, body, .general-body {
   -webkit-text-fill-color: transparent;
 }
 
+/* ==========================================
+   BOTÓN CONMUTADOR DE TEMA (DARK / LIGHT)
+   ========================================== */
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--bg-card-dark-glass);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  padding: 8px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.theme-toggle-btn:hover {
+  border-color: var(--gold-main);
+  color: var(--gold-main);
+  transform: translateY(-1px);
+}
+
+.theme-toggle-btn i {
+  font-size: 1rem;
+  color: var(--gold-main);
+  transition: transform 0.3s ease;
+}
+
+.theme-toggle-btn:hover i {
+  transform: rotate(20deg);
+}
+
+.theme-toggle-btn--circle {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 50%;
+}
+
 .btn-perfil-navbar {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 6px 14px;
   background: var(--bg-card-dark-glass);
-  border: 1px solid rgba(15, 23, 42, 0.12);
+  border: 1px solid var(--border-subtle);
   border-radius: 20px;
   text-decoration: none;
-  color: #ffffff;
+  color: var(--text-main);
   font-size: 0.84rem;
+  transition: all 0.2s ease;
 }
 
 .btn-perfil-navbar:hover {
@@ -337,6 +438,12 @@ html, body, .general-body {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .main-content {
@@ -426,3 +533,218 @@ html, body, .general-body {
     padding: 0.8rem;
   }
 }
+
+/* ==========================================
+   7. REGLAS COMPARTIDAS PARA MODO CLARO
+   ========================================== */
+html.light-theme .dash-card-metric,
+body.light-theme .dash-card-metric,
+html.light-theme .dash-panel,
+body.light-theme .dash-panel {
+  background: var(--bg-surface) !important;
+  border-color: var(--border-subtle) !important;
+  box-shadow: var(--shadow-card) !important;
+}
+
+html.light-theme .dash-card-metric--highlight,
+body.light-theme .dash-card-metric--highlight {
+  background: linear-gradient(135deg, rgba(229, 169, 60, 0.12) 0%, #ffffff 100%) !important;
+  border-color: rgba(229, 169, 60, 0.45) !important;
+}
+
+html.light-theme .dash-account-item,
+body.light-theme .dash-account-item {
+  background: #f8fafc !important;
+  border-color: var(--border-subtle) !important;
+}
+
+html.light-theme .dash-panel-header h3,
+body.light-theme .dash-panel-header h3,
+html.light-theme .dash-metric-value,
+body.light-theme .dash-metric-value {
+  color: var(--text-title) !important;
+}
+
+/* Formularios compartidos en modo claro */
+html.light-theme input:not([type="submit"]):not([type="button"]):not([type="checkbox"]):not([type="radio"]),
+body.light-theme input:not([type="submit"]):not([type="button"]):not([type="checkbox"]):not([type="radio"]),
+html.light-theme select,
+body.light-theme select,
+html.light-theme textarea,
+body.light-theme textarea {
+  background-color: var(--input-bg) !important;
+  color: var(--input-text) !important;
+  border-color: var(--input-border) !important;
+}
+
+html.light-theme select option,
+body.light-theme select option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+/* Encabezados de vistas principales */
+html.light-theme .tr-header h1,
+body.light-theme .tr-header h1,
+html.light-theme .saldos-header h1,
+body.light-theme .saldos-header h1,
+html.light-theme .request-header h1,
+body.light-theme .request-header h1,
+html.light-theme .profile-page-header h1,
+body.light-theme .profile-page-header h1 {
+  color: var(--text-title) !important;
+}
+
+/* Modo oscuro para títulos que tenían color oscuro hardcodeado */
+html.dark-theme .tr-header h1,
+body.dark-theme .tr-header h1,
+html.dark-theme .saldos-header h1,
+body.dark-theme .saldos-header h1,
+html.dark-theme .request-header h1,
+body.dark-theme .request-header h1 {
+  color: #ffffff !important;
+}
+
+html.dark-theme .tr-subtitle,
+body.dark-theme .tr-subtitle,
+html.dark-theme .saldos-subtitle,
+body.dark-theme .saldos-subtitle,
+html.dark-theme .request-header p,
+body.dark-theme .request-header p {
+  color: var(--text-muted) !important;
+}
+
+/* Tarjetas con clase bg-card-dark-glass */
+html.light-theme .deposit-card-form,
+body.light-theme .deposit-card-form,
+html.light-theme .withdraw-card-form,
+body.light-theme .withdraw-card-form,
+html.light-theme .tr-side-card,
+body.light-theme .tr-side-card,
+html.light-theme .tr-side-summary,
+body.light-theme .tr-side-summary,
+html.light-theme .info-widget,
+body.light-theme .info-widget,
+html.light-theme .mov-filtros,
+body.light-theme .mov-filtros,
+html.light-theme .card-option-box,
+body.light-theme .card-option-box,
+html.light-theme .cuenta-card,
+body.light-theme .cuenta-card,
+html.light-theme .profile-card,
+body.light-theme .profile-card,
+html.light-theme .admin-card,
+body.light-theme .admin-card,
+html.light-theme .admin-hero-banner,
+body.light-theme .admin-hero-banner {
+  background: var(--bg-surface) !important;
+  border-color: var(--border-subtle) !important;
+  color: #000000 !important;
+  box-shadow: var(--shadow-card) !important;
+}
+
+html.light-theme .card-title-box h3,
+body.light-theme .card-title-box h3,
+html.light-theme .admin-card h3,
+body.light-theme .admin-card h3,
+html.light-theme .admin-hero-content h1,
+body.light-theme .admin-hero-content h1 {
+  color: #000000 !important;
+  font-weight: 700 !important;
+}
+
+/* =========================================================
+   TODA LA LETRA NEGRA Y RESALTADA EN MODO CLARO
+   ========================================================= */
+html.light-theme,
+body.light-theme {
+  color: #000000 !important;
+}
+
+html.light-theme h1,
+body.light-theme h1,
+html.light-theme h2,
+body.light-theme h2,
+html.light-theme h3,
+body.light-theme h3,
+html.light-theme h4,
+body.light-theme h4,
+html.light-theme h5,
+body.light-theme h5,
+html.light-theme h6,
+body.light-theme h6,
+html.light-theme p,
+body.light-theme p,
+html.light-theme span,
+body.light-theme span,
+html.light-theme strong,
+body.light-theme strong,
+html.light-theme label,
+body.light-theme label,
+html.light-theme li,
+body.light-theme li,
+html.light-theme small,
+body.light-theme small,
+html.light-theme a:not(.btn-gold):not(.btn-solicitar-sidebar):not(.btn-register):not(.btn-submit-withdraw):not(.btn-solicitar-cabecera),
+body.light-theme a:not(.btn-gold):not(.btn-solicitar-sidebar):not(.btn-register):not(.btn-submit-withdraw):not(.btn-solicitar-cabecera) {
+  color: #000000 !important;
+}
+
+/* Mantener legibles los badges y acentos necesarios */
+html.light-theme .account-badge,
+body.light-theme .account-badge {
+  background: rgba(229, 169, 60, 0.2) !important;
+  color: #000000 !important;
+  border: 1px solid #b88322 !important;
+  font-weight: 800 !important;
+}
+
+/* Cajas internas de detalles y desgloses */
+html.light-theme .account-details-box,
+body.light-theme .account-details-box,
+html.light-theme .breakdown-box,
+body.light-theme .breakdown-box,
+html.light-theme .rule-hint,
+body.light-theme .rule-hint,
+html.light-theme .cuenta-card__saldo-box,
+body.light-theme .cuenta-card__saldo-box,
+html.light-theme .patrimonio-monto-box,
+body.light-theme .patrimonio-monto-box {
+  background: #f1f5f9 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+html.light-theme .account-details-box *,
+body.light-theme .account-details-box *,
+html.light-theme .breakdown-box *,
+body.light-theme .breakdown-box *,
+html.light-theme .rule-hint,
+body.light-theme .rule-hint,
+html.light-theme .info-widget *,
+body.light-theme .info-widget *,
+html.light-theme .card-title-box *,
+body.light-theme .card-title-box * {
+  color: #000000 !important;
+}
+
+html.light-theme .chip-monto,
+body.light-theme .chip-monto {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #000000 !important;
+  font-weight: 600 !important;
+}
+
+html.light-theme .btn-max-amount,
+body.light-theme .btn-max-amount {
+  border-color: #b88322 !important;
+  color: #000000 !important;
+  font-weight: 700 !important;
+}
+
+html.light-theme .btn-submit-withdraw,
+body.light-theme .btn-submit-withdraw {
+  color: #000000 !important;
+  font-weight: 800 !important;
+}
+

@@ -1,5 +1,10 @@
 // Vanilla/Global/app.js
+import { initTheme } from './themeManager.js';
+
 document.addEventListener("DOMContentLoaded", async () => {
+    // Inicializar sistema de temas (Modo Oscuro / Modo Claro)
+    initTheme();
+
     const getSesion = (key) => {
         const val = localStorage.getItem(key) || sessionStorage.getItem(key);
         return (val && val !== "undefined" && val !== "null") ? val : null;

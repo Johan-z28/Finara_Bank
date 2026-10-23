@@ -1,3 +1,5 @@
+import { initTheme } from '../Global/themeManager.js';
+
 window.togglePassword = function(inputId, button) {
     const input = document.getElementById(inputId);
     const icon = button.querySelector("i");
@@ -13,6 +15,9 @@ window.togglePassword = function(inputId, button) {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
+    // Inicializar gestión de temas
+    initTheme();
+
     const registroForm = document.getElementById("registroForm");
 
     if (registroForm) {

@@ -36,11 +36,11 @@ export function crearCuentaCard(cuenta, { ocultarSaldo = false, onEstadoCambiado
 
     if (cuenta.tipo === 'AHORROS') {
         clasePlastico = 'tarjeta-dorada';
-        logoPath = '../Style/image/Logo_finara_black.svg';
+        logoPath = '../Style/image/Logo_finara_gold.svg';
         tagTexto = 'Débito';
     } else if (cuenta.tipo === 'CORRIENTE') {
         clasePlastico = 'tarjeta-platino';
-        logoPath = '../Style/image/Logo_finara_black.svg';
+        logoPath = '../Style/image/Logo_finara_gold.svg';
         tagTexto = 'Corriente';
     }
 

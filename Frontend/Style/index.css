@@ -1284,3 +1284,80 @@ section[id] {
         grid-template-columns: 1fr !important;
     }
 }
+
+/* =========================================================
+   ADAPTACIÓN MODO CLARO (LANDING / INDEX)
+   ========================================================= */
+html.light-theme .navbar,
+body.light-theme .navbar {
+    background: rgba(255, 255, 255, 0.92) !important;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.9) !important;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05) !important;
+}
+
+html.light-theme .nav-links a,
+body.light-theme .nav-links a {
+    color: #475569 !important;
+}
+
+html.light-theme .nav-links a:hover,
+body.light-theme .nav-links a:hover {
+    color: var(--gold-main) !important;
+}
+
+html.light-theme .hero-content h1,
+body.light-theme .hero-content h1 {
+    color: #0f172a !important;
+}
+
+html.light-theme .hero-subtitle,
+body.light-theme .hero-subtitle {
+    color: #475569 !important;
+}
+
+html.light-theme .feature-card,
+body.light-theme .feature-card,
+html.light-theme .producto-card,
+body.light-theme .producto-card,
+html.light-theme .card-recompensa,
+body.light-theme .card-recompensa,
+html.light-theme .seguridad-banner,
+body.light-theme .seguridad-banner,
+html.light-theme .contacto-card,
+body.light-theme .contacto-card,
+html.light-theme .stat-card,
+body.light-theme .stat-card {
+    background: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06) !important;
+}
+
+html.light-theme .feature-text h4,
+body.light-theme .feature-text h4,
+html.light-theme .producto-info h3,
+body.light-theme .producto-info h3,
+html.light-theme .recompensa-info h4,
+body.light-theme .recompensa-info h4,
+html.light-theme .beneficios-header h2,
+body.light-theme .beneficios-header h2,
+html.light-theme .seccion-titulo h2,
+body.light-theme .seccion-titulo h2 {
+    color: #0f172a !important;
+}
+
+html.light-theme .feature-text p,
+body.light-theme .feature-text p,
+html.light-theme .producto-info p,
+body.light-theme .producto-info p,
+html.light-theme .recompensa-info p,
+body.light-theme .recompensa-info p,
+html.light-theme .seccion-subtitulo,
+body.light-theme .seccion-subtitulo {
+    color: #64748b !important;
+}
+
+html.light-theme .footer,
+body.light-theme .footer {
+    background: #0f172a !important; /* Footer oscuro elegante */
+    color: #f8fafc !important;
+}
