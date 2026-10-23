@@ -482,4 +482,70 @@ body {
 .login-button--admin:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 25px rgba(217, 153, 26, .35) !important;
-}
+}
+
+/* =========================================================
+   ADAPTACIÓN MODO CLARO (LOGIN)
+   ========================================================= */
+html.light-theme .login-container,
+body.light-theme .login-container {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+}
+
+html.light-theme .login-form-container,
+body.light-theme .login-form-container {
+    background: #ffffff;
+}
+
+html.light-theme .form-header h1,
+body.light-theme .form-header h1 {
+    color: #0f172a;
+}
+
+html.light-theme .form-header p,
+body.light-theme .form-header p {
+    color: #64748b;
+}
+
+html.light-theme .input-group label,
+body.light-theme .input-group label {
+    color: #334155;
+}
+
+html.light-theme .input-wrapper,
+body.light-theme .input-wrapper {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+html.light-theme .input-wrapper input,
+body.light-theme .input-wrapper input {
+    color: #0f172a;
+}
+
+html.light-theme .input-wrapper input::placeholder,
+body.light-theme .input-wrapper input::placeholder {
+    color: #94a3b8;
+}
+
+html.light-theme .login-role-tabs,
+body.light-theme .login-role-tabs {
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+}
+
+html.light-theme .login-role-tab,
+body.light-theme .login-role-tab {
+    color: #64748b;
+}
+
+html.light-theme .login-role-tab.activo,
+body.light-theme .login-role-tab.activo {
+    background: #ffffff;
+    color: #b88322;
+    border-color: rgba(229, 169, 60, 0.5);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+

@@ -26,11 +26,14 @@
         <section class="login-form-container">
             <div class="login-form">
 
-                <!-- Volver al inicio -->
-                <div class="form-back-wrapper">
+                <!-- Volver al inicio y Toggle de Tema -->
+                <div class="form-back-wrapper" style="display: flex; justify-content: space-between; align-items: center;">
                     <a href="../../index.html" class="back-home-link">
                         <i class="fa-solid fa-arrow-left"></i> Volver al inicio
                     </a>
+                    <button type="button" class="theme-toggle-btn theme-toggle-btn--circle" aria-label="Cambiar modo claro / oscuro" title="Cambiar tema">
+                        <i class="fa-solid fa-sun"></i>
+                    </button>
                 </div>
 
                 <!-- Encabezado -->
@@ -98,7 +101,7 @@
     <!-- SweetAlert2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- JS del login -->
-    <script src="../../Vanilla/formulario/Login.js"></script>
+    <script type="module" src="../../Vanilla/formulario/Login.js"></script>
 </body>
 
 </html>

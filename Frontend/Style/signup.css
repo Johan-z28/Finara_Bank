@@ -449,3 +449,57 @@ body {
         margin-bottom: 12px;
     }
 }
+
+/* =========================================================
+   ADAPTACIÓN MODO CLARO (SIGNUP)
+   ========================================================= */
+html.light-theme .register-container,
+body.light-theme .register-container {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+}
+
+html.light-theme .register-form-container,
+body.light-theme .register-form-container {
+    background: #ffffff;
+}
+
+html.light-theme .form-header h1,
+body.light-theme .form-header h1 {
+    color: #0f172a;
+}
+
+html.light-theme .form-header p,
+body.light-theme .form-header p {
+    color: #64748b;
+}
+
+html.light-theme .input-group label,
+body.light-theme .input-group label {
+    color: #334155;
+}
+
+html.light-theme .input-wrapper,
+body.light-theme .input-wrapper {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+html.light-theme .input-wrapper input,
+body.light-theme .input-wrapper input,
+html.light-theme .input-wrapper select,
+body.light-theme .input-wrapper select {
+    color: #0f172a;
+}
+
+html.light-theme .input-wrapper select option,
+body.light-theme .input-wrapper select option {
+    background: #ffffff;
+    color: #0f172a;
+}
+
+html.light-theme .input-wrapper input::placeholder,
+body.light-theme .input-wrapper input::placeholder {
+    color: #94a3b8;
+}

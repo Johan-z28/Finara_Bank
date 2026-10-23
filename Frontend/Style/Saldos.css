@@ -139,13 +139,13 @@
     background: linear-gradient(135deg, #f3be58 0%, #a1701e 100%);
     border: 1px solid #ffe3a3;
 }
-.tarjeta-dorada * { color: #000000 !important; }
+.tarjeta-dorada * { color: #000000 !important; font-weight: 700; }
 
 .tarjeta-platino {
     background: linear-gradient(135deg, #e2e8f0 0%, #808ea3 100%);
     border: 1px solid #ffffff;
 }
-.tarjeta-platino * { color: #0f172a !important; }
+.tarjeta-platino * { color: #000000 !important; font-weight: 700; }
 
 .tarjeta-negra {
     background: linear-gradient(135deg, #242c3d 0%, #0d1017 100%);
@@ -399,23 +399,123 @@
     margin-top: 4px;
 }
 
-/* CORRECCIÓN DE COLOR EN "Fondos disponibles para operaciones" */
-.patrimonio-bage,
-.patrimonio-badge {
-    color: #e2e8f0 !important;
-    font-size: 0.82rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 10px;
-    font-weight: 500;
+/* =========================================================
+   ADAPTACIÓN MODO CLARO (SALDOS)
+   ========================================================= */
+html.light-theme .cuenta-card,
+body.light-theme .cuenta-card,
+html.light-theme .analitica-card,
+body.light-theme .analitica-card {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06) !important;
 }
 
-.patrimonio-bage i,
-.patrimonio-badge i {
-    color: #34d399 !important;
-    font-size: 0.9rem;
+/* Letras de títulos y textos en negro/oscuro resaltado */
+html.light-theme .cuenta-card__tipo-titulo,
+body.light-theme .cuenta-card__tipo-titulo {
+    color: #0f172a !important;
+    font-weight: 700 !important;
 }
+
+html.light-theme .cuenta-card__sub-numero,
+body.light-theme .cuenta-card__sub-numero {
+    color: #334155 !important;
+    font-weight: 600 !important;
+}
+
+html.light-theme .cuenta-card__saldo-box,
+body.light-theme .cuenta-card__saldo-box {
+    background: #f1f5f9 !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+html.light-theme .cuenta-card__saldo-label,
+body.light-theme .cuenta-card__saldo-label {
+    color: #1e293b !important;
+    font-weight: 600 !important;
+}
+
+html.light-theme .cuenta-card__valor-monto,
+body.light-theme .cuenta-card__valor-monto {
+    color: #b88322 !important;
+    font-weight: 800 !important;
+}
+
+html.light-theme .btn-tarjeta-accion,
+body.light-theme .btn-tarjeta-accion {
+    background: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+    font-weight: 600 !important;
+}
+
+html.light-theme .btn-tarjeta-accion:hover,
+body.light-theme .btn-tarjeta-accion:hover {
+    background: rgba(229, 169, 60, 0.15) !important;
+    border-color: #e5a93c !important;
+    color: #b88322 !important;
+}
+
+html.light-theme .analitica-card__title,
+body.light-theme .analitica-card__title {
+    color: #0f172a !important;
+    font-weight: 700 !important;
+}
+
+html.light-theme .analitica-card__subtitle,
+body.light-theme .analitica-card__subtitle {
+    color: #334155 !important;
+    font-weight: 500 !important;
+}
+
+html.light-theme .leyenda-col-header,
+body.light-theme .leyenda-col-header {
+    color: #0f172a !important;
+    font-weight: 700 !important;
+}
+
+html.light-theme .leyenda-monto-val,
+body.light-theme .leyenda-monto-val {
+    color: #0f172a !important;
+    font-weight: 800 !important;
+}
+
+html.light-theme .leyenda-pct-val,
+body.light-theme .leyenda-pct-val {
+    color: #475569 !important;
+    font-weight: 600 !important;
+}
+
+html.light-theme .barra-distribucion,
+body.light-theme .barra-distribucion {
+    background: #e2e8f0 !important;
+}
+
+html.light-theme .patrimonio-monto-box,
+body.light-theme .patrimonio-monto-box {
+    background: #f1f5f9 !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+html.light-theme .patrimonio-label,
+body.light-theme .patrimonio-label {
+    color: #1e293b !important;
+    font-weight: 600 !important;
+}
+
+html.light-theme .patrimonio-valor,
+body.light-theme .patrimonio-valor {
+    color: #0f172a !important;
+    font-weight: 800 !important;
+}
+
+html.light-theme .patrimonio-badge,
+body.light-theme .patrimonio-badge {
+    color: #334155 !important;
+    font-weight: 600 !important;
+}
+
 
 /* RESPONSIVE MÓVIL */
 @media (max-width: 900px) {

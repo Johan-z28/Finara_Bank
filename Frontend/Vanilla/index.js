@@ -1,4 +1,9 @@
+import { initTheme } from './Global/themeManager.js';
+
 document.addEventListener('DOMContentLoaded', () => {
+    // Inicializar gestión de modo claro / modo oscuro
+    initTheme();
+
     // ==========================================
     // 1. NAVEGACIÓN Y MENÚ HAMBURGUESA
     // ==========================================

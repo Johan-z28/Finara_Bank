@@ -1,4 +1,6 @@
 // ---------- Configuración ----------
+import { initTheme } from '../Global/themeManager.js';
+
 const MAX_INTENTOS = 3;           // intentos fallidos antes de bloquear la cuenta
 const MINUTOS_BLOQUEO = 50;        // duración del bloqueo
 const CLAVE_USUARIOS = "finara_usuarios_local";   // lo escribe signup.js
@@ -188,6 +190,9 @@ function alertaCuentaBloqueada(bloqueadoHasta, recienBloqueada) {
 
 // ---------- Inicio ----------
 document.addEventListener("DOMContentLoaded", () => {
+    // Inicializar gestión de temas
+    initTheme();
+
     const loginForm = document.getElementById("loginForm");
     const inputUsuario = document.getElementById("usuario");
     const inputPassword = document.getElementById("password");
