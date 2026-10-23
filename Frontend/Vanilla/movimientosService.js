@@ -63,11 +63,12 @@ export async function obtenerMovimientos({ cuentaId, periodo = '30d', tipo = 'to
         return pedir(`${API_BASE}/cuentas/${encodeURIComponent(cuentaId)}/movimientos?${qs}`);
     }
 
-    await new Promise(r => setTimeout(r, 200));
+    await new Promise(r => setTimeout(r, 150));
 
     const cuentas = await obtenerCuentasFiltro();
-    const cuentaActiva = cuentas.find(c => String(c.id) === String(cuentaId)) || cuentas[0];
-    const numLimpio = cuentaActiva ? String(cuentaActiva.numero || '').replace(/\D/g, '') : '';
+    const numerosCuentasUsuario = cuentas.map(c => String(c.numero || '').replace(/\D/g, '')).filter(Boolean);
+    const cuentaActiva = cuentaId ? cuentas.find(c => String(c.id) === String(cuentaId)) : null;
+    const numLimpioFiltro = cuentaActiva ? String(cuentaActiva.numero || '').replace(/\D/g, '') : '';
 
     let movimientosLocales = [];
     try {
@@ -80,11 +81,20 @@ export async function obtenerMovimientos({ cuentaId, periodo = '30d', tipo = 'to
     let movimientosCuenta = movimientosLocales.filter(m => {
         if (!m) return false;
         const mId = String(m.cuentaId || '').trim();
-        const mNum = String(m.cuentaNumero || m.cuentaOrigen || '').replace(/\D/g, '');
+        const mNum = String(m.cuentaNumero || m.cuentaOrigen || m.numeroCuenta || '').replace(/\D/g, '');
 
+        // Si se pidió una cuenta específica
         if (cuentaId && mId === String(cuentaId)) return true;
-        if (numLimpio && mNum && (mNum.includes(numLimpio) || numLimpio.includes(mNum))) return true;
-        if (!mId && !mNum) return true;
+        if (numLimpioFiltro && mNum && (mNum.includes(numLimpioFiltro) || numLimpioFiltro.includes(mNum))) return true;
+
+        // Si no se especificó cuentaId (ej: Dashboard o vista general de movimientos):
+        // Incluir movimientos de cualquiera de las cuentas del usuario activo o generales
+        if (!cuentaId) {
+            if (numerosCuentasUsuario.length === 0) return true;
+            if (!mNum) return true;
+            return numerosCuentasUsuario.some(nc => nc.includes(mNum) || mNum.includes(nc));
+        }
+
         return false;
     });
 

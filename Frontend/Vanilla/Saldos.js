@@ -103,7 +103,20 @@ export async function initSaldosView() {
     };
 
     const pintarCuentas = () => {
-        const nodos = cuentas.map(c => {
+        // Regla: Cualquier producto solicitado se ordena hacia la derecha.
+        // Si hay Crédito, Crédito SIEMPRE se coloca en el extremo derecho (último elemento).
+        // Los otros productos (Débito / Corriente) van a la izquierda del Crédito.
+        const cuentasOrdenadas = [...cuentas].sort((a, b) => {
+            const esCreditoA = a.tipo === 'TARJETA_CREDITO';
+            const esCreditoB = b.tipo === 'TARJETA_CREDITO';
+            if (esCreditoA && !esCreditoB) return 1;  // Crédito va al final (derecha)
+            if (!esCreditoA && esCreditoB) return -1;
+            // Si ninguno o ambos son crédito, preservar orden (Débito antes que Corriente)
+            const ordenTipos = { AHORROS: 1, CORRIENTE: 2 };
+            return (ordenTipos[a.tipo] || 99) - (ordenTipos[b.tipo] || 99);
+        });
+
+        const nodos = cuentasOrdenadas.map(c => {
             try {
                 return crearCuentaCard(c, { 
                     ocultarSaldo: ocultar,
@@ -114,6 +127,7 @@ export async function initSaldosView() {
             }
         }).filter(Boolean);
 
+        lista.setAttribute('data-count', String(cuentasOrdenadas.length));
         lista.replaceChildren(...nodos);
         actualizarAnalitica();
     };
