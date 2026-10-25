@@ -60,9 +60,12 @@ export function registrarSolicitudPrestamo({ monto, meses, cuotaMensual, estadoE
     }
 
     const radicado = `PRES-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}-${Math.floor(1000 + Math.random() * 9000)}`;
-    
-    // Si es aprobado automáticamente, lo marcamos como ACTIVO para el dashboard de créditos
     const esActivo = estadoEvaluacion.estado === 'APROBADO';
+
+    // Definir la tasa según el tipo de crédito elegido
+    let tasaTexto = '1.8% E.M. (24% E.A.)';
+    if (tipoId === 'vehiculo') tasaTexto = '1.38% E.M. (18% E.A.)';
+    if (tipoId === 'hipotecario') tasaTexto = '1.10% E.M. (14% E.A.)';
 
     const nuevaSolicitud = {
         radicado,
@@ -71,12 +74,12 @@ export function registrarSolicitudPrestamo({ monto, meses, cuotaMensual, estadoE
         meses: Number(meses),
         cuotaMensual: Number(cuotaMensual),
         totalPagar: Number(cuotaMensual) * Number(meses),
-        tasaInteres: '1.8% E.M. (24% E.A.)',
+        tasaInteres: tasaTexto,
         estado: estadoEvaluacion.estado,
         mensajeEstado: estadoEvaluacion.mensaje,
         concepto: concepto || 'Libre inversión',
         tipoId: tipoId || 'libre',
-        activo: esActivo, // Para mostrar en el Dashboard de créditos activos
+        activo: esActivo,
         cuotasPagadas: 0
     };
 
@@ -116,7 +119,6 @@ export function pagarCuotaPrestamo(radicado, cuentaId) {
         return { success: false, message: 'Este crédito ya se encuentra totalmente pagado.' };
     }
 
-    // Obtener cuentas del usuario
     const cuentas = obtenerCuentas() || [];
     const cuentaIndex = cuentas.findIndex(c => String(c.id || c.numero) === String(cuentaId));
 
@@ -131,7 +133,7 @@ export function pagarCuotaPrestamo(radicado, cuentaId) {
         return { success: false, message: 'Fondos insuficientes en la cuenta seleccionada para pagar la cuota.' };
     }
 
-    // Descontar saldo de la cuenta y actualizar almacenamiento local de cuentas
+    // Descontar saldo y guardar en localStorage de cuentas directamente
     cuenta.saldo -= valorCuota;
     
     let todasLasCuentas = [];
@@ -141,7 +143,6 @@ export function pagarCuotaPrestamo(radicado, cuentaId) {
         todasLasCuentas = [];
     }
 
-    // Actualizar la cuenta específica en la lista global de cuentas
     const globalIndex = todasLasCuentas.findIndex(c => c && String(c.id || c.numero) === String(cuentaId));
     if (globalIndex !== -1) {
         todasLasCuentas[globalIndex] = cuenta;
@@ -159,7 +160,7 @@ export function pagarCuotaPrestamo(radicado, cuentaId) {
     prestamos[prestamoIndex] = prestamo;
     localStorage.setItem(K.prestamos, JSON.stringify(prestamos));
 
-    // Registrar en movimientos globales (finara_movimientos)
+    // Registrar en movimientos globales
     let movimientos = [];
     try {
         movimientos = JSON.parse(localStorage.getItem(K.movimientos)) || [];

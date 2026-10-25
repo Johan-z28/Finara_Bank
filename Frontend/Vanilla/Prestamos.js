@@ -15,7 +15,7 @@ export async function initPrestamosView() {
         const link = document.createElement('link');
         link.id = 'prestamos-css-theme';
         link.rel = 'stylesheet';
-        link.href = '../../Style/Prestamos.css';
+        link.href = '../Style/Prestamos.css';
         document.head.appendChild(link);
     }
 
@@ -25,56 +25,68 @@ export async function initPrestamosView() {
         return;
     }
 
-    // 1. GESTIÓN DIRECTA Y ROBUSTA DE PESTAÑAS (TABS)
-    const tabBtns = document.querySelectorAll('.prestamo-tab-btn');
-    const tabContents = document.querySelectorAll('.prestamo-tab-content');
+    // 1. SISTEMA GLOBAL DE PESTAÑAS POR DELEGACIÓN DE EVENTOS (A prueba de SPA)
+    if (!window._prestamosTabListenerInitialized) {
+        window._prestamosTabListenerInitialized = true;
+        document.addEventListener('click', (e) => {
+            const tabBtn = e.target.closest('.prestamo-tab-btn');
+            if (tabBtn) {
+                e.preventDefault();
+                const targetId = tabBtn.getAttribute('data-tab');
+                
+                const container = tabBtn.closest('.prestamo-container');
+                if (!container) return;
 
-    tabBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const targetId = btn.getAttribute('data-tab');
+                const tabBtns = container.querySelectorAll('.prestamo-tab-btn');
+                const tabContents = container.querySelectorAll('.prestamo-tab-content');
 
-            // Desactivar todos los botones y ocultar todas las pestañas
-            tabBtns.forEach(b => b.classList.remove('active'));
-            tabContents.forEach(c => {
-                c.style.display = 'none';
-                c.classList.remove('active');
-            });
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => {
+                    c.style.display = 'none';
+                    c.classList.remove('active');
+                });
 
-            // Activar el botón clicueado y mostrar su pestaña correspondiente
-            btn.classList.add('active');
-            const targetContent = document.getElementById(targetId);
-            if (targetContent) {
-                targetContent.style.display = 'block';
-                targetContent.classList.add('active');
+                tabBtn.classList.add('active');
+                const targetContent = container.querySelector(`#${targetId}`);
+                if (targetContent) {
+                    targetContent.style.display = 'block';
+                    targetContent.classList.add('active');
+                }
+
+                if (targetId === 'tab-dashboard') {
+                    renderizarDashboardCreditos();
+                }
             }
 
-            if (targetId === 'tab-dashboard') {
-                renderizarDashboardCreditos();
+            // Conectar comparador con simulador (HU-27)
+            const btnComparativa = e.target.closest('.btn-elegir-comparativa');
+            if (btnComparativa) {
+                const tipo = btnComparativa.getAttribute('data-tipo');
+                const selectTipo = document.getElementById('selectTipoCredito');
+                const tabSolicitudBtn = document.querySelector('[data-tab="tab-solicitud"]');
+                
+                if (selectTipo && tabSolicitudBtn) {
+                    selectTipo.value = tipo;
+                    tabSolicitudBtn.click();
+                    if (typeof window.actualizarSimulacionDinamica === 'function') {
+                        window.actualizarSimulacionDinamica();
+                    }
+                }
+            }
+
+            // Botón de pagar cuota (HU-16)
+            const btnPagarModal = e.target.closest('.btn-pagar-cuota-modal');
+            if (btnPagarModal) {
+                const radicado = btnPagarModal.getAttribute('data-radicado');
+                abrirModalPagoCuota(radicado);
             }
         });
-    });
+    }
 
-    // Cargar dashboard inicial
+    // Renderizar dashboard inicial al entrar a la vista
     renderizarDashboardCreditos();
 
-    // 2. CONECTAR COMPARADOR CON SIMULADOR (HU-27)
-    const btnsElegirComparativa = document.querySelectorAll('.btn-elegir-comparativa');
-    btnsElegirComparativa.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const tipo = btn.getAttribute('data-tipo');
-            const selectTipo = document.getElementById('selectTipoCredito');
-            const tabSolicitudBtn = document.querySelector('[data-tab="tab-solicitud"]');
-            
-            if (selectTipo && tabSolicitudBtn) {
-                selectTipo.value = tipo;
-                tabSolicitudBtn.click();
-                actualizarSimulacion();
-            }
-        });
-    });
-
-    // 3. SIMULADOR Y FORMULARIO (HU-14)
+    // 2. SIMULADOR Y FORMULARIO (HU-14)
     const formPrestamo = document.getElementById('formPrestamo');
     const inputMonto = document.getElementById('prestamoMonto');
     const selectPlazo = document.getElementById('prestamoPlazo');
@@ -96,7 +108,7 @@ export async function initPrestamosView() {
 
     const leerMonto = () => Number(String(inputMonto ? inputMonto.value : '').replace(/\D/g, '')) || 0;
 
-    const actualizarSimulacion = () => {
+    window.actualizarSimulacionDinamica = () => {
         if (!inputMonto) return;
         const monto = leerMonto();
         const meses = Number(selectPlazo ? selectPlazo.value : 12);
@@ -130,12 +142,25 @@ export async function initPrestamosView() {
         inputMonto.addEventListener('input', () => {
             const val = leerMonto();
             inputMonto.value = val > 0 ? formatearConPuntos(val) : '';
-            actualizarSimulacion();
+            window.actualizarSimulacionDinamica();
         });
     }
 
-    if (selectPlazo) selectPlazo.addEventListener('change', actualizarSimulacion);
-    if (selectTipoCredito) selectTipoCredito.addEventListener('change', actualizarSimulacion);
+    if (selectPlazo) selectPlazo.addEventListener('change', window.actualizarSimulacionDinamica);
+    if (selectTipoCredito) selectTipoCredito.addEventListener('change', window.actualizarSimulacionDinamica);
+
+    const quickAmountBtns = document.querySelectorAll('.btn-quick-amount');
+    quickAmountBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const valor = btn.getAttribute('data-valor');
+            if (inputMonto) {
+                inputMonto.value = formatearConPuntos(valor);
+                if (typeof window.actualizarSimulacionDinamica === 'function') {
+                    window.actualizarSimulacionDinamica();
+                }
+            }
+        });
+    });
 
     // Enviar solicitud de préstamo
     if (formPrestamo) {
@@ -190,14 +215,14 @@ export async function initPrestamosView() {
                 confirmButtonColor: '#e5a93c'
             }).then(() => {
                 formPrestamo.reset();
-                actualizarSimulacion();
+                window.actualizarSimulacionDinamica();
                 const tabDashboard = document.querySelector('[data-tab="tab-dashboard"]');
                 if (tabDashboard) tabDashboard.click();
             });
         });
     }
 
-    // 4. CONSULTA POR RADICADO (HU-14)
+    // 3. CONSULTA POR RADICADO (HU-14)
     const btnConsultar = document.getElementById('btnConsultarRadicado');
     const inputRadicado = document.getElementById('inputBuscarRadicado');
     const boxResultadoRadicado = document.getElementById('resultadoRadicadoBox');
@@ -227,7 +252,7 @@ export async function initPrestamosView() {
     }
 }
 
-// 5. DASHBOARD DE CRÉDITOS ACTIVOS Y PAGO DE CUOTAS (HU-16)
+// 4. DASHBOARD DE CRÉDITOS ACTIVOS Y PAGO DE CUOTAS (HU-16)
 function renderizarDashboardCreditos() {
     const contenedor = document.getElementById('dashboardCreditosList');
     if (!contenedor) return;
@@ -254,6 +279,7 @@ function renderizarDashboardCreditos() {
     contenedor.innerHTML = activos.map(p => {
         const cuotasRestantes = p.meses - p.cuotasPagadas;
         const saldoPendiente = cuotasRestantes * p.cuotaMensual;
+        const tasaMostrar = p.tasaInteres || '1.8% E.M. (24% E.A.)';
 
         return `
             <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.2rem; display: flex; flex-direction: column; gap: 10px;">
@@ -264,23 +290,18 @@ function renderizarDashboardCreditos() {
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; font-size: 0.85rem; color: var(--text-muted);">
                     <div>Monto Inicial: <strong style="color: #fff;">${formatoCOP.format(p.monto)}</strong></div>
                     <div>Cuota Mensual: <strong style="color: #e5a93c;">${formatoCOP.format(p.cuotaMensual)}</strong></div>
+                    <div>Tasa de Interés: <strong style="color: #fff;">${tasaMostrar}</strong></div>
                     <div>Progreso: <strong style="color: #34d399;">${p.cuotasPagadas} / ${p.meses} cuotas</strong></div>
                     <div>Saldo Pendiente: <strong style="color: #fff;">${formatoCOP.format(saldoPendiente)}</strong></div>
                 </div>
                 <div style="display: flex; justify-content: flex-end; margin-top: 5px;">
-                    <button type="button" class="btn-pagar-cuota-modal" data-radicado="${p.radicado}" style="background: rgba(52, 211, 153, 0.15); border: 1px solid rgba(52, 211, 153, 0.4); color: #34d399; padding: 8px 16px; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">Pagar Cuota Mensual</button>
+                    <button type="button" class="btn-pagar-cuota-modal" data-radicado="${p.radicado}" style="background: rgba(229, 169, 60, 0.15); border: 1px solid rgba(229, 169, 60, 0.4); color: var(--gold-main); padding: 8px 16px; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">Pagar Cuota Mensual</button>
                 </div>
             </div>
         `;
     }).join('');
-
-    contenedor.querySelectorAll('.btn-pagar-cuota-modal').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const radicado = btn.getAttribute('data-radicado');
-            abrirModalPagoCuota(radicado);
-        });
-    });
 }
+
 
 function abrirModalPagoCuota(radicado) {
     let prestamos = JSON.parse(localStorage.getItem('finara_prestamos')) || [];
