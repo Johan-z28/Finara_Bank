@@ -1,3 +1,15 @@
+@import url('../admin.css');
+@import url('../Consignar.css');
+@import url('../CreditoSimulador.css');
+@import url('../Dashboard.css');
+@import url('../Movimientos.css');
+@import url('../Perfil.css');
+@import url('../Prestamos.css');
+@import url('../Retiros.css');
+@import url('../Saldos.css');
+@import url('../solicitudTarjeta.css');
+@import url('../Transferencias.css');
+
 /* ==========================================
    1. IMPORTACIÓN DE FUENTES Y MÓDULOS
    ========================================== */

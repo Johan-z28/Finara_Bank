@@ -36,6 +36,18 @@
     width: 100%;
 }
 
+/* Grid específico para el comparador multi-columna (HU-27) */
+.prestamo-grid-comparador {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 1.5rem;
+    align-items: stretch;
+    width: 100%;
+}
+
+.prestamo-grid-consulta {
+    grid-template-columns: 1fr 1.2fr !important;
+}
+
 .prestamo-panel {
     background: var(--bg-card-dark-glass, rgba(17, 20, 29, 0.85)) !important;
     backdrop-filter: blur(16px);
@@ -48,6 +60,33 @@
     display: flex;
     flex-direction: column;
     gap: 1.2rem;
+}
+
+/* Tarjetas del comparador con la línea superior dorada oficial */
+.prestamo-card-comparativa {
+    border-top: 4px solid var(--gold-main, #e5a93c) !important;
+}
+
+.prestamo-dashboard-panel {
+    margin-bottom: 1.5rem !important;
+}
+
+.prestamo-dashboard-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.prestamo-loading-text {
+    color: var(--text-muted, #94a3b8);
+    font-size: 0.9rem;
+}
+
+.prestamo-card-desc {
+    color: var(--text-muted, #94a3b8);
+    font-size: 0.85rem;
+    margin: 0;
 }
 
 .prestamo-panel-footer-between {
@@ -73,6 +112,41 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
+}
+
+.prestamo-campo-terminos {
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    margin: 0.5rem 0 1rem 0 !important;
+    padding: 10px 12px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+.prestamo-checkbox {
+    width: 18px !important;
+    height: 18px !important;
+    accent-color: var(--gold-main, #e5a93c);
+    cursor: pointer;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.prestamo-campo-terminos label {
+    font-size: 0.82rem !important;
+    color: var(--text-muted, #94a3b8) !important;
+    cursor: pointer;
+    line-height: 1.4;
+    text-align: left !important;
+    margin: 0 !important;
+}
+
+.prestamo-text-white {
+    color: var(--text-white, #ffffff) !important;
+    font-weight: 600;
 }
 
 .prestamo-campo label {
@@ -190,6 +264,74 @@
     background: rgba(229, 169, 60, 0.15);
     border-color: rgba(229, 169, 60, 0.4);
     color: var(--gold-main, #e5a93c);
+}
+
+.prestamo-center-muted {
+    color: var(--text-muted, #94a3b8);
+    text-align: center;
+    margin: 1.5rem 0;
+}
+
+/* ==========================================
+   ESTILO DE MONTO DESTACADO (ESTILO TRANSFERENCIAS)
+   ========================================== */
+
+.prestamo-input-monto-container {
+    position: relative;
+    width: 100%;
+}
+
+.prestamo-input-monto-container span {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gold-main, #e5a93c);
+    font-weight: 700;
+    font-size: 1.25rem;
+    z-index: 2;
+}
+
+.prestamo-input-monto-container input {
+    padding-left: 38px !important;
+}
+
+.prestamo-input-grande {
+    font-size: 1.4rem !important;
+    font-weight: 700 !important;
+    color: var(--gold-main, #e5a93c) !important;
+    letter-spacing: 0.5px;
+}
+
+.prestamo-quick-amounts {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-quick-amount {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-muted, #94a3b8);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-quick-amount:hover {
+    background: rgba(229, 169, 60, 0.15);
+    border-color: rgba(229, 169, 60, 0.4);
+    color: var(--gold-main, #e5a93c);
+}
+
+@media (max-width: 1200px) {
+    .prestamo-grid-comparador {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+    }
 }
 
 @media (max-width: 992px) {

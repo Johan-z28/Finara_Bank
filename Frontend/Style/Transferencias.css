@@ -310,6 +310,7 @@
     position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
     color: var(--gold-main); font-weight: 700; font-size: 1.25rem;
 }
+
 .tr-monto input {
     padding-left: 36px;
     font-size: 1.3rem;
