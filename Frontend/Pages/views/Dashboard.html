@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consignar Fondos | Finara Bank</title>
+    <title>Panel Principal | Finara Bank</title>
     <link rel="icon" type="image/png" sizes="32x32" href="../Style/image/favicon.svg">
     <link rel="stylesheet" href="../../Style/Dashboard.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -15,7 +15,6 @@
     <div class="dash-container">
         <!-- RESUMEN DE SALDOS (METRIC CARDS) -->
         <section class="dash-metrics">
-            <!-- Card Total Consolidado -->
             <div class="dash-card-metric dash-card-metric--highlight">
                 <div class="dash-metric-header">
                     <span>Saldo Consolidado</span>
@@ -27,7 +26,6 @@
                 </span>
             </div>
 
-            <!-- Card Productos Activos -->
             <div class="dash-card-metric">
                 <div class="dash-metric-header">
                     <span>Productos Bancarios</span>
@@ -37,7 +35,6 @@
                 <span class="dash-metric-sub">Ahorros, Corriente y Crédito</span>
             </div>
 
-            <!-- Card Accesos Rápidos -->
             <div class="dash-card-metric">
                 <div class="dash-metric-header">
                     <span>Operaciones Rápidas</span>
@@ -54,18 +51,33 @@
             </div>
         </section>
 
+        <!-- SECCIÓN DE GRÁFICO DE ACTIVIDAD FINANCIERA (MINI-CHART) -->
+        <section class="dash-panel dash-panel-chart">
+            <div class="dash-panel-header">
+                <h3>Actividad Financiera (Últimos 7 días)</h3>
+                <span class="dash-chart-legend">
+                    <i class="fa-solid fa-circle" style="color: #34d399; font-size: 8px;"></i> Ingresos vs Egreso
+                </span>
+            </div>
+            <div class="dash-mini-chart-container">
+                <div class="dash-chart-bars" id="dashChartBars">
+                    <!-- Barras generadas dinámicamente -->
+                </div>
+            </div>
+        </section>
+
         <!-- SECCIÓN DE CUENTAS Y ÚLTIMOS MOVIMIENTOS -->
         <div class="dash-grid">
-            <!-- Columna Izquierda: Mis Productos -->
+            <!-- Columna Izquierda: Mis Productos con Tarjetas Interactivas -->
             <section class="dash-panel">
                 <div class="dash-panel-header">
-                    <h3>Mis Productos</h3>
+                    <h3>Mis Productos <small style="font-size: 0.7rem; color: #94a3b8; font-weight: normal;"></small></h3>
                     <a href="#" data-view="saldos" class="dash-panel-link">
                         Ver todos <i class="fa-solid fa-chevron-right"></i>
                     </a>
                 </div>
                 <div id="dashListaCuentas" class="dash-accounts-list">
-                    <!-- Cuentas inyectadas dinámicamente por Dashboard.js -->
+                    <!-- Cuentas inyectadas dinámicamente -->
                 </div>
             </section>
 
@@ -78,7 +90,7 @@
                     </a>
                 </div>
                 <div id="dashListaMovimientos" class="dash-movs-list">
-                    <!-- Movimientos inyectados dinámicamente por Dashboard.js -->
+                    <!-- Movimientos inyectados dinámicamente -->
                 </div>
             </section>
         </div>
