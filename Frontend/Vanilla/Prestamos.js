@@ -25,18 +25,29 @@ export async function initPrestamosView() {
         return;
     }
 
-    // 1. GESTIÓN DE PESTAÑAS (TABS)
+    // 1. GESTIÓN DIRECTA Y ROBUSTA DE PESTAÑAS (TABS)
     const tabBtns = document.querySelectorAll('.prestamo-tab-btn');
     const tabContents = document.querySelectorAll('.prestamo-tab-content');
 
     tabBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            tabBtns.forEach(b => b.classList.remove('active'));
-            tabContents.forEach(c => c.style.display = 'none');
-
-            btn.classList.add('active');
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
             const targetId = btn.getAttribute('data-tab');
-            document.getElementById(targetId).style.display = 'block';
+
+            // Desactivar todos los botones y ocultar todas las pestañas
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => {
+                c.style.display = 'none';
+                c.classList.remove('active');
+            });
+
+            // Activar el botón clicueado y mostrar su pestaña correspondiente
+            btn.classList.add('active');
+            const targetContent = document.getElementById(targetId);
+            if (targetContent) {
+                targetContent.style.display = 'block';
+                targetContent.classList.add('active');
+            }
 
             if (targetId === 'tab-dashboard') {
                 renderizarDashboardCreditos();
@@ -47,27 +58,29 @@ export async function initPrestamosView() {
     // Cargar dashboard inicial
     renderizarDashboardCreditos();
 
-    // 2. CONECTAR COMPARADOR CON SIMULADOR
+    // 2. CONECTAR COMPARADOR CON SIMULADOR (HU-27)
     const btnsElegirComparativa = document.querySelectorAll('.btn-elegir-comparativa');
     btnsElegirComparativa.forEach(btn => {
         btn.addEventListener('click', () => {
             const tipo = btn.getAttribute('data-tipo');
             const selectTipo = document.getElementById('selectTipoCredito');
-            if (selectTipo) {
+            const tabSolicitudBtn = document.querySelector('[data-tab="tab-solicitud"]');
+            
+            if (selectTipo && tabSolicitudBtn) {
                 selectTipo.value = tipo;
-                // Activar tab de solicitud
-                document.querySelector('[data-tab="tab-solicitud"]').click();
+                tabSolicitudBtn.click();
                 actualizarSimulacion();
             }
         });
     });
 
-    // 3. SIMULADOR Y FORMULARIO
+    // 3. SIMULADOR Y FORMULARIO (HU-14)
     const formPrestamo = document.getElementById('formPrestamo');
     const inputMonto = document.getElementById('prestamoMonto');
     const selectPlazo = document.getElementById('prestamoPlazo');
     const selectTipoCredito = document.getElementById('selectTipoCredito');
     const inputConcepto = document.getElementById('prestamoConcepto');
+    const checkTerminos = document.getElementById('checkTerminos');
 
     const lblCuotaEstimada = document.getElementById('lblCuotaEstimada');
     const lblTotalPagar = document.getElementById('lblTotalPagar');
@@ -81,9 +94,10 @@ export async function initPrestamosView() {
         return { em: TASA_INTERES_MENSUAL, texto: '1.8% Mensual (24% E.A.)' };
     };
 
-    const leerMonto = () => Number(String(inputMonto.value).replace(/\D/g, '')) || 0;
+    const leerMonto = () => Number(String(inputMonto ? inputMonto.value : '').replace(/\D/g, '')) || 0;
 
     const actualizarSimulacion = () => {
+        if (!inputMonto) return;
         const monto = leerMonto();
         const meses = Number(selectPlazo ? selectPlazo.value : 12);
         const tasaInfo = obtenerTasaActual();
@@ -127,6 +141,19 @@ export async function initPrestamosView() {
     if (formPrestamo) {
         formPrestamo.addEventListener('submit', (e) => {
             e.preventDefault();
+
+            if (checkTerminos && !checkTerminos.checked) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Términos y Condiciones',
+                    text: 'Debes aceptar los términos y condiciones para continuar con la solicitud.',
+                    background: '#12151c',
+                    color: '#fff',
+                    confirmButtonColor: '#e5a93c'
+                });
+                return;
+            }
+
             const monto = leerMonto();
             const meses = Number(selectPlazo.value);
             const tipoId = selectTipoCredito.value;
@@ -164,12 +191,13 @@ export async function initPrestamosView() {
             }).then(() => {
                 formPrestamo.reset();
                 actualizarSimulacion();
-                document.querySelector('[data-tab="tab-dashboard"]').click();
+                const tabDashboard = document.querySelector('[data-tab="tab-dashboard"]');
+                if (tabDashboard) tabDashboard.click();
             });
         });
     }
 
-    // 4. CONSULTA POR RADICADO
+    // 4. CONSULTA POR RADICADO (HU-14)
     const btnConsultar = document.getElementById('btnConsultarRadicado');
     const inputRadicado = document.getElementById('inputBuscarRadicado');
     const boxResultadoRadicado = document.getElementById('resultadoRadicadoBox');
@@ -199,7 +227,7 @@ export async function initPrestamosView() {
     }
 }
 
-// 5. RENDERIZAR DASHBOARD DE CRÉDITOS ACTIVOS Y PASARELA DE PAGO (HU-16)
+// 5. DASHBOARD DE CRÉDITOS ACTIVOS Y PAGO DE CUOTAS (HU-16)
 function renderizarDashboardCreditos() {
     const contenedor = document.getElementById('dashboardCreditosList');
     if (!contenedor) return;
@@ -246,8 +274,7 @@ function renderizarDashboardCreditos() {
         `;
     }).join('');
 
-    // Activar eventos de pago de cuota
-    document.querySelectorAll('.btn-pagar-cuota-modal').forEach(btn => {
+    contenedor.querySelectorAll('.btn-pagar-cuota-modal').forEach(btn => {
         btn.addEventListener('click', () => {
             const radicado = btn.getAttribute('data-radicado');
             abrirModalPagoCuota(radicado);
@@ -255,7 +282,6 @@ function renderizarDashboardCreditos() {
     });
 }
 
-// MODAL DE SELECCIÓN DE CUENTA PARA PAGAR CUOTA (HU-16)
 function abrirModalPagoCuota(radicado) {
     let prestamos = JSON.parse(localStorage.getItem('finara_prestamos')) || [];
     const prestamo = prestamos.find(p => p.radicado === radicado);

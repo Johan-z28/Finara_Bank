@@ -1,9 +1,10 @@
 // Vanilla/prestamosService.js
-import { obtenerCuentas, guardarCuentas } from './cuentasService.js';
+import { obtenerCuentas } from './cuentasService.js';
 
 const K = {
     prestamos: 'finara_prestamos',
-    movimientos: 'finara_movimientos'
+    movimientos: 'finara_movimientos',
+    cuentas: 'finara_cuentas'
 };
 
 export const TASA_INTERES_MENSUAL = 0.018; // 1.8% T.M. (24% E.A.)
@@ -130,9 +131,24 @@ export function pagarCuotaPrestamo(radicado, cuentaId) {
         return { success: false, message: 'Fondos insuficientes en la cuenta seleccionada para pagar la cuota.' };
     }
 
-    // Descontar saldo de la cuenta
+    // Descontar saldo de la cuenta y actualizar almacenamiento local de cuentas
     cuenta.saldo -= valorCuota;
-    guardarCuentas(cuentas);
+    
+    let todasLasCuentas = [];
+    try {
+        todasLasCuentas = JSON.parse(localStorage.getItem(K.cuentas)) || [];
+    } catch {
+        todasLasCuentas = [];
+    }
+
+    // Actualizar la cuenta específica en la lista global de cuentas
+    const globalIndex = todasLasCuentas.findIndex(c => c && String(c.id || c.numero) === String(cuentaId));
+    if (globalIndex !== -1) {
+        todasLasCuentas[globalIndex] = cuenta;
+    } else {
+        todasLasCuentas.push(cuenta);
+    }
+    localStorage.setItem(K.cuentas, JSON.stringify(todasLasCuentas));
 
     // Actualizar préstamo
     prestamo.cuotasPagadas += 1;
