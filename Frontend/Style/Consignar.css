@@ -309,6 +309,156 @@
 }
 
 /* ==========================================
+   ESTILOS UNIFICADOS - SIDEBAR LATERAL (CONSIGNAR)
+   ========================================== */
+
+.deposit-sidebar-info, .tr-info {
+    background: var(--bg-card-dark-glass, rgba(17, 20, 29, 0.85)) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--bg-card-border, rgba(255, 255, 255, 0.08)) !important;
+    border-radius: var(--radius-card, 16px);
+    padding: 1.8rem;
+    box-shadow: var(--shadow-card, 0 10px 30px rgba(0, 0, 0, 0.4));
+    box-sizing: border-box;
+    color: #ffffff !important;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.deposit-sidebar-info h3, .tr-info h3 {
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    color: var(--text-white, #ffffff) !important;
+    margin-bottom: 0.2rem !important;
+}
+
+.tr-side-card {
+    background: rgba(0, 0, 0, 0.4) !important;
+    border: 1px solid rgba(229, 169, 60, 0.25) !important;
+    border-radius: 14px !important;
+    padding: 1.1rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+}
+
+.tr-side-card__header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+.tr-side-card__label {
+    font-size: 0.78rem !important;
+    color: var(--text-muted, #94a3b8) !important;
+}
+
+.tr-side-card__badge {
+    font-size: 0.7rem !important;
+    font-weight: 700 !important;
+    padding: 2px 8px !important;
+    border-radius: 12px !important;
+    text-transform: uppercase !important;
+}
+
+.badge--activa {
+    background: rgba(52, 211, 153, 0.15) !important;
+    color: #34d399 !important;
+    border: 1px solid rgba(52, 211, 153, 0.3) !important;
+}
+
+.tr-side-card__monto {
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    color: var(--gold-main, #e5a93c) !important;
+}
+
+.tr-side-card__sub {
+    font-size: 0.8rem !important;
+    color: #cbd5e1 !important;
+}
+
+.tr-side-summary {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 12px !important;
+    padding: 1rem !important;
+}
+
+.tr-side-summary h4 {
+    font-size: 0.85rem !important;
+    color: var(--text-white, #ffffff) !important;
+    margin-bottom: 4px !important;
+}
+
+.tr-side-summary__row {
+    display: flex !important;
+    justify-content: space-between !important;
+    font-size: 0.82rem !important;
+    color: var(--text-muted, #94a3b8) !important;
+}
+
+.tr-side-summary__row strong {
+    color: var(--text-white, #ffffff) !important;
+}
+
+.gold-text { color: var(--gold-main, #e5a93c) !important; }
+.green-text { color: #34d399 !important; }
+
+.tr-divider {
+    border: none !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    margin: 4px 0 !important;
+}
+
+.tr-info-features { 
+    list-style: none !important; 
+    display: flex !important; 
+    flex-direction: column !important; 
+    gap: 1rem !important; 
+    padding: 0 !important; 
+    margin: 0 !important;
+}
+
+.tr-info-features li { 
+    display: flex !important; 
+    gap: 0.9rem !important; 
+    align-items: flex-start !important; 
+}
+
+.tr-info-features li i {
+    width: 36px !important; 
+    height: 36px !important; 
+    flex-shrink: 0 !important;
+    display: flex !important; 
+    align-items: center !important; 
+    justify-content: center !important;
+    border-radius: 10px !important; 
+    color: var(--gold-main, #e5a93c) !important;
+    background: rgba(229, 169, 60, 0.12) !important;
+    border: 1px solid rgba(229, 169, 60, 0.2) !important;
+    font-size: 0.95rem !important;
+}
+
+.tr-info-features strong { 
+    display: block !important; 
+    font-size: 0.88rem !important; 
+    color: var(--text-white, #ffffff) !important; 
+    margin-bottom: 2px !important; 
+}
+
+.tr-info-features span { 
+    color: var(--text-muted, #94a3b8) !important; 
+    font-size: 0.78rem !important; 
+    line-height: 1.4 !important; 
+}
+
+/* ==========================================
    CORRECCIÓN DEFINITIVA DE IMPRESIÓN - CONSIGNAR
    ========================================== */
 @media print {

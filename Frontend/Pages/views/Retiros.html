@@ -31,39 +31,22 @@
                 </div>
 
                 <form id="formRetiro" class="withdraw-form" novalidate>
-                    <!-- 1. SELECCIÓN DE CUENTA -->
                     <div class="form-group">
                         <label for="cuentaOrigenSelect">Cuenta de Origen</label>
                         <select id="cuentaOrigenSelect" required>
                             <option value="" disabled selected>Cargando tus cuentas...</option>
                         </select>
-                        <div class="account-details-box" id="accountDetailsBox" style="display: none;">
-                            <div class="account-badge" id="accountTypeBadge">Ahorros</div>
-                            <div class="account-info-line">
-                                <span>Saldo actual:</span>
-                                <strong id="accountCurrentBalance">$ 0</strong>
-                            </div>
-                            <div class="account-info-line" id="overdraftLine" style="display: none;">
-                                <span>Sobregiro disponible (20%):</span>
-                                <strong id="accountOverdraftLimit" style="color: #38bdf8;">$ 0</strong>
-                            </div>
-                            <div class="account-info-line highlight-line">
-                                <span>Cupo total disponible para retiro:</span>
-                                <strong id="accountAvailableBalance" style="color: #e5a93c;">$ 0</strong>
-                            </div>
-                            <p class="rule-hint" id="accountRuleHint"></p>
-                        </div>
                     </div>
 
-                    <!-- 2. MONTO A RETIRAR -->
                     <div class="form-group">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="monto-header-row">
                             <label for="montoRetirar">Monto a Retirar</label>
                             <button type="button" class="btn-max-amount" id="btnMaxAmount">Retirar todo</button>
                         </div>
                         <div class="amount-input-wrapper">
                             <span>$</span>
-                            <input type="text" id="montoRetirar" placeholder="0" inputmode="numeric" required autocomplete="off">
+                            <input type="text" id="montoRetirar" placeholder="0" inputmode="numeric" required
+                                autocomplete="off">
                         </div>
                         <div class="chips-monto-container">
                             <button type="button" class="chip-monto" data-monto="50000">$ 50.000</button>
@@ -74,35 +57,10 @@
                         <small class="helper-text" id="helperMonto">Monto mínimo por retiro: $ 10.000 COP</small>
                     </div>
 
-                    <!-- 3. DESGLOSE Y SIMULACIÓN PREVIA AL RETIRO -->
-                    <div class="breakdown-box" id="breakdownBox" style="display: none;">
-                        <h4><i class="fa-solid fa-calculator"></i> Liquidación de la Operación</h4>
-                        <div class="breakdown-row">
-                            <span>Monto solicitado:</span>
-                            <strong id="bdMontoSolicitado">$ 0</strong>
-                        </div>
-                        <div class="breakdown-row" id="bdRowInteres" style="display: none;">
-                            <span>Interés mensual aplicado (1.5% T.M.):</span>
-                            <strong id="bdInteresGenerado" style="color: #10b981;">+ $ 0</strong>
-                        </div>
-                        <div class="breakdown-row" id="bdRowSobregiro" style="display: none;">
-                            <span>Uso de sobregiro:</span>
-                            <strong id="bdSobregiroUsado" style="color: #38bdf8;">$ 0</strong>
-                        </div>
-                        <div class="breakdown-row breakdown-total">
-                            <span>Total debitado / descontado:</span>
-                            <strong id="bdTotalDebitado">$ 0</strong>
-                        </div>
-                        <div class="breakdown-row breakdown-result">
-                            <span>Nuevo saldo proyectado:</span>
-                            <strong id="bdNuevoSaldo">$ 0</strong>
-                        </div>
-                    </div>
-
-                    <!-- 4. CONCEPTO O NOTA -->
                     <div class="form-group">
                         <label for="conceptoRetiro">Concepto (Opcional)</label>
-                        <input type="text" id="conceptoRetiro" placeholder="Ej. Retiro cajero, gastos personales..." maxlength="60">
+                        <input type="text" id="conceptoRetiro" placeholder="Ej. Retiro cajero, gastos personales..."
+                            maxlength="60">
                     </div>
 
                     <button type="submit" class="btn-submit-withdraw" id="btnSubmitWithdraw">
@@ -111,46 +69,82 @@
                 </form>
             </div>
 
-            <!-- Columna Derecha: Reglas de Negocio y Garantía -->
+            <!-- Columna Derecha: Panel Lateral Unificado -->
             <aside class="withdraw-sidebar-info" aria-label="Información">
-                <div class="info-widget rule-widget">
-                    <div class="widget-header">
-                        <i class="fa-solid fa-piggy-bank" style="color: #10b981;"></i>
-                        <h4>Cuenta de Ahorros</h4>
+                <h3>Retiro sin complicaciones</h3>
+
+                <!-- Tarjeta de Saldo del producto seleccionado -->
+                <div class="tr-side-card">
+                    <div class="tr-side-card__header">
+                        <span class="tr-side-card__label">Saldo del producto seleccionado</span>
+                        <span id="accountTypeBadge" class="tr-side-card__badge badge--activa">Activa</span>
                     </div>
-                    <p>Tu ahorro genera rendimientos constantes para tu futuro:</p>
-                    <ul class="rule-benefits">
-                        <li><i class="fa-solid fa-check"></i> <strong>Interés del 1.5% mensual:</strong> Se calcula y abona sobre el saldo al momento del retiro.</li>
-                        <li><i class="fa-solid fa-check"></i> Retiros 100% seguros y respaldados.</li>
-                        <li><i class="fa-solid fa-shield"></i> Límite: No supera tu saldo disponible.</li>
-                    </ul>
+                    <div id="accountCurrentBalance" class="tr-side-card__monto">$ 0</div>
+                    <div id="accountSubTxt" class="tr-side-card__sub">Selecciona un producto</div>
                 </div>
 
-                <div class="info-widget rule-widget">
-                    <div class="widget-header">
-                        <i class="fa-solid fa-briefcase" style="color: #38bdf8;"></i>
-                        <h4>Cuenta Corriente</h4>
+                <!-- Resumen previo -->
+                <div class="tr-side-summary">
+                    <h4>Resumen previo</h4>
+                    <div class="tr-side-summary__row">
+                        <span>Monto solicitado:</span>
+                        <strong id="bdMontoSolicitado" class="gold-text">$ 0</strong>
                     </div>
-                    <p>Mayor liquidez y respaldo para tus necesidades inmediatas:</p>
-                    <ul class="rule-benefits">
-                        <li><i class="fa-solid fa-check"></i> <strong>Sobregiro del 20%:</strong> Permite retirar hasta un 20% adicional sobre tu saldo actual.</li>
-                        <li><i class="fa-solid fa-check"></i> Respaldo automático sin trámites.</li>
-                        <li><i class="fa-solid fa-shield"></i> Validación estricta de cupo límite.</li>
-                    </ul>
+                    <div class="tr-side-summary__row" id="bdRowInteres">
+                        <span>Interés (1.5%):</span>
+                        <strong id="bdInteresGenerado" class="green-text">+ $ 0</strong>
+                    </div>
+                    <div class="tr-side-summary__row" id="bdRowSobregiro">
+                        <span>Sobregiro:</span>
+                        <strong id="bdSobregiroUsado" class="blue-text">$ 0</strong>
+                    </div>
+                    <div class="tr-side-summary__row">
+                        <span>Total debitado:</span>
+                        <strong id="bdTotalDebitado">$ 0</strong>
+                    </div>
+                    <div class="tr-side-summary__row">
+                        <span>Nuevo saldo:</span>
+                        <strong id="bdNuevoSaldo" class="green-text">$ 0</strong>
+                    </div>
                 </div>
 
-                <div class="info-widget security-widget">
-                    <div class="widget-header">
-                        <i class="fa-solid fa-shield-halved" style="color: #e5a93c;"></i>
-                        <h4>Seguridad Finara</h4>
+                <!-- Bloque Unificado Inferior (Exactamente igual a Transferencias) -->
+
+                <div class="rule-box-content rule-box-divider">
+                    <div class="rule-icon-wrapper">
+                        <i class="fa-solid fa-shield-halved"></i>
                     </div>
-                    <p>Cada retiro actualiza tu saldo en tiempo real, genera comprobante de auditoría y registra el movimiento financiero.</p>
+
+                    <div class="rule-box-text">
+                        <strong>Seguro</strong>
+                        <span>Validación estricta en tiempo real.</span>
+                    </div>
                 </div>
+
+                <div class="rule-box-content">
+                    <div class="rule-icon-wrapper">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <div class="rule-box-text">
+                        <strong>Rápido</strong>
+                        <span>En minutos, sin filas.</span>
+                    </div>
+                </div>
+
+                <div class="rule-box-content rule-box-divider rule-box-destacada">
+                    <div class="rule-icon-wrapper">
+                        <i class="fa-solid fa-circle-info"></i>
+                    </div>
+                    <div class="rule-box-text">
+                        <strong>Condiciones del producto</strong>
+                        <span id="accountRuleHint">Selecciona una cuenta para ver sus reglas y beneficios.</span>
+                    </div>
+                </div>
+
             </aside>
         </div>
     </div>
 
-    <!-- Módulo JS principal -->
     <script type="module" src="../../Vanilla/Retiros.js"></script>
 </body>
 

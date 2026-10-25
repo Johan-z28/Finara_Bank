@@ -19,7 +19,6 @@ import('./notificaciones.js')
 
 const ultimos4 = numero => String(numero).replace(/\D/g, '').slice(-4);
 
-// Función para formatear el número ingresado con puntos de miles (es-CO)
 const formatearNumeroConPuntos = (val) => {
     const soloNumeros = String(val).replace(/\D/g, '');
     if (!soloNumeros) return '';
@@ -47,12 +46,8 @@ export async function initRetirosView() {
     }
 
     const selectCuenta = document.getElementById('cuentaOrigenSelect');
-    const boxDetalles = document.getElementById('accountDetailsBox');
     const badgeTipo = document.getElementById('accountTypeBadge');
     const txtSaldoActual = document.getElementById('accountCurrentBalance');
-    const rowSobregiro = document.getElementById('overdraftLine');
-    const txtSobregiroLimite = document.getElementById('accountOverdraftLimit');
-    const txtCupoDisponible = document.getElementById('accountAvailableBalance');
     const txtReglaHint = document.getElementById('accountRuleHint');
 
     const inputMonto = document.getElementById('montoRetirar');
@@ -60,7 +55,6 @@ export async function initRetirosView() {
     const chipsMonto = document.querySelectorAll('.chip-monto');
     const helperMonto = document.getElementById('helperMonto');
 
-    const boxBreakdown = document.getElementById('breakdownBox');
     const bdMontoSolicitado = document.getElementById('bdMontoSolicitado');
     const bdRowInteres = document.getElementById('bdRowInteres');
     const bdInteresGenerado = document.getElementById('bdInteresGenerado');
@@ -125,46 +119,48 @@ export async function initRetirosView() {
         }
     }
 
-    // Punto 1: Actualizar badge y reglas según el tipo exacto (Tarjeta de Crédito, Corriente o Ahorros)
     function actualizarDetallesCuenta() {
         const id = selectCuenta.value;
         cuentaSeleccionada = cuentas.find(c => String(c.id) === String(id) || String(c.numero) === String(id));
 
+        // Forzar ocultamiento absoluto al cambiar de cuenta
+        if (bdRowInteres) bdRowInteres.style.setProperty('display', 'none', 'important');
+        if (bdRowSobregiro) bdRowSobregiro.style.setProperty('display', 'none', 'important');
+
         if (!cuentaSeleccionada) {
-            if (boxDetalles) boxDetalles.style.display = 'none';
             actualizarBreakdown();
             return;
         }
 
-        if (boxDetalles) boxDetalles.style.display = 'flex';
         const tipo = String(cuentaSeleccionada.tipo || '').toUpperCase();
         const saldo = Number(cuentaSeleccionada.saldo) || 0;
-        const disponible = calcularDisponibleRetiro(cuentaSeleccionada);
+
+        let tipoLabel = 'Cuenta de Ahorros';
+        let reglaTexto = '¡Beneficio de Ahorro! Se abona un rendimiento del 1.5% mensual sobre tu saldo actual al realizar retiros.';
 
         if (tipo.includes('CREDITO') || tipo.includes('CRÉDITO')) {
-            if (badgeTipo) { badgeTipo.textContent = 'Tarjeta de Crédito'; badgeTipo.className = 'account-badge account-badge--credito'; }
-            if (rowSobregiro) rowSobregiro.style.display = 'none';
-            if (txtReglaHint) txtReglaHint.textContent = 'Avance de efectivo permitido de hasta el 50% de tu cupo disponible.';
+            tipoLabel = 'Tarjeta de Crédito';
+            reglaTexto = 'Avance de efectivo permitido de hasta el 50% de tu cupo disponible.';
+            if (badgeTipo) { badgeTipo.textContent = 'Activa'; badgeTipo.className = 'tr-side-card__badge badge--activa'; }
         } else if (tipo.includes('CORRIENTE')) {
-            if (badgeTipo) { badgeTipo.textContent = 'Cuenta Corriente'; badgeTipo.className = 'account-badge account-badge--corriente'; }
-            if (rowSobregiro) rowSobregiro.style.display = 'flex';
-            if (txtSobregiroLimite) txtSobregiroLimite.textContent = formatoCOP.format(Math.max(saldo, 0) * 0.20);
-            if (txtReglaHint) txtReglaHint.textContent = 'Permite un sobregiro de hasta el 20% sobre tu saldo actual.';
+            tipoLabel = 'Cuenta Corriente';
+            reglaTexto = 'Permite un sobregiro de hasta el 20% sobre tu saldo actual.';
+            if (badgeTipo) { badgeTipo.textContent = 'Activa'; badgeTipo.className = 'tr-side-card__badge badge--activa'; }
         } else {
-            if (badgeTipo) { badgeTipo.textContent = 'Cuenta de Ahorros'; badgeTipo.className = 'account-badge'; }
-            if (rowSobregiro) rowSobregiro.style.display = 'none';
-            if (txtReglaHint) txtReglaHint.textContent = '¡Beneficio de Ahorro! Se abona un rendimiento del 1.5% mensual sobre tu saldo actual al realizar retiros.';
+            tipoLabel = 'Cuenta de Ahorros';
+            if (badgeTipo) { badgeTipo.textContent = 'Activa'; badgeTipo.className = 'tr-side-card__badge badge--activa'; }
         }
 
         if (txtSaldoActual) txtSaldoActual.textContent = formatoCOP.format(saldo);
-        if (txtCupoDisponible) txtCupoDisponible.textContent = formatoCOP.format(disponible);
+        const subTxt = document.getElementById('accountSubTxt');
+        if (subTxt) subTxt.textContent = `${tipoLabel} · •••• ${ultimos4(cuentaSeleccionada.numero)}`;
+        if (txtReglaHint) txtReglaHint.textContent = reglaTexto;
 
         actualizarBreakdown();
     }
 
     selectCuenta.onchange = actualizarDetallesCuenta;
 
-    // Obtener siempre el valor numérico limpio del input
     function leerMonto() {
         if (!inputMonto) return 0;
         const numLimpio = String(inputMonto.value).replace(/\D/g, '');
@@ -179,10 +175,8 @@ export async function initRetirosView() {
     }
 
     if (inputMonto) {
-        // Punto 2: Desactivar scroll sobre el campo para evitar cambio accidental del valor
         inputMonto.addEventListener('wheel', (e) => e.preventDefault(), { passive: false });
 
-        // Punto 3: Formatear con puntos de miles en tiempo real mientras se escribe
         inputMonto.oninput = () => {
             const montoVal = leerMonto();
             if (montoVal > 0) {
@@ -222,32 +216,36 @@ export async function initRetirosView() {
 
     function actualizarBreakdown() {
         const monto = leerMonto();
+        
+        // Asegurar que comiencen ocultas
+        if (bdRowInteres) bdRowInteres.style.setProperty('display', 'none', 'important');
+        if (bdRowSobregiro) bdRowSobregiro.style.setProperty('display', 'none', 'important');
+
         if (!cuentaSeleccionada || monto <= 0) {
-            if (boxBreakdown) boxBreakdown.style.display = 'none';
+            if (bdMontoSolicitado) bdMontoSolicitado.textContent = '$ 0';
+            if (bdTotalDebitado) bdTotalDebitado.textContent = '$ 0';
+            if (bdNuevoSaldo) bdNuevoSaldo.textContent = '$ 0';
             if (helperMonto) { helperMonto.textContent = 'Monto mínimo por retiro: $ 10.000 COP'; helperMonto.style.color = '#8a8f99'; }
             return;
         }
 
-        if (boxBreakdown) boxBreakdown.style.display = 'flex';
+        const tipo = String(cuentaSeleccionada.tipo || '').toUpperCase();
         const liq = liquidarRetiro(cuentaSeleccionada, monto);
 
         if (bdMontoSolicitado) bdMontoSolicitado.textContent = formatoCOP.format(monto);
         
-        if (liq.interesGenerado > 0) {
-            if (bdRowInteres) bdRowInteres.style.display = 'flex';
+        // Control exclusivo y estricto por tipo de cuenta
+        if (tipo.includes('AHORRO') || tipo.includes('DEBITO')) {
+            if (bdRowInteres) bdRowInteres.style.setProperty('display', 'flex', 'important');
             if (bdInteresGenerado) {
-                bdInteresGenerado.textContent = `+ ${formatoCOP.format(liq.interesGenerado)} (Abono Rendimiento 1.5%)`;
+                bdInteresGenerado.textContent = `+ ${formatoCOP.format(liq.interesGenerado || (monto * 0.015))} (1.5%)`;
                 bdInteresGenerado.style.color = '#10b981';
             }
-        } else if (bdRowInteres) {
-            bdRowInteres.style.display = 'none';
-        }
-
-        if (liq.usaSobregiro) {
-            if (bdRowSobregiro) bdRowSobregiro.style.display = 'flex';
-            if (bdSobregiroUsado) bdSobregiroUsado.textContent = formatoCOP.format(liq.sobregiroUsado);
-        } else if (bdRowSobregiro) {
-            bdRowSobregiro.style.display = 'none';
+        } else if (tipo.includes('CORRIENTE')) {
+            if (liq.usaSobregiro) {
+                if (bdRowSobregiro) bdRowSobregiro.style.setProperty('display', 'flex', 'important');
+                if (bdSobregiroUsado) bdSobregiroUsado.textContent = formatoCOP.format(liq.sobregiroUsado);
+            }
         }
 
         if (bdTotalDebitado) bdTotalDebitado.textContent = formatoCOP.format(monto);
