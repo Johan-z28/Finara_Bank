@@ -453,8 +453,16 @@ export async function initRetirosView() {
     }
 
     if (btnVerMovimientos) {
-        btnVerMovimientos.onclick = () => {
-            window.location.href = './app.html#movimientos';
+        btnVerMovimientos.onclick = (e) => {
+            e.preventDefault();
+            // Buscar el enlace de movimientos en el menú lateral y simular su clic para activar la vista correctamente
+            const linkMovimientos = document.querySelector('[data-view="movimientos"]');
+            if (linkMovimientos) {
+                linkMovimientos.click();
+            } else {
+                window.location.hash = 'movimientos';
+                window.location.reload();
+            }
         };
     }
 

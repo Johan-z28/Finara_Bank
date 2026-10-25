@@ -3,7 +3,7 @@
 
 import { obtenerCuentas as obtenerCuentasUsuario, obtenerUsernameActivo, obtenerUsuarioAutenticado } from './cuentasService.js';
 
-export const TASA_INTERES_AHORROS = 0.015; // 1.5% mensual abonado al saldo
+export const TASA_INTERES_AHORROS = 0.015; // 1.5% mensual abonado al monto retirado
 export const TOPE_SOBREGIRO_CORRIENTE = 0.20; // 20% sobre el saldo en Cuenta Corriente
 export const TOPE_AVANCE_CREDITO = 0.50; // Hasta 50% de avance para Tarjetas de Crédito
 
@@ -81,8 +81,8 @@ export function liquidarRetiro(cuenta, montoSolicitado) {
     let sobregiroUsado = 0;
 
     if (tipo.includes('AHORRO') || tipo.includes('DEBITO') || tipo.includes('DÉBITO')) {
-        // Cálculo del 1.5% de interés abonado a la cuenta
-        interesGenerado = Math.round(saldoActual * TASA_INTERES_AHORROS);
+        // CORRECCIÓN: Cálculo del 1.5% de interés aplicado estrictamente sobre el monto del retiro
+        interesGenerado = Math.round(monto * TASA_INTERES_AHORROS);
     } else if (tipo.includes('CORRIENTE')) {
         if (monto > saldoActual) {
             usaSobregiro = true;
