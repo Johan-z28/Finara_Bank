@@ -17,7 +17,28 @@ import('./notificaciones.js')
     })
     .catch(() => {});
 
+const formatoFechaHora = new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium', timeStyle: 'short' });
 const ultimos4 = numero => String(numero).replace(/\D/g, '').slice(-4);
+const textoCuenta = c => `${c.tipo} · •••• ${ultimos4(c.numero)}`;
+
+function el(tag, clase, texto) {
+    const n = document.createElement(tag);
+    if (clase) n.className = clase;
+    if (texto !== undefined) n.textContent = texto;
+    return n;
+}
+
+function filas(contenedor, items) {
+    contenedor.replaceChildren(...items.map(({ label, valor, destacado, negativo }) => {
+        const fila = el('div', 'tr-fila-resumen');
+        const dd = el('dd', destacado ? 'tr-valor tr-valor--grande' : 'tr-valor');
+        dd.textContent = valor;
+        if (negativo) dd.style.color = '#f87171';
+
+        fila.append(el('dt', '', label), dd);
+        return fila;
+    }));
+}
 
 const formatearNumeroConPuntos = (val) => {
     const soloNumeros = String(val).replace(/\D/g, '');
@@ -67,10 +88,47 @@ export async function initRetirosView() {
     const formRetiro = document.getElementById('formRetiro');
     const btnSubmit = document.getElementById('btnSubmitWithdraw');
 
+    // Elementos de pasos y éxito
+    const vistas = { 1: document.getElementById('vistaForm'), 2: document.getElementById('vistaResumen'), 3: document.getElementById('vistaExito') };
+    const pasos = document.querySelectorAll('.tr-paso');
+    const sideInfo = document.querySelector('.withdraw-sidebar-info');
+    const btnEditar = document.getElementById('btnEditar');
+    const btnConfirmar = document.getElementById('btnConfirmar');
+    const btnDescargarPDF = document.getElementById('btnDescargarPDF');
+    const btnVerMovimientos = document.getElementById('btnVerMovimientos');
+    const btnNueva = document.getElementById('btnNueva');
+    const resumenLista = document.getElementById('resumenLista');
+    const exitoLista = document.getElementById('exitoLista');
+
     if (!selectCuenta || !formRetiro) return;
 
     let cuentas = [];
     let cuentaSeleccionada = null;
+    let datosRetiro = null;
+    let resultadoFinal = null;
+    let enProceso = false;
+
+    function irAPaso(n) {
+        Object.entries(vistas).forEach(([k, v]) => {
+            if (v) v.classList.toggle('hidden', Number(k) !== n);
+        });
+
+        pasos.forEach(p => {
+            const num = Number(p.dataset.paso);
+            p.classList.toggle('activo', num === n);
+            p.classList.toggle('completo', num < n);
+            p.setAttribute('aria-current', num === n ? 'step' : 'false');
+        });
+
+        if (sideInfo) {
+            sideInfo.style.display = n === 1 ? 'flex' : 'none';
+        }
+
+        const gridContainer = document.querySelector('.withdraw-container-grid');
+        if (gridContainer) {
+            gridContainer.style.gridTemplateColumns = n === 1 ? 'minmax(0, 1.8fr) minmax(300px, 1fr)' : '1fr';
+        }
+    }
 
     async function cargarCuentas() {
         try {
@@ -123,7 +181,6 @@ export async function initRetirosView() {
         const id = selectCuenta.value;
         cuentaSeleccionada = cuentas.find(c => String(c.id) === String(id) || String(c.numero) === String(id));
 
-        // Forzar ocultamiento absoluto al cambiar de cuenta
         if (bdRowInteres) bdRowInteres.style.setProperty('display', 'none', 'important');
         if (bdRowSobregiro) bdRowSobregiro.style.setProperty('display', 'none', 'important');
 
@@ -217,7 +274,6 @@ export async function initRetirosView() {
     function actualizarBreakdown() {
         const monto = leerMonto();
         
-        // Asegurar que comiencen ocultas
         if (bdRowInteres) bdRowInteres.style.setProperty('display', 'none', 'important');
         if (bdRowSobregiro) bdRowSobregiro.style.setProperty('display', 'none', 'important');
 
@@ -234,7 +290,6 @@ export async function initRetirosView() {
 
         if (bdMontoSolicitado) bdMontoSolicitado.textContent = formatoCOP.format(monto);
         
-        // Control exclusivo y estricto por tipo de cuenta
         if (tipo.includes('AHORRO') || tipo.includes('DEBITO')) {
             if (bdRowInteres) bdRowInteres.style.setProperty('display', 'flex', 'important');
             if (bdInteresGenerado) {
@@ -291,65 +346,223 @@ export async function initRetirosView() {
             return;
         }
 
-        const confirmResult = await Swal.fire({
-            icon: 'question',
-            title: '¿Confirmar Retiro?',
-            html: `¿Estás seguro de retirar <strong>${formatoCOP.format(monto)}</strong>?`,
-            showCancelButton: true,
-            confirmButtonText: 'Sí, retirar',
-            cancelButtonText: 'Cancelar',
-            background: '#12151c',
-            color: '#ffffff',
-            confirmButtonColor: '#e5a93c'
-        });
+        const liq = liquidarRetiro(cuentaSeleccionada, monto);
+        datosRetiro = {
+            cuenta: cuentaSeleccionada,
+            monto,
+            concepto: inputConcepto ? inputConcepto.value.trim() : '',
+            nuevoSaldo: liq.nuevoSaldo
+        };
 
-        if (!confirmResult.isConfirmed) return;
+        pintarResumen();
+        irAPaso(2);
+    };
 
-        if (btnSubmit) {
-            btnSubmit.disabled = true;
-            btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Procesando...';
-        }
+    function pintarResumen() {
+        if (!resumenLista || !datosRetiro) return;
+        filas(resumenLista, [
+            { label: 'Cuenta de origen', valor: textoCuenta(datosRetiro.cuenta) },
+            { label: 'Monto a retirar', valor: formatoCOP.format(datosRetiro.monto), destacado: true },
+            { label: 'Concepto', valor: datosRetiro.concepto || 'Sin concepto' },
+            { label: 'Nuevo saldo estimado', valor: formatoCOP.format(datosRetiro.nuevoSaldo), negativo: datosRetiro.nuevoSaldo < 0 }
+        ]);
+    }
 
-        try {
-            const resultado = await ejecutarRetiro({
-                cuentaId: cuentaSeleccionada.id || cuentaSeleccionada.numero,
-                monto,
-                concepto: inputConcepto ? inputConcepto.value.trim() : ''
-            });
+    if (btnEditar) btnEditar.onclick = () => irAPaso(1);
 
-            if (typeof actualizarCampana === 'function') {
-                actualizarCampana();
+    if (btnConfirmar) {
+        btnConfirmar.onclick = async () => {
+            if (enProceso) return;
+            enProceso = true;
+            btnConfirmar.disabled = btnEditar.disabled = true;
+            btnConfirmar.textContent = 'Procesando...';
+
+            try {
+                const resultado = await ejecutarRetiro({
+                    cuentaId: datosRetiro.cuenta.id || datosRetiro.cuenta.numero,
+                    monto: datosRetiro.monto,
+                    concepto: datosRetiro.concepto
+                });
+
+                resultadoFinal = {
+                    referencia: `RET-${Date.now().toString().slice(-8)}`,
+                    fecha: new Date().toISOString(),
+                    monto: datosRetiro.monto,
+                    cuenta: datosRetiro.cuenta,
+                    concepto: datosRetiro.concepto,
+                    nuevoSaldo: resultado.nuevoSaldo
+                };
+
+                // REGISTRO DE MOVIMIENTOS EN LOCALSTORAGE
+                try {
+                    let movimientos = JSON.parse(localStorage.getItem('finara_movimientos')) || [];
+                    const perfilActivo = JSON.parse(localStorage.getItem('userProfile')) || {};
+                    const usuarioActual = perfilActivo.username || perfilActivo.nombre || 'Johan Zapata Cifuentes';
+                    const textoConcepto = datosRetiro.concepto ? ` - ${datosRetiro.concepto}` : '';
+
+                    movimientos.unshift({
+                        id: `MOV-RET-${Date.now()}`,
+                        fecha: new Date().toISOString(),
+                        descripcion: `Retiro de efectivo (${textoCuenta(datosRetiro.cuenta)})${textoConcepto}`,
+                        categoria: 'Retiro',
+                        tipo: 'EGRESO',
+                        valor: datosRetiro.monto,
+                        cuentaId: datosRetiro.cuenta.id || datosRetiro.cuenta.numero,
+                        numeroCuenta: datosRetiro.cuenta.numero,
+                        usuario: usuarioActual
+                    });
+
+                    localStorage.setItem('finara_movimientos', JSON.stringify(movimientos));
+                } catch (e) {
+                    console.error("Error al guardar movimientos en localStorage:", e);
+                }
+
+                if (typeof actualizarCampana === 'function') {
+                    actualizarCampana();
+                }
+
+                pintarExito(resultadoFinal);
+                irAPaso(3);
+            } catch (err) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error en la transacción',
+                    text: err.message || 'No se pudo completar el retiro.',
+                    background: '#12151c',
+                    color: '#ffffff',
+                    confirmButtonColor: '#e5a93c'
+                });
+            } finally {
+                enProceso = false;
+                btnConfirmar.disabled = btnEditar.disabled = false;
+                btnConfirmar.textContent = 'Confirmar retiro';
+            }
+        };
+    }
+
+    function pintarExito(r) {
+        if (!exitoLista) return;
+        filas(exitoLista, [
+            { label: 'Referencia', valor: r.referencia },
+            { label: 'Cuenta de origen', valor: textoCuenta(r.cuenta) },
+            { label: 'Monto retirado', valor: formatoCOP.format(r.monto), destacado: true },
+            { label: 'Concepto', valor: r.concepto || 'Sin concepto' },
+            { label: 'Nuevo saldo', valor: formatoCOP.format(r.nuevoSaldo), negativo: r.nuevoSaldo < 0 },
+            { label: 'Fecha', valor: formatoFechaHora.format(new Date(r.fecha)) }
+        ]);
+    }
+
+    if (btnVerMovimientos) {
+        btnVerMovimientos.onclick = () => {
+            window.location.href = './app.html#movimientos';
+        };
+    }
+
+    // IMPRESIÓN Y DESCARGA DEL COMPROBANTE EN PDF (VOUCHER OSCURO UNIFICADO)
+    if (btnDescargarPDF) {
+        btnDescargarPDF.onclick = async () => {
+            if (!resultadoFinal) return;
+
+            const previo = document.getElementById('impresionVoucher');
+            if (previo) previo.remove();
+
+            const rutaLogo = '../Style/image/Logo_finara.svg';
+            let logoDataUrl = rutaLogo;
+            try {
+                const resp = await fetch(rutaLogo);
+                if (resp.ok) {
+                    const svgTexto = await resp.text();
+                    logoDataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgTexto)}`;
+                }
+            } catch (e) {
+                console.warn("Cargando ruta del logo SVG...");
             }
 
-            await Swal.fire({
-                icon: 'success',
-                title: '¡Retiro Exitoso!',
-                text: `Has retirado ${formatoCOP.format(monto)}. Nuevo saldo: ${formatoCOP.format(resultado.nuevoSaldo)}`,
-                background: '#12151c',
-                color: '#ffffff',
-                confirmButtonColor: '#e5a93c'
-            });
+            const voucher = document.createElement('div');
+            voucher.id = 'impresionVoucher';
+            voucher.style.cssText = `
+                display: none;
+                background: #121620 !important;
+                color: #ffffff !important;
+                padding: 40px !important;
+                font-family: 'Poppins', Arial, sans-serif !important;
+                width: 100% !important;
+                max-width: 560px !important;
+                margin: 0 auto !important;
+                box-sizing: border-box !important;
+                border: 1px solid rgba(229, 169, 60, 0.4);
+                border-radius: 20px;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            `;
 
+            voucher.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 18px; margin-bottom: 25px;">
+                    <img src="${logoDataUrl}" alt="Finara Bank Logo" style="height: 38px; width: auto; display: block;">
+                    <div style="font-size: 11px; font-weight: 700; color: #34d399; background: rgba(52, 211, 153, 0.15); border: 1px solid rgba(52, 211, 153, 0.3); padding: 5px 14px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px;">
+                        ✓ Retiro Exitoso
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-bottom: 25px;">
+                    <h2 style="font-size: 20px; color: #ffffff; font-weight: 700; margin: 0 0 4px 0;">Comprobante de Retiro</h2>
+                    <p style="font-size: 11px; color: #94a3b8; margin: 0; letter-spacing: 0.3px;">Finara Bank Digital · Certificación de Operación</p>
+                </div>
+
+                <div style="background: rgba(229, 169, 60, 0.1); border: 1px solid rgba(229, 169, 60, 0.35); border-radius: 14px; padding: 20px; text-align: center; margin-bottom: 25px;">
+                    <div style="font-size: 11px; font-weight: 600; color: #e5a93c; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px;">Monto Retirado</div>
+                    <div style="font-size: 28px; font-weight: 800; color: #e5a93c;">${formatoCOP.format(resultadoFinal.monto)}</div>
+                </div>
+
+                <div style="background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 14px; padding: 6px 18px; margin-bottom: 25px; font-size: 13px;">
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
+                        <span style="color: #94a3b8; font-weight: 500;">Referencia</span>
+                        <strong style="color: #ffffff; font-family: monospace; font-size: 13px;">${resultadoFinal.referencia}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
+                        <span style="color: #94a3b8; font-weight: 500;">Fecha y hora</span>
+                        <strong style="color: #ffffff;">${formatoFechaHora.format(new Date(resultadoFinal.fecha))}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
+                        <span style="color: #94a3b8; font-weight: 500;">Cuenta de origen</span>
+                        <strong style="color: #ffffff;">${textoCuenta(resultadoFinal.cuenta)}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
+                        <span style="color: #94a3b8; font-weight: 500;">Concepto</span>
+                        <strong style="color: #ffffff;">${resultadoFinal.concepto || 'Sin concepto'}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0;">
+                        <span style="color: #94a3b8; font-weight: 500;">Nuevo saldo</span>
+                        <strong style="color: #34d399;">${formatoCOP.format(resultadoFinal.nuevoSaldo)}</strong>
+                    </div>
+                </div>
+
+                <div style="text-align: center; font-size: 10px; color: #64748b; border-top: 1px dashed rgba(255, 255, 255, 0.1); padding-top: 15px; line-height: 1.4;">
+                    Este documento es un comprobante digital válido emitido por Finara Bank S.A.<br>
+                    Garantizado bajo estrictos estándares de seguridad y cifrado digital.
+                </div>
+            `;
+
+            document.body.appendChild(voucher);
+
+            setTimeout(() => {
+                window.print();
+                voucher.remove();
+            }, 150);
+        };
+    }
+
+    if (btnNueva) {
+        btnNueva.onclick = async () => {
+            formRetiro.reset();
+            datosRetiro = null;
+            resultadoFinal = null;
             if (inputMonto) inputMonto.value = '';
-            if (inputConcepto) inputConcepto.value = '';
             actualizarChipsActivos(0);
             await cargarCuentas();
-        } catch (err) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error en la transacción',
-                text: err.message || 'No se pudo completar el retiro.',
-                background: '#12151c',
-                color: '#ffffff',
-                confirmButtonColor: '#e5a93c'
-            });
-        } finally {
-            if (btnSubmit) {
-                btnSubmit.disabled = false;
-                btnSubmit.innerHTML = '<i class="fa-solid fa-circle-check"></i> Confirmar y Procesar Retiro';
-            }
-        }
-    };
+            irAPaso(1);
+        };
+    }
 
     await cargarCuentas();
 }
