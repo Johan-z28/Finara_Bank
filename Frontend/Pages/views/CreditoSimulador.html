@@ -4,154 +4,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consignar Fondos | Finara Bank</title>
+    <title>Simulador de Compras a Cuotas | Finara Bank</title>
     <link rel="icon" type="image/png" sizes="32x32" href="../Style/image/favicon.svg">
-    <link rel="stylesheet" href="../Style/Consignar.css">
+    <link rel="stylesheet" href="../Style/CreditoSimulador.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="general-body">
-    <div class="simulador-container"
-        style="max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.8rem;">
-        <!-- CABECERA DE LA VISTA -->
-        <div class="simulador-header"
-            style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(229, 169, 60, 0.2); padding-bottom: 1rem;">
-            <div>
-                <h1
-                    style="font-size: 1.6rem; font-weight: 700; color: #ffffff; margin: 0; display: flex; align-items: center; gap: 10px;">
-                    <i class="fa-solid fa-calculator" style="color: #e5a93c;"></i> Simulador de Compras a Cuotas
-                </h1>
-                <p style="color: #94a3b8; font-size: 0.85rem; margin-top: 4px;">Simula tus compras con tu Tarjeta de
-                    Crédito Gold y revisa los diferidos.</p>
-            </div>
-            <!-- CUPO DISPONIBLE EN VIVO -->
-            <div
-                style="background: rgba(229, 169, 60, 0.1); border: 1px solid rgba(229, 169, 60, 0.3); padding: 0.6rem 1.2rem; border-radius: 12px; text-align: right;">
-                <span
-                    style="font-size: 0.72rem; color: #94a3b8; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Cupo
-                    Crédito Disponible</span>
-                <strong id="lblCupoTCDisponible" style="font-size: 1.2rem; color: #e5a93c; font-family: monospace;">$
-                    3.000.000</strong>
-            </div>
-        </div>
-
-        <!-- PANEL PRINCIPAL GRID -->
-        <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 1.5rem; align-items: start;">
-
-            <!-- FORMULARIO DE COMPRA -->
-            <div
-                style="background: #0f121a; border: 1px solid rgba(229, 169, 60, 0.25); border-radius: 16px; padding: 1.8rem; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);">
-                <h3
-                    style="margin-top: 0; font-size: 1.1rem; color: #fff; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-cart-shopping" style="color: #e5a93c;"></i> Detalles del Producto
-                </h3>
-
-                <form id="formSimuladorTC" style="display: flex; flex-direction: column; gap: 1.2rem;">
+    <main class="main-content">
+        <div class="tr-container">
+            
+            <!-- CABECERA -->
+            <div class="tr-header">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <a href="#" data-view="saldos" class="tr-btn tr-btn--ghost" style="width: 42px; height: 42px; border-radius: 50%; padding: 0;" title="Volver a Saldos">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </a>
                     <div>
-                        <label
-                            style="display: block; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.4rem; font-weight: 500;">Establecimiento
-                            / Producto</label>
-                        <div style="position: relative;">
-                            <i class="fa-solid fa-store"
-                                style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #64748b;"></i>
-                            <input type="text" id="tcEstablecimiento"
-                                placeholder="Ej. Tienda Electrónica, Amazon, Éxito" required
-                                style="width: 100%; padding: 0.75rem 0.75rem 0.75rem 2.6rem; background: #161a23; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff; font-size: 0.9rem; box-sizing: border-box; outline: none;">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label
-                            style="display: block; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.4rem; font-weight: 500;">Monto
-                            de la Compra ($ COP)</label>
-                        <div style="position: relative;">
-                            <i class="fa-solid fa-dollar-sign"
-                                style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #e5a93c;"></i>
-                            <input type="number" id="tcMonto" placeholder="Ej. 1200000" min="10000" step="10000"
-                                required
-                                style="width: 100%; padding: 0.75rem 0.75rem 0.75rem 2.6rem; background: #161a23; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff; font-size: 0.95rem; font-weight: 600; box-sizing: border-box; outline: none;">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label
-                            style="display: block; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.4rem; font-weight: 500;">Plazo
-                            en Cuotas</label>
-                        <div style="position: relative;">
-                            <i class="fa-solid fa-calendar-days"
-                                style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #64748b;"></i>
-                            <select id="tcCuotas" required
-                                style="width: 100%; padding: 0.75rem 0.75rem 0.75rem 2.6rem; background: #161a23; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff; font-size: 0.9rem; box-sizing: border-box; outline: none; cursor: pointer;">
-                                <option value="1">1 cuota (0% Interés)</option>
-                                <option value="2">2 cuotas (0% Interés)</option>
-                                <option value="3">3 cuotas (1.9% mensual)</option>
-                                <option value="6">6 cuotas (1.9% mensual)</option>
-                                <option value="12" selected>12 cuotas (2.3% mensual)</option>
-                                <option value="24">24 cuotas (2.3% mensual)</option>
-                                <option value="36">36 cuotas (2.3% mensual)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <button type="submit" id="btnProcesarCompraTC"
-                        style="margin-top: 0.6rem; width: 100%; background: linear-gradient(135deg, #e5a93c 0%, #b8860b 100%); color: #0a0c10; border: none; padding: 0.9rem; border-radius: 10px; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(229, 169, 60, 0.3);">
-                        <i class="fa-solid fa-credit-card"></i> Procesar Compra Real
-                    </button>
-                </form>
-            </div>
-
-            <!-- TARJETA DE RESUMEN DE CÁLCULO Y DÉBITOS -->
-            <div style="display: flex; flex-direction: column; gap: 1rem;">
-                <div
-                    style="background: linear-gradient(145deg, #161a23 0%, #0d0f14 100%); border: 1px solid rgba(229, 169, 60, 0.35); border-radius: 16px; padding: 1.6rem; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);">
-                    <h3
-                        style="margin-top: 0; font-size: 1rem; color: #e5a93c; margin-bottom: 1.2rem; display: flex; align-items: center; justify-content: space-between;">
-                        <span>Proyección de Pago</span>
-                        <i class="fa-solid fa-chart-line"></i>
-                    </h3>
-
-                    <div style="display: flex; flex-direction: column; gap: 1rem;">
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.06);">
-                            <span style="font-size: 0.85rem; color: #94a3b8;">Tasa de interés aplicable:</span>
-                            <strong id="lblTasa" style="color: #34d399; font-size: 0.95rem;">0% mensual</strong>
-                        </div>
-
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.06);">
-                            <span style="font-size: 0.85rem; color: #94a3b8;">Cuota estimada por mes:</span>
-                            <strong id="lblCuotaMensual"
-                                style="color: #e5a93c; font-size: 1.25rem; font-family: monospace;">$ 0</strong>
-                        </div>
-
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.06);">
-                            <span style="font-size: 0.85rem; color: #94a3b8;">Total intereses diferidos:</span>
-                            <strong id="lblTotalIntereses" style="color: #f87171; font-size: 0.95rem;">$ 0</strong>
-                        </div>
-
-                        <div
-                            style="background: rgba(229, 169, 60, 0.08); border: 1px dashed rgba(229, 169, 60, 0.3); padding: 1rem; border-radius: 10px; margin-top: 0.4rem; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 0.85rem; color: #ffffff; font-weight: 600;">Total diferido a
-                                pagar:</span>
-                            <strong id="lblTotalPagar"
-                                style="color: #e5a93c; font-size: 1.3rem; font-family: monospace;">$ 0</strong>
-                        </div>
+                        <h1>Simulador de Compras a Cuotas</h1>
+                        <p style="color: var(--text-muted, #94a3b8); font-size: 0.85rem; margin: 0;">Simula tus compras con tu Tarjeta de Crédito Gold y revisa los diferidos.</p>
                     </div>
                 </div>
+            </div>
 
-                <div
-                    style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 1rem; font-size: 0.78rem; color: #94a3b8; display: flex; gap: 10px; align-items: flex-start;">
-                    <i class="fa-solid fa-circle-info" style="color: #e5a93c; margin-top: 2px;"></i>
-                    <span>Al confirmar la compra, el saldo se descontará directamente del cupo de tu <strong>Tarjeta de
-                            Crédito</strong> y se registrará en tus movimientos.</span>
-                </div>
+            <!-- LAYOUT PRINCIPAL DE 2 COLUMNAS -->
+            <div class="tr-layout">
+
+                <!-- FORMULARIO DE COMPRA -->
+                <section class="tr-card">
+                    <h2>
+                        <i class="fa-solid fa-cart-shopping" style="color: var(--gold-main, #e5a93c); margin-right: 8px;"></i> 
+                        Detalles del Producto
+                    </h2>
+
+                    <form id="formSimuladorTC" novalidate>
+                        <div class="tr-campo">
+                            <label for="tcEstablecimiento">Establecimiento / Producto</label>
+                            <div style="position: relative;">
+                                <i class="fa-solid fa-store" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #64748b;"></i>
+                                <input type="text" id="tcEstablecimiento" placeholder="Ej. Tienda Electrónica, Amazon, Éxito" required style="padding-left: 36px;">
+                            </div>
+                        </div>
+
+                        <div class="tr-campo">
+                            <label for="tcMonto">Monto de la Compra ($ COP)</label>
+                            <div class="tr-monto">
+                                <span>$</span>
+                                <input id="tcMonto" type="text" inputmode="numeric" autocomplete="off" placeholder="0">
+                            </div>
+                        </div>
+
+                        <div class="tr-campo">
+                            <label for="tcCuotas">Plazo en Cuotas</label>
+                            <div style="position: relative;">
+                                <i class="fa-solid fa-calendar-days" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #64748b;"></i>
+                                <select id="tcCuotas" required style="padding-left: 36px;">
+                                    <option value="1">1 cuota (0% Interés)</option>
+                                    <option value="2">2 cuotas (0% Interés)</option>
+                                    <option value="3">3 cuotas (1.9% mensual)</option>
+                                    <option value="6">6 cuotas (1.9% mensual)</option>
+                                    <option value="12" selected>12 cuotas (2.3% mensual)</option>
+                                    <option value="24">24 cuotas (2.3% mensual)</option>
+                                    <option value="36">36 cuotas (2.3% mensual)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="tr-acciones">
+                            <button type="submit" id="btnProcesarCompraTC" class="tr-btn tr-btn--primary" style="width: 100%;">
+                                <i class="fa-solid fa-credit-card"></i> Procesar Compra Real
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- PANEL LATERAL EXACTAMENTE IGUAL AL DE TRANSFERENCIAS CON EL ESTILO DE SALDO -->
+                <aside class="tr-info" aria-label="Proyección y Resumen">
+                    <h3>Transfiere sin complicaciones</h3>
+
+                    <!-- TARJETA DE SALDO ESTILO TRANSFERENCIAS -->
+                    <div class="tr-side-card" style="padding: 1.1rem; gap: 6px;">
+                        <div class="tr-side-card__header">
+                            <span class="tr-side-card__label">Saldo de la cuenta seleccionada</span>
+                            <span class="tr-side-card__badge badge--activa">ACTIVA</span>
+                        </div>
+                        <div class="tr-side-card__monto" id="lblCupoTCDisponible">$ 3.000.000</div>
+                        <div class="tr-side-card__sub" id="lblSubTarjetaInfo">Tarjeta de Crédito (Gold) · •••• 2488</div>
+                    </div>
+
+                    <!-- RESUMEN PREVIO -->
+                    <div class="tr-side-summary">
+                        <h4>Proyección de Pago</h4>
+                        <div class="tr-side-summary__row">
+                            <span>Tasa de interés:</span>
+                            <strong id="lblTasa" class="green-text">0% mensual</strong>
+                        </div>
+                        <div class="tr-side-summary__row">
+                            <span>Cuota estimada:</span>
+                            <strong id="lblCuotaMensual" class="gold-text">$ 0</strong>
+                        </div>
+                        <div class="tr-side-summary__row">
+                            <span>Total intereses:</span>
+                            <strong id="lblTotalIntereses" style="color: #f87171;">$ 0</strong>
+                        </div>
+
+                        <hr class="tr-divider">
+
+                        <div class="tr-side-summary__row">
+                            <span>Total a pagar:</span>
+                            <strong id="lblTotalPagar" class="gold-text" style="font-size: 1.15rem;">$ 0</strong>
+                        </div>
+                    </div>
+
+                    <ul class="tr-info-features">
+                        <li>
+                            <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                            <div><strong>Seguro</strong><span>El saldo se descuenta directo de tu cupo aprobado.</span></div>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+                            <div><strong>Inmediato</strong><span>La diferición se registra al instante en movimientos.</span></div>
+                        </li>
+                    </ul>
+                </aside>
+
             </div>
         </div>
-    </div>
+    </main>
 
-    <script type="module" src="../../Vanilla/CreditoSimulador.js"></script>
+    <script type="module" src="../../Vanilla/SimuladorTC.js"></script>
 </body>
 
 </html>

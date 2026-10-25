@@ -6,12 +6,15 @@ export function initSimuladorTCView() {
     const selectCuotas = document.getElementById('tcCuotas');
     const form = document.getElementById('formSimuladorTC');
     const lblCupoTCDisponible = document.getElementById('lblCupoTCDisponible');
+    const lblSubTarjetaInfo = document.getElementById('lblSubTarjetaInfo');
 
     function actualizarCupoPantalla() {
-        if (!lblCupoTCDisponible) return;
         const tarjetaCredito = obtenerTarjetaCreditoExclusiva();
         
-        let cupo = 3000000; // Valor base predeterminado
+        let cupo = 3000000;
+        let nombreTarjeta = "Tarjeta de Crédito (Gold)";
+        let numeroRef = "•••• 2488";
+
         if (tarjetaCredito) {
             if (typeof tarjetaCredito.saldo === 'number') cupo = tarjetaCredito.saldo;
             else if (typeof tarjetaCredito.cupoDisponible === 'number') cupo = tarjetaCredito.cupoDisponible;
@@ -19,15 +22,35 @@ export function initSimuladorTCView() {
                 const val = parseFloat(String(tarjetaCredito.cupoDisponible || tarjetaCredito.saldo).replace(/[^0-9.-]+/g, ""));
                 if (!isNaN(val)) cupo = val;
             }
+
+            if (tarjetaCredito.nombre || tarjetaCredito.tipo) {
+                nombreTarjeta = tarjetaCredito.nombre || tarjetaCredito.tipo;
+            }
+            const numCompleto = String(tarjetaCredito.numero || tarjetaCredito.numeroTarjeta || "");
+            if (numCompleto.length >= 4) {
+                numeroRef = "•••• " + numCompleto.slice(-4);
+            }
         }
 
-        lblCupoTCDisponible.textContent = "$ " + Math.round(cupo).toLocaleString("es-CO");
+        if (lblCupoTCDisponible) {
+            lblCupoTCDisponible.textContent = "$ " + Math.round(cupo).toLocaleString("es-CO");
+        }
+        if (lblSubTarjetaInfo) {
+            lblSubTarjetaInfo.textContent = `${nombreTarjeta} · ${numeroRef}`;
+        }
+    }
+
+    function obtenerMontoNumerico() {
+        if (!inputMonto) return 0;
+        // Limpia los puntos de miles antes de operar matemáticamente
+        const valorLimpio = inputMonto.value.replace(/\./g, '').replace(/[^0-9.-]+/g, "");
+        return parseFloat(valorLimpio) || 0;
     }
 
     function actualizarCalculo() {
         if (!inputMonto || !selectCuotas) return;
 
-        const monto = parseFloat(inputMonto.value) || 0;
+        const monto = obtenerMontoNumerico();
         const cuotas = parseInt(selectCuotas.value, 10) || 1;
 
         const res = calcularCuotaMensual(monto, cuotas);
@@ -43,8 +66,19 @@ export function initSimuladorTCView() {
         if (lblTotalPagar) lblTotalPagar.textContent = "$ " + Math.round(res.totalPagar).toLocaleString("es-CO");
     }
 
-    if (inputMonto && selectCuotas) {
-        inputMonto.addEventListener('input', actualizarCalculo);
+    if (inputMonto) {
+        inputMonto.addEventListener('input', () => {
+            let valorLimpio = inputMonto.value.replace(/\D/g, "");
+            if (valorLimpio) {
+                inputMonto.value = parseInt(valorLimpio, 10).toLocaleString("es-CO");
+            } else {
+                inputMonto.value = "";
+            }
+            actualizarCalculo();
+        });
+    }
+
+    if (selectCuotas) {
         selectCuotas.addEventListener('change', actualizarCalculo);
     }
 
@@ -56,7 +90,7 @@ export function initSimuladorTCView() {
             e.preventDefault();
 
             const establecimiento = document.getElementById('tcEstablecimiento').value;
-            const monto = inputMonto.value;
+            const montoNum = obtenerMontoNumerico();
             const cuotas = selectCuotas.value;
 
             const tarjetaCredito = obtenerTarjetaCreditoExclusiva();
@@ -72,7 +106,7 @@ export function initSimuladorTCView() {
                         confirmButtonColor: '#e5a93c'
                     });
                 } else {
-                    alert('No se encontró una Tarjeta de Crédito activa en tus productos.');
+                    alert('No se encontró una Tarjeta de Crédito activa.');
                 }
                 return;
             }
@@ -80,7 +114,7 @@ export function initSimuladorTCView() {
             const resultado = ejecutarCompraTarjetaCredito({
                 numeroTarjeta: tarjetaCredito.numero || tarjetaCredito.numeroTarjeta,
                 establecimiento,
-                monto,
+                monto: montoNum,
                 cuotas
             });
 
@@ -90,9 +124,9 @@ export function initSimuladorTCView() {
                         icon: 'success',
                         title: '¡Compra Procesada Con Éxito!',
                         html: `
-                            <p style="color: #cbd5e1;">Tu transacción en <b>${establecimiento}</b> se realizó con tu Tarjeta de Crédito.</p>
+                            <p style="color: #cbd5e1;">Tu transacción en <b>${establecimiento}</b> se realizó con éxito.</p>
                             <div style="background: rgba(229,169,60,0.1); border: 1px dashed rgba(229,169,60,0.3); padding: 1rem; border-radius: 10px; margin-top: 10px; text-align: left;">
-                                <p style="margin: 4px 0; color: #fff;"><b>Monto:</b> $ ${parseFloat(monto).toLocaleString("es-CO")}</p>
+                                <p style="margin: 4px 0; color: #fff;"><b>Monto:</b> $ ${montoNum.toLocaleString("es-CO")}</p>
                                 <p style="margin: 4px 0; color: #fff;"><b>Plazo:</b> ${cuotas} cuota(s)</p>
                                 <p style="margin: 4px 0; color: #e5a93c;"><b>Cuota Mensual:</b> $ ${Math.round(resultado.calculo.cuotaMensual).toLocaleString("es-CO")}</p>
                                 <p style="margin: 4px 0; color: #34d399;"><b>Nuevo Cupo Crédito:</b> $ ${Math.round(resultado.nuevoCupo).toLocaleString("es-CO")}</p>

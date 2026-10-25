@@ -23,7 +23,7 @@
     font-size: 1.8rem;
     font-weight: 700;
     margin-bottom: 0.3rem;
-    color: #1e293b !important;
+    color: #ffffff;
 }
 
 .request-header p {
@@ -69,19 +69,19 @@
     background: linear-gradient(145deg, rgba(17, 20, 29, 0.95), #181d24);
 }
 
-/* Plástico físico de las tarjetas 3D con proporción real adaptable */
+/* Plástico físico de las tarjetas 3D */
 .tarjeta-plastico {
     width: 100%;
     aspect-ratio: 1.58 / 1;
     height: auto;
-    min-height: 170px;
+    min-height: 185px;
     border-radius: 14px;
-    padding: 16px 18px;
+    padding: 18px 20px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
     margin-bottom: 0.8rem;
     transition: transform 0.3s ease;
 }
@@ -98,34 +98,38 @@
 }
 
 .head-tarjeta .logo-svg {
-    height: 28px;
+    height: 36px; /* 🚀 LOGOTIPO AMPLIADO SIGNIFICATIVAMENTE */
     width: auto;
 }
 
 .head-tarjeta .card-contactless {
-    font-size: 1rem;
+    font-size: 1.1rem;
     color: #ffffff;
     transform: rotate(90deg);
+    opacity: 0.9;
 }
 
 .card-chip-area {
     display: flex;
     align-items: center;
     gap: 12px;
+    margin: 4px 0;
 }
 
 .card-chip-area .chip {
-    width: 34px;
-    height: 24px;
+    width: 40px;
+    height: 28px;
     background: linear-gradient(135deg, #fce09b 0%, #8a6218 100%);
     border-radius: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.35);
 }
 
 .card-tag {
-    font-size: 0.82rem;
+    font-size: 0.9rem;
     color: #ffffff;
-    font-weight: 600;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
 }
 
 .foot-tarjeta {
@@ -136,21 +140,22 @@
 }
 
 .foot-tarjeta .card-number {
-    font-size: 0.85rem;
-    letter-spacing: 2px;
+    font-size: 1rem;
+    letter-spacing: 2.5px;
     font-family: 'Courier New', Courier, monospace;
     font-weight: 700;
     color: #ffffff;
 }
 
 .foot-tarjeta .card-type {
-    font-size: 0.95rem;
+    font-size: 1.15rem;
     font-weight: 900;
     font-style: italic;
     color: #ffffff;
+    letter-spacing: 1px;
 }
 
-/* Colores de plásticos */
+/* Colores de plásticos y contraste dinámico de texto */
 .tarjeta-dorada {
     background: linear-gradient(135deg, #e5a93c 0%, #9e6f1a 100%);
     border: 1px solid #fce09b;

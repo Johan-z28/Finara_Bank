@@ -32,17 +32,17 @@ export async function initSaldosView() {
         const ahorros = cuentas.find(c => {
             const t = String(c.tipo || '').toUpperCase();
             return (t.includes('AHORRO') || t.includes('DEBITO') || t.includes('DÉBITO')) && c.estado !== 'INACTIVA';
-        }) || { saldo: 0 };
+        });
 
         const corriente = cuentas.find(c => {
             const t = String(c.tipo || '').toUpperCase();
             return t.includes('CORRIENTE') && c.estado !== 'INACTIVA';
-        }) || { saldo: 0 };
+        });
 
         const credito = cuentas.find(c => {
             const t = String(c.tipo || '').toUpperCase();
             return (t.includes('CREDITO') || t.includes('CRÉDITO')) && c.estado !== 'INACTIVA';
-        }) || null;
+        });
 
         const limpiarSaldo = (val) => {
             if (typeof val === 'number') return val;
@@ -51,12 +51,15 @@ export async function initSaldosView() {
             return isNaN(num) ? 0 : num;
         };
 
-        const saldoAhorros = limpiarSaldo(ahorros.saldo);
-        const saldoCorriente = limpiarSaldo(corriente.saldo);
+        const saldoAhorros = ahorros ? limpiarSaldo(ahorros.saldo) : 0;
+        const saldoCorriente = corriente ? limpiarSaldo(corriente.saldo) : 0;
         const cupoCredito = credito ? limpiarSaldo(credito.saldo || credito.cupoDisponible) : 0;
         
+        // El patrimonio consolidado SOLO suma cuentas de efectivo (Ahorros y Corriente)
         const totalConsolidado = saldoAhorros + saldoCorriente;
-        const sumaTotalConCredito = saldoAhorros + saldoCorriente + cupoCredito;
+
+        // Si hay tarjeta de crédito, la liquidez incluye el cupo; si no, solo efectivo
+        const sumaTotalLiquidez = totalConsolidado + (credito ? cupoCredito : 0);
 
         const elCreditoTotal = document.getElementById('montoCreditoTotal');
         const elAhorrosTotal = document.getElementById('montoAhorrosTotal');
@@ -70,6 +73,20 @@ export async function initSaldosView() {
         const segCredito = document.getElementById('segCredito');
         const segAhorros = document.getElementById('segAhorros');
         const segCorriente = document.getElementById('segCorriente');
+
+        // Referencias a los elementos de la leyenda para ocultar/mostrar dinámicamente
+        const itemCreditoLeyenda = elCreditoTotal ? elCreditoTotal.closest('.leyenda-item') : null;
+        const itemAhorrosLeyenda = elAhorrosTotal ? elAhorrosTotal.closest('.leyenda-item') : null;
+        const itemCorrienteLeyenda = elCorrienteTotal ? elCorrienteTotal.closest('.leyenda-item') : null;
+
+        // Controlar visibilidad en la leyenda y barras según existencia de productos
+        if (itemCreditoLeyenda) itemCreditoLeyenda.style.display = credito ? 'block' : 'none';
+        if (itemAhorrosLeyenda) itemAhorrosLeyenda.style.display = ahorros ? 'block' : 'none';
+        if (itemCorrienteLeyenda) itemCorrienteLeyenda.style.display = corriente ? 'block' : 'none';
+
+        if (segCredito) segCredito.style.display = credito ? 'block' : 'none';
+        if (segAhorros) segAhorros.style.display = ahorros ? 'block' : 'none';
+        if (segCorriente) segCorriente.style.display = corriente ? 'block' : 'none';
 
         if (ocultar) {
             if (elCreditoTotal) elCreditoTotal.textContent = '$ ••••••';
@@ -87,10 +104,18 @@ export async function initSaldosView() {
         let pctAhorros = 0;
         let pctCorriente = 0;
 
-        if (sumaTotalConCredito > 0) {
-            pctCredito = Math.round((cupoCredito / sumaTotalConCredito) * 100);
-            pctAhorros = Math.round((saldoAhorros / sumaTotalConCredito) * 100);
-            pctCorriente = Math.max(0, 100 - (pctCredito + pctAhorros));
+        if (sumaTotalLiquidez > 0) {
+            if (credito) pctCredito = Math.round((cupoCredito / sumaTotalLiquidez) * 100);
+            if (ahorros) pctAhorros = Math.round((saldoAhorros / sumaTotalLiquidez) * 100);
+            
+            const activosCount = [credito, ahorros, corriente].filter(Boolean).length;
+            if (activosCount === 1) {
+                if (credito) pctCredito = 100;
+                if (ahorros) pctAhorros = 100;
+                if (corriente) pctCorriente = 100;
+            } else {
+                pctCorriente = Math.max(0, 100 - (pctCredito + pctAhorros));
+            }
         }
 
         if (elPctCredito) elPctCredito.textContent = `${pctCredito}%`;
@@ -150,4 +175,4 @@ export async function initSaldosView() {
 
     pintarOjo();
     await cargar();
-}
+}   

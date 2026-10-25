@@ -8,7 +8,7 @@
    2. VARIABLES GLOBALES
    ========================================== */
 :root {
-  --bg-fondo: #E4E4E5;
+  --bg-fondo: #0D111A;
   --bg-card-dark-glass: rgba(18, 22, 32, 0.92);
   --bg-card-border: rgba(255, 255, 255, 0.12);
   --gold-main: #e5a93c;
@@ -29,13 +29,13 @@
   box-sizing: border-box;
 }
 
-html, body, .general-body {
+html,
+body,
+.general-body {
   font-family: var(--font-main);
-  background: radial-gradient(circle at 80% 20%, rgba(229, 169, 60, 0.08) 0%, transparent 40%),
-              radial-gradient(circle at 10% 90%, rgba(56, 189, 248, 0.05) 0%, transparent 40%),
-              #f4f6f9 !important;
+  background: var(--bg-fondo);
   background-attachment: fixed !important;
-  color: #1e293b;
+  color: #f1f5f9;
   min-height: 100vh;
   width: 100%;
   display: flex;
@@ -55,21 +55,23 @@ html, body, .general-body {
 }
 
 /* ==========================================
-   4. SIDEBAR LATERAL Y TOGGLE
+   4. SIDEBAR LATERAL FLOTANTE Y TOOLTIPS
    ========================================== */
 .sidebar {
   width: 250px;
-  height: 100vh;
-  background-color: rgba(10, 13, 20, 0.96);
+  height: calc(100vh - 40px);
+  background-color: rgba(17, 20, 29, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-right: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
   display: flex;
   flex-direction: column;
   position: fixed;
-  top: 0;
-  left: 0;
+  top: 20px;
+  left: 20px;
   z-index: 100;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -108,7 +110,7 @@ html, body, .general-body {
 }
 
 .sidebar-logo {
-  height: 38px !important;
+  height: 50px !important;
   width: auto !important;
   max-width: 160px !important;
   object-fit: contain;
@@ -148,6 +150,8 @@ html, body, .general-body {
   font-weight: 500;
   border-radius: 12px;
   transition: all 0.2s ease;
+  position: relative;
+  /* Necesario para posicionar el tooltip */
 }
 
 .sidebar .nav-link i {
@@ -213,6 +217,41 @@ html, body, .general-body {
   text-decoration: none;
 }
 
+/* ==========================================
+   EFECTO TOOLTIP FLOTANTE (SOLO CUANDO ESTÁ COLAPSADO)
+   ========================================== */
+.sidebar.collapsed .nav-link::after {
+  content: attr(title);
+  /* Extrae automáticamente el texto del atributo title del enlace */
+  position: absolute;
+  left: 90px;
+  /* Distancia respecto al sidebar reducido */
+  top: 50%;
+  transform: translateY(-50%) scale(0.9);
+  background: rgba(13, 17, 26, 0.95);
+  backdrop-filter: blur(12px);
+  color: #ffffff;
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(229, 169, 60, 0.3);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+/* Muestra el tooltip al pasar el cursor */
+.sidebar.collapsed .nav-link:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-50%) scale(1);
+}
+
 /* REGLAS MODO COLAPSADO */
 .sidebar.collapsed {
   width: 78px;
@@ -260,8 +299,8 @@ html, body, .general-body {
    5. WRAPPER Y NAVBAR SUPERIOR
    ========================================== */
 .main-wrapper {
-  margin-left: 250px;
-  width: calc(100% - 250px);
+  margin-left: 290px;
+  width: calc(100% - 290px);
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -269,8 +308,8 @@ html, body, .general-body {
 }
 
 .main-wrapper.expanded {
-  margin-left: 78px;
-  width: calc(100% - 78px);
+  margin-left: 118px;
+  width: calc(100% - 118px);
 }
 
 .dashboard-navbar {
@@ -292,13 +331,13 @@ html, body, .general-body {
   font-size: 1.2rem;
   color: #0f172a;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .user-greeting h2 {
   font-size: 1.2rem;
   font-weight: 500;
-  color: #1e293b;
+  color: #ffffff;
 }
 
 .user-greeting h2 span#greetingName {
@@ -314,17 +353,19 @@ html, body, .general-body {
   align-items: center;
   gap: 10px;
   padding: 6px 14px;
-  background: var(--bg-card-dark-glass);
-  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #ffffff;
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 20px;
   text-decoration: none;
-  color: #ffffff;
+  color: #0f172a;
   font-size: 0.84rem;
 }
 
 .btn-perfil-navbar:hover {
   background: rgba(229, 169, 60, 0.15);
   border-color: rgba(229, 169, 60, 0.4);
+  color: #ffffff;
 }
 
 .navbar-user-avatar {
@@ -349,12 +390,246 @@ html, body, .general-body {
 }
 
 /* ==========================================
+   WIDGET Y VENTANA FLOTANTE DEL CHATBOT (REDESIGN)
+   ========================================== */
+
+#chatWidgetContainer {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  font-family: var(--font-main, 'Poppins', sans-serif);
+}
+
+.chatbot-float-btn {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e5a93c 0%, #c48b28 100%);
+  border: 2px solid #fce09b;
+  box-shadow: 0 8px 25px rgba(229, 169, 60, 0.45);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+}
+
+.chatbot-float-btn:hover {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 12px 30px rgba(229, 169, 60, 0.7);
+}
+
+.float-btn-img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+}
+
+.chatbot-window {
+  position: absolute;
+  bottom: 80px;
+  right: 0;
+  width: 380px;
+  height: 520px;
+  background: rgba(13, 17, 26, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(229, 169, 60, 0.25);
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform-origin: bottom right;
+  animation: scaleUpChat 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes scaleUpChat {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.chatbot-window.hidden {
+  display: none !important;
+}
+
+.chatbot-header {
+  padding: 16px 20px;
+  background: linear-gradient(180deg, rgba(229, 169, 60, 0.1) 0%, rgba(0, 0, 0, 0) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chatbot-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bot-avatar-container {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(229, 169, 60, 0.2) 0%, rgba(196, 139, 40, 0.1) 100%);
+  border: 1.5px solid rgba(229, 169, 60, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(229, 169, 60, 0.2);
+}
+
+.bot-avatar-img {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+}
+
+.chatbot-header h6 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.2px;
+}
+
+.status-online {
+  font-size: 0.75rem;
+  color: #34d399;
+  font-weight: 500;
+}
+
+.close-chat-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.close-chat-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.chatbot-body {
+  flex: 1;
+  padding: 18px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  scroll-behavior: smooth;
+}
+
+.chat-bubble {
+  max-width: 85%;
+  padding: 12px 16px;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  animation: fadeInBubble 0.3s ease forwards;
+}
+
+@keyframes fadeInBubble {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bot-bubble {
+  background: rgba(255, 255, 255, 0.06);
+  color: #f1f5f9;
+  align-self: flex-start;
+  border-top-left-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.user-bubble {
+  background: linear-gradient(135deg, #e5a93c 0%, #c48b28 100%);
+  color: #07090e;
+  font-weight: 600;
+  align-self: flex-end;
+  border-top-right-radius: 4px;
+  box-shadow: 0 4px 15px rgba(229, 169, 60, 0.25);
+}
+
+.chat-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+  animation: fadeInBubble 0.3s ease forwards;
+}
+
+.chat-option-btn {
+  background: rgba(229, 169, 60, 0.07);
+  border: 1px solid rgba(229, 169, 60, 0.25);
+  color: #e5a93c;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.25s ease;
+}
+
+.chat-option-btn:hover {
+  background: rgba(229, 169, 60, 0.2);
+  border-color: var(--gold-main, #e5a93c);
+  color: #ffffff;
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(229, 169, 60, 0.15);
+}
+
+@media (max-width: 576px) {
+  .chatbot-window {
+    width: calc(100vw - 28px);
+    height: 460px;
+    bottom: 75px;
+    right: -8px;
+  }
+}
+
+/* ==========================================
    6. RESPONSIVO ADAPTATIVO (MEDIA QUERIES)
    ========================================== */
 @media (max-width: 992px) {
   .sidebar {
     transform: translateX(-100%);
     width: 260px !important;
+    height: 100vh !important;
+    top: 0 !important;
+    left: 0 !important;
+    border-radius: 0 !important;
     box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
   }
 

@@ -69,7 +69,6 @@ export function crearCuentaCard(cuenta, { ocultarSaldo = false, onEstadoCambiado
     const subNumero = el('span', 'cuenta-card__sub-numero', numeroTexto);
     titulosBox.append(tituloTipo, subNumero);
 
-    // ETIQUETA / BADGE DE ESTADO DE TARJETA (Activa / Bloqueada)
     const estadoBadge = el('span', `cuenta-card__estado-badge ${estaBloqueada ? 'badge--bloqueada' : 'badge--activa'}`,
         estaBloqueada ? 'Bloqueada' : 'Activa');
     
@@ -93,6 +92,20 @@ export function crearCuentaCard(cuenta, { ocultarSaldo = false, onEstadoCambiado
                 <i class="fa-solid fa-calculator"></i> Simular compra
             </button>
         `;
+    } else {
+        htmlBotones += `
+            <div class="acciones-operaciones-rapidas">
+                <button type="button" class="btn-operacion-rapida" data-accion="transferencias" title="Transferir fondos">
+                    <i class="fa-solid fa-arrow-right-arrow-left"></i> Transferir
+                </button>
+                <button type="button" class="btn-operacion-rapida" data-accion="consignar" title="Consignar dinero">
+                    <i class="fa-solid fa-plus-circle"></i> Consignar
+                </button>
+                <button type="button" class="btn-operacion-rapida" data-accion="retiros" title="Retirar efectivo">
+                    <i class="fa-solid fa-money-bill-wave"></i> Retirar
+                </button>
+            </div>
+        `;
     }
 
     htmlBotones += `
@@ -108,7 +121,15 @@ export function crearCuentaCard(cuenta, { ocultarSaldo = false, onEstadoCambiado
 
     accionesGrupo.innerHTML = htmlBotones;
 
-    // ALERTA DE "VER DATOS" ELEGANTE Y COMPLETA
+    accionesGrupo.querySelectorAll('.btn-operacion-rapida').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const accion = btn.getAttribute('data-accion');
+            const linkDestino = document.querySelector(`[data-view="${accion}"]`);
+            if (linkDestino) linkDestino.click();
+        });
+    });
+
     accionesGrupo.querySelector('.btn-ver-detalles').addEventListener('click', (e) => {
         e.stopPropagation();
         if (window.Swal) {
@@ -125,22 +146,10 @@ export function crearCuentaCard(cuenta, { ocultarSaldo = false, onEstadoCambiado
                             <span style="color: #94a3b8; font-size: 0.82rem;">Producto:</span>
                             <strong style="color: #ffffff; font-size: 0.9rem;">${tipoInfo.etiqueta}</strong>
                         </div>
-                        
                         <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 0.75rem;">
                             <span style="color: #94a3b8; font-size: 0.82rem;">Número completo:</span>
                             <strong style="color: #e5a93c; font-family: monospace; font-size: 0.95rem; letter-spacing: 1px;">${numeroTexto}</strong>
                         </div>
-
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 0.75rem;">
-                            <span style="color: #94a3b8; font-size: 0.82rem;">Vencimiento:</span>
-                            <strong style="color: #ffffff; font-size: 0.9rem;">09/29</strong>
-                        </div>
-
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 0.75rem;">
-                            <span style="color: #94a3b8; font-size: 0.82rem;">CVV de seguridad:</span>
-                            <span style="background: rgba(229, 169, 60, 0.2); color: #e5a93c; border: 1px solid rgba(229, 169, 60, 0.4); padding: 2px 10px; border-radius: 8px; font-weight: 700; font-family: monospace; font-size: 0.9rem;">584</span>
-                        </div>
-
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <span style="color: #94a3b8; font-size: 0.82rem;">Estado actual:</span>
                             <span style="color: ${estaBloqueada ? '#f87171' : '#34d399'}; font-size: 0.85rem; font-weight: 600;">
@@ -158,10 +167,8 @@ export function crearCuentaCard(cuenta, { ocultarSaldo = false, onEstadoCambiado
         }
     });
 
-    // ACCIÓN DE BLOQUEAR CON PERSISTENCIA EN LOCALSTORAGE
     accionesGrupo.querySelector('.btn-toggle-bloqueo').addEventListener('click', (e) => {
         e.stopPropagation();
-        
         const nuevoBloqueo = !estaBloqueada;
 
         let todasLasCuentas = JSON.parse(localStorage.getItem('finara_cuentas')) || [];

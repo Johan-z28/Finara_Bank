@@ -30,15 +30,9 @@
     font-size: 1.8rem;
     font-weight: 700;
     margin-bottom: 0.3rem;
-    color: #1e293b !important;
+    color: #ffffff;
 }
 
-.tr-subtitle { 
-    color: #64748b !important; 
-    font-size: 0.9rem; 
-}
-
-/* Indicador de pasos estilizado */
 .tr-pasos {
     list-style: none;
     display: flex;
@@ -76,7 +70,6 @@
     color: #cbd5e1;
 }
 
-/* Estado activo */
 .tr-paso.activo {
     color: #ffffff !important;
     border-color: rgba(229, 169, 60, 0.6);
@@ -102,7 +95,6 @@
     font-weight: 800;
 }
 
-/* Layout principal */
 .tr-layout {
     display: grid;
     grid-template-columns: minmax(0, 1.8fr) minmax(300px, 1fr);
@@ -142,12 +134,10 @@
     color: var(--text-white);
 }
 
-/* ELIMINACIÓN DEL ESPACIO DE TARJETA DUPLICADA DEBAJO DEL SELECTOR */
 .tr-origen-card {
     display: none !important;
 }
 
-/* Tarjeta lateral */
 .tr-side-card {
     background: rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(229, 169, 60, 0.25);
@@ -200,7 +190,6 @@
     color: #cbd5e1;
 }
 
-/* Resumen dinámico lateral */
 .tr-side-summary {
     display: flex;
     flex-direction: column;
@@ -250,7 +239,6 @@
 .tr-info-features strong { display: block; font-size: 0.88rem; color: var(--text-white); margin-bottom: 2px; }
 .tr-info-features span { color: var(--text-muted); font-size: 0.78rem; line-height: 1.4; }
 
-/* Campos del Formulario */
 .tr-campo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.1rem; flex: 1 1 200px; min-width: 0; }
 .tr-fila-campos { display: flex; flex-wrap: wrap; gap: 1rem; }
 
@@ -441,10 +429,6 @@
 
 .tr-valor--grande { font-size: 1.25rem !important; color: var(--gold-main) !important; font-weight: 700 !important; }
 
-/* ==========================================
-   PASO 3: VISTA DE ÉXITO Y VOUCHER
-   ========================================== */
-
 .tr-exito-header {
     display: flex;
     flex-direction: column;
@@ -503,6 +487,51 @@
     justify-content: center;
     gap: 1.2rem;
     margin-top: 2rem;
+}
+
+/* ==========================================
+   CONFIGURACIÓN DE IMPRESIÓN LIMPIA Y DIRECTA
+   ========================================== */
+@media print {
+
+    @page {
+        margin: 10mm; /* Reduce los márgenes de la hoja de papel */
+    }
+    
+    /* Ocultar toda la aplicación por defecto */
+    body * {
+        display: none !important;
+    }
+
+    /* Mostrar únicamente el comprobante de impresión inyectado */
+    #impresionVoucher,
+    #impresionVoucher * {
+        display: block !important;
+        visibility: visible !important;
+    }
+
+    #impresionVoucher {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        margin: 0 !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+    }
+
+    #impresionVoucher table {
+        display: table !important;
+        width: 100% !important;
+    }
+
+    #impresionVoucher tr {
+        display: table-row !important;
+    }
+
+    #impresionVoucher td {
+        display: table-cell !important;
+    }
 }
 
 @media (max-width: 992px) {

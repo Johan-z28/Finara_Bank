@@ -41,6 +41,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     const sidebarUserName = document.getElementById("sidebarUserName");
     if (sidebarUserName) sidebarUserName.textContent = nombreUsuario;
 
+    // Sincronizar Avatar en el Navbar
+    const avatarSrc = usuarioActivo?.avatar || (localStorage.getItem('userProfile') ? JSON.parse(localStorage.getItem('userProfile')).avatar : "../Style/image/profile/avatar-maria.png");
+    const navbarAvatarImg = document.getElementById("navbarAvatarImg");
+    if (navbarAvatarImg && avatarSrc) {
+        navbarAvatarImg.src = avatarSrc;
+    }
+
     const mainContent = document.getElementById("mainContent");
     const sidebar = document.getElementById("sidebar");
     const menuToggle = document.getElementById("menuToggle");
@@ -124,28 +131,32 @@ document.addEventListener("DOMContentLoaded", async () => {
             // Inicialización de módulos JS
             switch (vistaMin) {
                 case "dashboard":
-                    try { const m = await import('../Dashboard.js'); if (m.initDashboardView) await m.initDashboardView(); } catch (e) {}
+                    try { const m = await import('../Dashboard.js'); if (m.initDashboardView) await m.initDashboardView(); } catch (e) { }
                     break;
                 case "saldos":
-                    try { const m = await import('../Saldos.js'); if (m.initSaldosView) await m.initSaldosView(); } catch (e) {}
+                    try { const m = await import('../Saldos.js'); if (m.initSaldosView) await m.initSaldosView(); } catch (e) { }
                     break;
                 case "transferencias":
-                    try { const m = await import('../Transferencias.js'); if (m.initTransferenciasView) await m.initTransferenciasView(); } catch (e) {}
+                    try { const m = await import('../Transferencias.js'); if (m.initTransferenciasView) await m.initTransferenciasView(); } catch (e) { }
                     break;
                 case "consignar":
-                    try { const m = await import('../Consignar.js'); if (m.initConsignarView) await m.initConsignarView(); } catch (e) {}
+                    try { const m = await import('../Consignar.js'); if (m.initConsignarView) await m.initConsignarView(); } catch (e) { }
                     break;
                 case "retiros":
-                    try { const m = await import('../Retiros.js'); if (m.initRetirosView) await m.initRetirosView(); } catch (e) {}
+                    try { const m = await import('../Retiros.js'); if (m.initRetirosView) await m.initRetirosView(); } catch (e) { }
                     break;
                 case "solicitarproductos":
-                    try { const m = await import('../newCard.js'); if (m.initSolicitarProductosView) await m.initSolicitarProductosView(); } catch (e) {}
+                    try { const m = await import('../newCard.js'); if (m.initSolicitarProductosView) await m.initSolicitarProductosView(); } catch (e) { }
                     break;
                 case "perfil":
-                    try { const m = await import('../Perfil.js'); if (m.initPerfilView) await m.initPerfilView(); } catch (e) {}
+                    try { const m = await import('../Perfil.js'); if (m.initPerfilView) await m.initPerfilView(); } catch (e) { }
                     break;
                 case "movimientos":
-                    try { const m = await import('../Movimientos.js'); if (m.initMovimientosView) await m.initMovimientosView(); } catch (e) {}
+                    try { const m = await import('../Movimientos.js'); if (m.initMovimientosView) await m.initMovimientosView(); } catch (e) { }
+                    break;
+
+                case "simuladortc":
+                    try { const m = await import('../SimuladorTC.js'); if (m.initSimuladorTCView) await m.initSimuladorTCView(); } catch (e) { console.error(e); }
                     break;
             }
 
@@ -168,7 +179,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             marcarItemActivo(vistaDestino);
             cargarVista(vistaDestino);
-            cerrarMenuMovil(); // Cierra el menú al navegar en celular
+            cerrarMenuMovil();
         }
     });
 
@@ -188,6 +199,70 @@ document.addEventListener("DOMContentLoaded", async () => {
             sessionStorage.clear();
             window.location.href = "../index.html";
         });
+    }
+
+    // ==========================================
+    // LÓGICA INTEGRADA DEL CHATBOT
+    // ==========================================
+    const btnToggleChat = document.getElementById("btnToggleChat");
+    const btnCloseChat = document.getElementById("btnCloseChat");
+    const windowChat = document.getElementById("windowChat");
+    const chatBody = document.getElementById("chatBody");
+
+    if (btnToggleChat && windowChat) {
+        btnToggleChat.addEventListener("click", () => {
+            windowChat.classList.toggle("hidden");
+            if (!windowChat.classList.contains("hidden")) {
+                renderOpcionesIniciales();
+            }
+        });
+
+        if (btnCloseChat) {
+            btnCloseChat.addEventListener("click", () => {
+                windowChat.classList.add("hidden");
+            });
+        }
+
+        const preguntasFrecuentes = [
+            { id: "saldos", texto: "💳 ¿Cómo consultar mis saldos?", respuesta: "Puedes revisar tus saldos y el consolidado general directamente en la sección de **Dashboard** o en la vista de **Saldos** en el menú lateral." },
+            { id: "transferir", texto: "🔄 ¿Cómo hacer una transferencia?", respuesta: "Dirígete a la sección **Transferencias**, selecciona la cuenta de origen, ingresa el número de destino y el monto a transferir de forma inmediata." },
+            { id: "consignar", texto: "➕ ¿Cómo realizar una consignación?", respuesta: "Entra a la opción **Consignar** en el menú, escoge la cuenta receptora, digita el monto y confirma la operación." },
+            { id: "bloquear", texto: "🔒 ¿Cómo bloquear una tarjeta?", respuesta: "Ve a la sección **Saldos**, ubica la tarjeta que deseas proteger y haz clic en el botón de **Bloquear** por seguridad." }
+        ];
+
+        function agregarMensaje(texto, tipo) {
+            const bubble = document.createElement("div");
+            bubble.className = `chat-bubble ${tipo === 'bot' ? 'bot-bubble' : 'user-bubble'}`;
+            bubble.innerHTML = texto;
+            chatBody.appendChild(bubble);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        function renderOpcionesIniciales() {
+            if (chatBody.querySelector(".chat-options")) return;
+
+            const optionsContainer = document.createElement("div");
+            optionsContainer.className = "chat-options";
+
+            preguntasFrecuentes.forEach(item => {
+                const btn = document.createElement("button");
+                btn.className = "chat-option-btn";
+                btn.innerHTML = `<i class="fa-solid fa-chevron-right" style="font-size: 10px; color: var(--gold-main);"></i> ${item.texto}`;
+                btn.addEventListener("click", () => {
+                    agregarMensaje(item.texto, "user");
+                    optionsContainer.remove();
+
+                    setTimeout(() => {
+                        agregarMensaje(item.respuesta, "bot");
+                        setTimeout(renderOpcionesIniciales, 600);
+                    }, 400);
+                });
+                optionsContainer.appendChild(btn);
+            });
+
+            chatBody.appendChild(optionsContainer);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
     }
 
     const vistaInicial = esAdmin ? "admindashboard" : "dashboard";

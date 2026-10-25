@@ -11,236 +11,191 @@
 
 <body class="general-body">
     <!-- ======= PRINCIPAL ======= -->
-    <main class="main-content">
+    <div class="profile-page-header">
+        <div>
+            <h1>Mi perfil</h1>
+        </div>
 
-        <!-- Encabezado -->
-        <div class="profile-page-header">
-            <div>
-                <h1>Mi perfil</h1>
-                <p>Administra tu información personal y mantén tu cuenta segura.</p>
+        <button class="btn-edit-profile">
+            <i class="fa-solid fa-pen"></i>
+            Editar perfil
+        </button>
+    </div>
+
+
+    <!-- TARJETA PRINCIPAL DEL PERFIL -->
+    <section class="profile-hero">
+        <div class="profile-user">
+            <div class="profile-avatar">
+                <img src="../Style/image/profile/avatar-maria.png" alt="Foto de perfil" id="profileAvatarImg">
+                <!-- Input oculto para cambiar la foto al hacer clic en la cámara -->
+                <input type="file" id="inputCambiarFoto" accept="image/*" style="display: none;">
+                <button class="change-photo" id="btnCambiarFoto" title="Cambiar foto de perfil">
+                    <i class="fa-solid fa-camera"></i>
+                </button>
+            </div>
+            <div class="profile-data">
+                <div class="profile-name">
+                    <h2 id="profileHeroName">Johan Zapata</h2>
+                    <span id="profileHeroRole">Cliente</span>
+                </div>
+                <!-- Badge de Verificación Dinámico -->
+                <div class="verification-badge-container" style="margin-top: 12px;">
+                    <span id="verificationStatusBadge"
+                        style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500;">
+                        <i class="fa-solid fa-circle-check"></i> Cuenta Verificada
+                    </span>
+                </div>
+            </div>
+        </div>
+        <!-- Decoración derecha -->
+        <div class="profile-security">
+            <div class="gold-plant">
+                <i class="fa-solid fa-seedling"></i>
+            </div>
+            <div class="security-shield">
+                <i class="fa-solid fa-check"></i>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- BLOQUE SUPERIOR: 3 Columnas -->
+    <section class="profile-grid">
+
+        <!-- Información personal -->
+        <div class="profile-card">
+            <div class="card-title">
+                <div class="card-icon">
+                    <i class="fa-regular fa-user"></i>
+                </div>
+                <h3>Información personal</h3>
             </div>
 
-            <button class="btn-edit-profile">
-                <i class="fa-solid fa-pen"></i>
-                Editar perfil
+            <div class="info-row">
+                <span>Nombre completo</span>
+                <strong>Johan Zapata</strong>
+                <button><i class="fa-solid fa-pen"></i></button>
+            </div>
+
+            <div class="info-row">
+                <span>Correo electrónico</span>
+                <strong>jzapata12345@cesde.net</strong>
+                <button><i class="fa-solid fa-pen"></i></button>
+            </div>
+
+            <div class="info-row">
+                <span>Teléfono</span>
+                <strong>3042020579</strong>
+                <button><i class="fa-solid fa-pen"></i></button>
+            </div>
+
+            <div class="info-row">
+                <span>Dirección</span>
+                <strong>Por definir</strong>
+                <button><i class="fa-solid fa-pen"></i></button>
+            </div>
+        </div>
+
+
+        <!-- Configuración -->
+        <div class="profile-card">
+            <div class="card-title">
+                <div class="card-icon">
+                    <i class="fa-solid fa-gear"></i>
+                </div>
+                <h3>Configuración de cuenta</h3>
+            </div>
+
+            <div class="setting-row">
+                <i class="fa-solid fa-lock"></i>
+                <span>Cambiar contraseña</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </div>
+
+            <div class="setting-row">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Métodos de autenticación</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </div>
+
+            <div class="setting-row">
+                <i class="fa-solid fa-database"></i>
+                <span>Privacidad y datos</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </div>
+        </div>
+
+
+        <!-- Resumen -->
+        <div class="profile-card account-summary">
+            <div class="card-title">
+                <div class="card-icon">
+                    <i class="fa-solid fa-chart-column"></i>
+                </div>
+                <h3>Resumen de tu cuenta</h3>
+            </div>
+
+            <div class="summary-item">
+                <div class="summary-icon green">
+                    <i class="fa-regular fa-credit-card"></i>
+                </div>
+                <div>
+                    <small>Productos activos</small>
+                    <strong>0</strong>
+                </div>
+                <i class="fa-solid fa-chevron-right"></i>
+            </div>
+
+            <div class="summary-item gold">
+                <div class="summary-icon">
+                    <i class="fa-solid fa-coins"></i>
+                </div>
+                <div>
+                    <small>Saldo disponible</small>
+                    <strong>$ 0</strong>
+                </div>
+                <i class="fa-solid fa-chevron-right"></i>
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- BLOQUE INFERIOR: 2 Columnas -->
+    <section class="profile-bottom">
+
+        <div class="bottom-card">
+            <div class="bottom-icon">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div>
+                <h3>Límites y seguridad</h3>
+                <p>Configura tus límites de transacción y mantén tu cuenta protegida.</p>
+            </div>
+            <button>
+                Ver detalles
+                <i class="fa-solid fa-chevron-right"></i>
             </button>
         </div>
 
 
-        <!-- TARJETA PRINCIPAL DEL PERFIL -->
-        <section class="profile-hero">
-            <div class="profile-user">
-                <div class="profile-avatar">
-                    <img src="../Style/image/profile/avatar-maria.png" alt="Foto de perfil" id="profileAvatarImg">
-                    <!-- Input oculto para cambiar la foto al hacer clic en la cámara -->
-                    <input type="file" id="inputCambiarFoto" accept="image/*" style="display: none;">
-                    <button class="change-photo" id="btnCambiarFoto" title="Cambiar foto de perfil">
-                        <i class="fa-solid fa-camera"></i>
-                    </button>
-                </div>
-                <div class="profile-data">
-                    <div class="profile-name">
-                        <h2 id="profileHeroName">Johan Zapata</h2>
-                        <span id="profileHeroRole">Cliente</span>
-                    </div>
-                    <!-- Badge de Verificación Dinámico -->
-                    <div class="verification-badge-container" style="margin-top: 12px;">
-                        <span id="verificationStatusBadge"
-                            style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500;">
-                            <i class="fa-solid fa-circle-check"></i> Cuenta Verificada
-                        </span>
-                    </div>
-                </div>
+        <div class="bottom-card">
+            <div class="bottom-icon">
+                <i class="fa-solid fa-headset"></i>
             </div>
-            <!-- Decoración derecha -->
-            <div class="profile-security">
-                <div class="gold-plant">
-                    <i class="fa-solid fa-seedling"></i>
-                </div>
-                <div class="security-shield">
-                    <i class="fa-solid fa-check"></i>
-                </div>
+            <div>
+                <h3>¿Necesitas ayuda?</h3>
+                <p>Contáctanos si tienes alguna duda o problema.</p>
             </div>
-        </section>
+            <button>
+                Ir al soporte
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
 
+    </section>
 
-        <!-- CONTENEDORES INFERIORES -->
-        <section class="profile-grid">
-
-            <!-- Información personal -->
-            <div class="profile-card">
-
-                <div class="card-title">
-                    <div class="card-icon">
-                        <i class="fa-regular fa-user"></i>
-                    </div>
-
-                    <h3>Información personal</h3>
-                </div>
-
-                <div class="info-row">
-                    <span>Nombre completo</span>
-                    <strong>Johan Zapata</strong>
-                    <button>
-                        <i class="fa-solid fa-pen"></i>
-                    </button>
-                </div>
-
-                <div class="info-row">
-                    <span>Correo electrónico</span>
-                    <strong>jzapata12345@cesde.net</strong>
-                    <button>
-                        <i class="fa-solid fa-pen"></i>
-                    </button>
-                </div>
-
-                <div class="info-row">
-                    <span>Teléfono</span>
-                    <strong>3042020579</strong>
-                    <button>
-                        <i class="fa-solid fa-pen"></i>
-                    </button>
-                </div>
-
-                <div class="info-row">
-                    <span>Dirección</span>
-                    <strong>Por definir</strong>
-                    <button>
-                        <i class="fa-solid fa-pen"></i>
-                    </button>
-                </div>
-
-            </div>
-
-
-            <!-- Configuración -->
-            <div class="profile-card">
-
-                <div class="card-title">
-                    <div class="card-icon">
-                        <i class="fa-solid fa-gear"></i>
-                    </div>
-
-                    <h3>Configuración de cuenta</h3>
-                </div>
-
-                <div class="setting-row">
-                    <i class="fa-solid fa-lock"></i>
-                    <span>Cambiar contraseña</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </div>
-
-                <div class="setting-row">
-                    <i class="fa-regular fa-bell"></i>
-                    <span>Notificaciones</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </div>
-
-                <div class="setting-row">
-                    <i class="fa-solid fa-shield-halved"></i>
-                    <span>Métodos de autenticación</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </div>
-
-                <div class="setting-row">
-                    <i class="fa-solid fa-database"></i>
-                    <span>Privacidad y datos</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </div>
-
-            </div>
-
-
-            <!-- Resumen -->
-            <div class="profile-card account-summary">
-
-                <div class="card-title">
-                    <div class="card-icon">
-                        <i class="fa-solid fa-chart-column"></i>
-                    </div>
-
-                    <h3>Resumen de tu cuenta</h3>
-                </div>
-
-                <div class="summary-item">
-                    <div class="summary-icon green">
-                        <i class="fa-regular fa-credit-card"></i>
-                    </div>
-
-                    <div>
-                        <small>Productos activos</small>
-                        <strong>0</strong>
-                    </div>
-
-                    <i class="fa-solid fa-chevron-right"></i>
-                </div>
-
-                <div class="summary-item gold">
-                    <div class="summary-icon">
-                        <i class="fa-solid fa-coins"></i>
-                    </div>
-
-                    <div>
-                        <small>Saldo disponible</small>
-                        <strong>$ 0</strong>
-                    </div>
-
-                    <i class="fa-solid fa-chevron-right"></i>
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- PARTE INFERIOR -->
-        <section class="profile-bottom">
-
-            <div class="bottom-card">
-
-                <div class="bottom-icon">
-                    <i class="fa-solid fa-shield-halved"></i>
-                </div>
-
-                <div>
-                    <h3>Límites y seguridad</h3>
-                    <p>
-                        Configura tus límites de transacción y mantén
-                        tu cuenta protegida.
-                    </p>
-                </div>
-
-                <button>
-                    Ver detalles
-                    <i class="fa-solid fa-chevron-right"></i>
-                </button>
-
-            </div>
-
-
-            <div class="bottom-card">
-
-                <div class="bottom-icon">
-                    <i class="fa-solid fa-headset"></i>
-                </div>
-
-                <div>
-                    <h3>¿Necesitas ayuda?</h3>
-                    <p>
-                        Contáctanos si tienes alguna duda o problema.
-                    </p>
-                </div>
-
-                <button>
-                    Ir al soporte
-                    <i class="fa-solid fa-chevron-right"></i>
-                </button>
-
-            </div>
-
-        </section>
-
-    </main>
 
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

@@ -50,22 +50,22 @@ export async function initTransferenciasView() {
     const form = $('formTransferencia');
     if (!form) return;
 
-    const selOrigen = $('trOrigen'), selTipo =$('trTipoDestino');
-    const inpNumero = $('trNumeroDestino'), inpMonto = $('trMonto'), inpConcepto =$('trConcepto');
-    const hintOrigen = $('trOrigenHint'), boxDestino =$('trDestino');
+    const selOrigen = $('trOrigen'), selTipo = $('trTipoDestino');
+    const inpNumero = $('trNumeroDestino'), inpMonto = $('trMonto'), inpConcepto = $('trConcepto');
+    const hintOrigen = $('trOrigenHint'), boxDestino = $('trDestino');
 
     const sideInfo = document.querySelector('.tr-info');
-    const sideOrigenSaldo = $('sideOrigenSaldo'), sideOrigenSub = $('sideOrigenSub'), sideOrigenBadge =$('sideOrigenBadge');
-    const sideDestinoTxt = $('sideDestinoTxt'), sideMontoTxt =$('sideMontoTxt');
+    const sideOrigenSaldo = $('sideOrigenSaldo'), sideOrigenSub = $('sideOrigenSub'), sideOrigenBadge = $('sideOrigenBadge');
+    const sideDestinoTxt = $('sideDestinoTxt'), sideMontoTxt = $('sideMontoTxt');
 
-    const btnTransferirTodo = $('btnTransferirTodo'), chipsMonto =$('chipsMonto');
-    const errOrigen = $('errOrigen'), errDestino = $('errDestino'), errMonto =$('errMonto');
-    const vistas = { 1: $('vistaForm'), 2: $('vistaResumen'), 3:$('vistaExito') };
+    const btnTransferirTodo = $('btnTransferirTodo'), chipsMonto = $('chipsMonto');
+    const errOrigen = $('errOrigen'), errDestino = $('errDestino'), errMonto = $('errMonto');
+    const vistas = { 1: $('vistaForm'), 2: $('vistaResumen'), 3: $('vistaExito') };
     const pasos = document.querySelectorAll('.tr-paso');
-    const btnEditar = $('btnEditar'), btnConfirmar =$('btnConfirmar'), btnNueva = $('btnNueva'), btnContinuar =$('btnContinuar');
-    const btnDescargarPDF = $('btnDescargarPDF'), btnVerMovimientos =$('btnVerMovimientos');
-    const resumenError = $('resumenError'), resumenAlerta =$('resumenAlerta');
-    const estadoGlobal = $('trEstado'), toast =$('trToast');
+    const btnEditar = $('btnEditar'), btnConfirmar = $('btnConfirmar'), btnNueva = $('btnNueva'), btnContinuar = $('btnContinuar');
+    const btnDescargarPDF = $('btnDescargarPDF'), btnVerMovimientos = $('btnVerMovimientos');
+    const resumenError = $('resumenError'), resumenAlerta = $('resumenAlerta');
+    const estadoGlobal = $('trEstado'), toast = $('trToast');
 
     let cuentas = [];
     let destino = null;
@@ -606,12 +606,11 @@ export async function initTransferenciasView() {
         });
     }
 
-    // IMPRESIÓN Y DESCARGA DEL COMPROBANTE CON LOGO REAL Y SIN SUPERPOSICIONES
+    // IMPRESIÓN Y DESCARGA DEL COMPROBANTE CON CONTENEDOR OSCURO UNIFICADO
     if (btnDescargarPDF) {
         btnDescargarPDF.addEventListener('click', async () => {
             if (!resultadoFinal) return;
 
-            // Limpiar cualquier voucher previo si existiera
             const previo = document.getElementById('impresionVoucher');
             if (previo) previo.remove();
 
@@ -619,7 +618,6 @@ export async function initTransferenciasView() {
             const tipoDestinoTexto = TIPOS[resultadoFinal.destino.tipo] || resultadoFinal.destino.tipo || 'Cuenta de Ahorros';
             const rutaLogo = '../Style/image/Logo_finara.svg';
 
-            // Convertir el SVG a DataURL para asegurar su visualización rápida
             let logoDataUrl = rutaLogo;
             try {
                 const resp = await fetch(rutaLogo);
@@ -633,65 +631,81 @@ export async function initTransferenciasView() {
 
             const voucher = document.createElement('div');
             voucher.id = 'impresionVoucher';
+            // Se unifica el fondo de todo el contenedor de impresión al color oscuro corporativo
+            voucher.style.cssText = `
+                display: none;
+                background: #121620 !important;
+                color: #ffffff !important;
+                padding: 40px !important;
+                font-family: 'Poppins', Arial, sans-serif !important;
+                width: 100% !important;
+                max-width: 560px !important;
+                margin: 0 auto !important;
+                box-sizing: border-box !important;
+                border: 1px solid rgba(229, 169, 60, 0.4);
+                border-radius: 20px;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            `;
+
             voucher.innerHTML = `
-                <div style="background: #11141d; border: 1px solid rgba(229, 169, 60, 0.35); border-radius: 16px; padding: 2.2rem; width: 100%; max-width: 620px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); box-sizing: border-box;">
-                    
-                    <!-- Encabezado con Logo Oficial de Finara Bank -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 1.4rem; margin-bottom: 1.6rem;">
-                        <img src="${logoDataUrl}" alt="Finara Bank Logo" style="height: 38px; width: auto; max-width: 220px; display: block; object-fit: contain;">
-                        <div>
-                            <span style="font-size: 0.72rem; color: #34d399; font-weight: 700; background: rgba(52, 211, 153, 0.15); padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(52, 211, 153, 0.3); letter-spacing: 0.5px; text-transform: uppercase;">
-                                TRANSACCIÓN EXITOSA
-                            </span>
-                        </div>
+                <!-- Encabezado con Logo y Estado -->
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 18px; margin-bottom: 25px;">
+                    <img src="${logoDataUrl}" alt="Finara Bank Logo" style="height: 38px; width: auto; display: block;">
+                    <div style="font-size: 11px; font-weight: 700; color: #34d399; background: rgba(52, 211, 153, 0.15); border: 1px solid rgba(52, 211, 153, 0.3); padding: 5px 14px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px;">
+                        ✓ Transacción Exitosa
                     </div>
+                </div>
 
-                    <div style="text-align: center; margin-bottom: 1.8rem; display: block !important;">
-                        <h2 style="font-size: 1.35rem; color: #ffffff; font-weight: 700; margin: 0 0 4px 0;">Comprobante de Transferencia</h2>
-                        <p style="font-size: 0.82rem; color: #64748b; margin: 0;">Finara Bank Digital · Certificación de Operación</p>
-                    </div>
+                <!-- Título -->
+                <div style="text-align: center; margin-bottom: 25px;">
+                    <h2 style="font-size: 20px; color: #ffffff; font-weight: 700; margin: 0 0 4px 0;">Comprobante de Transferencia</h2>
+                    <p style="font-size: 11px; color: #94a3b8; margin: 0; letter-spacing: 0.3px;">Finara Bank Digital · Certificación de Operación</p>
+                </div>
 
-                    <!-- Detalles de la transferencia -->
-                    <div style="background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; overflow: hidden; margin-bottom: 1.5rem; display: block !important;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 13px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                            <span style="font-size: 0.82rem; color: #94a3b8;">Referencia</span>
-                            <strong style="font-size: 0.9rem; color: #ffffff; font-family: monospace;">${resultadoFinal.referencia}</strong>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 13px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                            <span style="font-size: 0.82rem; color: #94a3b8;">Fecha y Hora</span>
-                            <strong style="font-size: 0.9rem; color: #ffffff;">${formatoFechaHora.format(new Date(resultadoFinal.fecha))}</strong>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 13px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                            <span style="font-size: 0.82rem; color: #94a3b8;">Producto de Origen</span>
-                            <strong style="font-size: 0.9rem; color: #ffffff;">${textoCuenta(datos.origen)}</strong>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 13px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                            <span style="font-size: 0.82rem; color: #94a3b8;">Destinatario</span>
-                            <div style="text-align: right; display: block !important;">
-                                <div style="font-size: 0.9rem; color: #ffffff; font-weight: 700;">${resultadoFinal.destino.titular}</div>
-                                <div style="font-size: 0.78rem; color: #94a3b8;">${tipoDestinoTexto}</div>
-                                <div style="font-size: 0.82rem; color: #e5a93c; font-family: monospace;">N° ${numDestinoEspaciado}</div>
-                            </div>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 13px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                            <span style="font-size: 0.82rem; color: #94a3b8;">Concepto</span>
-                            <strong style="font-size: 0.9rem; color: #ffffff;">${datos.concepto || 'Sin concepto'}</strong>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; background: rgba(229, 169, 60, 0.08);">
-                            <span style="font-size: 0.88rem; color: #ffffff; font-weight: 700;">Monto Transferido</span>
-                            <strong style="font-size: 1.4rem; color: #e5a93c; font-weight: 800;">${formatoCOP.format(resultadoFinal.monto)}</strong>
-                        </div>
-                    </div>
+                <!-- Bloque de Monto Destacado (Dorado Finara) -->
+                <div style="background: rgba(229, 169, 60, 0.1); border: 1px solid rgba(229, 169, 60, 0.35); border-radius: 14px; padding: 20px; text-align: center; margin-bottom: 25px;">
+                    <div style="font-size: 11px; font-weight: 600; color: #e5a93c; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px;">Monto Transferido</div>
+                    <div style="font-size: 28px; font-weight: 800; color: #e5a93c;">${formatoCOP.format(resultadoFinal.monto)}</div>
+                </div>
 
-                    <div style="text-align: center; font-size: 0.72rem; color: #64748b; margin-top: 1.8rem; border-top: 1px dashed rgba(255, 255, 255, 0.1); padding-top: 1rem; display: block !important;">
-                        Este documento es un comprobante digital válido emitido por Finara Bank S.A.
+                <!-- Detalles -->
+                <div style="background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 14px; padding: 6px 18px; margin-bottom: 25px; font-size: 13px;">
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
+                        <span style="color: #94a3b8; font-weight: 500;">Referencia</span>
+                        <strong style="color: #ffffff; font-family: monospace; font-size: 13px;">${resultadoFinal.referencia}</strong>
                     </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
+                        <span style="color: #94a3b8; font-weight: 500;">Fecha y hora</span>
+                        <strong style="color: #ffffff;">${formatoFechaHora.format(new Date(resultadoFinal.fecha))}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
+                        <span style="color: #94a3b8; font-weight: 500;">Origen</span>
+                        <strong style="color: #ffffff;">${textoCuenta(datos.origen)}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.06); align-items: flex-start;">
+                        <span style="color: #94a3b8; font-weight: 500;">Destinatario</span>
+                        <div style="text-align: right;">
+                            <div style="font-weight: 700; color: #ffffff;">${resultadoFinal.destino.titular}</div>
+                            <div style="font-size: 11px; color: #94a3b8;">${tipoDestinoTexto}</div>
+                            <div style="font-size: 11px; color: #e5a93c; font-family: monospace; font-weight: 600;">N° ${numDestinoEspaciado}</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0;">
+                        <span style="color: #94a3b8; font-weight: 500;">Concepto</span>
+                        <strong style="color: #ffffff;">${datos.concepto || 'Sin concepto'}</strong>
+                    </div>
+                </div>
+
+                <!-- Nota al pie -->
+                <div style="text-align: center; font-size: 10px; color: #64748b; border-top: 1px dashed rgba(255, 255, 255, 0.1); padding-top: 15px; line-height: 1.4;">
+                    Este documento es un comprobante digital válido emitido por Finara Bank S.A.<br>
+                    Garantizado bajo estrictos estándares de seguridad y cifrado digital.
                 </div>
             `;
 
             document.body.appendChild(voucher);
 
-            // Ejecutar la impresión y limpiar el DOM tras cerrar el diálogo
             setTimeout(() => {
                 window.print();
                 voucher.remove();

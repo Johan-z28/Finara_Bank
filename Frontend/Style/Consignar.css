@@ -24,12 +24,7 @@
     font-size: 1.8rem;
     font-weight: 700;
     margin-bottom: 0.3rem;
-    color: #1e293b !important;
-}
-
-.tr-subtitle { 
-    color: #64748b !important; 
-    font-size: 0.9rem; 
+    color: #ffffff;
 }
 
 /* Layout principal alineado idéntico a transferencias */
@@ -311,6 +306,44 @@
     font-size: 0.84rem;
     line-height: 1.4;
     margin: 0;
+}
+
+/* ==========================================
+   CORRECCIÓN DEFINITIVA DE IMPRESIÓN - CONSIGNAR
+   ========================================== */
+@media print {
+    @page {
+        margin: 10mm;
+    }
+    
+    /* Ocultar todo el sitio web por defecto */
+    body * {
+        display: none !important;
+    }
+
+    /* Mostrar el voucher y absolutamente todos sus elementos internos sin excepción */
+    #impresionVoucher,
+    #impresionVoucher * {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    #impresionVoucher {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        background: #121620 !important;
+        color: #ffffff !important;
+    }
+
+    /* Asegurar que las filas de detalles mantengan su diseño de columnas separadas */
+    #impresionVoucher div[style*="display: flex"] {
+        display: flex !important;
+    }
 }
 
 @media (max-width: 992px) {

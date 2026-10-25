@@ -91,10 +91,14 @@ function renderizarPerfil(user) {
     const roleSpan = document.getElementById('profileHeroRole');
     const avatarImg = document.getElementById('profileAvatarImg');
     const verificationBadge = document.getElementById('verificationStatusBadge');
+    
+    // Sincronizar también con el avatar del Navbar superior
+    const navbarAvatarImg = document.getElementById('navbarAvatarImg');
 
     if (nameH2) nameH2.textContent = user.nombre;
     if (roleSpan) roleSpan.textContent = user.rol;
     if (avatarImg && user.avatar) avatarImg.src = user.avatar;
+    if (navbarAvatarImg && user.avatar) navbarAvatarImg.src = user.avatar;
 
     if (verificationBadge) {
         if (user.verificado) {
@@ -308,7 +312,6 @@ async function editarCampoIndividual(row) {
     }
 }
 
-// 🚀 FUNCIÓN CORREGIDA: DESPLIEGA EL MODAL REAL DE CAMBIO DE CONTRASEÑA
 async function manejarOpcionConfiguracion(index) {
     if (index === 0) {
         const userData = JSON.parse(localStorage.getItem('userProfile')) || {};
@@ -416,7 +419,6 @@ function mostrarModalCambiarContrasena(usuario) {
             return;
         }
 
-        // Actualización en Almacenamiento Local
         let userProfile = JSON.parse(localStorage.getItem("userProfile")) || {};
         userProfile.password = nueva;
         userProfile.contrasena = nueva;

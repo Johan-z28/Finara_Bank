@@ -337,24 +337,44 @@ function emitirTarjetaDirecta(usuarioActivo, tipoTarjeta, numeroOficial) {
     usuarioActivo.tarjetasAprobadas.push(datosTarjetaAprobada);
     localStorage.setItem("userProfile", JSON.stringify(usuarioActivo));
 
+    // Formatear el número oficial en bloques de 4 dígitos
+    const numeroLimpio = String(numeroOficial).replace(/\D/g, '');
+    const numeroFormateado = numeroLimpio.replace(/(\d{4})(?=\d)/g, '$1 ');
+
     if (window.Swal) {
         Swal.fire({
-            icon: 'success',
-            title: `¡${tarjetaObj.titulo} Emitida!`,
+            title: `
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding-top: 10px;">
+                    <div style="width: 50px; height: 50px; background: rgba(52, 211, 153, 0.15); border: 1px solid rgba(52, 211, 153, 0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #34d399; font-size: 1.4rem;">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                    <span style="color: #ffffff; font-size: 1.25rem; font-weight: 700;">¡${tarjetaObj.titulo} Emitida!</span>
+                </div>
+            `,
             html: `
-                <p style="color: #cbd5e1; font-size: 0.95rem; margin-bottom: 0.8rem;">
-                    Tu tarjeta ha sido vinculada exitosamente a tu cuenta con el número oficial.
-                </p>
-                <div style="background: rgba(229,169,60,0.1); border: 1px dashed rgba(229,169,60,0.3); padding: 1rem; border-radius: 10px; margin-top: 0.5rem; text-align: center;">
-                    <span style="font-size: 0.75rem; color: #8a8f99; text-transform: uppercase;">Número Oficial Asignado</span>
-                    <h3 style="color: #e5a93c; margin: 0.3rem 0; font-family: monospace; letter-spacing: 1px;">${numeroOficial}</h3>
-                    <small style="color: #34d399;"><i class="fa-solid fa-circle-check"></i> Activa para compras y retiros</small>
+                <div style="font-family: 'Poppins', sans-serif; text-align: left; padding: 0.5rem 0;">
+                    <p style="color: #94a3b8; font-size: 0.88rem; text-align: center; margin-bottom: 1.2rem; line-height: 1.5;">
+                        Tu tarjeta ha sido vinculada exitosamente a tu cuenta con el número oficial asignado.
+                    </p>
+                    
+                    <div style="background: linear-gradient(135deg, rgba(229, 169, 60, 0.08) 0%, rgba(17, 20, 29, 0.9) 100%); border: 1px solid rgba(229, 169, 60, 0.3); padding: 1.2rem; border-radius: 14px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.4);">
+                        <span style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; display: block; margin-bottom: 6px;">Número Oficial Asignado</span>
+                        <div style="color: #e5a93c; font-size: 1.25rem; font-weight: 700; font-family: 'Courier New', Courier, monospace; letter-spacing: 2px; margin-bottom: 8px;">
+                            ${numeroFormateado}
+                        </div>
+                        <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(52, 211, 153, 0.12); border: 1px solid rgba(52, 211, 153, 0.3); padding: 3px 10px; border-radius: 20px; color: #34d399; font-size: 0.78rem; font-weight: 500;">
+                            <i class="fa-solid fa-circle-check"></i> Activa para compras y retiros
+                        </div>
+                    </div>
                 </div>
             `,
             confirmButtonColor: '#e5a93c',
             confirmButtonText: 'Ver en Saldos',
-            background: '#12151c',
-            color: '#ffffff'
+            background: '#0d1017',
+            color: '#ffffff',
+            customClass: {
+                popup: 'swal2-custom-popup'
+            }
         }).then(() => {
             const linkSaldos = document.querySelector('[data-view="saldos"]');
             if (linkSaldos) linkSaldos.click();

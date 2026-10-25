@@ -7,6 +7,7 @@
     <title>Finara Bank | Banca Digital</title>
     <link rel="icon" type="image/png" sizes="32x32" href="../Style/image/favicon.svg">
     <link rel="stylesheet" href="../Style/global/styles.css">
+    <link rel="stylesheet" href="../Style/Dashboard.css">
     <link rel="stylesheet" href="../Style/admin.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
@@ -38,7 +39,7 @@
                 <li class="nav-item">
                     <a href="#" class="nav-link" data-view="saldos" title="Saldos">
                         <i class="fa-solid fa-wallet"></i>
-                        <span>Saldos</span>
+                        <span>Mis Cuentas</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -90,17 +91,18 @@
                     <i class="fa-solid fa-bars"></i>
                 </button>
                 <div class="user-greeting">
-                    <h2>Hola, <span id="greetingName">Johan Zapata</span></h2>
+                    <h2>Hola, <span id="greetingName">Usuario</span></h2>
                 </div>
             </div>
 
             <div class="navbar-actions">
                 <a href="#" class="btn-perfil-navbar" data-view="perfil" title="Mi perfil">
                     <div class="navbar-user-avatar">
-                        <i class="fa-solid fa-user"></i>
+                        <img src="../Style/image/profile/avatarDefault.png" alt="Avatar" id="navbarAvatarImg"
+                            style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                     </div>
                     <div class="navbar-user-info">
-                        <strong id="sidebarUserName">Johan Zapata</strong>
+                        <strong id="sidebarUserName">Usuario</strong>
                         <span>Ver perfil</span>
                     </div>
                     <i class="fa-solid fa-chevron-right navbar-user-arrow"></i>
@@ -112,6 +114,37 @@
         <main class="main-content" id="mainContent">
             <!-- Vistas inyectadas por app.js -->
         </main>
+
+        <!-- ======= WIDGET Y VENTANA FLOTANTE DEL CHATBOT ======= -->
+        <div id="chatWidgetContainer">
+            <div id="windowChat" class="chatbot-window hidden">
+                <div class="chatbot-header">
+                    <div class="chatbot-info">
+                        <div class="bot-avatar-container">
+                            <img src="../Style/image/bot_finara.png" alt="Finara Bot" class="bot-avatar-img">
+                        </div>
+                        <div>
+                            <h6>Asistente Finara</h6>
+                            <small class="status-online">• En línea</small>
+                        </div>
+                    </div>
+                    <button id="btnCloseChat" class="close-chat-btn">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div id="chatBody" class="chatbot-body">
+                    <div class="chat-bubble bot-bubble">
+                        ¡Hola! 👋 Soy tu asistente virtual de <strong>Finara Bank</strong>. ¿En qué puedo ayudarte hoy
+                        con tus tarjetas o saldos?
+                    </div>
+                </div>
+            </div>
+
+            <button id="btnToggleChat" class="chatbot-float-btn" title="Asesoría Financiera">
+                <img src="../Style/image/bot_finara.png" alt="Finara Bot" class="float-btn-img">
+            </button>
+        </div>
     </div>
 
     <script type="module" src="../Vanilla/Global/app.js"></script>

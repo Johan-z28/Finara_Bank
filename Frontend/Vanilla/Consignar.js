@@ -171,7 +171,6 @@ function poblarSelectorTarjetasDestino(usuario, selectDestino) {
         if (tipoLabel === 'CORRIENTE') tipoLabel = 'Cuenta Corriente';
         if (tipoLabel === 'TARJETA_CREDITO' || tipoLabel === 'CREDITO') tipoLabel = 'Tarjeta de Crédito';
 
-        // 🚀 Requerimiento: Solo tipo de cuenta y número enmascarado
         option.textContent = `${tipoLabel} · •••• ${numLimpio.slice(-4)}`;
         selectDestino.appendChild(option);
     });
@@ -190,52 +189,72 @@ function generarComprobanteConsignacion({ referencia, fecha, tipoProducto, numer
 
     const voucher = document.createElement('div');
     voucher.id = 'impresionVoucher';
+    voucher.style.cssText = `
+        display: none;
+        background: #121620 !important;
+        color: #ffffff !important;
+        padding: 30px !important;
+        font-family: 'Poppins', Arial, sans-serif !important;
+        width: 100% !important;
+        max-width: 520px !important;
+        height: auto !important;
+        margin: 0 auto !important;
+        box-sizing: border-box !important;
+        border: 1px solid rgba(229, 169, 60, 0.4);
+        border-radius: 18px;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    `;
+
     voucher.innerHTML = `
-        <div style="background: #11141d; border: 1px solid rgba(229, 169, 60, 0.35); border-radius: 16px; padding: 2.2rem; width: 100%; max-width: 620px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); box-sizing: border-box; font-family: system-ui, sans-serif;">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 1.4rem; margin-bottom: 1.6rem;">
-                <img src="${logoDataUrl}" alt="Finara Bank Logo" style="height: 38px; width: auto; max-width: 220px; display: block; object-fit: contain;">
-                <div>
-                    <span style="font-size: 0.72rem; color: #34d399; font-weight: 700; background: rgba(52, 211, 153, 0.15); padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(52, 211, 153, 0.3); letter-spacing: 0.5px; text-transform: uppercase;">
-                        CONSIGNACIÓN EXITOSA
-                    </span>
-                </div>
+        <!-- Encabezado con Logo y Estado -->
+        <div style="display: flex !important; justify-content: space-between !important; align-items: center !important; border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important; padding-bottom: 15px !important; margin-bottom: 20px !important;">
+            <img src="${logoDataUrl}" alt="Finara Bank Logo" style="height: 36px !important; width: auto !important; display: block !important;">
+            <div style="font-size: 10px !important; font-weight: 700 !important; color: #34d399 !important; background: rgba(52, 211, 153, 0.15) !important; border: 1px solid rgba(52, 211, 153, 0.3) !important; padding: 5px 12px !important; border-radius: 20px !important; text-transform: uppercase !important; letter-spacing: 0.5px !important;">
+                ✓ Consignación Exitosa
             </div>
+        </div>
 
-            <div style="text-align: center; margin-bottom: 1.8rem;">
-                <h2 style="font-size: 1.35rem; color: #ffffff; font-weight: 700; margin: 0 0 4px 0;">Comprobante de Consignación</h2>
-                <p style="font-size: 0.82rem; color: #64748b; margin: 0;">Finara Bank Digital · Certificación de Operación</p>
-            </div>
+        <!-- Título -->
+        <div style="text-align: center !important; margin-bottom: 20px !important;">
+            <h2 style="font-size: 19px !important; color: #ffffff !important; font-weight: 700 !important; margin: 0 0 3px 0 !important;">Comprobante de Consignación</h2>
+            <p style="font-size: 11px !important; color: #94a3b8 !important; margin: 0 !important;">Finara Bank Digital · Certificación de Operación</p>
+        </div>
 
-            <div style="background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; overflow: hidden; margin-bottom: 1.5rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 13px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                    <span style="font-size: 0.82rem; color: #94a3b8;">Referencia</span>
-                    <strong style="font-size: 0.9rem; color: #ffffff; font-family: monospace;">${referencia}</strong>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 13px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                    <span style="font-size: 0.82rem; color: #94a3b8;">Fecha y Hora</span>
-                    <strong style="font-size: 0.9rem; color: #ffffff;">${formatoFechaHora.format(new Date(fecha))}</strong>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 13px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                    <span style="font-size: 0.82rem; color: #94a3b8;">Producto Abonado</span>
-                    <strong style="font-size: 0.9rem; color: #ffffff;">${tipoProducto} · •••• ${ultimos4(numero)}</strong>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 13px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                    <span style="font-size: 0.82rem; color: #94a3b8;">Concepto</span>
-                    <strong style="font-size: 0.9rem; color: #ffffff;">${concepto || 'Recarga de saldo'}</strong>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 13px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                    <span style="font-size: 0.82rem; color: #94a3b8;">Nuevo Saldo / Cupo</span>
-                    <strong style="font-size: 0.9rem; color: #34d399;">${formatoCOP.format(nuevoSaldo)}</strong>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; background: rgba(229, 169, 60, 0.08);">
-                    <span style="font-size: 0.88rem; color: #ffffff; font-weight: 700;">Monto Recargado</span>
-                    <strong style="font-size: 1.4rem; color: #e5a93c; font-weight: 800;">${formatoCOP.format(monto)}</strong>
-                </div>
-            </div>
+        <!-- Bloque de Monto Destacado (Dorado Finara) -->
+        <div style="background: rgba(229, 169, 60, 0.1) !important; border: 1px solid rgba(229, 169, 60, 0.35) !important; border-radius: 14px !important; padding: 18px !important; text-align: center !important; margin-bottom: 20px !important;">
+            <div style="font-size: 11px !important; font-weight: 600 !important; color: #e5a93c !important; text-transform: uppercase !important; margin-bottom: 3px !important; letter-spacing: 0.5px !important;">Monto Recargado</div>
+            <div style="font-size: 26px !important; font-weight: 800 !important; color: #e5a93c !important;">${formatoCOP.format(monto)}</div>
+        </div>
 
-            <div style="text-align: center; font-size: 0.72rem; color: #64748b; margin-top: 1.8rem; border-top: 1px dashed rgba(255, 255, 255, 0.1); padding-top: 1rem;">
-                Este documento es un comprobante digital válido emitido por Finara Bank S.A.
+        <!-- Detalles con visibilidad y bloques seguros -->
+        <div style="background: rgba(0, 0, 0, 0.25) !important; border: 1px solid rgba(255, 255, 255, 0.06) !important; border-radius: 14px !important; padding: 10px 18px !important; margin-bottom: 20px !important; font-size: 12px !important;">
+            <div style="display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 10px 0 !important; border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;">
+                <span style="color: #94a3b8 !important; font-weight: 500 !important;">Referencia</span>
+                <strong style="color: #ffffff !important; font-family: monospace !important; font-size: 13px !important;">${referencia}</strong>
             </div>
+            <div style="display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 10px 0 !important; border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;">
+                <span style="color: #94a3b8 !important; font-weight: 500 !important;">Fecha y hora</span>
+                <strong style="color: #ffffff !important;">${formatoFechaHora.format(new Date(fecha))}</strong>
+            </div>
+            <div style="display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 10px 0 !important; border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;">
+                <span style="color: #94a3b8 !important; font-weight: 500 !important;">Producto Abonado</span>
+                <strong style="color: #ffffff !important;">${tipoProducto} · •••• ${ultimos4(numero)}</strong>
+            </div>
+            <div style="display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 10px 0 !important; border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;">
+                <span style="color: #94a3b8 !important; font-weight: 500 !important;">Concepto</span>
+                <strong style="color: #ffffff !important;">${concepto || 'Recarga de saldo'}</strong>
+            </div>
+            <div style="display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 10px 0 !important;">
+                <span style="color: #94a3b8 !important; font-weight: 500 !important;">Nuevo Saldo / Cupo</span>
+                <strong style="color: #34d399 !important; font-weight: 700 !important;">${formatoCOP.format(nuevoSaldo)}</strong>
+            </div>
+        </div>
+
+        <!-- Nota al pie -->
+        <div style="text-align: center !important; font-size: 10px !important; color: #64748b !important; border-top: 1px dashed rgba(255, 255, 255, 0.1) !important; padding-top: 12px !important; line-height: 1.4 !important;">
+            Este documento es un comprobante digital válido emitido por Finara Bank S.A.<br>
+            Garantizado bajo estrictos estándares de seguridad y cifrado digital.
         </div>
     `;
 
@@ -316,7 +335,6 @@ function procesarRecargaPropia(usuarioActivo) {
         });
         localStorage.setItem('finara_cuentas', JSON.stringify(todasLasCuentas));
 
-        // 🚀 Requerimiento: Botones de Descargar Comprobante, Ver saldos y Cerrar
         Swal.fire({
             icon: 'success',
             title: '¡Abono a Tarjeta Exitoso!',
@@ -374,7 +392,6 @@ function procesarRecargaPropia(usuarioActivo) {
             console.error("Error al registrar movimiento:", e);
         }
 
-        // 🚀 Requerimiento: Alerta con Descargar Comprobante, Ver saldos y Cerrar
         Swal.fire({
             icon: 'success',
             title: '¡Recarga Exitosa!',

@@ -1,7 +1,7 @@
 @import url('global/styles.css');
 
 /* ==========================================
-   VISTA SALDOS - RESPONSIVE & CONTRASTE FIX
+   VISTA SALDOS - TARJETAS PLÁSTICAS UNIFICADAS
    ========================================== */
 
 .saldos-container {
@@ -22,14 +22,8 @@
 .saldos-header h1 {
     font-size: 1.6rem;
     font-weight: 700;
-    color: #0f172a;
+    color: #ffffff;
     margin: 0;
-}
-
-.saldos-subtitle {
-    color: #64748b;
-    font-size: 0.85rem;
-    margin-top: 4px;
 }
 
 .saldos-actions-group {
@@ -72,22 +66,26 @@
 /* GRILLA DE TARJETAS ADAPTATIVA */
 .cuentas-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 420px));
+    justify-content: center; /* Centra automáticamente la tarjeta cuando hay 1 sola */
+    gap: 1.5rem;
     width: 100%;
+    box-sizing: border-box;
 }
 
 .cuenta-card {
-    background: var(--bg-card-dark-glass);
+    background: var(--bg-card-dark-glass, rgba(17, 20, 29, 0.85));
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--bg-card-border);
-    border-radius: var(--radius-card);
-    padding: 1.25rem;
+    border: 1px solid var(--bg-card-border, rgba(255, 255, 255, 0.08));
+    border-radius: var(--radius-card, 16px);
+    padding: 1.6rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    box-shadow: var(--shadow-card);
+    gap: 1.2rem;
+    box-shadow: var(--shadow-card, 0 10px 30px rgba(0, 0, 0, 0.4));
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .cuenta-card__meta-container {
@@ -123,98 +121,138 @@
     border: 1px solid rgba(248, 113, 113, 0.3);
 }
 
+/* ======= PLÁSTICO FÍSICO IDÉNTICO A SOLICITAR PRODUCTOS ======= */
 .tarjeta-plastico {
-    width: 100%;
-    height: 185px;
-    border-radius: 16px;
-    padding: 18px 20px;
-    box-sizing: border-box;
+    width: 100% !important;
+    max-width: 420px !important; /* Limita el ancho máximo para que no se estire de más */
+    aspect-ratio: 1.58 / 1 !important;
+    height: auto !important;
+    min-height: unset !important;
+    max-height: none !important;
+    border-radius: 14px !important;
+    padding: 18px 20px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6) !important;
+    margin: 0 auto 0.5rem auto !important; /* Centra la tarjeta dentro de su contenedor */
+}
+
+.cuenta-card {
+    background: var(--bg-card-dark-glass, rgba(17, 20, 29, 0.85));
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--bg-card-border, rgba(255, 255, 255, 0.08));
+    border-radius: var(--radius-card, 16px);
+    padding: 1.6rem;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55);
+    gap: 1.2rem;
+    box-shadow: var(--shadow-card, 0 10px 30px rgba(0, 0, 0, 0.4));
+    width: 100%;
+    max-width: 440px; /* Limita el ancho de la tarjeta para que luzca compacta y profesional */
+    box-sizing: border-box;
 }
 
+/* Tipos de plásticos y colores */
 .tarjeta-dorada {
-    background: linear-gradient(135deg, #f3be58 0%, #a1701e 100%);
-    border: 1px solid #ffe3a3;
+    background: linear-gradient(135deg, #e5a93c 0%, #9e6f1a 100%);
+    border: 1px solid #fce09b;
 }
-.tarjeta-dorada * { color: #000000 !important; }
+.tarjeta-dorada .card-number,
+.tarjeta-dorada .card-type,
+.tarjeta-dorada .card-tag,
+.tarjeta-dorada .card-contactless {
+    color: #ffffff !important;
+}
 
 .tarjeta-platino {
-    background: linear-gradient(135deg, #e2e8f0 0%, #808ea3 100%);
+    background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%);
     border: 1px solid #ffffff;
 }
-.tarjeta-platino * { color: #0f172a !important; }
+.tarjeta-platino .card-number,
+.tarjeta-platino .card-type,
+.tarjeta-platino .card-tag,
+.tarjeta-platino .card-contactless {
+    color: #0f172a !important;
+}
 
 .tarjeta-negra {
-    background: linear-gradient(135deg, #242c3d 0%, #0d1017 100%);
-    border: 1px solid #3d4861;
+    background: linear-gradient(135deg, #1f2533 0%, #0d1017 100%);
+    border: 1px solid #2d3548;
 }
-.tarjeta-negra * { color: #ffffff !important; }
 
 .head-tarjeta {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
 }
 
 .logo-svg {
-    height: 26px;
+    height: 36px; /* Logotipo grande y proporcionado */
     width: auto;
 }
 
 .card-contactless {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     transform: rotate(90deg);
+    opacity: 0.9;
 }
 
 .card-chip-area {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 12px;
+    margin: 4px 0;
 }
 
 .chip {
-    width: 42px;
-    height: 30px;
-    background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 100%);
-    border-radius: 6px;
+    width: 40px;
+    height: 28px;
+    background: linear-gradient(135deg, #fce09b 0%, #8a6218 100%);
+    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
 }
 
 .card-tag {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     font-weight: 700;
+    letter-spacing: 0.8px;
     text-transform: uppercase;
 }
 
 .foot-tarjeta {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-end;
+    width: 100%;
 }
 
 .card-number {
     font-family: 'Courier New', Courier, monospace;
-    font-size: 1.05rem;
+    font-size: 1rem;
     font-weight: 700;
-    letter-spacing: 1.5px;
+    letter-spacing: 2.5px;
 }
 
 .card-type {
     font-weight: 900;
     font-style: italic;
     font-size: 1.15rem;
+    letter-spacing: 1px;
 }
 
+/* DETALLES DE CUENTA Y SALDOS */
 .cuenta-card__tipo-titulo {
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     font-weight: 600;
     color: #ffffff !important;
 }
 
 .cuenta-card__sub-numero {
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     color: #94a3b8 !important;
     font-family: monospace;
 }
@@ -224,27 +262,28 @@
     justify-content: space-between;
     align-items: center;
     background: rgba(0, 0, 0, 0.4);
-    padding: 0.8rem 1rem;
+    padding: 0.9rem 1.1rem;
     border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .cuenta-card__saldo-label {
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     color: #94a3b8 !important;
 }
 
 .cuenta-card__valor-monto {
-    font-size: 1.15rem;
+    font-size: 1.2rem;
     font-weight: 700;
-    color: var(--gold-main) !important;
+    color: var(--gold-main, #e5a93c) !important;
+    font-family: monospace;
 }
 
-/* ACCIONES DE TARJETA Y ESPACIADO */
+/* ACCIONES DE TARJETA */
 .cuenta-card__acciones-grupo {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     width: 100%;
     margin-top: 4px;
 }
@@ -253,18 +292,17 @@
     width: 100%;
     background: linear-gradient(135deg, #e5a93c 0%, #c48b28 100%);
     border: none;
-    color: #000000;
-    padding: 0.8rem;
+    color: #07090e;
+    padding: 0.85rem;
     border-radius: 12px;
     font-weight: 700;
-    font-size: 0.85rem;
+    font-size: 0.88rem;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
     box-shadow: 0 4px 14px rgba(229, 169, 60, 0.3);
-    margin-bottom: 2px;
     transition: all 0.2s ease;
 }
 
@@ -283,32 +321,34 @@
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.12);
     color: #ffffff;
-    padding: 0.65rem;
+    padding: 0.7rem;
     border-radius: 10px;
     font-size: 0.82rem;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .btn-tarjeta-accion:hover {
     background: rgba(229, 169, 60, 0.2);
-    border-color: var(--gold-main);
+    border-color: var(--gold-main, #e5a93c);
+    color: var(--gold-main, #e5a93c);
 }
 
-/* ANALÍTICA Y PUNTOS DE LEYENDA */
+/* ANALÍTICA Y PATRIMONIO */
 .saldos-analitica-grid {
     display: grid;
     grid-template-columns: 1.3fr 1fr;
-    gap: 1.25rem;
+    gap: 1.5rem;
     width: 100%;
 }
 
 .analitica-card {
-    background: var(--bg-card-dark-glass);
+    background: var(--bg-card-dark-glass, rgba(17, 20, 29, 0.85));
     backdrop-filter: blur(16px);
-    border: 1px solid var(--bg-card-border);
-    border-radius: var(--radius-card);
-    padding: 1.25rem;
+    border: 1px solid var(--bg-card-border, rgba(255, 255, 255, 0.08));
+    border-radius: var(--radius-card, 16px);
+    padding: 1.6rem;
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -321,7 +361,7 @@
 }
 
 .analitica-card__subtitle {
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     color: #cbd5e1 !important;
 }
 
@@ -371,6 +411,7 @@
     color: #ffffff !important;
     display: block;
     margin-top: 2px;
+    font-family: monospace;
 }
 
 .leyenda-pct-val {
@@ -397,9 +438,9 @@
     font-weight: 700;
     color: #ffffff !important;
     margin-top: 4px;
+    font-family: monospace;
 }
 
-/* CORRECCIÓN DE COLOR EN "Fondos disponibles para operaciones" */
 .patrimonio-bage,
 .patrimonio-badge {
     color: #e2e8f0 !important;
@@ -417,7 +458,45 @@
     font-size: 0.9rem;
 }
 
-/* RESPONSIVE MÓVIL */
+/* ==========================================
+   OPERACIONES RÁPIDAS EN TARJETAS DE SALDOS
+   ========================================== */
+.acciones-operaciones-rapidas {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    width: 100%;
+}
+
+.btn-operacion-rapida {
+    background: rgba(229, 169, 60, 0.1);
+    border: 1px solid rgba(229, 169, 60, 0.3);
+    color: #e5a93c;
+    padding: 0.65rem 0.4rem;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+}
+
+.btn-operacion-rapida i {
+    font-size: 0.95rem;
+}
+
+.btn-operacion-rapida:hover {
+    background: linear-gradient(135deg, #e5a93c 0%, #c48b28 100%);
+    color: #07090e;
+    border-color: #fce09b;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(229, 169, 60, 0.3);
+}
+
+/* RESPONSIVE */
 @media (max-width: 900px) {
     .cuentas-grid { grid-template-columns: 1fr; }
     .saldos-analitica-grid { grid-template-columns: 1fr; }
@@ -426,25 +505,5 @@
 @media (max-width: 480px) {
     .saldos-container { gap: 1rem; }
     .saldos-header h1 { font-size: 1.3rem; }
-    .btn-solicitar-cabecera span { display: none; }
-    .btn-solicitar-cabecera {
-        padding: 10px;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        justify-content: center;
-    }
     .cuenta-card { padding: 1rem; }
-    .tarjeta-plastico {
-        height: 165px;
-        padding: 12px 14px;
-    }
-    .card-number {
-        font-size: 0.88rem;
-        letter-spacing: 0.8px;
-    }
-    .distribucion-leyenda-grid {
-        grid-template-columns: 1fr;
-        gap: 0.8rem;
-    }
 }

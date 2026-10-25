@@ -1,5 +1,5 @@
 /* ==========================================
-   DASHBOARD / PANORAMA GENERAL
+   DASHBOARD / PANORAMA GENERAL (FINARA)
    ========================================== */
 
 .dash-container {
@@ -22,51 +22,54 @@
 }
 
 .dash-card-metric {
-    background: linear-gradient(145deg, #101319 0%, #0a0c10 100%);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 16px;
-    padding: 1.4rem;
+    background: var(--bg-card-dark-glass, rgba(17, 20, 29, 0.85)) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--bg-card-border, rgba(255, 255, 255, 0.08)) !important;
+    border-radius: var(--radius-card, 16px);
+    padding: 1.6rem;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    gap: 10px;
+    box-shadow: var(--shadow-card, 0 10px 30px rgba(0, 0, 0, 0.4));
     transition: transform 0.2s ease, border-color 0.2s ease;
+    box-sizing: border-box;
 }
 
 .dash-card-metric:hover {
-    border-color: rgba(229, 169, 60, 0.3);
+    border-color: rgba(229, 169, 60, 0.4);
     transform: translateY(-2px);
 }
 
 .dash-card-metric--highlight {
-    background: linear-gradient(135deg, rgba(229, 169, 60, 0.12) 0%, #101319 100%);
-    border: 1px solid rgba(229, 169, 60, 0.3);
+    background: linear-gradient(135deg, rgba(229, 169, 60, 0.12) 0%, rgba(17, 20, 29, 0.9) 100%) !important;
+    border: 1px solid rgba(229, 169, 60, 0.4);
 }
 
 .dash-metric-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: var(--text-muted);
+    color: var(--text-muted, #94a3b8);
     font-size: 0.82rem;
     font-weight: 500;
 }
 
 .dash-metric-header i {
     font-size: 1.15rem;
-    color: var(--gold-main);
+    color: var(--gold-main, #e5a93c);
 }
 
 .dash-metric-value {
     font-size: 1.65rem;
     font-weight: 700;
-    color: var(--text-white);
+    color: var(--text-white, #ffffff);
     letter-spacing: -0.5px;
 }
 
 .dash-metric-sub {
     font-size: 0.75rem;
-    color: var(--text-muted);
+    color: var(--text-muted, #94a3b8);
     display: flex;
     align-items: center;
     gap: 6px;
@@ -103,7 +106,7 @@
 .dash-btn-action--transfer {
     background: rgba(229, 169, 60, 0.1);
     border: 1px solid rgba(229, 169, 60, 0.3);
-    color: var(--gold-main);
+    color: var(--gold-main, #e5a93c);
 }
 
 .dash-btn-action--transfer:hover {
@@ -130,11 +133,14 @@
 }
 
 .dash-panel {
-    background: linear-gradient(145deg, #101319 0%, #0a0c10 100%);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 16px;
-    padding: 1.5rem;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+    background: var(--bg-card-dark-glass, rgba(17, 20, 29, 0.85)) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--bg-card-border, rgba(255, 255, 255, 0.08)) !important;
+    border-radius: var(--radius-card, 16px);
+    padding: 1.8rem;
+    box-shadow: var(--shadow-card, 0 10px 30px rgba(0, 0, 0, 0.4));
+    box-sizing: border-box;
 }
 
 .dash-panel-header {
@@ -142,17 +148,19 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.2rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .dash-panel-header h3 {
-    color: var(--text-white);
-    font-size: 1.05rem;
-    font-weight: 600;
+    color: var(--text-white, #ffffff);
+    font-size: 1.15rem;
+    font-weight: 700;
     margin: 0;
 }
 
 .dash-panel-link {
-    color: var(--gold-main);
+    color: var(--gold-main, #e5a93c);
     font-size: 0.8rem;
     text-decoration: none;
     font-weight: 600;
@@ -178,14 +186,15 @@
     justify-content: space-between;
     align-items: center;
     padding: 12px 14px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 12px;
-    transition: background 0.2s ease;
+    transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .dash-account-item:hover {
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(0, 0, 0, 0.5);
+    border-color: rgba(229, 169, 60, 0.3);
 }
 
 .dash-account-info {
@@ -199,7 +208,7 @@
     height: 38px;
     border-radius: 10px;
     background: rgba(229, 169, 60, 0.12);
-    color: var(--gold-main);
+    color: var(--gold-main, #e5a93c);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -208,17 +217,17 @@
 
 .dash-account-details strong {
     display: block;
-    color: var(--text-white);
+    color: var(--text-white, #ffffff);
     font-size: 0.85rem;
 }
 
 .dash-account-details span {
-    color: var(--text-muted);
+    color: var(--text-muted, #94a3b8);
     font-size: 0.75rem;
 }
 
 .dash-account-balance {
-    color: var(--gold-main);
+    color: var(--gold-main, #e5a93c);
     font-weight: 700;
     font-size: 0.95rem;
 }
@@ -235,7 +244,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 10px 12px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .dash-mov-item:last-child {
@@ -257,13 +266,13 @@
 
 .dash-mov-desc strong {
     display: block;
-    color: var(--text-white);
+    color: var(--text-white, #ffffff);
     font-size: 0.82rem;
     font-weight: 500;
 }
 
 .dash-mov-desc small {
-    color: var(--text-muted);
+    color: var(--text-muted, #94a3b8);
     font-size: 0.72rem;
 }
 
@@ -276,7 +285,7 @@
 .dash-mov-value--egreso { color: #f87171; }
 
 .dash-empty {
-    color: var(--text-muted);
+    color: var(--text-muted, #94a3b8);
     font-size: 0.85rem;
     padding: 8px 0;
 }
