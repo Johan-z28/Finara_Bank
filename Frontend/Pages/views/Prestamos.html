@@ -9,44 +9,113 @@
 <body>
     <div class="prestamo-container">
         <div class="prestamo-header">
-            <h1>Simulador y Solicitud de Préstamo</h1>
-            <p class="prestamo-subtitle">Obtén financiación inmediata con evaluación inteligente y transparente.</p>
+            <h1>Módulo de Créditos y Préstamos</h1>
+            <p class="prestamo-subtitle">Simula, compara, solicita y gestiona el estado de tus financiaciones en tiempo real.</p>
         </div>
 
-        <div class="prestamo-grid">
-            <!-- Formulario de Simulación -->
-            <section class="prestamo-panel">
-                <h3>Configura tu Préstamo</h3>
-                <form id="formPrestamo" class="prestamo-form">
-                    <div class="prestamo-campo">
-                        <label>Monto a solicitar (COP)</label>
-                        <input type="text" id="prestamoMonto" placeholder="Ej. 5.000.000" required>
-                    </div>
-                    <div class="prestamo-campo">
-                        <label>Plazo en meses</label>
-                        <select id="prestamoPlazo">
-                            <option value="6">6 meses</option>
-                            <option value="12" selected>12 meses</option>
-                            <option value="24">24 meses</option>
-                            <option value="36">36 meses</option>
-                        </select>
-                    </div>
-                    <div class="prestamo-campo">
-                        <label>Destino del Crédito / Concepto</label>
-                        <input type="text" id="prestamoConcepto" placeholder="Ej. Compra de inventario, libre inversión, etc.">
-                    </div>
-                    <button type="submit" class="btn-solicitar-prestamo">Evaluar y Solicitar Préstamo</button>
-                </form>
-            </section>
+        <!-- PESTAÑAS DE NAVEGACIÓN -->
+        <div class="prestamo-tabs">
+            <button class="prestamo-tab-btn active" data-tab="tab-dashboard">Mis Créditos Activos</button>
+            <button class="prestamo-tab-btn" data-tab="tab-comparador">Comparador de Créditos</button>
+            <button class="prestamo-tab-btn" data-tab="tab-solicitud">Simular y Solicitar</button>
+            <button class="prestamo-tab-btn" data-tab="tab-consulta">Consultar Radicado</button>
+        </div>
 
-            <!-- Panel de Resultados y Términos -->
-            <section class="prestamo-panel prestamo-panel-footer-between">
-                <div>
-                    <h3>Resumen y Condiciones</h3>
+        <!-- TAB 1: DASHBOARD DE CRÉDITOS ACTIVOS Y PAGO DE CUOTAS (HU-16) -->
+        <div id="tab-dashboard" class="prestamo-tab-content active">
+            <div class="prestamo-panel" style="margin-bottom: 1.5rem;">
+                <h3>Resumen de Créditos Activos</h3>
+                <div id="dashboardCreditosList" style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Cargando tus créditos activos...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: COMPARADOR MULTI-COLUMNA (HU-27) -->
+        <div id="tab-comparador" class="prestamo-tab-content" style="display: none;">
+            <div class="prestamo-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                <!-- Opción 1: Libre Inversión -->
+                <section class="prestamo-panel" style="border-top: 4px solid var(--gold-main);">
+                    <h3>Libre Inversión</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">Ideal para cualquier proyecto personal, viajes o imprevistos.</p>
+                    <div class="prestamo-resumen-box" style="margin-top: 10px;">
+                        <div class="prestamo-resumen-fila"><span>Tasa E.A.:</span><strong>24%</strong></div>
+                        <div class="prestamo-resumen-fila"><span>Tasa Mes Vencido:</span><strong>1.8%</strong></div>
+                        <div class="prestamo-resumen-fila"><span>Plazo Máximo:</span><strong>36 meses</strong></div>
+                        <div class="prestamo-resumen-fila"><span>Cuota Ej. ($5M / 12m):</span><strong style="color: var(--gold-main);">$ 467.010</strong></div>
+                    </div>
+                    <button type="button" class="btn-solicitar-prestamo btn-elegir-comparativa" data-tipo="libre" style="margin-top: 10px;">Solicitar esta opción</button>
+                </section>
+
+                <!-- Opción 2: Vehículo -->
+                <section class="prestamo-panel" style="border-top: 4px solid #34d399;">
+                    <h3>Financiación Vehicular</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">Tasas preferenciales con prenda para estrenar carro o moto.</p>
+                    <div class="prestamo-resumen-box" style="margin-top: 10px;">
+                        <div class="prestamo-resumen-fila"><span>Tasa E.A.:</span><strong>18%</strong></div>
+                        <div class="prestamo-resumen-fila"><span>Tasa Mes Vencido:</span><strong>1.38%</strong></div>
+                        <div class="prestamo-resumen-fila"><span>Plazo Máximo:</span><strong>60 meses</strong></div>
+                        <div class="prestamo-resumen-fila"><span>Cuota Ej. ($5M / 12m):</span><strong style="color: #34d399;">$ 458.320</strong></div>
+                    </div>
+                    <button type="button" class="btn-solicitar-prestamo btn-elegir-comparativa" data-tipo="vehiculo" style="margin-top: 10px; background: linear-gradient(135deg, #34d399 0%, #059669 100%); color: #07090e;">Solicitar esta opción</button>
+                </section>
+
+                <!-- Opción 3: Hipotecario -->
+                <section class="prestamo-panel" style="border-top: 4px solid #60a5fa;">
+                    <h3>Crédito Hipotecario</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">El plazo más amplio y la cuota más baja para adquirir tu vivienda.</p>
+                    <div class="prestamo-resumen-box" style="margin-top: 10px;">
+                        <div class="prestamo-resumen-fila"><span>Tasa E.A.:</span><strong>14%</strong></div>
+                        <div class="prestamo-resumen-fila"><span>Tasa Mes Vencido:</span><strong>1.10%</strong></div>
+                        <div class="prestamo-resumen-fila"><span>Plazo Máximo:</span><strong>180 meses</strong></div>
+                        <div class="prestamo-resumen-fila"><span>Cuota Ej. ($5M / 12m):</span><strong style="color: #60a5fa;">$ 444.150</strong></div>
+                    </div>
+                    <button type="button" class="btn-solicitar-prestamo btn-elegir-comparativa" data-tipo="hipotecario" style="margin-top: 10px; background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%); color: #ffffff;">Solicitar esta opción</button>
+                </section>
+            </div>
+        </div>
+
+        <!-- TAB 3: SIMULADOR Y SOLICITUD (HU-14) -->
+        <div id="tab-solicitud" class="prestamo-tab-content" style="display: none;">
+            <div class="prestamo-grid">
+                <section class="prestamo-panel">
+                    <h3>Configura tu Préstamo</h3>
+                    <form id="formPrestamo" class="prestamo-form">
+                        <div class="prestamo-campo">
+                            <label>Tipo de Crédito</label>
+                            <select id="selectTipoCredito">
+                                <option value="libre">Crédito de Libre Inversión (24% E.A.)</option>
+                                <option value="vehiculo">Financiación de Vehículo (18% E.A.)</option>
+                                <option value="hipotecario">Crédito Hipotecario (14% E.A.)</option>
+                            </select>
+                        </div>
+                        <div class="prestamo-campo">
+                            <label>Monto a solicitar (COP)</label>
+                            <input type="text" id="prestamoMonto" placeholder="Ej. 5.000.000" required>
+                        </div>
+                        <div class="prestamo-campo">
+                            <label>Plazo en meses</label>
+                            <select id="prestamoPlazo">
+                                <option value="6">6 meses</option>
+                                <option value="12" selected>12 meses</option>
+                                <option value="24">24 meses</option>
+                                <option value="36">36 meses</option>
+                            </select>
+                        </div>
+                        <div class="prestamo-campo">
+                            <label>Destino del Crédito / Concepto</label>
+                            <input type="text" id="prestamoConcepto" placeholder="Ej. Compra de inventario, remodelación, etc.">
+                        </div>
+                        <button type="submit" class="btn-solicitar-prestamo">Evaluar y Enviar Solicitud</button>
+                    </form>
+                </section>
+
+                <section class="prestamo-panel">
+                    <h3>Resumen y Viabilidad</h3>
                     <div class="prestamo-resumen-box">
                         <div class="prestamo-resumen-fila">
-                            <span>Tasa de interés:</span>
-                            <strong>1.8% Mensual (24% E.A.)</strong>
+                            <span>Tasa Aplicada:</span>
+                            <strong id="lblTasaAplicada">1.8% Mensual (24% E.A.)</strong>
                         </div>
                         <div class="prestamo-resumen-fila">
                             <span>Cuota estimada:</span>
@@ -57,15 +126,38 @@
                             <strong id="lblTotalPagar">$ 0</strong>
                         </div>
                         <div class="prestamo-resumen-fila">
-                            <span>Estado de evaluación:</span>
-                            <strong id="lblEstadoEval" class="prestamo-estado-ok">Pendiente de monto</strong>
+                            <span>Evaluación del sistema:</span>
+                            <strong id="lblEstadoEval">Pendiente de monto</strong>
                         </div>
                     </div>
-                </div>
-                <div class="prestamo-terminos-legal">
-                    * Los términos están sujetos a validación de identidad y políticas de riesgo de Finara Bank S.A.
-                </div>
-            </section>
+                    <div class="prestamo-terminos-legal">
+                        * Montos hasta $5M pre-aprobados automáticamente. De $5M a $30M pasan a revisión analítica.
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- TAB 4: CONSULTAR ESTADO POR RADICADO (HU-14) -->
+        <div id="tab-consulta" class="prestamo-tab-content" style="display: none;">
+            <div class="prestamo-grid" style="grid-template-columns: 1fr 1.2fr;">
+                <section class="prestamo-panel">
+                    <h3>Buscar por Radicado</h3>
+                    <div class="prestamo-form">
+                        <div class="prestamo-campo">
+                            <label>Número de Radicado</label>
+                            <input type="text" id="inputBuscarRadicado" placeholder="Ej. PRES-202610-1234">
+                        </div>
+                        <button type="button" id="btnConsultarRadicado" class="btn-solicitar-prestamo">Consultar Estado</button>
+                    </div>
+                </section>
+
+                <section class="prestamo-panel">
+                    <h3>Detalle de la Postulación</h3>
+                    <div id="resultadoRadicadoBox" class="prestamo-resumen-box">
+                        <p style="color: var(--text-muted); text-align: center; margin: 1.5rem 0;">Ingresa tu número de radicado para visualizar el estado actual y detalles de tu solicitud.</p>
+                    </div>
+                </section>
+            </div>
         </div>
     </div>
 
