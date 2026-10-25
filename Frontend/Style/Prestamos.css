@@ -1,0 +1,269 @@
+@import url('global/styles.css');
+
+/* ==========================================
+   ESTILOS ESPECÍFICOS - VISTA PRÉSTAMOS (FINARA)
+   ========================================== */
+
+.prestamo-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    box-sizing: border-box !important;
+}
+
+.prestamo-header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    color: var(--text-white, #ffffff);
+}
+
+.prestamo-subtitle {
+    color: var(--text-muted, #94a3b8);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.prestamo-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(300px, 1fr);
+    gap: 1.5rem;
+    align-items: start;
+    width: 100%;
+}
+
+.prestamo-grid-comparador {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+}
+
+.prestamo-grid-consulta {
+    grid-template-columns: 1fr 1.2fr !important;
+}
+
+.prestamo-panel {
+    background: var(--bg-card-dark-glass, rgba(17, 20, 29, 0.85)) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--bg-card-border, rgba(255, 255, 255, 0.08)) !important;
+    border-radius: var(--radius-card, 16px);
+    padding: 1.8rem;
+    box-shadow: var(--shadow-card, 0 10px 30px rgba(0, 0, 0, 0.4));
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+/* Identidad corporativa: Tarjetas del comparador con borde superior dorado */
+.prestamo-card-comparativa {
+    border-top: 4px solid var(--gold-main, #e5a93c) !important;
+}
+
+.prestamo-dashboard-panel {
+    margin-bottom: 1.5rem !important;
+}
+
+.prestamo-dashboard-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.prestamo-loading-text {
+    color: var(--text-muted, #94a3b8);
+    font-size: 0.9rem;
+}
+
+.prestamo-card-desc {
+    color: var(--text-muted, #94a3b8);
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+.prestamo-panel h3 {
+    color: var(--text-white, #ffffff);
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    padding-bottom: 0.8rem;
+}
+
+.prestamo-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.prestamo-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.prestamo-campo-terminos {
+    flex-direction: row !important;
+    align-items: flex-start !important; /* Alinea el texto con la parte superior del checkbox */
+    gap: 12px !important;
+    margin: 0.5rem 0 1rem 0 !important;
+    padding: 10px 12px;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+.prestamo-checkbox {
+    width: 18px !important;
+    height: 18px !important;
+    accent-color: var(--gold-main, #e5a93c);
+    cursor: pointer;
+    margin-top: 2px; /* Pequeño ajuste visual para centrarlo con la primera línea del texto */
+    flex-shrink: 0;
+}
+
+.prestamo-campo-terminos label {
+    font-size: 0.82rem !important;
+    color: var(--text-muted, #94a3b8) !important;
+    cursor: pointer;
+    line-height: 1.4;
+    text-align: left !important;
+    margin: 0 !important;
+}
+
+.prestamo-text-white {
+    color: var(--text-white, #ffffff) !important;
+    font-weight: 600;
+}
+
+.prestamo-campo label {
+    color: var(--text-muted, #94a3b8);
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.prestamo-campo input,
+.prestamo-campo select {
+    background: rgba(0, 0, 0, 0.4);
+    color: var(--text-white, #ffffff);
+    border: 1px solid var(--bg-card-border, rgba(255, 255, 255, 0.1));
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-family: inherit;
+    font-size: 0.92rem;
+    width: 100%;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+.prestamo-campo input:focus,
+.prestamo-campo select:focus {
+    border-color: var(--gold-main, #e5a93c);
+    box-shadow: 0 0 0 3px rgba(229, 169, 60, 0.15);
+    outline: none;
+}
+
+.prestamo-resumen-box {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-size: 0.88rem;
+    color: var(--text-muted, #94a3b8);
+}
+
+.prestamo-resumen-fila {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    padding-bottom: 8px;
+}
+
+.prestamo-resumen-fila:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.prestamo-resumen-fila strong {
+    color: var(--text-white, #ffffff);
+}
+
+.prestamo-cuota-gold {
+    color: var(--gold-main, #e5a93c) !important;
+    font-size: 1.15rem;
+}
+
+.prestamo-estado-ok {
+    color: #34d399 !important;
+}
+
+.prestamo-terminos-legal {
+    font-size: 0.72rem;
+    color: #64748b;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-top: 10px;
+    line-height: 1.4;
+}
+
+.btn-solicitar-prestamo {
+    margin-top: 0.5rem;
+    background: linear-gradient(135deg, #e5a93c 0%, #c48b28 100%);
+    color: #07090e;
+    border: none;
+    padding: 13px;
+    border-radius: 12px;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(229, 169, 60, 0.25);
+    transition: opacity 0.2s ease;
+}
+
+.btn-solicitar-prestamo:hover {
+    opacity: 0.9;
+}
+
+.prestamo-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 10px;
+}
+
+.prestamo-tab-btn {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-muted, #94a3b8);
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.prestamo-tab-btn.active {
+    background: rgba(229, 169, 60, 0.15);
+    border-color: rgba(229, 169, 60, 0.4);
+    color: var(--gold-main, #e5a93c);
+}
+
+.prestamo-center-muted {
+    color: var(--text-muted, #94a3b8);
+    text-align: center;
+    margin: 1.5rem 0;
+}
+
+@media (max-width: 992px) {
+    .prestamo-grid {
+        grid-template-columns: 1fr;
+    }
+}

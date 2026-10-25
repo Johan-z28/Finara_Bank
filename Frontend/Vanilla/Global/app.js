@@ -117,7 +117,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                     solicitarproductos: 'views/SolicitarProductos.html',
                     movimientos: 'views/Movimientos.html',
                     perfil: 'views/Perfil.html',
-                    simuladortc: 'views/CreditoSimulador.html'
+                    simuladortc: 'views/CreditoSimulador.html',
+                    prestamos: 'views/Prestamos.html'
                 };
                 urlFetch = `/Frontend/Pages/${mapaVistas[vistaMin] || `views/${nombreVista}.html`}`;
             }
@@ -159,8 +160,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                     try { const m = await import('../SimuladorTC.js'); if (m.initSimuladorTCView) await m.initSimuladorTCView(); } catch (e) { console.error(e); }
                     break;
 
-                case "extrato":
-                    try { const m = await import('../extractoService.js'); } catch (e) { console.error(e); }
+                case "prestamos":
+                    try { const m = await import('../Prestamos.js'); if (m.initPrestamosView) await m.initPrestamosView(); } catch (e) { console.error(e); }
                     break;
             }
 
