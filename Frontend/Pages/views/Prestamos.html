@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitud de Préstamos | Finara Bank</title>
+    <link rel="stylesheet" href="../../Style/Prestamos.css">
+</head>
+<body>
+    <div class="prestamo-container">
+        <div class="prestamo-header">
+            <h1>Simulador y Solicitud de Préstamo</h1>
+            <p class="prestamo-subtitle">Obtén financiación inmediata con evaluación inteligente y transparente.</p>
+        </div>
+
+        <div class="prestamo-grid">
+            <!-- Formulario de Simulación -->
+            <section class="prestamo-panel">
+                <h3>Configura tu Préstamo</h3>
+                <form id="formPrestamo" class="prestamo-form">
+                    <div class="prestamo-campo">
+                        <label>Monto a solicitar (COP)</label>
+                        <input type="text" id="prestamoMonto" placeholder="Ej. 5.000.000" required>
+                    </div>
+                    <div class="prestamo-campo">
+                        <label>Plazo en meses</label>
+                        <select id="prestamoPlazo">
+                            <option value="6">6 meses</option>
+                            <option value="12" selected>12 meses</option>
+                            <option value="24">24 meses</option>
+                            <option value="36">36 meses</option>
+                        </select>
+                    </div>
+                    <div class="prestamo-campo">
+                        <label>Destino del Crédito / Concepto</label>
+                        <input type="text" id="prestamoConcepto" placeholder="Ej. Compra de inventario, libre inversión, etc.">
+                    </div>
+                    <button type="submit" class="btn-solicitar-prestamo">Evaluar y Solicitar Préstamo</button>
+                </form>
+            </section>
+
+            <!-- Panel de Resultados y Términos -->
+            <section class="prestamo-panel prestamo-panel-footer-between">
+                <div>
+                    <h3>Resumen y Condiciones</h3>
+                    <div class="prestamo-resumen-box">
+                        <div class="prestamo-resumen-fila">
+                            <span>Tasa de interés:</span>
+                            <strong>1.8% Mensual (24% E.A.)</strong>
+                        </div>
+                        <div class="prestamo-resumen-fila">
+                            <span>Cuota estimada:</span>
+                            <strong id="lblCuotaEstimada" class="prestamo-cuota-gold">$ 0</strong>
+                        </div>
+                        <div class="prestamo-resumen-fila">
+                            <span>Total a pagar aprox:</span>
+                            <strong id="lblTotalPagar">$ 0</strong>
+                        </div>
+                        <div class="prestamo-resumen-fila">
+                            <span>Estado de evaluación:</span>
+                            <strong id="lblEstadoEval" class="prestamo-estado-ok">Pendiente de monto</strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="prestamo-terminos-legal">
+                    * Los términos están sujetos a validación de identidad y políticas de riesgo de Finara Bank S.A.
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="../../Vanilla/Prestamos.js"></script>
+</body>
+</html>
