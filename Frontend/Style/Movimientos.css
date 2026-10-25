@@ -329,3 +329,168 @@
 
 .mov-pag-btn:hover:not(:disabled) { border-color: var(--gold-main, #e5a93c); color: var(--gold-main, #e5a93c); }
 .mov-pag-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ==========================================
+   ESTILOS DEL MODAL DE EXTRACTOS BANCARIOS
+   ========================================== */
+
+.modal-extracto-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(7, 9, 14, 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.modal-extracto-card {
+    background: var(--bg-card-dark-glass, rgba(17, 20, 29, 0.95));
+    border: 1px solid var(--bg-card-border, rgba(255, 255, 255, 0.1));
+    border-radius: 20px;
+    width: 100%;
+    max-width: 480px;
+    padding: 2rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+    animation: popInModal 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popInModal {
+    0% { transform: scale(0.9); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.modal-extracto-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 1.2rem;
+}
+
+.btn-cerrar-modal {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-cerrar-modal:hover {
+    background: rgba(248, 113, 113, 0.15);
+    color: #f87171;
+    border-color: rgba(248, 113, 113, 0.3);
+}
+
+.modal-extracto-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.extracto-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.extracto-campo label {
+    font-size: 0.8rem;
+    color: var(--text-muted, #94a3b8);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.extracto-campo select {
+    background: rgba(0, 0, 0, 0.4);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-family: inherit;
+    font-size: 0.92rem;
+    width: 100%;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.extracto-grid-periodo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.extracto-preview-info {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+.preview-item {
+    display: flex;
+    justify-content: space-between;
+}
+
+.preview-item strong {
+    color: #ffffff;
+}
+
+.modal-extracto-acciones {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.btn-cancelar-extracto {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    padding: 12px;
+    border-radius: 12px;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-descargar-extracto {
+    flex: 2;
+    background: linear-gradient(135deg, #e5a93c 0%, #c48b28 100%);
+    color: #07090e;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    font-family: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 16px rgba(229, 169, 60, 0.25);
+}

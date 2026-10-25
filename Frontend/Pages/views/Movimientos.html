@@ -11,13 +11,19 @@
     <!-- SweetAlert2 CSS y JS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- AGREGA ESTA LÍNEA AQUÍ EN EL APP.HTML -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 
 <body class="general-body">
     <main class="main-content">
         <div class="tr-container">
-            <div class="tr-header">
+            <div class="tr-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                 <h1>Historial de Movimientos</h1>
+                <!-- Botón para abrir el modal de extractos bancarios -->
+                <button type="button" class="btn-submit-withdraw" id="btnAbrirModalExtracto" style="width: auto; padding: 10px 20px; font-size: 0.88rem; background: linear-gradient(135deg, #e5a93c 0%, #c48b28 100%); color: #07090e; font-weight: 700; border-radius: 12px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-file-pdf"></i> Descargar Extracto
+                </button>
             </div>
 
             <!-- Contenedor principal unificado idéntico a las demás vistas -->

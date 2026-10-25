@@ -158,6 +158,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 case "simuladortc":
                     try { const m = await import('../SimuladorTC.js'); if (m.initSimuladorTCView) await m.initSimuladorTCView(); } catch (e) { console.error(e); }
                     break;
+
+                case "extrato":
+                    try { const m = await import('../extractoService.js'); } catch (e) { console.error(e); }
+                    break;
             }
 
         } catch (error) {
