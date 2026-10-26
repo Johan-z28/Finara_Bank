@@ -10,6 +10,12 @@ const formatearConPuntos = (val) => {
     return new Intl.NumberFormat('es-CO').format(Number(soloNumeros));
 };
 
+const ocultarNumeroCuenta = (num) => {
+    const digitos = String(num || '').replace(/\D/g, '');
+    const ultimos4 = digitos.slice(-4) || '••••';
+    return `•••• ${ultimos4}`;
+};
+
 export async function initPrestamosView() {
     if (!document.getElementById('prestamos-css-theme')) {
         const link = document.createElement('link');
@@ -72,13 +78,6 @@ export async function initPrestamosView() {
                         window.actualizarSimulacionDinamica();
                     }
                 }
-            }
-
-            // Botón de pagar cuota (HU-16)
-            const btnPagarModal = e.target.closest('.btn-pagar-cuota-modal');
-            if (btnPagarModal) {
-                const radicado = btnPagarModal.getAttribute('data-radicado');
-                abrirModalPagoCuota(radicado);
             }
         });
     }
@@ -295,20 +294,41 @@ function renderizarDashboardCreditos() {
                     <div>Saldo Pendiente: <strong style="color: #fff;">${formatoCOP.format(saldoPendiente)}</strong></div>
                 </div>
                 <div style="display: flex; justify-content: flex-end; margin-top: 5px;">
-                    <button type="button" class="btn-pagar-cuota-modal" data-radicado="${p.radicado}" style="background: rgba(229, 169, 60, 0.15); border: 1px solid rgba(229, 169, 60, 0.4); color: var(--gold-main); padding: 8px 16px; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">Pagar Cuota Mensual</button>
+                    <button type="button" class="btn-pagar-cuota-action" data-radicado="${p.radicado}" style="background: rgba(229, 169, 60, 0.15); border: 1px solid rgba(229, 169, 60, 0.4); color: var(--gold-main); padding: 8px 16px; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">Pagar Cuota Mensual</button>
                 </div>
             </div>
         `;
     }).join('');
-}
 
+    // Vinculación directa de eventos
+    contenedor.querySelectorAll('.btn-pagar-cuota-action').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const radicado = btn.getAttribute('data-radicado');
+            if (radicado) {
+                abrirModalPagoCuota(radicado);
+            }
+        });
+    });
+}
 
 function abrirModalPagoCuota(radicado) {
     let prestamos = JSON.parse(localStorage.getItem('finara_prestamos')) || [];
     const prestamo = prestamos.find(p => p.radicado === radicado);
     if (!prestamo) return;
 
-    const cuentas = obtenerCuentas() || [];
+    let cuentasRaw = [];
+    try {
+        cuentasRaw = JSON.parse(localStorage.getItem('finara_cuentas')) || obtenerCuentas() || [];
+    } catch {
+        cuentasRaw = [];
+    }
+
+    const listaCuentas = Array.isArray(cuentasRaw) ? cuentasRaw : Object.values(cuentasRaw);
+    const cuentasValidas = listaCuentas.filter(c => {
+        const tipoStr = String(c.tipo || '').toLowerCase();
+        return tipoStr.includes('ahorro') || tipoStr.includes('corriente');
+    });
 
     Swal.fire({
         title: 'Pagar Cuota de Crédito',
@@ -317,10 +337,24 @@ function abrirModalPagoCuota(radicado) {
                 <p style="margin:0;"><strong>Radicado:</strong> <span style="color: #e5a93c;">${prestamo.radicado}</span></p>
                 <p style="margin:0;"><strong>Valor Cuota:</strong> <span style="color: #34d399; font-size: 1.1rem; font-weight: bold;">${formatoCOP.format(prestamo.cuotaMensual)}</span></p>
                 <div class="prestamo-campo" style="margin-top: 8px;">
-                    <label style="color: #94a3b8; font-size: 0.8rem;">Selecciona la cuenta de pago:</label>
-                    <select id="selectCuentaPago" style="background: rgba(0,0,0,0.4); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px; width: 100%;">
-                        ${cuentas.map(c => `<option value="${c.id || c.numero}">${c.tipo || 'Cuenta'} - ${c.numero || c.id} (Saldo: ${formatoCOP.format(c.saldo)})</option>`).join('')}
-                    </select>
+                    <label style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 6px; display: block;">Selecciona la cuenta de pago:</label>
+                    <div id="cuentasCardsContainer" style="display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto;">
+                        ${cuentasValidas.length > 0 ? cuentasValidas.map((c, index) => {
+                            const numeroOculto = ocultarNumeroCuenta(c.numero || c.id);
+                            const tipoLabel = String(c.tipo || 'CUENTA').toUpperCase();
+                            const saldoNum = Number(c.saldo) || 0;
+                            return `
+                                <div class="cuenta-card-opcion ${index === 0 ? 'selected' : ''}" data-id="${c.id || c.numero}" style="background: rgba(0,0,0,0.4); border: 1px solid ${index === 0 ? 'var(--gold-main, #e5a93c)' : 'rgba(255,255,255,0.1)'}; border-radius: 12px; padding: 10px 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s ease;">
+                                    <div>
+                                        <strong style="color: #fff; font-size: 0.88rem; display: block;">${tipoLabel} - ${numeroOculto}</strong>
+                                        <span style="color: #94a3b8; font-size: 0.78rem;">Saldo disponible:</span>
+                                    </div>
+                                    <span style="color: #34d399; font-weight: bold; font-size: 0.9rem;">${formatoCOP.format(saldoNum)}</span>
+                                </div>
+                            `;
+                        }).join('') : '<p style="color: #94a3b8; text-align: center;">No hay cuentas disponibles</p>'}
+                    </div>
+                    <input type="hidden" id="cuentaSeleccionadaId" value="${cuentasValidas.length > 0 ? (cuentasValidas[0].id || cuentasValidas[0].numero) : ''}">
                 </div>
             </div>
         `,
@@ -330,10 +364,29 @@ function abrirModalPagoCuota(radicado) {
         confirmButtonText: 'Confirmar y Pagar',
         cancelButtonText: 'Cancelar',
         confirmButtonColor: '#e5a93c',
-        cancelButtonColor: '#334155'
+        cancelButtonColor: '#334155',
+        didOpen: () => {
+            const cards = Swal.getHtmlContainer().querySelectorAll('.cuenta-card-opcion');
+            cards.forEach(card => {
+                card.addEventListener('click', () => {
+                    cards.forEach(c => {
+                        c.style.borderColor = 'rgba(255,255,255,0.1)';
+                        c.style.background = 'rgba(0,0,0,0.4)';
+                    });
+                    card.style.borderColor = 'var(--gold-main, #e5a93c)';
+                    card.style.background = 'rgba(229, 169, 60, 0.08)';
+                    document.getElementById('cuentaSeleccionadaId').value = card.getAttribute('data-id');
+                });
+            });
+        }
     }).then((result) => {
         if (result.isConfirmed) {
-            const cuentaId = document.getElementById('selectCuentaPago').value;
+            const cuentaId = document.getElementById('cuentaSeleccionadaId').value;
+            if (!cuentaId) {
+                Swal.fire({ icon: 'warning', title: 'Cuenta requerida', text: 'Por favor selecciona una cuenta para realizar el pago.', background: '#12151c', color: '#fff', confirmButtonColor: '#e5a93c' });
+                return;
+            }
+
             const resultadoPago = pagarCuotaPrestamo(radicado, cuentaId);
 
             if (!resultadoPago.success) {
@@ -354,3 +407,7 @@ function abrirModalPagoCuota(radicado) {
         }
     });
 }
+
+window.abrirModalPagoCuotaGlobal = (radicado) => {
+    abrirModalPagoCuota(radicado);
+};
