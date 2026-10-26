@@ -56,13 +56,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     const mainWrapper = document.querySelector(".main-wrapper");
 
     // RECONFIGURACIÓN SEGÚN ROL
+    // RECONFIGURACIÓN SEGÚN ROL
     const sidebarNavUl = document.querySelector(".sidebar-nav ul");
     if (sidebarNavUl && esAdmin) {
-        const vistasOcultar = ["dashboard", "saldos", "transferencias", "consignar", "retiros", "movimientos", "simuladortc"];
+        const vistasOcultar = ["dashboard", "saldos", "transferencias", "consignar", "retiros", "movimientos", "simuladortc", "prestamos"]; // <-- Añadido "prestamos"
         vistasOcultar.forEach(vista => {
             const item = sidebarNavUl.querySelector(`[data-view="${vista}"]`)?.closest('li');
             if (item) item.style.display = 'none';
         });
+
+        // Ocultar también por selector de enlace directo si existe
+        const linkPrestamos = sidebarNavUl.querySelector('[data-view="prestamos"]');
+        if (linkPrestamos) {
+            const liParent = linkPrestamos.closest('li');
+            if (liParent) liParent.style.display = 'none';
+        }
 
         const btnSolicitar = document.querySelector('.btn-solicitar-sidebar');
         if (btnSolicitar) btnSolicitar.style.display = 'none';
@@ -155,13 +163,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                 case "movimientos":
                     try { const m = await import('../Movimientos.js'); if (m.initMovimientosView) await m.initMovimientosView(); } catch (e) { }
                     break;
-
                 case "simuladortc":
                     try { const m = await import('../SimuladorTC.js'); if (m.initSimuladorTCView) await m.initSimuladorTCView(); } catch (e) { console.error(e); }
                     break;
-
                 case "prestamos":
                     try { const m = await import('../Prestamos.js'); if (m.initPrestamosView) await m.initPrestamosView(); } catch (e) { console.error(e); }
+                    break;
+                case "admindashboard":
+                case "admin-dashboard":
+                    try { const m = await import('../../Vanilla/AdminCall/Admin.js'); if (m.initAdminView) await m.initAdminView(); } catch (e) { console.error(e); }
                     break;
             }
 
@@ -200,8 +210,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (btnCerrarSesion) {
         btnCerrarSesion.addEventListener("click", (e) => {
             e.preventDefault();
-            localStorage.clear();
+            
+            // Eliminar únicamente las llaves de la sesión activa
+            localStorage.removeItem("userProfile");
+            localStorage.removeItem("emailSesion");
+            localStorage.removeItem("usuarioLogueado");
+            
             sessionStorage.clear();
+            
             window.location.href = "../index.html";
         });
     }

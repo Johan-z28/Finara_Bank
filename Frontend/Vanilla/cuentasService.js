@@ -1,7 +1,6 @@
 // Vanilla/cuentasService.js
 // Capa de acceso a datos de cuentas para HU-04 (Consulta de saldo).
-// Maneja la gestión de cuentas asociadas al usuario autenticado (Ahorros, Corriente y Tarjetas de Crédito).
-// Evita mezclar o duplicar cuentas entre diferentes usuarios.
+// Maneja la gestión de cuentas asociadas al usuario autenticado (Ahorros, Corriente, Tarjetas de Crédito y Préstamos).
 
 const USAR_API_BACKEND = false;
 const API_URL = 'http://localhost:8080/api/cuentas';
@@ -40,7 +39,6 @@ export function obtenerUsuarioAutenticado() {
     } catch {
         // En caso de JSON corrupto
     }
-    // Usuario estándar de sesión por defecto si Login.js no guardó en localStorage
     return { username: 'maria17', nombre: 'María Gómez' };
 }
 
@@ -54,7 +52,7 @@ export function obtenerUsernameActivo() {
 
 /**
  * Consulta qué productos bancarios iniciales tiene activos el usuario actual:
- * { tieneAhorros: boolean, tieneCorriente: boolean, tieneCredito: boolean, cuentas: Array }
+ * { tieneAhorros: boolean, tieneCorriente: boolean, tieneCredito: boolean, tienePrestamo: boolean, cuentas: Array }
  */
 export async function consultarEstadoProductosUsuario() {
     const cuentas = await obtenerCuentas();
@@ -62,14 +60,14 @@ export async function consultarEstadoProductosUsuario() {
         tieneAhorros: cuentas.some(c => c.tipo === 'AHORROS' && c.estado === 'ACTIVA'),
         tieneCorriente: cuentas.some(c => c.tipo === 'CORRIENTE' && c.estado === 'ACTIVA'),
         tieneCredito: cuentas.some(c => c.tipo === 'TARJETA_CREDITO' && c.estado === 'ACTIVA'),
+        tienePrestamo: cuentas.some(c => c.tipo === 'PRESTAMO' && c.estado === 'ACTIVA'),
         cuentas
     };
 }
 
 /**
  * Sincroniza y obtiene las cuentas del usuario autenticado sin datos falsos.
- * Conecta con los productos aprobados en solicitud de tarjetas (tarjetasAprobadas)
- * y con las cuentas persistentes en finara_cuentas (compartidas con transferencias y operaciones).
+ * Conecta con los productos aprobados, tarjetas y préstamos activos de finara_prestamos y finara_cuentas.
  */
 export async function obtenerCuentas() {
     if (USAR_API_BACKEND) {
@@ -89,7 +87,6 @@ export async function obtenerCuentas() {
         return respuesta.json();
     }
 
-    // Modo simulación local con persistencia real del usuario autenticado
     await new Promise(r => setTimeout(r, 150)); // Latencia fluida de UI
 
     const usuario = obtenerUsuarioAutenticado();
@@ -108,7 +105,6 @@ export async function obtenerCuentas() {
         todasLasCuentas = [];
     }
 
-    // Identificadores reales del usuario activo (username, correo y alias)
     const correoActual = usuario.correo || '';
     const usernameNorm = String(usernameActual || '').trim().toLowerCase();
     const correoNorm = String(correoActual || '').trim().toLowerCase();
@@ -122,8 +118,6 @@ export async function obtenerCuentas() {
         return false;
     });
 
-    // Si el usuario es nuevo y no tiene ninguna cuenta registrada en finara_cuentas,
-    // configurar sus cuentas iniciales según su perfil (Ahorros y Corriente por defecto para maria17)
     let cambios = false;
     if (cuentasUsuario.length === 0) {
         if (usernameActual === 'maria17') {
@@ -134,27 +128,12 @@ export async function obtenerCuentas() {
             cuentasUsuario = cuentasInicialesMaria;
             todasLasCuentas.push(...cuentasInicialesMaria);
             cambios = true;
-        } else if (usuario.cuentaInicial) {
-            // Si el usuario se registró con una cuenta específica (ej: sólo Ahorros)
-            const nuevaCta = {
-                id: `CTA-${usuario.cuentaInicial.slice(0, 3).toUpperCase()}-${Date.now()}`,
-                tipo: usuario.cuentaInicial === 'corriente' ? 'CORRIENTE' : 'AHORROS',
-                numero: '4021' + String(Date.now()).slice(-8),
-                saldo: 0,
-                estado: 'ACTIVA',
-                username: usernameActual,
-                fechaCreacion: new Date().toISOString()
-            };
-            cuentasUsuario = [nuevaCta];
-            todasLasCuentas.push(nuevaCta);
-            cambios = true;
         } else {
-            // Usuario recién registrado sin productos solicitados aún: No forzar cuenta automática
             cuentasUsuario = [];
         }
     }
 
-    // Sincronizar tarjetas aprobadas por el usuario (newCard.js)
+    // Sincronizar tarjetas aprobadas por el usuario
     const tarjetasAprobadas = usuario.tarjetasAprobadas || [];
     tarjetasAprobadas.forEach((tarjeta, index) => {
         let tipoCuenta = 'AHORROS';
@@ -162,7 +141,6 @@ export async function obtenerCuentas() {
         else if (tarjeta.tipo === 'corriente') tipoCuenta = 'CORRIENTE';
         else if (tarjeta.tipo === 'credito') tipoCuenta = 'TARJETA_CREDITO';
 
-        // Si es tarjeta débito o corriente, vincularla a la cuenta correspondiente para que se vea asociada en Saldos
         if (tipoCuenta === 'AHORROS' || tipoCuenta === 'CORRIENTE') {
             const ctaMatch = cuentasUsuario.find(c => c.tipo === tipoCuenta);
             if (ctaMatch) {
@@ -177,7 +155,6 @@ export async function obtenerCuentas() {
             }
         }
 
-        // Si es tarjeta de crédito aprobada, agregar como producto independiente
         if (tipoCuenta === 'TARJETA_CREDITO') {
             const idTarjeta = `TC-${tarjeta.numeroTarjeta || tarjeta.fechaAprobacion || index}`;
             const yaExisteTC = cuentasUsuario.some(c => c.id === idTarjeta || c.numero === tarjeta.numeroTarjeta || (c.tipo === 'TARJETA_CREDITO' && c.fechaAprobacion === tarjeta.fechaAprobacion));
@@ -190,7 +167,7 @@ export async function obtenerCuentas() {
                     numero: tarjeta.numeroTarjeta || ('5412' + String(Date.now()).slice(-12)),
                     fechaVencimiento: tarjeta.fechaVencimiento || '09/29',
                     cvv: tarjeta.cvv || '584',
-                    saldo: cupoCalculado, // Cupo disponible
+                    saldo: cupoCalculado,
                     estado: 'ACTIVA',
                     bloqueada: tarjeta.bloqueada || false,
                     username: usernameActual,
@@ -203,22 +180,60 @@ export async function obtenerCuentas() {
         }
     });
 
+    // 🚀 SINCRONIZACIÓN Y FILTRADO ESTRICTO DE PRÉSTAMOS ACTIVOS
+    let listaPrestamosActivos = [];
+    try {
+        const prestamosGlobales = JSON.parse(localStorage.getItem('finara_prestamos')) || [];
+        if (Array.isArray(prestamosGlobales)) {
+            // Filtrar estrictamente solo los que NO estén pagados
+            listaPrestamosActivos.push(...prestamosGlobales.filter(p => p && p.activo !== false && p.estado !== 'PAGADO'));
+        }
+    } catch {}
+
+    // Remover de cuentasUsuario cualquier préstamo viejo que ya haya sido pagado
+    cuentasUsuario = cuentasUsuario.filter(c => {
+        if (c.tipo !== 'PRESTAMO') return true;
+        const sigueActivo = listaPrestamosActivos.some(p => p.radicado === c.radicado || p.numero === c.numero);
+        return sigueActivo;
+    });
+
+    listaPrestamosActivos.forEach(prestamo => {
+        const radicadoId = prestamo.radicado || prestamo.id || ('PRES-' + Math.floor(Math.random() * 1000000));
+        const idPrestamo = `PRES-${radicadoId}`;
+        const yaExistePrestamo = cuentasUsuario.some(c => c.id === idPrestamo || (c.tipo === 'PRESTAMO' && (c.numero === prestamo.numero || c.radicado === prestamo.radicado)));
+
+        if (!yaExistePrestamo) {
+            let saldoDeuda = Number(prestamo.saldo || prestamo.monto) || 0;
+            if (prestamo.cuotasPagadas !== undefined && prestamo.cuotaMensual && prestamo.meses) {
+                const cuotasRestantes = prestamo.meses - prestamo.cuotasPagadas;
+                saldoDeuda = cuotasRestantes * prestamo.cuotaMensual;
+            }
+
+            const nuevoPrestamo = {
+                id: idPrestamo,
+                tipo: 'PRESTAMO',
+                radicado: prestamo.radicado,
+                numero: prestamo.numero || ('8844' + String(Math.floor(Math.random() * 100000000))),
+                saldo: saldoDeuda,
+                estado: 'ACTIVA',
+                username: usernameActual,
+                fechaCreacion: prestamo.fecha || prestamo.fechaCreacion || new Date().toISOString()
+            };
+            cuentasUsuario.push(nuevoPrestamo);
+            todasLasCuentas.push(nuevoPrestamo);
+            cambios = true;
+        }
+    });
+
     if (cambios) {
         try {
             localStorage.setItem('finara_cuentas', JSON.stringify(todasLasCuentas));
-        } catch {
-            // Manejo de cuota de almacenamiento
-        }
+        } catch {}
     }
 
-    // Depurar y consolidar cuentas para evitar duplicidad de productos del mismo tipo:
-    // 1) Si una cuenta tiene tipo AHORROS o CORRIENTE y su número empieza con 4532 (número de tarjeta)
-    //    mientras ya existe la cuenta original 4021..., descartar el registro huérfano.
-    // 2) Mantener como máximo una Cuenta de Ahorros y una Cuenta Corriente por usuario.
     const cuentasConsolidadas = [];
     const tiposCuentasVistos = new Set();
 
-    // Priorizar cuentas bancarias reales (número 4021 o saldos con dinero)
     cuentasUsuario.sort((a, b) => {
         const aEsCuentaReal = String(a.numero).startsWith('4021') ? 1 : 0;
         const bEsCuentaReal = String(b.numero).startsWith('4021') ? 1 : 0;
@@ -232,23 +247,18 @@ export async function obtenerCuentas() {
                 tiposCuentasVistos.add(c.tipo);
                 cuentasConsolidadas.push(c);
             }
+        } else if (c.tipo === 'PRESTAMO') {
+            const clavePrestamo = `PRESTAMO_${c.radicado || c.numero}`;
+            if (!tiposCuentasVistos.has(clavePrestamo)) {
+                tiposCuentasVistos.add(clavePrestamo);
+                cuentasConsolidadas.push(c);
+            }
         } else {
-            // Tarjetas de crédito u otros productos
             const clave = `${c.tipo}_${c.numero}`;
             if (!tiposCuentasVistos.has(clave)) {
                 tiposCuentasVistos.add(clave);
                 cuentasConsolidadas.push(c);
             }
-        }
-    }
-
-    // Actualizar storage si se eliminaron cuentas huérfanas duplicadas
-    if (cuentasConsolidadas.length !== cuentasUsuario.length) {
-        const cuentasOtrosUsuarios = todasLasCuentas.filter(c => c && !(c.username === usernameActual || (!c.username && usernameActual === 'maria17')));
-        try {
-            localStorage.setItem('finara_cuentas', JSON.stringify([...cuentasOtrosUsuarios, ...cuentasConsolidadas]));
-        } catch {
-            // Manejo de cuota
         }
     }
 

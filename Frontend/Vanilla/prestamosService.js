@@ -54,7 +54,6 @@ export function registrarSolicitudPrestamo({ monto, meses, cuotaMensual, estadoE
 
     const listaCuentas = Array.isArray(todasLasCuentas) ? todasLasCuentas : Object.values(todasLasCuentas);
     
-    // Buscar la cuenta de ahorros/débito activa del usuario para el desembolso
     const cuentaAhorrosIndex = listaCuentas.findIndex(c => {
         if (!c) return false;
         const tipoStr = String(c.tipo || '').toUpperCase();
@@ -99,17 +98,14 @@ export function registrarSolicitudPrestamo({ monto, meses, cuotaMensual, estadoE
     prestamos.unshift(nuevaSolicitud);
     localStorage.setItem(K.prestamos, JSON.stringify(prestamos));
 
-    // Si el crédito fue pre-aprobado automáticamente, DESEMBOLSAR EL DINERO EN LA CUENTA DE AHORROS
     if (esAprobado) {
         const cuentaAhorros = listaCuentas[cuentaAhorrosIndex];
         const montoPrestamo = Number(monto);
         
-        // 1. Aumentar el saldo de la cuenta de ahorros
         cuentaAhorros.saldo = (Number(cuentaAhorros.saldo) || 0) + montoPrestamo;
         listaCuentas[cuentaAhorrosIndex] = cuentaAhorros;
         localStorage.setItem(K.cuentas, JSON.stringify(listaCuentas));
 
-        // 2. Registrar el movimiento de INGRESO por desembolso
         let movimientos = [];
         try {
             movimientos = JSON.parse(localStorage.getItem(K.movimientos)) || [];
@@ -183,7 +179,6 @@ export function pagarCuotaPrestamo(radicado, cuentaId, pagarTotal = false) {
 
     const cuenta = todasLasCuentas[cuentaIndex];
     
-    // Calcular valor a pagar según si es cuota individual o la totalidad
     const cuotasRestantes = prestamo.meses - prestamo.cuotasPagadas;
     const valorPago = pagarTotal ? (cuotasRestantes * prestamo.cuotaMensual) : Number(prestamo.cuotaMensual);
     const saldoActual = Number(cuenta.saldo) || 0;
@@ -197,19 +192,29 @@ export function pagarCuotaPrestamo(radicado, cuentaId, pagarTotal = false) {
     todasLasCuentas[cuentaIndex] = cuenta;
     localStorage.setItem(K.cuentas, JSON.stringify(todasLasCuentas));
 
-    // 2. Actualizar Préstamo
+    // 2. Actualizar Préstamo y removerlo de cuentas activas si se pagó la totalidad
     if (pagarTotal) {
         prestamo.cuotasPagadas = prestamo.meses;
-    } else {
-        prestamo.cuotasPagadas += 1;
-    }
-
-    if (prestamo.cuotasPagadas >= prestamo.meses) {
         prestamo.estado = 'PAGADO';
         prestamo.activo = false;
+    } else {
+        prestamo.cuotasPagadas += 1;
+        if (prestamo.cuotasPagadas >= prestamo.meses) {
+            prestamo.estado = 'PAGADO';
+            prestamo.activo = false;
+        }
     }
     prestamos[prestamoIndex] = prestamo;
     localStorage.setItem(K.prestamos, JSON.stringify(prestamos));
+
+    // 🚀 REMOVER INMEDIATAMENTE DE finara_cuentas PARA QUE DESAPAREZCA DE "MIS CUENTAS"
+    if (!prestamo.activo || prestamo.estado === 'PAGADO') {
+        try {
+            let cuentasActualizadas = JSON.parse(localStorage.getItem(K.cuentas)) || [];
+            cuentasActualizadas = cuentasActualizadas.filter(c => !(c.tipo === 'PRESTAMO' && (c.radicado === prestamo.radicado || c.numero === prestamo.numero)));
+            localStorage.setItem(K.cuentas, JSON.stringify(cuentasActualizadas));
+        } catch {}
+    }
 
     // 3. Registrar Egreso en Movimientos
     let movimientos = [];

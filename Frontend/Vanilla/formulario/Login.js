@@ -206,7 +206,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             // 🛡️ 2. VALIDACIÓN DE CREDENCIALES DE ADMINISTRADOR FINARA BANK
-            if (normalizar(nombreUsuario) === "finara_banck" && password === "123456777") {
+            if (normalizar(nombreUsuario) === "admin" && password === "admin123") {
                 const adminUser = {
                     nombre: "Administrador Finara",
                     username: "finara_banck",
