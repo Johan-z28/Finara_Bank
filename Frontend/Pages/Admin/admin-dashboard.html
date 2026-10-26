@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración de Usuarios | Finara Bank</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="../../Style/image/favicon.svg">
+    <link rel="stylesheet" href="../../Style/admin.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body class="general-body">
+    <main class="main-content">
+        <div class="admin-main-container">
+
+            <!-- BANNER SUPERIOR DE BIENVENIDA -->
+            <section class="admin-hero-banner">
+                <div class="admin-hero-content">
+                    <span class="admin-badge"><i class="fa-solid fa-shield-halved"></i> Módulo Seguro</span>
+                    <h1>Panel de Gestión y Control Admin</h1>
+                    <p>Bienvenido al núcleo de administración de Finara Bank. Desde este espacio estructurado puedes gestionar de forma segura los registros, validar credenciales, auditar saldos y configurar respuestas del sistema.</p>
+                </div>
+                <div class="admin-hero-icon">
+                    <i class="fa-solid fa-user-gear"></i>
+                </div>
+            </section>
+
+            <!-- GRID DE 4 TARJETAS CRUD -->
+            <div class="admin-grid-container">
+                <!-- 1. CREATE -->
+                <div class="admin-card">
+                    <div class="card-icon-container create-color">
+                        <i class="fa-solid fa-user-plus"></i>
+                    </div>
+                    <h3>Crear & Validar</h3>
+                    <p>Agrega nuevos usuarios al sistema validando previamente formatos de correo y campos requeridos antes de guardar.</p>
+                    <button class="btn-admin-action" data-accion="Create">Gestionar Alta</button>
+                </div>
+
+                <!-- 2. READ -->
+                <div class="admin-card">
+                    <div class="card-icon-container read-color">
+                        <i class="fa-solid fa-address-book"></i>
+                    </div>
+                    <h3>Consultar Listado</h3>
+                    <p>Visualiza el volumen total de usuarios registrados, audita sus datos generales y monitorea la base actual.</p>
+                    <button class="btn-admin-action" data-accion="Read">Ver Registros</button>
+                </div>
+
+                <!-- 3. UPDATE -->
+                <div class="admin-card">
+                    <div class="card-icon-container update-color">
+                        <i class="fa-solid fa-user-pen"></i>
+                    </div>
+                    <h3>Actualizar Datos</h3>
+                    <p>Adapta y modifica credenciales del titular, datos de perfil o ajusta saldos derivados de movimientos recientes.</p>
+                    <button class="btn-admin-action" data-accion="Update">Modificar Datos</button>
+                </div>
+
+                <!-- 4. DELETE -->
+                <div class="admin-card">
+                    <div class="card-icon-container delete-color">
+                        <i class="fa-solid fa-user-xmark"></i>
+                    </div>
+                    <h3>Depuración Segura</h3>
+                    <p>Zona protegida con confirmación previa para eliminar registros de usuarios de manera definitiva del almacenamiento.</p>
+                    <button class="btn-admin-action danger-btn" data-accion="Delete">Depurar Registros</button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- MODALES FUNCIONALES -->
+    <div class="admin-modal-overlay" id="adminModal">
+        <div class="admin-modal-container">
+            <div class="admin-modal-header">
+                <h3><i class="fa-solid fa-user-plus"></i> Gestión de Usuarios Pendientes</h3>
+                <button class="modal-close-btn" id="closeAdminModal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="admin-modal-body">
+                <div class="modal-col-left">
+                    <h4>Solicitudes de Registro</h4>
+                    <div class="usuarios-list-container" id="usuariosPendientesList">
+                        <p class="empty-list-text">No hay usuarios pendientes por validar.</p>
+                    </div>
+                </div>
+                <div class="modal-col-right" id="detalleUsuarioContainer">
+                    <div class="placeholder-detalle">
+                        <i class="fa-solid fa-hand-pointer"></i>
+                        <p>Selecciona un usuario de la izquierda para gestionar su verificación.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-modal-overlay" id="adminReadModal">
+        <div class="admin-modal-container">
+            <div class="admin-modal-header">
+                <h3><i class="fa-solid fa-address-book"></i> Consulta General de Usuarios</h3>
+                <button class="modal-close-btn" id="closeAdminReadModal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="admin-modal-body">
+                <div class="modal-col-left">
+                    <h4>Listado de Registros</h4>
+                    <div class="usuarios-list-container" id="usuariosReadList">
+                        <p class="empty-list-text">No hay usuarios registrados en el sistema.</p>
+                    </div>
+                </div>
+                <div class="modal-col-right" id="detalleReadContainer">
+                    <div class="placeholder-detalle">
+                        <i class="fa-solid fa-id-card"></i>
+                        <p>Selecciona un usuario de la lista para ver sus datos y opciones de gestión.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-modal-overlay" id="adminUpdateModal">
+        <div class="admin-modal-container" style="max-width: 950px;">
+            <div class="admin-modal-header">
+                <h3><i class="fa-solid fa-user-pen"></i> Gestión y Actualización de Usuarios</h3>
+                <button class="modal-close-btn" id="closeAdminUpdateModal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="admin-modal-body">
+                <div class="modal-col-left">
+                    <h4>Seleccionar Usuario</h4>
+                    <div class="usuarios-list-container" id="usuariosUpdateList">
+                        <p class="empty-list-text">No hay usuarios disponibles para actualizar.</p>
+                    </div>
+                </div>
+                <div class="modal-col-right" id="detalleUpdateContainer" style="align-items: stretch; text-align: left;">
+                    <div class="placeholder-detalle" style="text-align: center; margin: auto;">
+                        <i class="fa-solid fa-user-pen"></i>
+                        <p>Selecciona un usuario de la izquierda para modificar su información personal.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-modal-overlay" id="adminDeleteModal">
+        <div class="admin-modal-container" style="max-width: 950px;">
+            <div class="admin-modal-header">
+                <h3><i class="fa-solid fa-user-xmark" style="color: #ef4444;"></i> Depuración y Eliminación de Usuarios</h3>
+                <button class="modal-close-btn" id="closeAdminDeleteModal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="admin-modal-body">
+                <div class="modal-col-left">
+                    <h4>Seleccionar para Depurar</h4>
+                    <div class="usuarios-list-container" id="usuariosDeleteList">
+                        <p class="empty-list-text">No hay usuarios disponibles para eliminar.</p>
+                    </div>
+                </div>
+                <div class="modal-col-right" id="detalleDeleteContainer" style="align-items: stretch; text-align: left;">
+                    <div class="placeholder-detalle" style="text-align: center; margin: auto;">
+                        <i class="fa-solid fa-user-shield" style="font-size: 2.5rem; color: #ef4444; margin-bottom: 1rem;"></i>
+                        <p>Selecciona un usuario de la izquierda para iniciar el protocolo de borrado seguro.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../Vanilla/AdminCall/Admin.js" type="module"></script>
+</body>
+
+</html>

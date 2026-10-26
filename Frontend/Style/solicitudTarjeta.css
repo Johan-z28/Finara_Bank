@@ -1,0 +1,314 @@
+@import url('global/styles.css');
+
+/* ======= VISTA DE SOLICITUD DE TARJETA - FINARA BANK ======= */
+.card-request-container {
+    padding: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    color: var(--text-white, #ffffff);
+    font-family: var(--font-main, 'Poppins', sans-serif);
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    box-sizing: border-box !important;
+    width: 100%;
+}
+
+.request-header {
+    margin-bottom: 0.5rem;
+    width: 100%;
+}
+
+.request-header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    color: #ffffff;
+}
+
+.request-header p {
+    color: #64748b !important;
+    font-size: 0.9rem;
+}
+
+/* ======= GRID DE CATALOGO DE PRODUCTOS RESPONSIVO ======= */
+.catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.card-option-box {
+    background: var(--bg-card-dark-glass, rgba(17, 20, 29, 0.85)) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--bg-card-border, rgba(255, 255, 255, 0.08)) !important;
+    border-radius: var(--radius-card, 16px);
+    padding: 1.6rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1.2rem;
+    box-shadow: var(--shadow-card, 0 10px 30px rgba(0, 0, 0, 0.4));
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    box-sizing: border-box;
+    position: relative;
+    width: 100%;
+}
+
+.card-option-box:hover {
+    border-color: var(--gold-main, #e5a93c);
+    transform: translateY(-4px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+}
+
+.card-option-box.selected {
+    border-color: var(--gold-main, #e5a93c);
+    background: linear-gradient(145deg, rgba(17, 20, 29, 0.95), #181d24);
+}
+
+/* Plástico físico de las tarjetas 3D */
+.tarjeta-plastico {
+    width: 100%;
+    aspect-ratio: 1.58 / 1;
+    height: auto;
+    min-height: 185px;
+    border-radius: 14px;
+    padding: 18px 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
+    margin-bottom: 0.8rem;
+    transition: transform 0.3s ease;
+}
+
+.tarjeta-plastico:hover {
+    transform: scale(1.02);
+}
+
+.head-tarjeta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.head-tarjeta .logo-svg {
+    height: 36px; /* 🚀 LOGOTIPO AMPLIADO SIGNIFICATIVAMENTE */
+    width: auto;
+}
+
+.head-tarjeta .card-contactless {
+    font-size: 1.1rem;
+    color: #ffffff;
+    transform: rotate(90deg);
+    opacity: 0.9;
+}
+
+.card-chip-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 4px 0;
+}
+
+.card-chip-area .chip {
+    width: 40px;
+    height: 28px;
+    background: linear-gradient(135deg, #fce09b 0%, #8a6218 100%);
+    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.card-tag {
+    font-size: 0.9rem;
+    color: #ffffff;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+.foot-tarjeta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    width: 100%;
+}
+
+.foot-tarjeta .card-number {
+    font-size: 1rem;
+    letter-spacing: 2.5px;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.foot-tarjeta .card-type {
+    font-size: 1.15rem;
+    font-weight: 900;
+    font-style: italic;
+    color: #ffffff;
+    letter-spacing: 1px;
+}
+
+/* Colores de plásticos y contraste dinámico de texto */
+.tarjeta-dorada {
+    background: linear-gradient(135deg, #e5a93c 0%, #9e6f1a 100%);
+    border: 1px solid #fce09b;
+}
+.tarjeta-dorada .card-number,
+.tarjeta-dorada .card-type,
+.tarjeta-dorada .card-tag,
+.tarjeta-dorada .card-contactless {
+    color: #ffffff !important;
+}
+
+.tarjeta-platino {
+    background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%);
+    border: 1px solid #ffffff;
+}
+.tarjeta-platino .card-number,
+.tarjeta-platino .card-type,
+.tarjeta-platino .card-tag,
+.tarjeta-platino .card-contactless {
+    color: #0f172a !important;
+}
+
+.tarjeta-negra {
+    background: linear-gradient(135deg, #1f2533 0%, #0d1017 100%);
+    border: 1px solid #2d3548;
+}
+
+/* Contenido de la tarjeta */
+.card-content-top {
+    margin-bottom: 1rem;
+}
+
+.card-type-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.35rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+    letter-spacing: 0.5px;
+}
+
+.tag-ahorros { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.tag-corriente { background: rgba(96, 165, 250, 0.15); color: #60a5fa; }
+.tag-credito { background: rgba(229, 169, 60, 0.15); color: #e5a93c; }
+
+.card-option-box h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-white, #ffffff);
+}
+
+.card-option-box p {
+    font-size: 0.88rem;
+    color: var(--text-muted, #94a3b8);
+    margin-bottom: 1.2rem;
+    line-height: 1.5;
+}
+
+.card-benefits {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem 0;
+    font-size: 0.88rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 1.2rem;
+}
+
+.card-benefits li {
+    margin-bottom: 0.65rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-muted, #94a3b8);
+}
+
+.card-benefits li i {
+    color: var(--gold-main, #e5a93c);
+}
+
+/* Botones de solicitud */
+.request-card-btn {
+    background: linear-gradient(135deg, #e5a93c 0%, #c48b28 100%);
+    color: #07090e;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 18px;
+    font-size: 0.92rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(229, 169, 60, 0.3);
+}
+
+.request-card-btn:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+}
+
+.request-card-btn:active {
+    transform: scale(0.98);
+}
+
+.request-card-btn:disabled,
+.request-card-btn.btn-disabled {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: #94a3b8 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: none !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.card-prerequisito-hint {
+    font-size: 0.76rem;
+    color: #f87171;
+    margin-top: 0.5rem;
+    text-align: center;
+    display: block;
+}
+
+.card-aprobada-badge {
+    font-size: 0.76rem;
+    color: #34d399;
+    margin-top: 0.5rem;
+    text-align: center;
+    display: block;
+    font-weight: 500;
+}
+
+/* ======= MEDIA QUERIES RESPONSIVAS ======= */
+@media (max-width: 1200px) {
+    .catalog-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .catalog-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .card-request-container {
+        padding: 0.5rem !important;
+    }
+    
+    .request-header h1 {
+        font-size: 1.5rem;
+    }
+}

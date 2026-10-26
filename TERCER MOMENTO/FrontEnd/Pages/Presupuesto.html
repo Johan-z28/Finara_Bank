@@ -1,0 +1,318 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presupuesto | Finara Bank</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="../Style/image/favicon.svg">
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../Style/Presupuesto.css">
+    <!-- SweetAlert2 CSS y JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body class="general-body">
+
+    <!-- ======= SIDEBAR DE NAVEGACIÓN ======= -->
+    <aside class="sidebar">
+        <!-- BOTÓN CÍRCULO FLOTANTE EN EL BORDE DERECHO (ESCRITORIO) -->
+        <button class="sidebar-edge-toggle" id="sidebarCollapseBtn" aria-label="Colapsar menú" title="Alternar menú">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
+        <div class="sidebar-header">
+            <!-- Logo completo en modo expandido -->
+            <img src="../Style/image/Logo_finara.svg" alt="Finara Logo" class="sidebar-logo">
+            <!-- Isotipo favicon.svg al colapsar a 70px -->
+            <img src="../Style/image/favicon.svg" alt="Finara Icon" class="sidebar-logo-small">
+        </div>
+
+        <nav class="sidebar-nav">
+            <ul>
+                <li class="nav-item">
+                    <a href="Dashboard.html" class="nav-link" data-route="dashboard" title="Dashboard">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="solicitudTarjeta.html" class="nav-link" data-route="saldos" title="Solicitar Productos">
+                        <i class="fa-regular fa-credit-card"></i>
+                        <span>Solicitar Productos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Saldos.html" class="nav-link" data-route="saldos" title="Saldos">
+                        <i class="fa-regular fa-credit-card"></i>
+                        <span>Saldos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Transferencias.html" class="nav-link" data-route="transferencias" title="Transferencias">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <span>Transferencias</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Consignar.html" class="nav-link" data-route="consignar" title="Consignar">
+                        <i class="fa-solid fa-wallet"></i>
+                        <span>Consignar</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Retiros.html" class="nav-link" data-route="retiros" title="Retiros">
+                        <i class="fa-solid fa-money-bill-transfer"></i>
+                        <span>Retiros</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Movimientos.html" class="nav-link" data-route="movimientos" title="Movimientos">
+                        <i class="fa-solid fa-list-ul"></i>
+                        <span>Movimientos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Presupuesto.html" class="nav-link active" data-route="presupuesto" title="Presupuesto">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Presupuesto</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="FondoEmergencia.html" class="nav-link" data-route="fondo" title="Fondo de Emergencia">
+                        <i class="fa-solid fa-shield-heart"></i>
+                        <span>Fondo Emergencia</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Metas.html" class="nav-link" data-route="metas" title="Metas de Ahorro">
+                        <i class="fa-solid fa-bullseye"></i>
+                        <span>Metas de Ahorro</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Seguimiento.html" class="nav-link" data-route="seguimiento" title="Seguimiento Financiero">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Seguimiento Financiero</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Beneficios.html" class="nav-link" data-route="beneficios" title="Beneficios">
+                        <i class="fa-regular fa-star"></i>
+                        <span>Beneficios</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- ======= CONTENEDOR PRINCIPAL ======= -->
+    <div class="main-wrapper">
+
+        <!-- ======= NAVBAR SUPERIOR ======= -->
+        <header class="dashboard-navbar">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menú navegación">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="user-greeting">
+                    <h2>Hola, <span id="greetingName">Usuario</span></h2>
+                </div>
+            </div>
+
+            <div class="navbar-actions">
+                <button class="navbar-chatbot-btn" id="openChatbotNavBtn">
+                    <i class="fa-solid fa-comment-dots"></i>
+                    <span>Asesoría Financiera</span>
+                </button>
+
+                <button class="icon-btn" aria-label="Notificaciones">
+                    <i class="fa-regular fa-bell"></i>
+                </button>
+
+                <div class="profile-menu-container">
+                    <button class="profile-btn" id="profileMenuBtn">
+                        <div class="avatar-placeholder" id="avatarContainer">
+                            <img src="" alt="Foto de perfil" id="userAvatarImg" class="profile-img hidden">
+                            <i class="fa-solid fa-user profile-icon" id="userAvatarIcon"></i>
+                        </div>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="dropdown-header">
+                            <strong id="dropdownUserName">Usuario</strong>
+                        </div>
+                        <hr>
+                        <a href="Perfil.html" class="dropdown-item" data-route="perfil">
+                            <i class="fa-regular fa-user"></i> Ver Perfil
+                        </a>
+                        <a href="../index.html" class="dropdown-item logout-item">
+                            <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ======= VISTA DE PRESUPUESTO ======= -->
+        <main class="main-content" id="presupuestoApp">
+            <div class="pre-header">
+                <div>
+                    <h1>Elaboración de Presupuesto</h1>
+                    <p class="pre-subtitle">Planifica tus ingresos y gastos por categoría para mantener tus finanzas bajo control.</p>
+                </div>
+
+                <!-- Selector de Periodo Mensual Personalizado (Finara Dark & Gold) -->
+                <div class="pre-selector-periodo" id="selectorPeriodoContainer">
+                    <button type="button" class="btn-periodo-nav" id="btnMesAnterior" title="Mes anterior">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    
+                    <div class="periodo-display-box" id="periodoDisplayBtn">
+                        <i class="fa-regular fa-calendar-days color-dorado"></i>
+                        <span id="periodoTextoLabel">Octubre 2026</span>
+                        <i class="fa-solid fa-caret-down flecha-dropdown"></i>
+                    </div>
+
+                    <button type="button" class="btn-periodo-nav" id="btnMesSiguiente" title="Mes siguiente">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+
+                    <!-- Dropdown personalizado de meses y años -->
+                    <div class="pre-dropdown-meses hidden" id="dropdownMesesMenu">
+                        <div class="dropdown-header-year">
+                            <button type="button" class="btn-year-nav" id="btnYearPrev"><i class="fa-solid fa-chevron-left"></i></button>
+                            <strong id="labelYearSeleccionado">2026</strong>
+                            <button type="button" class="btn-year-nav" id="btnYearNext"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                        <div class="grid-meses-dropdown" id="gridMesesDropdown">
+                            <!-- Inyectado dinámicamente: Ene, Feb, Mar, etc. -->
+                        </div>
+                    </div>
+
+                    <!-- Input oculto para compatibilidad con el valor de periodo (YYYY-MM) -->
+                    <input type="hidden" id="selectPeriodo" value="2026-10">
+                </div>
+            </div>
+
+            <!-- Panel de Indicadores y Cálculo Automático de Saldo -->
+            <section class="pre-metricas-grid">
+                <div class="pre-metrica-card">
+                    <div class="pre-metrica-icono bg-ingreso">
+                        <i class="fa-solid fa-arrow-trend-up"></i>
+                    </div>
+                    <div class="pre-metrica-info">
+                        <span>Ingresos Estimados</span>
+                        <h3 id="metricaIngresos" class="color-ingreso">$ 0</h3>
+                        <small>Total presupuestado</small>
+                    </div>
+                </div>
+
+                <div class="pre-metrica-card">
+                    <div class="pre-metrica-icono bg-gasto">
+                        <i class="fa-solid fa-arrow-trend-down"></i>
+                    </div>
+                    <div class="pre-metrica-info">
+                        <span>Gastos Planificados</span>
+                        <h3 id="metricaGastos" class="color-gasto">$ 0</h3>
+                        <small id="metricaPorcentajeGastado">0% de los ingresos</small>
+                    </div>
+                </div>
+
+                <div class="pre-metrica-card">
+                    <div class="pre-metrica-icono bg-balance" id="iconoBalanceBox">
+                        <i class="fa-solid fa-scale-balanced" id="iconoBalance"></i>
+                    </div>
+                    <div class="pre-metrica-info">
+                        <span>Saldo Neto (Ingresos vs Gastos)</span>
+                        <h3 id="metricaSaldoNeto">$ 0</h3>
+                        <small id="metricaEstadoBalance">Balance equilibrado</small>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Barra de Progreso Presupuestaria -->
+            <section class="pre-barra-progreso-card">
+                <div class="pre-progreso-info">
+                    <span>Uso del presupuesto mensual</span>
+                    <strong id="progresoTexto">0% consumido</strong>
+                </div>
+                <div class="pre-progreso-track">
+                    <div class="pre-progreso-fill" id="progresoFill" style="width: 0%;"></div>
+                </div>
+            </section>
+
+            <!-- Panel de Creación / Registro de Ingreso y Gasto -->
+            <section class="pre-registro-card">
+                <div class="pre-registro-head">
+                    <h3><i class="fa-solid fa-circle-plus"></i> Registrar rubro de presupuesto</h3>
+                </div>
+                <form id="formRegistroRubro" class="pre-form-registro">
+                    <div class="pre-campo">
+                        <label for="rubroTipo">Tipo</label>
+                        <select id="rubroTipo" required>
+                            <option value="INGRESO">Ingreso Estimado</option>
+                            <option value="GASTO">Gasto Presupuestado</option>
+                        </select>
+                    </div>
+
+                    <div class="pre-campo">
+                        <label for="rubroCategoria">Categoría</label>
+                        <select id="rubroCategoria" required>
+                            <!-- Opciones cargadas dinámicamente según el tipo -->
+                        </select>
+                    </div>
+
+                    <div class="pre-campo">
+                        <label for="rubroDescripcion">Concepto o Descripción</label>
+                        <input type="text" id="rubroDescripcion" placeholder="Ej. Pago de arriendo, Salario principal" required>
+                    </div>
+
+                    <div class="pre-campo">
+                        <label for="rubroMonto">Monto (COP)</label>
+                        <input type="text" id="rubroMonto" placeholder="$ 0" required inputmode="numeric">
+                    </div>
+
+                    <div class="pre-campo-btn">
+                        <button type="submit" class="btn-guardar-rubro" id="btnGuardarRubro">
+                            <i class="fa-solid fa-plus"></i> Agregar Rubro
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Listado de rubros por categoría -->
+            <div class="pre-listados-grid">
+                <!-- Columna Ingresos -->
+                <div class="pre-columna-card">
+                    <div class="pre-columna-head">
+                        <h4><i class="fa-solid fa-arrow-down-long color-ingreso"></i> Ingresos Registrados</h4>
+                        <span class="badge-total-col color-ingreso" id="totalColIngresos">$ 0</span>
+                    </div>
+                    <div class="pre-items-lista" id="listaIngresos">
+                        <p class="pre-lista-vacia">No hay ingresos registrados en este mes.</p>
+                    </div>
+                </div>
+
+                <!-- Columna Gastos -->
+                <div class="pre-columna-card">
+                    <div class="pre-columna-head">
+                        <h4><i class="fa-solid fa-arrow-up-long color-gasto"></i> Gastos Registrados</h4>
+                        <span class="badge-total-col color-gasto" id="totalColGastos">$ 0</span>
+                    </div>
+                    <div class="pre-items-lista" id="listaGastos">
+                        <p class="pre-lista-vacia">No hay gastos registrados en este mes.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Script del Módulo de Presupuesto -->
+    <script type="module" src="../Vanilla/Presupuesto.js"></script>
+</body>
+
+</html>
