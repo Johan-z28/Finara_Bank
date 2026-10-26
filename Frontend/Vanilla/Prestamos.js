@@ -197,27 +197,38 @@ export async function initPrestamosView() {
                 return;
             }
 
-            const solicitudCreada = registrarSolicitudPrestamo({ monto, meses, cuotaMensual, estadoEvaluacion: evaluacion, concepto, tipoId });
+            try {
+                const solicitudCreada = registrarSolicitudPrestamo({ monto, meses, cuotaMensual, estadoEvaluacion: evaluacion, concepto, tipoId });
 
-            Swal.fire({
-                icon: 'success',
-                title: '¡Solicitud Registrada!',
-                html: `
-                    <div style="text-align: left; font-size: 0.9rem; color: #cbd5e1; background: rgba(0,0,0,0.3); padding: 14px; border-radius: 12px;">
-                        <p><strong>Radicado:</strong> <span style="color: #e5a93c; font-family: monospace;">${solicitudCreada.radicado}</span></p>
-                        <p><strong>Estado:</strong> <span style="color: ${evaluacion.color};">${solicitudCreada.estado}</span></p>
-                        <p><strong>Cuota Mensual:</strong> ${formatoCOP.format(solicitudCreada.cuotaMensual)}</p>
-                    </div>
-                `,
-                background: '#12151c',
-                color: '#fff',
-                confirmButtonColor: '#e5a93c'
-            }).then(() => {
-                formPrestamo.reset();
-                window.actualizarSimulacionDinamica();
-                const tabDashboard = document.querySelector('[data-tab="tab-dashboard"]');
-                if (tabDashboard) tabDashboard.click();
-            });
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Solicitud Registrada!',
+                    html: `
+                        <div style="text-align: left; font-size: 0.9rem; color: #cbd5e1; background: rgba(0,0,0,0.3); padding: 14px; border-radius: 12px;">
+                            <p><strong>Radicado:</strong> <span style="color: #e5a93c; font-family: monospace;">${solicitudCreada.radicado}</span></p>
+                            <p><strong>Estado:</strong> <span style="color: ${evaluacion.color};">${solicitudCreada.estado}</span></p>
+                            <p><strong>Cuota Mensual:</strong> ${formatoCOP.format(solicitudCreada.cuotaMensual)}</p>
+                        </div>
+                    `,
+                    background: '#12151c',
+                    color: '#fff',
+                    confirmButtonColor: '#e5a93c'
+                }).then(() => {
+                    formPrestamo.reset();
+                    window.actualizarSimulacionDinamica();
+                    const tabDashboard = document.querySelector('[data-tab="tab-dashboard"]');
+                    if (tabDashboard) tabDashboard.click();
+                });
+            } catch (error) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Cuenta Requerida',
+                    text: error.message,
+                    background: '#12151c',
+                    color: '#fff',
+                    confirmButtonColor: '#e5a93c'
+                });
+            }
         });
     }
 
@@ -317,6 +328,9 @@ function abrirModalPagoCuota(radicado) {
     const prestamo = prestamos.find(p => p.radicado === radicado);
     if (!prestamo) return;
 
+    const cuotasRestantes = prestamo.meses - prestamo.cuotasPagadas;
+    const saldoTotalPendiente = cuotasRestantes * prestamo.cuotaMensual;
+
     let cuentasRaw = [];
     try {
         cuentasRaw = JSON.parse(localStorage.getItem('finara_cuentas')) || obtenerCuentas() || [];
@@ -331,16 +345,25 @@ function abrirModalPagoCuota(radicado) {
     });
 
     Swal.fire({
-        title: 'Pagar Cuota de Crédito',
+        title: 'Pagar Crédito o Cuota',
         html: `
             <div style="text-align: left; font-size: 0.9rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 12px;">
                 <p style="margin:0;"><strong>Radicado:</strong> <span style="color: #e5a93c;">${prestamo.radicado}</span></p>
-                <p style="margin:0;"><strong>Valor Cuota:</strong> <span style="color: #34d399; font-size: 1.1rem; font-weight: bold;">${formatoCOP.format(prestamo.cuotaMensual)}</span></p>
-                <div class="prestamo-campo" style="margin-top: 8px;">
+                
+                <div class="prestamo-campo">
+                    <label style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 6px; display: block;">Tipo de Pago:</label>
+                    <select id="selectTipoPago" style="background: rgba(0,0,0,0.4); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px; width: 100%;">
+                        <option value="cuota">Pagar Cuota Mensual (${formatoCOP.format(prestamo.cuotaMensual)})</option>
+                        <option value="total">Pagar Totalidad del Préstamo (${formatoCOP.format(saldoTotalPendiente)})</option>
+                    </select>
+                </div>
+
+                <div class="prestamo-campo" style="margin-top: 4px;">
                     <label style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 6px; display: block;">Selecciona la cuenta de pago:</label>
-                    <div id="cuentasCardsContainer" style="display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto;">
+                    <div id="cuentasCardsContainer" style="display: flex; flex-direction: column; gap: 8px; max-height: 150px; overflow-y: auto;">
                         ${cuentasValidas.length > 0 ? cuentasValidas.map((c, index) => {
-                            const numeroOculto = ocultarNumeroCuenta(c.numero || c.id);
+                            const digitos = String(c.numero || c.id || '').replace(/\D/g, '');
+                            const numeroOculto = `•••• ${digitos.slice(-4)}`;
                             const tipoLabel = String(c.tipo || 'CUENTA').toUpperCase();
                             const saldoNum = Number(c.saldo) || 0;
                             return `
@@ -382,12 +405,15 @@ function abrirModalPagoCuota(radicado) {
     }).then((result) => {
         if (result.isConfirmed) {
             const cuentaId = document.getElementById('cuentaSeleccionadaId').value;
+            const tipoPago = document.getElementById('selectTipoPago').value;
+            
             if (!cuentaId) {
                 Swal.fire({ icon: 'warning', title: 'Cuenta requerida', text: 'Por favor selecciona una cuenta para realizar el pago.', background: '#12151c', color: '#fff', confirmButtonColor: '#e5a93c' });
                 return;
             }
 
-            const resultadoPago = pagarCuotaPrestamo(radicado, cuentaId);
+            const esTotal = tipoPago === 'total';
+            const resultadoPago = pagarCuotaPrestamo(radicado, cuentaId, esTotal);
 
             if (!resultadoPago.success) {
                 Swal.fire({ icon: 'error', title: 'Error en el Pago', text: resultadoPago.message, background: '#12151c', color: '#fff', confirmButtonColor: '#e5a93c' });
@@ -396,8 +422,8 @@ function abrirModalPagoCuota(radicado) {
 
             Swal.fire({
                 icon: 'success',
-                title: '¡Pago Exitoso!',
-                text: 'La cuota ha sido debitada de tu cuenta y registrada en tus movimientos.',
+                title: esTotal ? '¡Préstamo Cancelado en su Totalidad!' : '¡Pago Exitoso!',
+                text: esTotal ? 'Has pagado la totalidad del crédito. El préstamo ha quedado saldado.' : 'La cuota ha sido debitada de tu cuenta y registrada en tus movimientos.',
                 background: '#12151c',
                 color: '#fff',
                 confirmButtonColor: '#e5a93c'

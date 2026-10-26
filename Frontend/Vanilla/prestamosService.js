@@ -41,7 +41,31 @@ export function evaluarViabilidadPrestamo(monto) {
     }
 }
 
+/**
+ * Registra una nueva solicitud de préstamo, valida la cuenta de ahorros y desembolsa el dinero automáticamente si es APROBADO
+ */
 export function registrarSolicitudPrestamo({ monto, meses, cuotaMensual, estadoEvaluacion, concepto, tipoId }) {
+    let todasLasCuentas = [];
+    try {
+        todasLasCuentas = JSON.parse(localStorage.getItem(K.cuentas)) || obtenerCuentas() || [];
+    } catch {
+        todasLasCuentas = [];
+    }
+
+    const listaCuentas = Array.isArray(todasLasCuentas) ? todasLasCuentas : Object.values(todasLasCuentas);
+    
+    // Buscar la cuenta de ahorros/débito activa del usuario para el desembolso
+    const cuentaAhorrosIndex = listaCuentas.findIndex(c => {
+        if (!c) return false;
+        const tipoStr = String(c.tipo || '').toUpperCase();
+        const estadoStr = String(c.estado || 'ACTIVA').toUpperCase();
+        return (tipoStr.includes('AHORRO') || tipoStr.includes('DEBITO')) && estadoStr === 'ACTIVA';
+    });
+
+    if (cuentaAhorrosIndex === -1) {
+        throw new Error('Debes tener una Cuenta de Ahorros o Débito activa en tu perfil para recibir el desembolso del crédito.');
+    }
+
     let prestamos = [];
     try {
         prestamos = JSON.parse(localStorage.getItem(K.prestamos)) || [];
@@ -50,7 +74,7 @@ export function registrarSolicitudPrestamo({ monto, meses, cuotaMensual, estadoE
     }
 
     const radicado = `PRES-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}-${Math.floor(1000 + Math.random() * 9000)}`;
-    const esActivo = estadoEvaluacion.estado === 'APROBADO';
+    const esAprobado = estadoEvaluacion.estado === 'APROBADO';
 
     let tasaTexto = '1.8% E.M. (24% E.A.)';
     if (tipoId === 'vehiculo') tasaTexto = '1.38% E.M. (18% E.A.)';
@@ -68,12 +92,45 @@ export function registrarSolicitudPrestamo({ monto, meses, cuotaMensual, estadoE
         mensajeEstado: estadoEvaluacion.mensaje,
         concepto: concepto || 'Libre inversión',
         tipoId: tipoId || 'libre',
-        activo: esActivo,
+        activo: esAprobado,
         cuotasPagadas: 0
     };
 
     prestamos.unshift(nuevaSolicitud);
     localStorage.setItem(K.prestamos, JSON.stringify(prestamos));
+
+    // Si el crédito fue pre-aprobado automáticamente, DESEMBOLSAR EL DINERO EN LA CUENTA DE AHORROS
+    if (esAprobado) {
+        const cuentaAhorros = listaCuentas[cuentaAhorrosIndex];
+        const montoPrestamo = Number(monto);
+        
+        // 1. Aumentar el saldo de la cuenta de ahorros
+        cuentaAhorros.saldo = (Number(cuentaAhorros.saldo) || 0) + montoPrestamo;
+        listaCuentas[cuentaAhorrosIndex] = cuentaAhorros;
+        localStorage.setItem(K.cuentas, JSON.stringify(listaCuentas));
+
+        // 2. Registrar el movimiento de INGRESO por desembolso
+        let movimientos = [];
+        try {
+            movimientos = JSON.parse(localStorage.getItem(K.movimientos)) || [];
+        } catch {
+            movimientos = [];
+        }
+
+        const nuevoMovimiento = {
+            id: 'MOV-' + Date.now(),
+            fecha: new Date().toISOString(),
+            tipo: 'INGRESO',
+            categoria: 'Crédito',
+            descripcion: `Desembolso de Crédito - Radicado ${radicado}`,
+            valor: montoPrestamo,
+            cuentaId: cuentaAhorros.id || cuentaAhorros.numero,
+            cuentaNumero: cuentaAhorros.numero
+        };
+
+        movimientos.unshift(nuevoMovimiento);
+        localStorage.setItem(K.movimientos, JSON.stringify(movimientos));
+    }
 
     return nuevaSolicitud;
 }
@@ -90,19 +147,19 @@ export function buscarPrestamoPorRadicado(radicadoBuscado) {
 }
 
 /**
- * Procesa el pago de la cuota cumpliendo con la afectación de saldos, movimientos y actualización del préstamo.
+ * Procesa el pago de una cuota o la totalidad del préstamo
  */
-export function pagarCuotaPrestamo(radicado, cuentaId) {
+export function pagarCuotaPrestamo(radicado, cuentaId, pagarTotal = false) {
     let prestamos = JSON.parse(localStorage.getItem(K.prestamos)) || [];
-    const prestamoIndex = prestamos.findIndex(p => String(p.radicado).trim().toUpperCase() === String(radicado).trim().toUpperCase());
+    const prestamoIndex = prestamos.findIndex(p => p.radicado === radicado);
 
     if (prestamoIndex === -1) {
         return { success: false, message: 'Préstamo no encontrado.' };
     }
 
     const prestamo = prestamos[prestamoIndex];
-    if (prestamo.cuotasPagadas >= prestamo.meses || !prestamo.activo) {
-        return { success: false, message: 'Este crédito ya se encuentra totalmente pagado o inactivo.' };
+    if (prestamo.cuotasPagadas >= prestamo.meses) {
+        return { success: false, message: 'Este crédito ya se encuentra totalmente pagado.' };
     }
 
     let todasLasCuentas = [];
@@ -112,27 +169,41 @@ export function pagarCuotaPrestamo(radicado, cuentaId) {
         todasLasCuentas = [];
     }
 
-    const cuentaIndex = todasLasCuentas.findIndex(c => c && (String(c.id) === String(cuentaId) || String(c.numero) === String(cuentaId)));
+    const cuentaIndex = todasLasCuentas.findIndex(c => {
+        if (!c) return false;
+        const cId = String(c.id || '').trim();
+        const cNum = String(c.numero || '').replace(/\D/g, '');
+        const target = String(cuentaId).trim();
+        return cId === target || cNum === target || cNum.slice(-4) === target.slice(-4);
+    });
 
     if (cuentaIndex === -1) {
-        return { success: false, message: 'La cuenta seleccionada no es válida o no existe en el sistema.' };
+        return { success: false, message: 'La cuenta seleccionada no es válida en el sistema.' };
     }
 
     const cuenta = todasLasCuentas[cuentaIndex];
-    const valorCuota = Number(prestamo.cuotaMensual) || 0;
-    const saldoActualCuenta = Number(cuenta.saldo) || 0;
+    
+    // Calcular valor a pagar según si es cuota individual o la totalidad
+    const cuotasRestantes = prestamo.meses - prestamo.cuotasPagadas;
+    const valorPago = pagarTotal ? (cuotasRestantes * prestamo.cuotaMensual) : Number(prestamo.cuotaMensual);
+    const saldoActual = Number(cuenta.saldo) || 0;
 
-    if (saldoActualCuenta < valorCuota) {
-        return { success: false, message: 'Fondos insuficientes en la cuenta seleccionada para pagar la cuota.' };
+    if (saldoActual < valorPago) {
+        return { success: false, message: 'Fondos insuficientes en la cuenta seleccionada para cubrir el valor del pago.' };
     }
 
-    // 1. Descontar saldo de la cuenta
-    cuenta.saldo = saldoActualCuenta - valorCuota;
+    // 1. Actualizar Saldo de la Cuenta
+    cuenta.saldo = saldoActual - valorPago;
     todasLasCuentas[cuentaIndex] = cuenta;
     localStorage.setItem(K.cuentas, JSON.stringify(todasLasCuentas));
 
-    // 2. Actualizar cuotas pagadas y estado del préstamo
-    prestamo.cuotasPagadas = Number(prestamo.cuotasPagadas || 0) + 1;
+    // 2. Actualizar Préstamo
+    if (pagarTotal) {
+        prestamo.cuotasPagadas = prestamo.meses;
+    } else {
+        prestamo.cuotasPagadas += 1;
+    }
+
     if (prestamo.cuotasPagadas >= prestamo.meses) {
         prestamo.estado = 'PAGADO';
         prestamo.activo = false;
@@ -140,7 +211,7 @@ export function pagarCuotaPrestamo(radicado, cuentaId) {
     prestamos[prestamoIndex] = prestamo;
     localStorage.setItem(K.prestamos, JSON.stringify(prestamos));
 
-    // 3. Registrar el egreso en los movimientos globales
+    // 3. Registrar Egreso en Movimientos
     let movimientos = [];
     try {
         movimientos = JSON.parse(localStorage.getItem(K.movimientos)) || [];
@@ -148,20 +219,23 @@ export function pagarCuotaPrestamo(radicado, cuentaId) {
         movimientos = [];
     }
 
-    const numCuentaRef = String(cuenta.numero || cuenta.id || 'CUENTA');
+    const descMovimiento = pagarTotal 
+        ? `Pago total anticipado - Crédito ${prestamo.radicado}`
+        : `Pago cuota ${prestamo.cuotasPagadas}/${prestamo.meses} - Crédito ${prestamo.radicado}`;
+
     const nuevoMovimiento = {
         id: 'MOV-' + Date.now(),
-        cuentaId: String(cuenta.id || numCuentaRef),
-        cuentaNumero: numCuentaRef,
         fecha: new Date().toISOString(),
         tipo: 'EGRESO',
-        categoria: 'Pago de Préstamo',
-        descripcion: `Pago cuota ${prestamo.cuotasPagadas}/${prestamo.meses} - Crédito ${prestamo.radicado}`,
-        valor: valorCuota
+        categoria: 'Préstamos',
+        descripcion: descMovimiento,
+        valor: valorPago,
+        cuentaId: cuenta.id || cuenta.numero,
+        cuentaNumero: cuenta.numero
     };
 
     movimientos.unshift(nuevoMovimiento);
     localStorage.setItem(K.movimientos, JSON.stringify(movimientos));
 
-    return { success: true, message: 'Pago de cuota procesado con éxito.', prestamo, cuenta };
+    return { success: true, message: 'Pago procesado con éxito.', prestamo, cuenta };
 }
