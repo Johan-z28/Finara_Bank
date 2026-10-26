@@ -9,16 +9,12 @@ const K = {
 
 export const TASA_INTERES_MENSUAL = 0.018; // 1.8% T.M. (24% E.A.)
 
-// Opciones predefinidas para el Comparador de Créditos (HU-27)
 export const TIPOS_CREDITO_COMPARATIVA = [
     { id: 'libre', nombre: 'Crédito de Libre Inversión', tasaEA: '24% E.A.', tasaEM: '1.8%', desc: 'Ideal para cualquier proyecto personal o imprevisto.' },
     { id: 'vehiculo', nombre: 'Financiación de Vehículo', tasaEA: '18% E.A.', tasaEM: '1.38%', desc: 'Tasas preferenciales con prenda vehicular.' },
     { id: 'hipotecario', nombre: 'Crédito Hipotecario / Vivienda', tasaEA: '14% E.A.', tasaEM: '1.10%', desc: 'El plazo más amplio y la cuota más baja del mercado.' }
 ];
 
-/**
- * Calcula la cuota mensual fija (sistema francés)
- */
 export function calcularCuotaPrestamo(monto, meses, tasaMensual = TASA_INTERES_MENSUAL) {
     const P = Number(monto) || 0;
     const n = Number(meses) || 1;
@@ -30,9 +26,6 @@ export function calcularCuotaPrestamo(monto, meses, tasaMensual = TASA_INTERES_M
     return Math.round(cuota);
 }
 
-/**
- * Condicional de evaluación del monto solicitado (HU-14)
- */
 export function evaluarViabilidadPrestamo(monto) {
     const solicitado = Number(monto) || 0;
 
@@ -48,9 +41,6 @@ export function evaluarViabilidadPrestamo(monto) {
     }
 }
 
-/**
- * Registra una nueva solicitud de préstamo generando un radicado único (HU-14)
- */
 export function registrarSolicitudPrestamo({ monto, meses, cuotaMensual, estadoEvaluacion, concepto, tipoId }) {
     let prestamos = [];
     try {
@@ -62,7 +52,6 @@ export function registrarSolicitudPrestamo({ monto, meses, cuotaMensual, estadoE
     const radicado = `PRES-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}-${Math.floor(1000 + Math.random() * 9000)}`;
     const esActivo = estadoEvaluacion.estado === 'APROBADO';
 
-    // Definir la tasa según el tipo de crédito elegido
     let tasaTexto = '1.8% E.M. (24% E.A.)';
     if (tipoId === 'vehiculo') tasaTexto = '1.38% E.M. (18% E.A.)';
     if (tipoId === 'hipotecario') tasaTexto = '1.10% E.M. (14% E.A.)';
@@ -89,9 +78,6 @@ export function registrarSolicitudPrestamo({ monto, meses, cuotaMensual, estadoE
     return nuevaSolicitud;
 }
 
-/**
- * Busca un préstamo por radicado (HU-14 / HU-16)
- */
 export function buscarPrestamoPorRadicado(radicadoBuscado) {
     if (!radicadoBuscado) return null;
     try {
@@ -104,38 +90,21 @@ export function buscarPrestamoPorRadicado(radicadoBuscado) {
 }
 
 /**
- * Procesa el pago de una cuota descontando saldo de una cuenta y registrando el movimiento (HU-16)
+ * Procesa el pago de la cuota cumpliendo con la afectación de saldos, movimientos y actualización del préstamo.
  */
 export function pagarCuotaPrestamo(radicado, cuentaId) {
     let prestamos = JSON.parse(localStorage.getItem(K.prestamos)) || [];
-    const prestamoIndex = prestamos.findIndex(p => p.radicado === radicado);
+    const prestamoIndex = prestamos.findIndex(p => String(p.radicado).trim().toUpperCase() === String(radicado).trim().toUpperCase());
 
     if (prestamoIndex === -1) {
         return { success: false, message: 'Préstamo no encontrado.' };
     }
 
     const prestamo = prestamos[prestamoIndex];
-    if (prestamo.cuotasPagadas >= prestamo.meses) {
-        return { success: false, message: 'Este crédito ya se encuentra totalmente pagado.' };
+    if (prestamo.cuotasPagadas >= prestamo.meses || !prestamo.activo) {
+        return { success: false, message: 'Este crédito ya se encuentra totalmente pagado o inactivo.' };
     }
 
-    const cuentas = obtenerCuentas() || [];
-    const cuentaIndex = cuentas.findIndex(c => String(c.id || c.numero) === String(cuentaId));
-
-    if (cuentaIndex === -1) {
-        return { success: false, message: 'La cuenta seleccionada no es válida.' };
-    }
-
-    const cuenta = cuentas[cuentaIndex];
-    const valorCuota = prestamo.cuotaMensual;
-
-    if (cuenta.saldo < valorCuota) {
-        return { success: false, message: 'Fondos insuficientes en la cuenta seleccionada para pagar la cuota.' };
-    }
-
-    // Descontar saldo y guardar en localStorage de cuentas directamente
-    cuenta.saldo -= valorCuota;
-    
     let todasLasCuentas = [];
     try {
         todasLasCuentas = JSON.parse(localStorage.getItem(K.cuentas)) || [];
@@ -143,16 +112,27 @@ export function pagarCuotaPrestamo(radicado, cuentaId) {
         todasLasCuentas = [];
     }
 
-    const globalIndex = todasLasCuentas.findIndex(c => c && String(c.id || c.numero) === String(cuentaId));
-    if (globalIndex !== -1) {
-        todasLasCuentas[globalIndex] = cuenta;
-    } else {
-        todasLasCuentas.push(cuenta);
+    const cuentaIndex = todasLasCuentas.findIndex(c => c && (String(c.id) === String(cuentaId) || String(c.numero) === String(cuentaId)));
+
+    if (cuentaIndex === -1) {
+        return { success: false, message: 'La cuenta seleccionada no es válida o no existe en el sistema.' };
     }
+
+    const cuenta = todasLasCuentas[cuentaIndex];
+    const valorCuota = Number(prestamo.cuotaMensual) || 0;
+    const saldoActualCuenta = Number(cuenta.saldo) || 0;
+
+    if (saldoActualCuenta < valorCuota) {
+        return { success: false, message: 'Fondos insuficientes en la cuenta seleccionada para pagar la cuota.' };
+    }
+
+    // 1. Descontar saldo de la cuenta
+    cuenta.saldo = saldoActualCuenta - valorCuota;
+    todasLasCuentas[cuentaIndex] = cuenta;
     localStorage.setItem(K.cuentas, JSON.stringify(todasLasCuentas));
 
-    // Actualizar préstamo
-    prestamo.cuotasPagadas += 1;
+    // 2. Actualizar cuotas pagadas y estado del préstamo
+    prestamo.cuotasPagadas = Number(prestamo.cuotasPagadas || 0) + 1;
     if (prestamo.cuotasPagadas >= prestamo.meses) {
         prestamo.estado = 'PAGADO';
         prestamo.activo = false;
@@ -160,7 +140,7 @@ export function pagarCuotaPrestamo(radicado, cuentaId) {
     prestamos[prestamoIndex] = prestamo;
     localStorage.setItem(K.prestamos, JSON.stringify(prestamos));
 
-    // Registrar en movimientos globales
+    // 3. Registrar el egreso en los movimientos globales
     let movimientos = [];
     try {
         movimientos = JSON.parse(localStorage.getItem(K.movimientos)) || [];
@@ -168,13 +148,16 @@ export function pagarCuotaPrestamo(radicado, cuentaId) {
         movimientos = [];
     }
 
+    const numCuentaRef = String(cuenta.numero || cuenta.id || 'CUENTA');
     const nuevoMovimiento = {
         id: 'MOV-' + Date.now(),
+        cuentaId: String(cuenta.id || numCuentaRef),
+        cuentaNumero: numCuentaRef,
         fecha: new Date().toISOString(),
         tipo: 'EGRESO',
+        categoria: 'Pago de Préstamo',
         descripcion: `Pago cuota ${prestamo.cuotasPagadas}/${prestamo.meses} - Crédito ${prestamo.radicado}`,
-        valor: valorCuota,
-        cuentaId: cuenta.id || cuenta.numero
+        valor: valorCuota
     };
 
     movimientos.unshift(nuevoMovimiento);
