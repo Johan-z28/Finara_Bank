@@ -147,7 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 productosActivos: 0,
                 saldoDisponible: "$ 0",
                 ultimaActividad: "Recién registrado",
-                avatar: "../Style/image/profile/avatarDefault.png",
+                avatar: "document../../style/image/profile/avatarDefault.png",
                 verificado: true,
                 // Arreglo dinámico vacío para ir agregando cuentas o tarjetas reales conforme se soliciten
                 cuentas: [],
