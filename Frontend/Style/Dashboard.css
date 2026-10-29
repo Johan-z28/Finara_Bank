@@ -1,13 +1,359 @@
-@import url('Styles.css');
-
+@import url('../Style/global/styles.css');
 /* ==========================================
-   ESTILOS ESPECÍFICOS DEL INTERIOR DEL DASHBOARD
+   DASHBOARD / PANORAMA GENERAL (FINARA)
    ========================================== */
 
-/* Ejemplo: Títulos de sección */
-.main-content h1 {
-    font-size: 1.5rem;
+.dash-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    box-sizing: border-box !important;
+}
+
+/* --- TARJETAS DE MÉTRICAS PRINCIPALES --- */
+.dash-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.2rem;
+    width: 100%;
+}
+
+.dash-card-metric {
+    background: var(--bg-card-dark-glass, rgba(17, 20, 29, 0.85)) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--bg-card-border, rgba(255, 255, 255, 0.08)) !important;
+    border-radius: var(--radius-card, 16px);
+    padding: 1.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: var(--shadow-card, 0 10px 30px rgba(0, 0, 0, 0.4));
+    transition: transform 0.2s ease, border-color 0.2s ease;
+    box-sizing: border-box;
+}
+
+.dash-card-metric:hover {
+    border-color: rgba(229, 169, 60, 0.4);
+    transform: translateY(-2px);
+}
+
+.dash-card-metric--highlight {
+    background: linear-gradient(135deg, rgba(229, 169, 60, 0.12) 0%, rgba(17, 20, 29, 0.9) 100%) !important;
+    border: 1px solid rgba(229, 169, 60, 0.4);
+}
+
+.dash-metric-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-muted, #94a3b8);
+    font-size: 0.82rem;
+    font-weight: 500;
+}
+
+.dash-metric-header i {
+    font-size: 1.15rem;
+    color: var(--gold-main, #e5a93c);
+}
+
+.dash-metric-value {
+    font-size: 1.65rem;
+    font-weight: 700;
+    color: var(--text-white, #ffffff);
+    letter-spacing: -0.5px;
+}
+
+.dash-metric-sub {
+    font-size: 0.75rem;
+    color: var(--text-muted, #94a3b8);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dash-metric-sub--ok {
+    color: #34d399;
+}
+
+/* --- BOTONES DE ACCIONES RÁPIDAS --- */
+.dash-quick-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+    flex-wrap: wrap;
+}
+
+.dash-btn-action {
+    flex: 1;
+    min-width: 100px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 0.78rem;
     font-weight: 600;
-    margin-bottom: 1.5rem;
-    color: var(--text-white);
+    text-decoration: none;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.dash-btn-action--transfer {
+    background: rgba(229, 169, 60, 0.1);
+    border: 1px solid rgba(229, 169, 60, 0.3);
+    color: var(--gold-main, #e5a93c);
+}
+
+.dash-btn-action--transfer:hover {
+    background: rgba(229, 169, 60, 0.2);
+}
+
+.dash-btn-action--deposit {
+    background: rgba(52, 211, 153, 0.1);
+    border: 1px solid rgba(52, 211, 153, 0.3);
+    color: #34d399;
+}
+
+.dash-btn-action--deposit:hover {
+    background: rgba(52, 211, 153, 0.2);
+}
+
+/* --- MINI-CHART (ACTIVIDAD FINANCIERA) --- */
+.dash-panel-chart {
+    width: 100%;
+}
+
+.dash-chart-legend {
+    font-size: 0.75rem;
+    color: var(--text-muted, #94a3b8);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dash-mini-chart-container {
+    height: 110px;
+    display: flex;
+    align-items: flex-end;
+    padding-top: 15px;
+    box-sizing: border-box;
+}
+
+.dash-chart-bars {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    width: 100%;
+    height: 100%;
+    gap: 12px;
+}
+
+.dash-chart-bar-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    height: 100%;
+    justify-content: flex-end;
+}
+
+.dash-bar-fill {
+    width: 100%;
+    max-width: 28px;
+    background: linear-gradient(180deg, #34d399 0%, rgba(52, 211, 153, 0.2) 100%);
+    border-radius: 6px 6px 0 0;
+    transition: height 0.4s ease;
+    min-height: 4px;
+}
+
+.dash-bar-fill--egreso {
+    background: linear-gradient(180deg, #f87171 0%, rgba(248, 113, 113, 0.2) 100%);
+}
+
+.dash-chart-label {
+    font-size: 0.68rem;
+    color: var(--text-muted, #94a3b8);
+}
+
+/* --- LAYOUT PRINCIPAL (DOS COLUMNAS) --- */
+.dash-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.8fr) minmax(280px, 1.2fr);
+    gap: 1.5rem;
+    align-items: start;
+    width: 100%;
+}
+
+.dash-panel {
+    background: var(--bg-card-dark-glass, rgba(17, 20, 29, 0.85)) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--bg-card-border, rgba(255, 255, 255, 0.08)) !important;
+    border-radius: var(--radius-card, 16px);
+    padding: 1.8rem;
+    box-shadow: var(--shadow-card, 0 10px 30px rgba(0, 0, 0, 0.4));
+    box-sizing: border-box;
+}
+
+.dash-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.dash-panel-header h3 {
+    color: var(--text-white, #ffffff);
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.dash-panel-link {
+    color: var(--gold-main, #e5a93c);
+    font-size: 0.8rem;
+    text-decoration: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: opacity 0.2s ease;
+}
+
+.dash-panel-link:hover {
+    opacity: 0.8;
+}
+
+/* --- LISTA DE PRODUCTOS INTERACTIVOS --- */
+.dash-accounts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.dash-account-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.dash-account-item:hover {
+    background: rgba(229, 169, 60, 0.05);
+    border-color: rgba(229, 169, 60, 0.4);
+    transform: translateX(3px);
+}
+
+.dash-account-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dash-account-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: rgba(229, 169, 60, 0.12);
+    color: var(--gold-main, #e5a93c);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+}
+
+.dash-account-details strong {
+    display: block;
+    color: var(--text-white, #ffffff);
+    font-size: 0.85rem;
+}
+
+.dash-account-details span {
+    color: var(--text-muted, #94a3b8);
+    font-size: 0.75rem;
+}
+
+.dash-account-balance {
+    color: var(--gold-main, #e5a93c);
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+/* --- LISTA DE ÚLTIMOS MOVIMIENTOS --- */
+.dash-movs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dash-mov-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.dash-mov-item:last-child {
+    border-bottom: none;
+}
+
+.dash-mov-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dash-mov-icon {
+    font-size: 0.85rem;
+}
+
+.dash-mov-icon--ingreso { color: #34d399; }
+.dash-mov-icon--egreso { color: #f87171; }
+
+.dash-mov-desc strong {
+    display: block;
+    color: var(--text-white, #ffffff);
+    font-size: 0.82rem;
+    font-weight: 500;
+}
+
+.dash-mov-desc small {
+    color: var(--text-muted, #94a3b8);
+    font-size: 0.72rem;
+}
+
+.dash-mov-value {
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.dash-mov-value--ingreso { color: #34d399; }
+.dash-mov-value--egreso { color: #f87171; }
+
+.dash-empty {
+    color: var(--text-muted, #94a3b8);
+    font-size: 0.85rem;
+    padding: 8px 0;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 992px) {
+    .dash-grid {
+        grid-template-columns: 1fr;
+    }
 }
