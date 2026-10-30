@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Principal | Finara Bank</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="../Style/image/favicon.svg">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body class="general-body">
+    <div class="dash-container">
+        <!-- RESUMEN DE SALDOS (METRIC CARDS) -->
+        <section class="dash-metrics">
+            <div class="dash-card-metric dash-card-metric--highlight">
+                <div class="dash-metric-header">
+                    <span>Saldo Consolidado</span>
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <strong id="dashSaldoTotal" class="dash-metric-value">$ 0</strong>
+                <span class="dash-metric-sub dash-metric-sub--ok">
+                    <i class="fa-solid fa-circle-check"></i> Cuentas activas
+                </span>
+            </div>
+
+            <div class="dash-card-metric">
+                <div class="dash-metric-header">
+                    <span>Productos Bancarios</span>
+                    <i class="fa-regular fa-credit-card" style="color: #60a5fa;"></i>
+                </div>
+                <strong id="dashTotalProductos" class="dash-metric-value">0</strong>
+                <span class="dash-metric-sub">Ahorros, Corriente y Crédito</span>
+            </div>
+
+            <div class="dash-card-metric">
+                <div class="dash-metric-header">
+                    <span>Operaciones Rápidas</span>
+                    <i class="fa-solid fa-bolt" style="color: var(--gold-main);"></i>
+                </div>
+                <div class="dash-quick-actions">
+                    <a href="#" data-view="transferencias" class="dash-btn-action dash-btn-action--transfer">
+                        <i class="fa-solid fa-arrows-rotate"></i> Transferir
+                    </a>
+                    <a href="#" data-view="consignar" class="dash-btn-action dash-btn-action--deposit">
+                        <i class="fa-solid fa-wallet"></i> Consignar
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN DE GRÁFICO DE ACTIVIDAD FINANCIERA (MINI-CHART) -->
+        <section class="dash-panel dash-panel-chart">
+            <div class="dash-panel-header">
+                <h3>Actividad Financiera (Últimos 7 días)</h3>
+                <span class="dash-chart-legend">
+                    <i class="fa-solid fa-circle" style="color: #34d399; font-size: 8px;"></i> Ingresos vs Egreso
+                </span>
+            </div>
+            <div class="dash-mini-chart-container">
+                <div class="dash-chart-bars" id="dashChartBars">
+                    <!-- Barras generadas dinámicamente -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN DE CUENTAS Y ÚLTIMOS MOVIMIENTOS -->
+        <div class="dash-grid">
+            <!-- Columna Izquierda: Mis Productos con Tarjetas Interactivas -->
+            <section class="dash-panel">
+                <div class="dash-panel-header">
+                    <h3>Mis Productos <small style="font-size: 0.7rem; color: #94a3b8; font-weight: normal;"></small></h3>
+                    <a href="#" data-view="saldos" class="dash-panel-link">
+                        Ver todos <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </div>
+                <div id="dashListaCuentas" class="dash-accounts-list">
+                    <!-- Cuentas inyectadas dinámicamente -->
+                </div>
+            </section>
+
+            <!-- Columna Derecha: Últimas Transacciones -->
+            <section class="dash-panel">
+                <div class="dash-panel-header">
+                    <h3>Últimos Movimientos</h3>
+                    <a href="#" data-view="movimientos" class="dash-panel-link">
+                        Ver historial <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </div>
+                <div id="dashListaMovimientos" class="dash-movs-list">
+                    <!-- Movimientos inyectados dinámicamente -->
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script type="module" src="../../Vanilla/Dashboard.js"></script>
+</body>
+
+</html>
