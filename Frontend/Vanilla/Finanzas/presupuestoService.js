@@ -1,8 +1,4 @@
-// Vanilla/presupuestoService.js
-// Servicio de datos y cálculo de presupuestos (HU-23: Elaboración de presupuesto)
-// Gestiona el registro de ingresos y gastos por categoría, el cálculo automático de saldos y la persistencia mensual.
-
-import { obtenerUsernameActivo } from './cuentasService.js';
+import { obtenerUsernameActivo } from '../cuentasService.js';
 
 const CLAVE_PRESUPUESTOS = 'finara_presupuestos';
 
@@ -56,7 +52,6 @@ export function obtenerPresupuestosUsuario(periodo = null) {
     const usuarioActivo = obtenerUsernameActivo();
     let todos = leerTodos();
 
-    // Purgar rubros residuales de demo que se hayan guardado en el navegador del usuario
     const hayDemosResiduales = todos.some(p => p.id && String(p.id).startsWith('PRE-DEMO-'));
     if (hayDemosResiduales) {
         todos = todos.filter(p => !p.id || !String(p.id).startsWith('PRE-DEMO-'));

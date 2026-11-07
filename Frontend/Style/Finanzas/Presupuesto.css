@@ -1,19 +1,23 @@
-@import url('global/styles.css');
-
 /* ==========================================
-   ESTILOS DE PRESUPUESTO (HU-23)
+   ESTILOS DE PRESUPUESTO (HU-23 - FINARA FINANZAS)
    ========================================== */
 
+@import url('../global/styles_finanzas.css');
+
 :root {
-    --color-ingreso: #34d399;
+    --color-ingreso: #10b981;
     --color-gasto: #f87171;
     --color-balance-positivo: #38bdf8;
-    --color-balance-alerta: #fbbf24;
+    --finanzas-emerald: #10b981;
+    --finanzas-emerald-bg: rgba(16, 185, 129, 0.15);
+    --finanzas-emerald-border: rgba(16, 185, 129, 0.25);
 }
 
 .color-ingreso { color: var(--color-ingreso) !important; }
 .color-gasto { color: var(--color-gasto) !important; }
+.color-esmeralda { color: var(--finanzas-emerald) !important; }
 
+/* Encabezado sobre fondo claro */
 .pre-header {
     display: flex;
     justify-content: space-between;
@@ -24,18 +28,18 @@
 }
 
 .pre-header h1 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--text-white);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #0f172a;
     margin-bottom: 0.3rem;
 }
 
 .pre-subtitle {
-    color: var(--text-muted);
-    font-size: 0.85rem;
+    color: #64748b;
+    font-size: 0.88rem;
 }
 
-/* Selector de Periodo Personalizado (Finara Dark & Gold) */
+/* Selector de Periodo Personalizado (Caja oscura flotante estilo Fondo de Emergencia) */
 .pre-selector-periodo {
     position: relative;
     display: inline-flex;
@@ -43,8 +47,8 @@
     background: #0d111a;
     padding: 4px;
     border-radius: 12px;
-    border: 1px solid rgba(229, 169, 60, 0.35);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--finanzas-emerald-border);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     gap: 4px;
     user-select: none;
 }
@@ -52,7 +56,7 @@
 .btn-periodo-nav {
     background: transparent;
     border: none;
-    color: var(--gold-main);
+    color: var(--finanzas-emerald);
     width: 32px;
     height: 32px;
     border-radius: 8px;
@@ -65,7 +69,7 @@
 }
 
 .btn-periodo-nav:hover {
-    background: rgba(229, 169, 60, 0.15);
+    background: var(--finanzas-emerald-bg);
     transform: scale(1.05);
 }
 
@@ -73,7 +77,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.05);
     padding: 6px 14px;
     border-radius: 8px;
     cursor: pointer;
@@ -82,21 +86,21 @@
 }
 
 .periodo-display-box:hover {
-    background: rgba(229, 169, 60, 0.1);
-    border-color: rgba(229, 169, 60, 0.3);
+    background: var(--finanzas-emerald-bg);
+    border-color: var(--finanzas-emerald-border);
 }
 
 .periodo-display-box span {
     font-size: 0.88rem;
     font-weight: 600;
-    color: #fff;
+    color: #ffffff;
     min-width: 110px;
     text-align: center;
 }
 
 .flecha-dropdown {
     font-size: 0.75rem;
-    color: var(--gold-main);
+    color: var(--finanzas-emerald);
     transition: transform 0.2s ease;
 }
 
@@ -104,25 +108,19 @@
     transform: rotate(180deg);
 }
 
-/* Dropdown Flotante de Selección de Mes y Año */
+/* Dropdown Flotante */
 .pre-dropdown-meses {
     position: absolute;
     top: calc(100% + 8px);
     right: 0;
     width: 250px;
     background: #0e121b;
-    border: 1px solid rgba(229, 169, 60, 0.4);
+    border: 1px solid var(--finanzas-emerald-border);
     border-radius: 14px;
     padding: 14px;
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.8), 0 0 20px rgba(229, 169, 60, 0.2);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6);
     z-index: 100;
     backdrop-filter: blur(12px);
-    animation: fadeInScale 0.2s ease-out;
-}
-
-@keyframes fadeInScale {
-    from { opacity: 0; transform: scale(0.96) translateY(-6px); }
-    to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .dropdown-header-year {
@@ -136,7 +134,7 @@
 
 .dropdown-header-year strong {
     font-size: 0.95rem;
-    color: var(--gold-main);
+    color: var(--finanzas-emerald);
 }
 
 .btn-year-nav {
@@ -150,12 +148,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
-}
-
-.btn-year-nav:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.08);
 }
 
 .grid-meses-dropdown {
@@ -165,7 +157,7 @@
 }
 
 .btn-mes-item {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.04);
     border: 1px solid transparent;
     color: #cbd5e1;
     padding: 8px 4px;
@@ -174,62 +166,58 @@
     font-weight: 500;
     cursor: pointer;
     text-align: center;
-    transition: all 0.2s ease;
-}
-
-.btn-mes-item:hover {
-    background: rgba(229, 169, 60, 0.15);
-    color: #fff;
-    border-color: rgba(229, 169, 60, 0.3);
 }
 
 .btn-mes-item.activo {
-    background: linear-gradient(135deg, #e5a93c 0%, #b8860b 100%);
-    color: #0b0e14;
+    background: var(--finanzas-emerald);
+    color: #ffffff;
     font-weight: 700;
-    box-shadow: 0 2px 8px rgba(229, 169, 60, 0.35);
 }
 
-/* Métricas de Saldo e Indicadores (Cálculo Automático) */
+/* Panel de Métricas: Tarjeta Oscura estilo Banner Monitoreo Fondo de Emergencia */
 .pre-metricas-grid {
+    background: linear-gradient(135deg, rgba(20, 24, 33, 0.95) 0%, rgba(13, 17, 24, 0.98) 100%);
+    border: 1px solid var(--finanzas-emerald-border);
+    border-radius: var(--radius-card, 16px);
+    padding: 1.6rem;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 1.4rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.8rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
 .pre-metrica-card {
-    background: var(--bg-card-dark);
-    border: 1px solid rgba(229, 169, 60, 0.25);
-    border-radius: var(--radius-lg);
-    padding: 1.4rem;
+    background: #111318;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 1.25rem 1.4rem;
     display: flex;
     align-items: center;
     gap: 1.2rem;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
-    transition: transform 0.25s ease, border-color 0.25s ease;
+    transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
 .pre-metrica-card:hover {
     transform: translateY(-2px);
-    border-color: var(--gold-main);
+    border-color: var(--finanzas-emerald-border);
 }
 
 .pre-metrica-icono {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.25rem;
+    font-size: 1.2rem;
     flex-shrink: 0;
 }
 
 .bg-ingreso {
-    background: rgba(52, 211, 153, 0.15);
+    background: rgba(16, 185, 129, 0.15);
     color: var(--color-ingreso);
-    border: 1px solid rgba(52, 211, 153, 0.3);
+    border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
 .bg-gasto {
@@ -245,9 +233,9 @@
 }
 
 .bg-balance--superavit {
-    background: rgba(52, 211, 153, 0.15);
-    color: #34d399;
-    border: 1px solid rgba(52, 211, 153, 0.3);
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
 .bg-balance--deficit {
@@ -257,30 +245,30 @@
 }
 
 .pre-metrica-info span {
-    font-size: 0.75rem;
-    color: var(--text-muted);
+    font-size: 0.78rem;
+    color: #94a3b8;
     font-weight: 500;
     display: block;
 }
 
 .pre-metrica-info h3 {
-    font-size: 1.35rem;
+    font-size: 1.4rem;
     font-weight: 700;
+    color: #ffffff !important;
     margin: 4px 0 2px 0;
     font-family: monospace;
-    letter-spacing: -0.02em;
 }
 
 .pre-metrica-info small {
-    font-size: 0.72rem;
-    color: var(--text-muted);
+    font-size: 0.76rem;
+    color: #64748b;
 }
 
-/* Barra de progreso de consumo de presupuesto */
+/* Barra de progreso sobre fondo oscuro */
 .pre-barra-progreso-card {
-    background: var(--bg-card-dark);
+    background: #111318;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: var(--radius-md);
+    border-radius: 12px;
     padding: 1.1rem 1.4rem;
     margin-bottom: 1.8rem;
 }
@@ -288,49 +276,53 @@
 .pre-progreso-info {
     display: flex;
     justify-content: space-between;
-    font-size: 0.8rem;
-    color: var(--text-muted);
+    font-size: 0.82rem;
+    color: #94a3b8;
     margin-bottom: 8px;
 }
 
 .pre-progreso-info strong {
-    color: var(--text-white);
+    color: #ffffff;
     font-family: monospace;
 }
 
 .pre-progreso-track {
     width: 100%;
     height: 10px;
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.08);
     border-radius: 999px;
     overflow: hidden;
 }
 
 .pre-progreso-fill {
     height: 100%;
-    background: linear-gradient(90deg, #34d399 0%, #e5a93c 70%, #f87171 100%);
+    background: linear-gradient(90deg, #10b981 0%, #fbbf24 70%, #f87171 100%);
     border-radius: 999px;
     transition: width 0.5s ease-in-out;
 }
 
-/* Panel de Formulario de Registro */
+/* Formulario en Tarjeta Blanca (Estilo Calculadora de Fondo de Emergencia) */
 .pre-registro-card {
-    background: var(--bg-card-dark);
-    border: 1px solid rgba(229, 169, 60, 0.25);
-    border-radius: var(--radius-lg);
-    padding: 1.4rem;
+    background: #ffffff;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: var(--radius-card, 16px);
+    padding: 1.8rem;
     margin-bottom: 1.8rem;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
 }
 
 .pre-registro-head h3 {
-    font-size: 1.05rem;
-    font-weight: 600;
-    color: var(--gold-main);
-    margin-bottom: 1.2rem;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 1.4rem;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+}
+
+.pre-registro-head h3 i {
+    color: var(--finanzas-emerald);
 }
 
 .pre-form-registro {
@@ -347,39 +339,59 @@
 }
 
 .pre-campo label {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    font-weight: 500;
+    font-size: 0.82rem;
+    color: #334155;
+    font-weight: 600;
 }
 
+/* Estilos base para todos los controles del formulario */
 .pre-campo input,
 .pre-campo select {
-    background: #090c12;
-    color: var(--text-white);
-    border: 1px solid rgba(229, 169, 60, 0.3);
-    border-radius: 10px;
+    background-color: #ffffff;
+    color: #0f172a;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 12px;
     padding: 11px 14px;
     font-family: inherit;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     width: 100%;
     transition: all 0.2s ease;
 }
 
+/* EXCLUSIVO PARA SELECTS: Flecha desplegable personalizada */
+.pre-campo select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2310b981'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center !important;
+    background-size: 14px 14px;
+    padding-right: 40px !important;
+    cursor: pointer;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+}
+
+/* EXCLUSIVO PARA INPUTS: Sin imagen de fondo ni flecha */
+.pre-campo input {
+    background-image: none !important;
+    padding-right: 14px !important;
+}
+
 .pre-campo input:focus,
 .pre-campo select:focus {
-    border-color: var(--gold-main);
-    box-shadow: 0 0 10px rgba(229, 169, 60, 0.25);
+    border-color: var(--finanzas-emerald);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.25);
     outline: none;
 }
 
 .btn-guardar-rubro {
-    background: var(--gold-main);
-    color: #07090e;
+    background: var(--finanzas-emerald);
+    color: #ffffff;
     border: none;
-    padding: 12px 18px;
-    border-radius: 10px;
+    padding: 12px 20px;
+    border-radius: 12px;
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -390,12 +402,12 @@
 }
 
 .btn-guardar-rubro:hover {
-    background: #ffbe44;
+    background: #059669;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(229, 169, 60, 0.3);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
 }
 
-/* Listados de Ingresos y Gastos */
+/* Listados en Tarjetas Blancas */
 .pre-listados-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -403,10 +415,11 @@
 }
 
 .pre-columna-card {
-    background: var(--bg-card-dark);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: var(--radius-lg);
-    padding: 1.4rem;
+    background: #ffffff;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: var(--radius-card, 16px);
+    padding: 1.6rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
     display: flex;
     flex-direction: column;
 }
@@ -417,12 +430,13 @@
     align-items: center;
     margin-bottom: 1.2rem;
     padding-bottom: 0.8rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid #e2e8f0;
 }
 
 .pre-columna-head h4 {
-    font-size: 0.95rem;
-    color: var(--text-white);
+    font-size: 1rem;
+    color: #0f172a;
+    font-weight: 700;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -430,7 +444,7 @@
 
 .badge-total-col {
     font-family: monospace;
-    font-size: 1rem;
+    font-size: 1.05rem;
     font-weight: 700;
 }
 
@@ -438,31 +452,32 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    min-height: 150px;
+    min-height: 120px;
 }
 
 .pre-lista-vacia {
-    color: var(--text-muted);
-    font-size: 0.82rem;
+    color: #64748b;
+    font-size: 0.85rem;
     text-align: center;
     margin: auto 0;
-    padding: 2rem 0;
+    padding: 1.5rem 0;
 }
 
 .pre-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 10px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
     padding: 12px 14px;
     transition: all 0.2s ease;
 }
 
 .pre-item:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(229, 169, 60, 0.3);
+    border-color: var(--finanzas-emerald-border);
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 
 .pre-item-info {
@@ -474,7 +489,7 @@
 .pre-item-icono {
     width: 36px;
     height: 36px;
-    border-radius: 8px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -483,19 +498,19 @@
 
 .pre-item-detalles strong {
     display: block;
-    font-size: 0.85rem;
-    color: var(--text-white);
+    font-size: 0.88rem;
+    color: #0f172a;
 }
 
 .pre-item-detalles span {
-    font-size: 0.72rem;
-    color: var(--text-muted);
+    font-size: 0.74rem;
+    color: #64748b;
 }
 
 .pre-item-monto {
     font-family: monospace;
     font-size: 0.95rem;
-    font-weight: 600;
+    font-weight: 700;
     text-align: right;
 }
 
@@ -508,7 +523,7 @@
 .pre-item-acciones {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
 }
 
 .btn-accion-pre {
@@ -522,16 +537,16 @@
 }
 
 .btn-editar-pre {
-    color: #94a3b8;
+    color: #64748b;
 }
 
 .btn-editar-pre:hover {
-    color: var(--gold-main);
-    background: rgba(229, 169, 60, 0.15);
+    color: var(--finanzas-emerald);
+    background: var(--finanzas-emerald-bg);
 }
 
 .btn-eliminar-pre {
-    color: #94a3b8;
+    color: #64748b;
 }
 
 .btn-eliminar-pre:hover {
