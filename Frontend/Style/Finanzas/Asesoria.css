@@ -1,5 +1,6 @@
 /* ==========================================
    ESTILOS ASESORÍA FINANCIERA (HU-17)
+   Línea visual nítida y limpia estilo Presupuestos
    ========================================== */
 
 @import url('../global/styles_finanzas.css');
@@ -108,6 +109,7 @@
     justify-content: flex-start;
 }
 
+/* Forzar fila del usuario estrictamente a la derecha */
 .user-message-row {
     justify-content: flex-end !important;
 }
@@ -142,7 +144,7 @@
 
 .user-bubble {
     background: var(--finanzas-primary);
-    color: #07090e !important;
+    color: #ffffff!important;
     font-weight: 600;
     border-radius: 14px;
     border-top-right-radius: 4px;
@@ -232,7 +234,7 @@
 }
 
 /* ========================================================
-   SECCIÓN DE RESULTADOS E HISTORIAL
+   SECCIÓN DE RESULTADOS / INFORME FINAL (Estilo Claro)
    ======================================================== */
 .resultado-reporte-section {
     display: none;
@@ -296,7 +298,6 @@
 .resultado-score-numero {
     font-size: 3rem;
     font-weight: 700;
-    color: var(--finanzas-primary) !important;
     margin: 8px 0 4px 0;
     font-family: monospace;
 }
@@ -304,7 +305,6 @@
 .resultado-score-nivel {
     font-size: 1.05rem;
     font-weight: 600;
-    color: #4ade80 !important;
     margin: 0;
 }
 
@@ -365,21 +365,63 @@
     margin: 0;
 }
 
+/* ==========================================
+   ACCIONES DEL REPORTE INFERIOR (BOTONES)
+   ========================================== */
 .reporte-acciones-wrapper {
     display: flex;
-    gap: 12px;
-    margin-top: 10px;
+    gap: 16px;
+    margin-top: 1.5rem;
+    align-items: center;
 }
 
 .btn-flex-1 {
     flex: 1;
-}
-
-.btn-text-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
     text-align: center;
 }
 
-/* Tarjetas de Historial en Lista */
+/* Botón principal (Nueva Asesoría - Esmeralda Finara) */
+#btnRepetirEvaluacion.btn-guardar-meta {
+    background: var(--finanzas-primary) !important;
+    color: #ffffff !important;
+    border: none;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25);
+}
+
+#btnRepetirEvaluacion.btn-guardar-meta:hover {
+    background: #059669 !important;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+    transform: translateY(-1px);
+}
+
+/* Botón secundario (Ver Historial - Tarjeta Clara con Borde Esmeralda) */
+#btnVerHistorialDesdeReporte.btn-meses {
+    background: #ffffff !important;
+    color: #334155 !important;
+    border: 1px solid rgba(16, 185, 129, 0.3) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+#btnVerHistorialDesdeReporte.btn-meses:hover {
+    background: rgba(16, 185, 129, 0.08) !important;
+    border-color: var(--finanzas-primary) !important;
+    color: #0f172a !important;
+    transform: translateY(-1px);
+}
+
+/* ==========================================
+   TARJETAS DE HISTORIAL EN LISTA
+   ========================================== */
 .historial-lista-grid {
     display: flex;
     flex-direction: column;
@@ -421,14 +463,12 @@
 .historial-item-score {
     font-size: 1.2rem;
     font-weight: 700;
-    color: #0f172a;
     font-family: monospace;
 }
 
 .historial-item-nivel {
     font-size: 0.85rem;
     font-weight: 600;
-    color: var(--finanzas-primary);
 }
 
 .btn-ver-detalle-historial {
@@ -447,3 +487,23 @@
     background: #059669;
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
+
+/* ==========================================
+   ESTILOS DINÁMICOS DE SCORE POR COLORES
+   ========================================== */
+
+/* Score Crítico / Riesgo (< 40) -> Rojo */
+.score-critico { color: #ef4444 !important; }
+.nivel-critico { color: #f87171 !important; }
+
+/* Score En Observación (40 - 59) -> Amarillo / Ámbar */
+.score-observacion { color: #f59e0b !important; }
+.nivel-observacion { color: #fbbf24 !important; }
+
+/* Score Saludable / Estable (60 - 79) -> Verde Esmeralda Finara */
+.score-estable { color: var(--finanzas-primary) !important; }
+.nivel-estable { color: #4ade80 !important; }
+
+/* Score Excelente (>= 80) -> Verde Brillante */
+.score-excelente { color: #34d399 !important; }
+.nivel-excelente { color: #6ee7b7 !important; }

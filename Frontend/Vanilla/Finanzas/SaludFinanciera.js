@@ -179,8 +179,31 @@ export function initSaludFinancieraView() {
         if (seccionResultado) {
             seccionResultado.style.display = 'block';
 
-            document.getElementById('lblScore').textContent = `${data.score} / 100`;
-            document.getElementById('lblNivel').textContent = `Nivel: ${data.nivelSalud}`;
+            const lblScore = document.getElementById('lblScore');
+            const lblNivel = document.getElementById('lblNivel');
+
+            lblScore.textContent = `${data.score} / 100`;
+            lblNivel.textContent = `Nivel: ${data.nivelSalud}`;
+
+            // Limpiar clases de color anteriores
+            lblScore.className = 'resultado-score-numero';
+            lblNivel.className = 'resultado-score-nivel';
+
+            // Asignar color dinámico según el nivel de riesgo / score
+            if (data.score < 40) {
+                lblScore.classList.add('score-critico');
+                lblNivel.classList.add('nivel-critico');
+            } else if (data.score < 60) {
+                lblScore.classList.add('score-observacion');
+                lblNivel.classList.add('nivel-observacion');
+            } else if (data.score < 80) {
+                lblScore.classList.add('score-estable');
+                lblNivel.classList.add('nivel-estable');
+            } else {
+                lblScore.classList.add('score-excelente');
+                lblNivel.classList.add('nivel-excelente');
+            }
+
             document.getElementById('txtEnfoqueAsesoria').textContent = data.enfoqueAsesoria || "Asesoría personalizada basada en tu perfil financiero.";
 
             document.getElementById('listaPuntosFuertes').innerHTML = data.puntosFuertes?.length > 0 
@@ -214,11 +237,30 @@ export function initSaludFinancieraView() {
         historial.forEach((item, index) => {
             const card = document.createElement('div');
             card.className = 'historial-item-card';
+
+            // Determinar clases de color según el score del ítem
+            let claseScore = 'score-estable';
+            let claseNivel = 'nivel-estable';
+
+            if (item.score < 40) {
+                claseScore = 'score-critico';
+                claseNivel = 'nivel-critico';
+            } else if (item.score < 60) {
+                claseScore = 'score-observacion';
+                claseNivel = 'nivel-observacion';
+            } else if (item.score < 80) {
+                claseScore = 'score-estable';
+                claseNivel = 'nivel-estable';
+            } else {
+                claseScore = 'score-excelente';
+                claseNivel = 'nivel-excelente';
+            }
+
             card.innerHTML = `
                 <div class="historial-item-info">
                     <span class="historial-item-fecha"><i class="fa-regular fa-calendar"></i> ${item.fechaEvaluacion || `Evaluación #${historial.length - index}`}</span>
-                    <span class="historial-item-score">Score: ${item.score} / 100</span>
-                    <span class="historial-item-nivel">Nivel: ${item.nivelSalud}</span>
+                    <span class="historial-item-score ${claseScore}">Score: ${item.score} / 100</span>
+                    <span class="historial-item-nivel ${claseNivel}">Nivel: ${item.nivelSalud}</span>
                 </div>
                 <button type="button" class="btn-ver-detalle-historial">
                     Ver Reporte <i class="fa-solid fa-chevron-right"></i>
