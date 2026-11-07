@@ -4,71 +4,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asesoría Financiera | Finara Finanzas</title>
+    <title>Asesoría Financiera Personalizada | Finara Finanzas</title>
     <link rel="icon" type="image/png" sizes="32x32" href="../Style/image/favicon_esmeralda.svg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../Style/Asesoria.css"> <!-- O tu archivo de estilos global -->
+    <link rel="stylesheet" href="../Style/Asesoria.css">
 </head>
 
-<div class="seg-header">
-    <div>
-        <h1>Asesoría Financiera Personalizada</h1>
-        <p class="seg-subtitle">Completa tu evaluación de salud financiera para recibir un diagnóstico y recomendaciones
-            a la medida.</p>
-    </div>
-</div>
-
-<!-- Tarjeta del Formulario de Encuesta -->
-<section class="seg-tabla-card" style="max-width: 800px; margin: 0 auto;">
-    <div class="grafico-card-head">
-        <h3>Evaluación de Estado Financiero</h3>
-        <p>Tus datos son privados y se usan exclusivamente para calcular tu score.</p>
-    </div>
-
-    <form id="formEncuestaSalud" class="asesoria-form"
-        style="padding: 24px; display: flex; flex-direction: column; gap: 20px;">
-
-        <div class="form-group">
-            <label for="ingresosMensuales">1. ¿Cuáles son tus ingresos mensuales totales aproximados (COP)?</label>
-            <input type="number" id="ingresosMensuales" class="form-control" placeholder="Ej: 4500000" required min="0">
+<body>
+    <main class="main-content" id="asesoriaApp">
+        <div class="fe-header">
+            <div>
+                <h1>Asesoría Financiera Personalizada</h1>
+                <p class="fe-subtitle">Conversa con tu asistente virtual para obtener un diagnóstico experto y tu score de salud financiera.</p>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label for="gastosMensuales">2. ¿Cuánto sumas en tus gastos fijos mensuales (Arriendo, servicios,
-                mercado)?</label>
-            <input type="number" id="gastosMensuales" class="form-control" placeholder="Ej: 2800000" required min="0">
-        </div>
+        <!-- CONTENEDOR PRINCIPAL DEL CHAT ASESOR (Expandido a lo ancho) -->
+        <section class="asesoria-chat-card">
+            <div class="fe-card-head chat-header-box">
+                <div class="fe-badge-icono">
+                    <img src="../Style/image/bot_finara_esmeralda.png" alt="Asesor Finara" class="bot-avatar-img-fluid">
+                </div>
+                <div>
+                    <h3>Asesor Finara</h3>
+                    <p>En línea • Diagnóstico de Salud Financiera</p>
+                </div>
+                <div class="chat-header-actions">
+                    <button type="button" id="btnHistorialAsesorias" class="btn-text-action" title="Ver historial de asesorías">
+                        <i class="fa-solid fa-clock-rotate-left"></i> Historial
+                    </button>
+                    <button type="button" id="btnReiniciarChat" class="btn-text-action" title="Reiniciar conversación">
+                        <i class="fa-solid fa-rotate-right"></i> Reiniciar
+                    </button>
+                </div>
+            </div>
 
-        <div class="form-group">
-            <label for="deudaTotal">3. ¿Cuál es el monto total de tus deudas activas actuales (Tarjetas,
-                préstamos)?</label>
-            <input type="number" id="deudaTotal" class="form-control" placeholder="Ej: 5000000" required min="0">
-        </div>
+            <!-- Cuerpo del Chat -->
+            <div id="chatConversacionBody" class="chat-body-content"></div>
 
-        <div class="form-group">
-            <label for="ahorroActual">4. ¿Cuánto tienes actualmente acumulado en ahorros o fondo de emergencia?</label>
-            <input type="number" id="ahorroActual" class="form-control" placeholder="Ej: 2000000" required min="0">
-        </div>
+            <!-- Contenedor de Entrada Dinámica -->
+            <div id="chatInputContainer" class="chat-input-footer"></div>
+        </section>
 
-        <div class="form-group">
-            <label for="metaPrincipal">5. ¿Cuál es tu principal objetivo o meta financiera a corto plazo?</label>
-            <select id="metaPrincipal" class="form-control" required>
-                <option value="" disabled selected>Selecciona una opción</option>
-                <option value="ahorro">Construir mi fondo de emergencia o ahorrar</option>
-                <option value="deudas">Salir de deudas rápidamente</option>
-                <option value="inversion">Comenzar a invertir</option>
-                <option value="control">Controlar mejor mis gastos diarios</option>
-            </select>
-        </div>
+        <!-- SECCIÓN DE RESULTADOS / INFORME FINAL (Distribución amplia sin scroll forzado) -->
+        <section id="seccionResultado" class="asesoria-resultado-card resultado-reporte-section">
+            <div class="fe-card-head resultado-header-box">
+                <div class="fe-badge-icono color-esmeralda-bg">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <div>
+                    <span class="resultado-tag">Diagnóstico Completo</span>
+                    <h3>Tu Reporte de Salud Financiera</h3>
+                </div>
+            </div>
 
-        <button type="submit" class="btn-primary-finara"
-            style="background-color: #34d399; color: #0f172a; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.2s;">
-            Generar Mi Diagnóstico y Score
-        </button>
-    </form>
-</section>
+            <div class="resultado-grid-layout">
+                <!-- Tarjeta Principal de Score -->
+                <div class="resultado-score-box">
+                    <span class="resultado-score-label">Score de Salud Financiera</span>
+                    <h1 id="lblScore" class="resultado-score-numero">0 / 100</h1>
+                    <p id="lblNivel" class="resultado-score-nivel">Nivel: -</p>
+                </div>
 
-<script type="module" src="../../../Vanilla/Finanzas/SaludFinanciera.js"></script>
+                <!-- Tarjeta de Análisis del Asesor -->
+                <div class="resultado-bloque-info asesor-destacado-box">
+                    <h4><i class="fa-solid fa-user-tie"></i> Análisis de tu Asesor Financiero</h4>
+                    <p id="txtEnfoqueAsesoria"></p>
+                </div>
+
+                <!-- Grid de Puntos, Oportunidades y Recomendaciones -->
+                <div class="resultado-columnas-grid">
+                    <div class="resultado-bloque-info">
+                        <h4 class="color-verde-text"><i class="fa-solid fa-check-circle"></i> Puntos Fuertes</h4>
+                        <ul id="listaPuntosFuertes" class="resultado-lista-ul"></ul>
+                    </div>
+
+                    <div class="resultado-bloque-info">
+                        <h4 class="color-rojo-text"><i class="fa-solid fa-triangle-exclamation"></i> Oportunidades de Mejora</h4>
+                        <ul id="listaOportunidades" class="resultado-lista-ul"></ul>
+                    </div>
+                </div>
+
+                <div class="resultado-bloque-info">
+                    <h4 class="color-azul-text"><i class="fa-solid fa-lightbulb"></i> Pasos a Seguir (Recomendaciones)</h4>
+                    <ul id="listaRecomendaciones" class="resultado-lista-ul"></ul>
+                </div>
+
+                <div class="reporte-acciones-wrapper">
+                    <button type="button" id="btnRepetirEvaluacion" class="btn-guardar-meta btn-flex-1">
+                        Nueva Asesoría Conversacional
+                    </button>
+                    <button type="button" id="btnVerUltimoScore" class="btn-meses btn-flex-1 btn-text-center">
+                        Ver Mi Último Score Guardado
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script type="module" src="../../../Vanilla/Finanzas/SaludFinanciera.js"></script>
 </body>
-
 </html>
