@@ -1,0 +1,741 @@
+@import url('../Perfil.css');
+@import url('../Finanzas/FondoEmergencia.css');
+
+/* ==========================================
+   1. IMPORTACIÓN DE FUENTES Y MÓDULOS
+   ========================================== */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+/* ==========================================
+   2. VARIABLES GLOBALES (GRIS GRAFITO NEUTRO)
+   ========================================== */
+:root {
+  /* Fondo principal en gris claro humo neutro */
+  --bg-fondo: #F1F5F9; 
+  --bg-card-dark-glass: #FFFFFF; /* Tarjetas en blanco puro */
+  --bg-card-border: rgba(16, 185, 129, 0.25);
+  
+  /* Paleta Verde Esmeralda */
+  --finanzas-primary: #10b981;
+  --finanzas-primary-dark: #059669;
+  --finanzas-hover: #047857;
+  --gold-main: #10b981;
+  --gold-hover: #059669;
+
+  /* Ajuste de textos sobre fondo claro */
+  --text-white: #0F172A; /* Textos principales en gris oscuro */
+  --text-muted: #64748B; /* Textos secundarios */
+  --font-main: 'Poppins', sans-serif;
+  --radius-card: 20px;
+  --shadow-card: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+/* ==========================================
+   3. RESET Y BASE
+   ========================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+.general-body {
+  font-family: var(--font-main);
+  background: var(--bg-fondo);
+  color: var(--text-white);
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+}
+
+/* BACKDROP PARA MÓVIL */
+.sidebar-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(10, 13, 20, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 99;
+  transition: opacity 0.3s ease;
+}
+
+/* ==========================================
+   4. SIDEBAR LATERAL FLOTANTE Y TOOLTIPS
+   ========================================== */
+.sidebar {
+  width: 250px;
+  height: calc(100vh - 40px);
+  background-color: rgba(17, 20, 29, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 100;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-edge-toggle {
+  position: absolute;
+  top: 24px;
+  right: -14px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #11141b;
+  border: 1px solid rgba(16, 185, 129, 0.6);
+  color: var(--finanzas-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 110;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.sidebar-edge-toggle:hover {
+  background: var(--finanzas-primary);
+  color: #000000;
+  transform: scale(1.1);
+}
+
+.sidebar-header {
+  padding: 1.4rem 1.2rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.sidebar-logo {
+  height: 50px !important;
+  width: auto !important;
+  max-width: 160px !important;
+  object-fit: contain;
+  display: block;
+}
+
+.sidebar-logo-small {
+  height: 32px !important;
+  width: 32px !important;
+  display: none;
+  object-fit: contain;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 0.8rem;
+  overflow-y: auto;
+}
+
+.sidebar-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebar .nav-link {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 16px;
+  color: #94a3b8;
+  font-size: 0.88rem;
+  font-weight: 500;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.sidebar .nav-link i {
+  font-size: 1.15rem;
+  min-width: 22px;
+  text-align: center;
+}
+
+.sidebar .nav-link:hover {
+  color: #ffffff;
+  background-color: rgba(16, 185, 129, 0.12);
+}
+
+.sidebar .nav-link.active,
+.sidebar .nav-link.is-active {
+  color: #ffffff !important;
+  background: linear-gradient(90deg, rgba(16, 185, 129, 0.25) 0%, rgba(16, 185, 129, 0.05) 100%) !important;
+  border: 1px solid rgba(16, 185, 129, 0.4) !important;
+}
+
+.sidebar .nav-link.active i,
+.sidebar .nav-link.is-active i {
+  color: var(--finanzas-primary);
+}
+
+.sidebar-footer {
+  padding: 1rem 0.8rem 1.2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-logout-sidebar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #f87171 !important;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 11px 16px;
+  border-radius: 20px;
+  text-decoration: none;
+}
+
+/* TOOLTIP FLOTANTE (COLAPSADO) */
+.sidebar.collapsed .nav-link::after {
+  content: attr(title);
+  position: absolute;
+  left: 90px;
+  top: 50%;
+  transform: translateY(-50%) scale(0.9);
+  background: rgba(13, 17, 26, 0.95);
+  backdrop-filter: blur(12px);
+  color: #ffffff;
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.sidebar.collapsed .nav-link:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-50%) scale(1);
+}
+
+.sidebar.collapsed {
+  width: 78px;
+}
+
+.sidebar.collapsed .sidebar-logo {
+  display: none !important;
+}
+
+.sidebar.collapsed .sidebar-logo-small {
+  display: block !important;
+  margin: 0 auto;
+}
+
+.sidebar.collapsed .nav-link span,
+.sidebar.collapsed .btn-logout-sidebar span {
+  display: none !important;
+}
+
+.sidebar.collapsed .nav-link {
+  justify-content: center;
+  padding: 14px;
+}
+
+.sidebar.collapsed .nav-link i {
+  font-size: 1.35rem !important;
+  margin: 0;
+}
+
+.sidebar.collapsed .btn-logout-sidebar {
+  padding: 12px;
+  border-radius: 50%;
+  width: 46px;
+  height: 46px;
+  margin: 0 auto;
+}
+
+.sidebar.collapsed .sidebar-edge-toggle i {
+  transform: rotate(180deg);
+}
+
+/* ==========================================
+   5. WRAPPER Y NAVBAR SUPERIOR
+   ========================================== */
+.main-wrapper {
+  margin-left: 290px;
+  width: calc(100% - 290px);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.main-wrapper.expanded {
+  margin-left: 118px;
+  width: calc(100% - 118px);
+}
+
+.dashboard-navbar {
+  height: 70px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2.5rem;
+  background: transparent;
+}
+
+.mobile-menu-btn {
+  display: none;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  font-size: 1.2rem;
+  color: #0f172a;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.user-greeting h2 {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--text-white);
+}
+
+.user-greeting h2 span#greetingName {
+  font-weight: 700;
+  color: #10b981;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ACCIONES DE NAVBAR: BOTÓN BANCO Y PERFIL */
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-bank-navbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(229, 169, 60, 0.15);
+  border: 1px solid rgba(229, 169, 60, 0.4);
+  border-radius: 20px;
+  color: #e5a93c !important;
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(8px);
+}
+
+.btn-bank-navbar i {
+  font-size: 0.95rem;
+  color: #e5a93c;
+}
+
+.btn-bank-navbar:hover {
+  background: #e5a93c;
+  color: #0d111a !important;
+  border-color: #e5a93c;
+  box-shadow: 0 4px 15px rgba(229, 169, 60, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-bank-navbar:hover i {
+  color: #0d111a;
+}
+
+/* BOTÓN PERFIL Y HOVER ESMERALDA SÓLIDO */
+.btn-perfil-navbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px;
+  background: rgba(17, 20, 29, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 20px;
+  text-decoration: none;
+  color: #ffffff;
+  font-size: 0.84rem;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-perfil-navbar strong {
+  color: #ffffff;
+  transition: color 0.25s ease;
+}
+
+.btn-perfil-navbar span {
+  color: #94a3b8;
+  transition: color 0.25s ease;
+}
+
+.navbar-user-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.25s ease;
+}
+
+.btn-perfil-navbar .navbar-user-arrow {
+  color: #10b981;
+  transition: color 0.25s ease;
+}
+
+.btn-perfil-navbar:hover {
+  background: #10b981 !important;
+  border-color: #10b981 !important;
+  color: #0d111a !important;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-perfil-navbar:hover strong,
+.btn-perfil-navbar:hover span,
+.btn-perfil-navbar:hover .navbar-user-arrow {
+  color: #0d111a !important;
+}
+
+.btn-perfil-navbar:hover .navbar-user-avatar {
+  background: rgba(13, 17, 26, 0.2);
+  color: #0d111a;
+}
+
+.main-content {
+  flex: 1;
+  padding: 1.5rem 2.5rem 2.5rem;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ==========================================
+   6. WIDGET Y VENTANA FLOTANTE CHATBOT (VERDE)
+   ========================================== */
+#chatWidgetContainer {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  font-family: var(--font-main, 'Poppins', sans-serif);
+}
+
+.chatbot-float-btn {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: 2px solid #a7f3d0;
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.45);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+}
+
+.chatbot-float-btn:hover {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 12px 30px rgba(16, 185, 129, 0.7);
+}
+
+.float-btn-img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+}
+
+.chatbot-window {
+  position: absolute;
+  bottom: 80px;
+  right: 0;
+  width: 380px;
+  height: 520px;
+  background: rgba(13, 17, 26, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform-origin: bottom right;
+  animation: scaleUpChat 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes scaleUpChat {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.chatbot-window.hidden {
+  display: none !important;
+}
+
+.chatbot-header {
+  padding: 16px 20px;
+  background: linear-gradient(180deg, rgba(16, 185, 129, 0.12) 0%, rgba(0, 0, 0, 0) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chatbot-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bot-avatar-container {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.1) 100%);
+  border: 1.5px solid rgba(16, 185, 129, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.bot-avatar-img {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+}
+
+.chatbot-header h6 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.2px;
+}
+
+.status-online {
+  font-size: 0.75rem;
+  color: #34d399;
+  font-weight: 500;
+}
+
+.close-chat-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.close-chat-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.chatbot-body {
+  flex: 1;
+  padding: 18px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  scroll-behavior: smooth;
+}
+
+.chat-bubble {
+  max-width: 85%;
+  padding: 12px 16px;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  animation: fadeInBubble 0.3s ease forwards;
+}
+
+@keyframes fadeInBubble {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bot-bubble {
+  background: rgba(255, 255, 255, 0.06);
+  color: #f1f5f9;
+  align-self: flex-start;
+  border-top-left-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.user-bubble {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #07090e;
+  font-weight: 600;
+  align-self: flex-end;
+  border-top-right-radius: 4px;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25);
+}
+
+/* ==========================================
+   7. RESPONSIVO ADAPTATIVO (MEDIA QUERIES)
+   ========================================== */
+@media (max-width: 992px) {
+  .sidebar {
+    transform: translateX(-100%);
+    width: 260px !important;
+    height: 100vh !important;
+    top: 0 !important;
+    left: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+  }
+
+  .sidebar.is-open {
+    transform: translateX(0);
+  }
+
+  .sidebar-edge-toggle {
+    display: none;
+  }
+
+  .main-wrapper,
+  .main-wrapper.expanded {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
+  .mobile-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .dashboard-navbar {
+    padding: 0 1.2rem;
+  }
+
+  .main-content {
+    padding: 1.2rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .dashboard-navbar {
+    padding: 0 1rem !important;
+    height: 60px !important;
+  }
+
+  .user-greeting h2 {
+    font-size: 0.95rem !important;
+  }
+
+  .btn-bank-navbar span {
+    display: none;
+  }
+
+  .btn-bank-navbar {
+    padding: 0;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    min-height: 38px;
+    justify-content: center;
+  }
+
+  .btn-bank-navbar i {
+    font-size: 1.05rem;
+    margin: 0;
+  }
+
+  .btn-perfil-navbar .navbar-user-info,
+  .btn-perfil-navbar .navbar-user-arrow {
+    display: none !important;
+  }
+
+  .btn-perfil-navbar {
+    padding: 0 !important;
+    border-radius: 50% !important;
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    min-height: 38px !important;
+    aspect-ratio: 1 / 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+  }
+
+  .btn-perfil-navbar .navbar-user-avatar {
+    width: 100% !important;
+    height: 100% !important;
+    background: transparent !important;
+  }
+
+  .chatbot-window {
+    width: calc(100vw - 28px);
+    height: 460px;
+    bottom: 75px;
+    right: -8px;
+  }
+
+  .main-content {
+    padding: 0.8rem;
+  }
+}

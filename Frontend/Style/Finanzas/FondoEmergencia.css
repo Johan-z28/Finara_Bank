@@ -1,18 +1,14 @@
-@import url('global/styles.css');
-
 /* ==========================================
-   ESTILOS FONDO DE EMERGENCIA (HU-25)
+   ESTILOS COMPONENTES FONDO DE EMERGENCIA (HU-19)
    ========================================== */
 
-:root {
-    --color-progreso-verde: #34d399;
-    --color-progreso-oro: #e5a93c;
-    --color-progreso-azul: #38bdf8;
-}
+/* Importación de la base de estilos de Finara Finanzas */
+@import url('../global/styles_finanzas.css');
 
-.color-dorado { color: var(--gold-main) !important; }
-.color-verde { color: var(--color-progreso-verde) !important; }
+.color-esmeralda { color: var(--finanzas-primary) !important; }
+.color-verde { color: #4ade80 !important; }
 
+/* Encabezado sobre fondo claro */
 .fe-header {
     display: flex;
     justify-content: space-between;
@@ -23,25 +19,26 @@
 }
 
 .fe-header h1 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--text-white);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #0f172a; /* Oscuro para legibilidad sobre el fondo gris claro */
     margin-bottom: 0.3rem;
 }
 
 .fe-subtitle {
-    color: var(--text-muted);
-    font-size: 0.85rem;
+    color: #64748b;
+    font-size: 0.88rem;
 }
 
-/* Card Calculadora */
-.fe-calculadora-card {
-    background: var(--bg-card-dark);
-    border: 1px solid rgba(229, 169, 60, 0.25);
-    border-radius: var(--radius-lg);
-    padding: 1.6rem;
+/* Tarjetas base sobre fondo claro */
+.fe-calculadora-card,
+.fe-meta-card {
+    background: #ffffff;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: var(--radius-card);
+    padding: 1.8rem;
     margin-bottom: 1.8rem;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
 }
 
 .fe-card-head {
@@ -55,25 +52,25 @@
     width: 44px;
     height: 44px;
     border-radius: 12px;
-    background: rgba(229, 169, 60, 0.15);
-    color: var(--gold-main);
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--finanzas-primary);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.2rem;
-    border: 1px solid rgba(229, 169, 60, 0.3);
+    border: 1px solid rgba(16, 185, 129, 0.3);
     flex-shrink: 0;
 }
 
 .fe-card-head h3 {
-    font-size: 1.1rem;
-    color: var(--text-white);
+    font-size: 1.15rem;
+    color: #0f172a;
     margin-bottom: 4px;
 }
 
 .fe-card-head p {
-    font-size: 0.8rem;
-    color: var(--text-muted);
+    font-size: 0.82rem;
+    color: #64748b;
 }
 
 .fe-calc-grid {
@@ -91,9 +88,9 @@
 }
 
 .fe-campo label {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    font-weight: 500;
+    font-size: 0.82rem;
+    color: #334155;
+    font-weight: 600;
 }
 
 .fe-input-wrapper {
@@ -105,7 +102,7 @@
 .fe-currency-prefix {
     position: absolute;
     left: 14px;
-    color: var(--gold-main);
+    color: var(--finanzas-primary);
     font-weight: 700;
     font-size: 1.05rem;
     pointer-events: none;
@@ -113,10 +110,10 @@
 }
 
 .fe-input-wrapper input {
-    background: #090c12;
-    color: #fff;
-    border: 1px solid rgba(229, 169, 60, 0.3);
-    border-radius: 10px;
+    background: #ffffff;
+    color: #0f172a;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 12px;
     padding: 12px 14px 12px 38px;
     font-family: inherit;
     font-size: 1.05rem;
@@ -126,13 +123,13 @@
 }
 
 .fe-input-wrapper input:focus {
-    border-color: var(--gold-main);
-    box-shadow: 0 0 10px rgba(229, 169, 60, 0.25);
+    border-color: var(--finanzas-primary);
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
     outline: none;
 }
 
 .fe-hint {
-    font-size: 0.72rem;
+    font-size: 0.74rem;
     color: #64748b;
 }
 
@@ -143,11 +140,11 @@
 }
 
 .btn-meses {
-    background: #090c12;
-    color: var(--text-muted);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 10px;
+    background: #f8fafc;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 11px;
     font-size: 0.78rem;
     font-weight: 500;
     cursor: pointer;
@@ -155,24 +152,24 @@
 }
 
 .btn-meses:hover {
-    border-color: rgba(229, 169, 60, 0.4);
-    color: #fff;
+    border-color: var(--finanzas-primary);
+    color: #0f172a;
 }
 
 .btn-meses.active {
-    background: rgba(229, 169, 60, 0.15);
-    color: var(--gold-main);
-    border-color: var(--gold-main);
+    background: rgba(16, 185, 129, 0.18);
+    color: #047857;
+    border-color: var(--finanzas-primary);
     font-weight: 600;
 }
 
-/* Panel de Resultado Calculadora */
+/* Panel Resultado Calculadora (Fondo Oscuro -> Texto Blanco) */
 .fe-calc-resultado {
-    background: linear-gradient(135deg, rgba(27, 32, 44, 0.8) 0%, rgba(13, 15, 20, 0.95) 100%);
-    border: 1px solid rgba(229, 169, 60, 0.35);
-    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(20, 24, 33, 0.95) 0%, rgba(13, 17, 24, 0.98) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    border-radius: 16px;
     padding: 1.6rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
 }
 
 .fe-res-header {
@@ -183,24 +180,24 @@
 }
 
 .fe-res-header span {
-    font-size: 0.8rem;
-    color: var(--text-muted);
+    font-size: 0.82rem;
+    color: #94a3b8;
 }
 
 .fe-pill {
-    background: rgba(229, 169, 60, 0.2);
-    color: var(--gold-main);
-    border: 1px solid rgba(229, 169, 60, 0.4);
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 0.7rem;
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--finanzas-primary);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    padding: 4px 12px;
+    border-radius: 14px;
+    font-size: 0.72rem;
     font-weight: 600;
 }
 
 .fe-monto-sugerido {
-    font-size: 1.9rem;
+    font-size: 2rem;
     font-weight: 700;
-    color: #fff;
+    color: #ffffff !important;
     font-family: monospace;
     letter-spacing: -0.02em;
     margin-bottom: 1.4rem;
@@ -212,30 +209,21 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    font-size: 0.8rem;
+    font-size: 0.82rem;
 }
 
 .fe-desglose-fila {
     display: flex;
     justify-content: space-between;
-    color: var(--text-muted);
+    color: #94a3b8;
 }
 
 .fe-desglose-fila strong {
-    color: #fff;
+    color: #ffffff !important;
     font-family: monospace;
 }
 
-/* Sección de Definición de Meta */
-.fe-meta-card {
-    background: var(--bg-card-dark);
-    border: 1px solid rgba(56, 189, 248, 0.25);
-    border-radius: var(--radius-lg);
-    padding: 1.6rem;
-    margin-bottom: 1.8rem;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
-}
-
+/* Definición de Meta */
 .fe-meta-inputs-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -245,11 +233,11 @@
 
 .btn-usar-sugerido {
     background: transparent;
-    border: 1px dashed rgba(229, 169, 60, 0.5);
-    color: var(--gold-main);
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-size: 0.72rem;
+    border: 1px dashed rgba(16, 185, 129, 0.5);
+    color: var(--finanzas-primary);
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-size: 0.75rem;
     font-weight: 500;
     cursor: pointer;
     margin-top: 6px;
@@ -261,15 +249,15 @@
 }
 
 .btn-usar-sugerido:hover {
-    background: rgba(229, 169, 60, 0.15);
+    background: rgba(16, 185, 129, 0.15);
     border-style: solid;
 }
 
 .fe-select-cuenta {
-    background: #090c12;
-    color: #fff;
-    border: 1px solid rgba(229, 169, 60, 0.3);
-    border-radius: 10px;
+    background: #ffffff;
+    color: #0f172a;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 12px;
     padding: 12px 14px;
     font-family: inherit;
     font-size: 0.9rem;
@@ -279,18 +267,18 @@
 }
 
 .fe-select-cuenta:focus {
-    border-color: var(--gold-main);
-    box-shadow: 0 0 10px rgba(229, 169, 60, 0.25);
+    border-color: var(--finanzas-primary);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.25);
     outline: none;
 }
 
 .btn-guardar-meta {
-    background: var(--gold-main);
+    background: var(--finanzas-primary);
     color: #07090e;
     border: none;
     padding: 12px 24px;
-    border-radius: 10px;
-    font-size: 0.88rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
     display: inline-flex;
@@ -300,25 +288,26 @@
 }
 
 .btn-guardar-meta:hover {
-    background: #ffbe44;
+    background: #34d399;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(229, 169, 60, 0.3);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
 }
 
 /* ========================================================
-   INDICADOR DE AVANCE HACIA LA META (Criterio 3)
+   INDICADOR DE AVANCE HACIA LA META (CORREGIDO TEXTOS BLANCOS)
    ======================================================== */
 .fe-avance-card {
-    background: linear-gradient(135deg, rgba(18, 21, 28, 0.95) 0%, rgba(10, 12, 17, 0.98) 100%);
-    border: 1px solid rgba(229, 169, 60, 0.3);
-    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(20, 24, 33, 0.95) 0%, rgba(13, 17, 24, 0.98) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: var(--radius-card);
     padding: 1.8rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     display: flex;
     flex-direction: column;
     gap: 1.4rem;
     position: relative;
     overflow: hidden;
+    margin-bottom: 1.8rem;
 }
 
 .fe-avance-card::before {
@@ -328,8 +317,8 @@
     left: 0;
     width: 4px;
     height: 100%;
-    background: var(--gold-main);
-    box-shadow: 0 0 12px var(--gold-main);
+    background: var(--finanzas-primary);
+    box-shadow: 0 0 12px var(--finanzas-primary);
 }
 
 .fe-avance-head {
@@ -341,18 +330,18 @@
 }
 
 .fe-etiqueta-avance {
-    font-size: 0.72rem;
+    font-size: 0.74rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: var(--gold-main);
+    color: var(--finanzas-primary);
     font-weight: 700;
     display: inline-block;
     margin-bottom: 4px;
 }
 
 .fe-avance-titulo {
-    font-size: 1.35rem;
-    color: #fff;
+    font-size: 1.4rem;
+    color: #ffffff !important;
     margin: 0;
     font-weight: 700;
 }
@@ -365,21 +354,21 @@
     border-radius: 20px;
     font-size: 0.8rem;
     font-weight: 600;
-    background: rgba(229, 169, 60, 0.15);
-    color: var(--gold-main);
-    border: 1px solid rgba(229, 169, 60, 0.35);
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--finanzas-primary);
+    border: 1px solid rgba(16, 185, 129, 0.35);
 }
 
 .fe-badge-seguridad.exito {
-    background: rgba(34, 197, 94, 0.15);
+    background: rgba(34, 197, 94, 0.18);
     color: #4ade80;
     border-color: rgba(34, 197, 94, 0.4);
 }
 
 .fe-badge-seguridad.progreso {
-    background: rgba(59, 130, 246, 0.15);
-    color: #60a5fa;
-    border-color: rgba(59, 130, 246, 0.4);
+    background: rgba(56, 189, 248, 0.18);
+    color: #38bdf8;
+    border-color: rgba(56, 189, 248, 0.4);
 }
 
 .fe-avance-metricas-grid {
@@ -389,9 +378,9 @@
 }
 
 .fe-metrica-caja {
-    background: #090c12;
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 12px;
+    background: #111318;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
     padding: 1.25rem 1.4rem;
     display: flex;
     flex-direction: column;
@@ -402,38 +391,29 @@
 }
 
 .fe-metrica-caja:hover {
-    border-color: rgba(229, 169, 60, 0.3);
+    border-color: rgba(16, 185, 129, 0.35);
     transform: translateY(-2px);
 }
 
 .fe-metrica-label {
     font-size: 0.8rem;
-    color: var(--text-muted);
+    color: #94a3b8 !important;
     font-weight: 500;
-    letter-spacing: 0.02em;
 }
 
 .fe-metrica-valor {
-    font-size: 1.5rem;
+    font-size: 1.55rem;
     font-weight: 700;
-    color: #fff;
+    color: #ffffff !important;
     margin: 2px 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.fe-metrica-valor.color-verde {
-    color: #4ade80;
-}
-
-.fe-metrica-valor.color-dorado {
-    color: var(--gold-main);
-}
-
 .fe-metrica-caja small {
     font-size: 0.8rem;
-    color: #94a3b8;
+    color: #64748b !important;
     font-weight: 500;
     display: block;
     line-height: 1.4;
@@ -444,8 +424,8 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    background: #090c12;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: #111318;
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
     padding: 1rem 1.3rem;
 }
@@ -454,14 +434,14 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.82rem;
-    color: var(--text-muted);
+    font-size: 0.84rem;
+    color: #94a3b8 !important;
 }
 
 .fe-track-progreso {
     width: 100%;
     height: 12px;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 20px;
     overflow: hidden;
     position: relative;
@@ -469,8 +449,8 @@
 
 .fe-fill-progreso {
     height: 100%;
-    background: linear-gradient(90deg, #e5a93c 0%, #38ef7d 100%);
+    background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
     border-radius: 20px;
     transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 0 10px rgba(229, 169, 60, 0.5);
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
 }

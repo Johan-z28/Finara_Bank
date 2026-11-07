@@ -1,10 +1,6 @@
-// Vanilla/fondoEmergenciaService.js
-// Servicio de datos y cálculo para HU-25: Fondo de Emergencia (#36)
-// Gestiona el cálculo de fondo sugerido según gastos fijos (3 a 6 meses),
-// la definición de meta vinculada a la cuenta de ahorros y el indicador de avance.
+// Vanilla/Finanzas/FondoEmergenciaService.js
 
-import { obtenerCuentas, obtenerUsernameActivo } from './cuentasService.js';
-import { guardarNotificacion, actualizarCampana } from './notificaciones.js';
+import { obtenerCuentas, obtenerUsernameActivo } from '../cuentasService.js';
 
 const CLAVE_FONDO = 'finara_fondo_emergencia';
 
@@ -31,9 +27,6 @@ function guardarTodosFondos(lista) {
     }
 }
 
-/**
- * Calcula el monto sugerido de fondo de emergencia según gastos fijos mensuales y número de meses de cobertura.
- */
 export function calcularFondoSugerido(gastosFijosMensuales, mesesCobertura = 3) {
     const gastos = Number(gastosFijosMensuales) || 0;
     const meses = Math.max(1, Math.min(12, Number(mesesCobertura) || 3));
@@ -43,25 +36,20 @@ export function calcularFondoSugerido(gastosFijosMensuales, mesesCobertura = 3) 
         gastosFijosMensuales: gastos,
         mesesCobertura: meses,
         totalSugerido,
-        coberturaMinima: gastos * 3, // Regla financiera base: 3 meses
-        coberturaRecomendada: gastos * 6 // Cobertura óptima: 6 meses
+        coberturaMinima: gastos * 3,
+        coberturaRecomendada: gastos * 6
     };
 }
 
-/**
- * Obtiene la meta configurada del fondo de emergencia del usuario actual y sincroniza con el saldo real de su cuenta de ahorro.
- */
 export async function obtenerMetaFondoUsuario() {
     const usuarioActivo = obtenerUsernameActivo();
     let fondos = leerTodosFondos();
 
-    // Limpieza de metas ficticias legadas autogeneradas sin cuenta vinculada real
     fondos = fondos.filter(f => !(f.metaMonto === 10800000 && !f.fechaActualizacion && (!f.cuentaVinculadaId || f.cuentaVinculadaId === 1)));
     guardarTodosFondos(fondos);
 
     let meta = fondos.find(f => f.username === usuarioActivo);
 
-    // Consultar cuentas activas del usuario (filtrando cuentas de ahorro y corriente, excluyendo tarjetas)
     const cuentas = await obtenerCuentas();
     const cuentasPermitidas = cuentas.filter(c => c.tipo === 'AHORROS' || c.tipo === 'CORRIENTE');
 
@@ -94,9 +82,6 @@ export async function obtenerMetaFondoUsuario() {
     };
 }
 
-/**
- * Permite al usuario definir y actualizar su meta de fondo de emergencia vinculada a su ahorro.
- */
 export async function guardarMetaFondoUsuario({ metaMonto, gastosFijos, mesesCobertura, cuentaId }) {
     const usuarioActivo = obtenerUsernameActivo();
     let fondos = leerTodosFondos();
@@ -132,25 +117,9 @@ export async function guardarMetaFondoUsuario({ metaMonto, gastosFijos, mesesCob
     }
 
     guardarTodosFondos(fondos);
-
-    // Notificación en el sistema
-    guardarNotificacion({
-        titulo: 'Meta de Fondo de Emergencia Actualizada',
-        mensaje: `Has fijado tu meta de fondo en ${formatoCOP.format(montoNum)} vinculada a tu cuenta terminada en ${String(cta?.numero || '').slice(-4)}.`,
-        tipo: 'exito'
-    });
-
-    try {
-        actualizarCampana();
-    } catch { }
-
     return datosGuardar;
 }
 
-/**
- * Calcula el indicador de avance hacia la meta del fondo de emergencia:
- * porcentaje de cumplimiento, monto faltante, estado de cobertura y recomendaciones.
- */
 export async function calcularAvanceFondo() {
     const metaInfo = await obtenerMetaFondoUsuario();
     const meta = Number(metaInfo.metaMonto) || 0;
@@ -160,7 +129,6 @@ export async function calcularAvanceFondo() {
     const porcentajeReal = meta > 0 ? Math.round((saldoActual / meta) * 100) : 0;
     const montoFaltante = meta > 0 ? Math.max(0, meta - saldoActual) : 0;
 
-    // Meses cubiertos según el saldo actual y sus gastos fijos
     const gastosFijos = Number(metaInfo.gastosFijos) || 0;
     const mesesCubiertos = gastosFijos > 0 ? (saldoActual / gastosFijos).toFixed(1) : 0;
 

@@ -1,16 +1,19 @@
-import { initGlobalComponents } from './Global/app.js';
+// Vanilla/Finanzas/FondoEmergencia.js
+
+// 1. Importación desde la misma carpeta (Finanzas/)
 import {
     calcularFondoSugerido,
     formatoCOP,
     obtenerMetaFondoUsuario,
     guardarMetaFondoUsuario,
     calcularAvanceFondo
-} from './fondoEmergenciaService.js';
-import { obtenerCuentas } from './cuentasService.js';
+} from './FondoEmergenciaService.js';
 
-document.addEventListener('DOMContentLoaded', async () => {
-    initGlobalComponents();
+// 2. Importación subiendo una carpeta (../) hacia Vanilla/cuentasService.js
+import { obtenerCuentas } from '../cuentasService.js';
 
+// Función de inicialización requerida por el enrutador SPA de finanzas.js
+export async function initFondoEmergenciaView() {
     // Indicador de avance
     const textoSeguridad = document.getElementById('textoSeguridad');
     const badgeSeguridad = document.getElementById('badgeSeguridad');
@@ -36,6 +39,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const inputMetaPersonalizada = document.getElementById('inputMetaPersonalizada');
     const selectCuentaVinculada = document.getElementById('selectCuentaVinculada');
     const btnUsarSugerido = document.getElementById('btnUsarSugerido');
+
+    // Validación de seguridad por si el DOM no se inyectó correctamente
+    if (!inputGastos || !formDefinirMeta) return;
 
     let mesesSeleccionados = 6;
     let metaActual = null;
@@ -96,10 +102,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const valLimpio = Number(inputGastos.value.replace(/\D/g, '')) || 0;
         const res = calcularFondoSugerido(valLimpio, mesesSeleccionados);
 
-        montoSugeridoCalc.textContent = formatoCOP.format(res.totalSugerido);
-        pillCobertura.textContent = `Cobertura para ${mesesSeleccionados} meses`;
-        resMinimo3m.textContent = formatoCOP.format(res.coberturaMinima);
-        resOptimo6m.textContent = formatoCOP.format(res.coberturaRecomendada);
+        if (montoSugeridoCalc) montoSugeridoCalc.textContent = formatoCOP.format(res.totalSugerido);
+        if (pillCobertura) pillCobertura.textContent = `Cobertura para ${mesesSeleccionados} meses`;
+        if (resMinimo3m) resMinimo3m.textContent = formatoCOP.format(res.coberturaMinima);
+        if (resOptimo6m) resOptimo6m.textContent = formatoCOP.format(res.coberturaRecomendada);
     }
 
     inputGastos.addEventListener('input', () => {
@@ -108,48 +114,56 @@ document.addEventListener('DOMContentLoaded', async () => {
         recalcularCalculadora();
     });
 
-    selectorMeses.querySelectorAll('.btn-meses').forEach(btn => {
-        btn.addEventListener('click', () => {
-            selectorMeses.querySelectorAll('.btn-meses').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            mesesSeleccionados = Number(btn.getAttribute('data-meses')) || 3;
-            recalcularCalculadora();
+    if (selectorMeses) {
+        selectorMeses.querySelectorAll('.btn-meses').forEach(btn => {
+            btn.addEventListener('click', () => {
+                selectorMeses.querySelectorAll('.btn-meses').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                mesesSeleccionados = Number(btn.getAttribute('data-meses')) || 3;
+                recalcularCalculadora();
+            });
         });
-    });
+    }
 
-    // Formatear input de meta personalizada
-    inputMetaPersonalizada.addEventListener('input', () => {
-        const digitos = inputMetaPersonalizada.value.replace(/\D/g, '').slice(0, 11);
-        inputMetaPersonalizada.value = digitos ? new Intl.NumberFormat('es-CO').format(Number(digitos)) : '';
-    });
+    if (inputMetaPersonalizada) {
+        inputMetaPersonalizada.addEventListener('input', () => {
+            const digitos = inputMetaPersonalizada.value.replace(/\D/g, '').slice(0, 11);
+            inputMetaPersonalizada.value = digitos ? new Intl.NumberFormat('es-CO').format(Number(digitos)) : '';
+        });
+    }
 
-    btnUsarSugerido.addEventListener('click', () => {
-        const valLimpio = Number(inputGastos.value.replace(/\D/g, '')) || 0;
-        const res = calcularFondoSugerido(valLimpio, mesesSeleccionados);
-        inputMetaPersonalizada.value = new Intl.NumberFormat('es-CO').format(res.totalSugerido);
-    });
+    if (btnUsarSugerido) {
+        btnUsarSugerido.addEventListener('click', () => {
+            const valLimpio = Number(inputGastos.value.replace(/\D/g, '')) || 0;
+            const res = calcularFondoSugerido(valLimpio, mesesSeleccionados);
+            inputMetaPersonalizada.value = new Intl.NumberFormat('es-CO').format(res.totalSugerido);
+        });
+    }
 
-    // Cargar cuentas del usuario y meta guardada (solo Ahorros y Corriente, sin Tarjetas de Crédito)
     async function inicializarDatosMeta() {
         try {
             const cuentas = await obtenerCuentas();
             const cuentasPermitidas = cuentas.filter(c => c.tipo === 'AHORROS' || c.tipo === 'CORRIENTE');
 
             if (cuentasPermitidas.length === 0) {
-                selectCuentaVinculada.innerHTML = `<option value="">No tienes cuentas monetarias disponibles</option>`;
+                if (selectCuentaVinculada) {
+                    selectCuentaVinculada.innerHTML = `<option value="">No tienes cuentas monetarias disponibles</option>`;
+                }
                 return;
             }
 
             metaActual = await obtenerMetaFondoUsuario();
 
-            selectCuentaVinculada.innerHTML = `
-                <option value="" disabled ${!metaActual || !metaActual.cuentaVinculadaId ? 'selected' : ''}>Selecciona una cuenta</option>
-                ${cuentasPermitidas.map(c => `
-                    <option value="${c.id}" ${metaActual && String(metaActual.cuentaVinculadaId) === String(c.id) ? 'selected' : ''}>
-                        ${c.tipo === 'AHORROS' ? 'Cuenta de Ahorros' : 'Cuenta Corriente'} · •••• ${String(c.numero || '').slice(-4)} (${formatoCOP.format(c.saldo)})
-                    </option>
-                `).join('')}
-            `;
+            if (selectCuentaVinculada) {
+                selectCuentaVinculada.innerHTML = `
+                    <option value="" disabled ${!metaActual || !metaActual.cuentaVinculadaId ? 'selected' : ''}>Selecciona una cuenta</option>
+                    ${cuentasPermitidas.map(c => `
+                        <option value="${c.id}" ${metaActual && String(metaActual.cuentaVinculadaId) === String(c.id) ? 'selected' : ''}>
+                            ${c.tipo === 'AHORROS' ? 'Cuenta de Ahorros' : 'Cuenta Corriente'} · •••• ${String(c.numero || '').slice(-4)} (${formatoCOP.format(c.saldo)})
+                        </option>
+                    `).join('')}
+                `;
+            }
 
             if (metaActual) {
                 if (metaActual.gastosFijos && metaActual.gastosFijos > 0) {
@@ -164,34 +178,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Permitir previsualizar o actualizar el indicador al cambiar de cuenta vinculada
-    selectCuentaVinculada.addEventListener('change', async () => {
-        const cuentas = await obtenerCuentas();
-        const seleccionada = cuentas.find(c => String(c.id) === String(selectCuentaVinculada.value) && (c.tipo === 'AHORROS' || c.tipo === 'CORRIENTE'));
-        if (seleccionada && avanceSaldoActual) {
-            avanceSaldoActual.textContent = formatoCOP.format(seleccionada.saldo);
-            if (avanceCuentaDesc) {
-                avanceCuentaDesc.textContent = `${seleccionada.tipo === 'AHORROS' ? 'Cuenta de Ahorros' : 'Cuenta Corriente'} •••• ${String(seleccionada.numero || '').slice(-4)}`;
+    if (selectCuentaVinculada) {
+        selectCuentaVinculada.addEventListener('change', async () => {
+            const cuentas = await obtenerCuentas();
+            const seleccionada = cuentas.find(c => String(c.id) === String(selectCuentaVinculada.value) && (c.tipo === 'AHORROS' || c.tipo === 'CORRIENTE'));
+            if (seleccionada && avanceSaldoActual) {
+                avanceSaldoActual.textContent = formatoCOP.format(seleccionada.saldo);
+                if (avanceCuentaDesc) {
+                    avanceCuentaDesc.textContent = `${seleccionada.tipo === 'AHORROS' ? 'Cuenta de Ahorros' : 'Cuenta Corriente'} •••• ${String(seleccionada.numero || '').slice(-4)}`;
+                }
+                const montoMeta = Number(inputMetaPersonalizada.value.replace(/\D/g, '')) || (metaActual ? metaActual.metaMonto : 0);
+                const saldo = Number(seleccionada.saldo) || 0;
+                const faltante = montoMeta > 0 ? Math.max(0, montoMeta - saldo) : 0;
+                if (avanceMontoFaltante) {
+                    avanceMontoFaltante.textContent = montoMeta > 0 ? (faltante === 0 ? 'Meta Completada' : formatoCOP.format(faltante)) : '$ 0';
+                }
+                const porcentaje = montoMeta > 0 ? Math.round((saldo / montoMeta) * 100) : 0;
+                if (avancePorcentajeTexto) {
+                    avancePorcentajeTexto.textContent = `${porcentaje}% completado`;
+                }
+                if (avanceFillProgreso) {
+                    avanceFillProgreso.style.width = `${Math.min(100, porcentaje)}%`;
+                }
+                const gastos = Number(inputGastos.value.replace(/\D/g, '')) || 0;
+                if (avanceMesesCubiertos) {
+                    avanceMesesCubiertos.textContent = gastos > 0 ? `${(saldo / gastos).toFixed(1)} meses cubiertos` : '0 meses cubiertos';
+                }
             }
-            const montoMeta = Number(inputMetaPersonalizada.value.replace(/\D/g, '')) || (metaActual ? metaActual.metaMonto : 0);
-            const saldo = Number(seleccionada.saldo) || 0;
-            const faltante = montoMeta > 0 ? Math.max(0, montoMeta - saldo) : 0;
-            if (avanceMontoFaltante) {
-                avanceMontoFaltante.textContent = montoMeta > 0 ? (faltante === 0 ? 'Meta Completada' : formatoCOP.format(faltante)) : '$ 0';
-            }
-            const porcentaje = montoMeta > 0 ? Math.round((saldo / montoMeta) * 100) : 0;
-            if (avancePorcentajeTexto) {
-                avancePorcentajeTexto.textContent = `${porcentaje}% completado`;
-            }
-            if (avanceFillProgreso) {
-                avanceFillProgreso.style.width = `${Math.min(100, porcentaje)}%`;
-            }
-            const gastos = Number(inputGastos.value.replace(/\D/g, '')) || 0;
-            if (avanceMesesCubiertos) {
-                avanceMesesCubiertos.textContent = gastos > 0 ? `${(saldo / gastos).toFixed(1)} meses cubiertos` : '0 meses cubiertos';
-            }
-        }
-    });
+        });
+    }
 
     formDefinirMeta.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -207,7 +222,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     text: 'Debes seleccionar una cuenta de ahorros o corriente para vincular tu fondo de emergencia.',
                     background: '#12151c',
                     color: '#fff',
-                    confirmButtonColor: '#e5a93c'
+                    confirmButtonColor: '#10b981'
                 });
             } else {
                 alert('Debes seleccionar una cuenta de ahorros o corriente para vincular tu fondo de emergencia.');
@@ -223,7 +238,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     text: 'Por favor ingresa un monto objetivo mayor a cero.',
                     background: '#12151c',
                     color: '#fff',
-                    confirmButtonColor: '#e5a93c'
+                    confirmButtonColor: '#10b981'
                 });
             }
             return;
@@ -244,7 +259,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     text: `Tu fondo de emergencia ha sido fijado en ${formatoCOP.format(montoMeta)} y vinculado exitosamente a tu cuenta.`,
                     background: '#12151c',
                     color: '#fff',
-                    confirmButtonColor: '#e5a93c'
+                    confirmButtonColor: '#10b981'
                 });
             }
 
@@ -254,7 +269,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // Ejecución inicial automática al cambiar de vista
     recalcularCalculadora();
     await inicializarDatosMeta();
     await actualizarIndicadorAvance();
-});
+}
