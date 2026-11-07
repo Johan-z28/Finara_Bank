@@ -4,11 +4,16 @@ export function initSaludFinancieraView() {
     const chatBody = document.getElementById('chatConversacionBody');
     const inputContainer = document.getElementById('chatInputContainer');
     const seccionResultado = document.getElementById('seccionResultado');
-    const chatContainerCard = chatBody ? chatBody.closest('section') : null;
+    const seccionChatCard = document.getElementById('seccionChatCard');
+    const seccionHistorialLista = document.getElementById('seccionHistorialLista');
+    const contenedorListaHistorial = document.getElementById('contenedorListaHistorial');
+
     const btnReiniciar = document.getElementById('btnReiniciarChat');
     const btnRepetir = document.getElementById('btnRepetirEvaluacion');
     const btnVerScore = document.getElementById('btnVerUltimoScore');
     const btnHistorial = document.getElementById('btnHistorialAsesorias');
+    const btnVolverAlChat = document.getElementById('btnVolverAlChatDesdeHistorial');
+    const btnVerHistorialDesdeReporte = document.getElementById('btnVerHistorialDesdeReporte');
 
     let pasoActual = 0;
     const respuestasUsuario = {
@@ -149,7 +154,7 @@ export function initSaludFinancieraView() {
         setTimeout(() => {
             const resultadoDiagnostico = calcularSaludFinanciera({
                 ...respuestasUsuario,
-                fechaEvaluacion: new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'short', day: 'numeric' })
+                fechaEvaluacion: new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
             });
 
             const evaluacionCompleta = {
@@ -157,7 +162,7 @@ export function initSaludFinancieraView() {
                 ...resultadoDiagnostico
             };
 
-            // Guardar última evaluación y agregar al historial persistente
+            // Guardar última y añadir al historial en localStorage
             localStorage.setItem('finara_ultima_evaluacion_salud', JSON.stringify(evaluacionCompleta));
             
             let historial = JSON.parse(localStorage.getItem('finara_historial_asesorias') || '[]');
@@ -168,9 +173,10 @@ export function initSaludFinancieraView() {
         }, 1000);
     }
 
-    function mostrarReporteInforma(data) {
-        if (chatContainerCard && seccionResultado) {
-            chatContainerCard.style.display = 'none';
+    function mostrarReporteEnUI(data) {
+        if (seccionChatCard) seccionChatCard.style.display = 'none';
+        if (seccionHistorialLista) seccionHistorialLista.style.display = 'none';
+        if (seccionResultado) {
             seccionResultado.style.display = 'block';
 
             document.getElementById('lblScore').textContent = `${data.score} / 100`;
@@ -191,20 +197,66 @@ export function initSaludFinancieraView() {
         }
     }
 
-    function mostrarReporteEnUI(data) {
-        mostrarReporteInforma(data);
+    function renderizarListaHistorial() {
+        const historial = JSON.parse(localStorage.getItem('finara_historial_asesorias') || '[]');
+        contenedorListaHistorial.innerHTML = '';
+
+        if (historial.length === 0) {
+            contenedorListaHistorial.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: #64748b;">
+                    <i class="fa-solid fa-folder-open" style="font-size: 2rem; margin-bottom: 8px;"></i>
+                    <p>Aún no tienes asesorías guardadas. Realiza tu primera evaluación con el Asesor Finara.</p>
+                </div>
+            `;
+            return;
+        }
+
+        historial.forEach((item, index) => {
+            const card = document.createElement('div');
+            card.className = 'historial-item-card';
+            card.innerHTML = `
+                <div class="historial-item-info">
+                    <span class="historial-item-fecha"><i class="fa-regular fa-calendar"></i> ${item.fechaEvaluacion || `Evaluación #${historial.length - index}`}</span>
+                    <span class="historial-item-score">Score: ${item.score} / 100</span>
+                    <span class="historial-item-nivel">Nivel: ${item.nivelSalud}</span>
+                </div>
+                <button type="button" class="btn-ver-detalle-historial">
+                    Ver Reporte <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            `;
+
+            card.querySelector('.btn-ver-detalle-historial').onclick = () => {
+                mostrarReporteEnUI(item);
+            };
+
+            contenedorListaHistorial.appendChild(card);
+        });
+    }
+
+    function abrirVistaHistorial() {
+        if (seccionChatCard) seccionChatCard.style.display = 'none';
+        if (seccionResultado) seccionResultado.style.display = 'none';
+        if (seccionHistorialLista) {
+            seccionHistorialLista.style.display = 'block';
+            renderizarListaHistorial();
+        }
     }
 
     function iniciarChat() {
         chatBody.innerHTML = '';
         pasoActual = 0;
         if (seccionResultado) seccionResultado.style.display = 'none';
-        if (chatContainerCard) chatContainerCard.style.display = 'block';
+        if (seccionHistorialLista) seccionHistorialLista.style.display = 'none';
+        if (seccionChatCard) seccionChatCard.style.display = 'block';
         mostrarSiguientePregunta();
     }
 
+    // Eventos de botones
     if (btnReiniciar) btnReiniciar.onclick = iniciarChat;
     if (btnRepetir) btnRepetir.onclick = iniciarChat;
+    if (btnHistorial) btnHistorial.onclick = abrirVistaHistorial;
+    if (btnVerHistorialDesdeReporte) btnVerHistorialDesdeReporte.onclick = abrirVistaHistorial;
+    if (btnVolverAlChat) btnVolverAlChat.onclick = iniciarChat;
 
     if (btnVerScore) {
         btnVerScore.onclick = () => {
@@ -215,19 +267,6 @@ export function initSaludFinancieraView() {
             }
             const data = JSON.parse(guardado);
             mostrarReporteEnUI(data);
-        };
-    }
-
-    if (btnHistorial) {
-        btnHistorial.onclick = () => {
-            const historial = JSON.parse(localStorage.getItem('finara_historial_asesorias') || '[]');
-            if (historial.length === 0) {
-                alert("No hay historial de asesorías registradas aún.");
-                return;
-            }
-            const ultima = historial[0];
-            mostrarReporteEnUI(ultima);
-            alert(`Mostrando tu asesoría más reciente del ${ultima.fechaEvaluacion || 'registro previo'}. (Historial total guardado: ${historial.length} evaluaciones).`);
         };
     }
 

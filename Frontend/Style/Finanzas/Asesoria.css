@@ -30,8 +30,9 @@
 
 .chat-header-actions {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     margin-left: auto;
+    align-items: center;
 }
 
 .bot-avatar-img-fluid {
@@ -39,6 +40,29 @@
     height: 100%;
     object-fit: cover;
     border-radius: 10px;
+}
+
+/* Botón Historial Estilizado y Elegante */
+.btn-historial-pill {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--finanzas-primary);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    padding: 7px 14px;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-historial-pill:hover {
+    background: var(--finanzas-primary);
+    color: #07090e;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
 }
 
 .btn-text-action {
@@ -80,12 +104,10 @@
     width: 100%;
 }
 
-/* Fila del Bot a la Izquierda */
 .bot-message-row {
     justify-content: flex-start;
 }
 
-/* Fila del Usuario forzada estrictamente a la Derecha */
 .user-message-row {
     justify-content: flex-end !important;
 }
@@ -111,7 +133,6 @@
     word-break: break-word;
 }
 
-/* Bot: Texto oscuro (#0f172a) sobre fondo claro */
 .bot-bubble {
     background: #f1f5f9;
     color: #0f172a !important;
@@ -119,10 +140,9 @@
     border: 1px solid #e2e8f0;
 }
 
-/* Usuario: Una sola línea de texto, fondo esmeralda y texto oscuro */
 .user-bubble {
     background: var(--finanzas-primary);
-    color: #ffffff !important;
+    color: #07090e !important;
     font-weight: 600;
     border-radius: 14px;
     border-top-right-radius: 4px;
@@ -143,7 +163,6 @@
     gap: 10px;
 }
 
-/* Remover flechas de scroll en inputs numéricos */
 .chat-input-form input[type="text"]::-webkit-outer-spin-button,
 .chat-input-form input[type="text"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
@@ -186,7 +205,7 @@
     box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
 }
 
-/* Opciones de Meta Financiera compactas en Grid para evitar scroll */
+/* Opciones de Meta Financiera compactas en Grid */
 .chat-options-stack {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -213,7 +232,7 @@
 }
 
 /* ========================================================
-   SECCIÓN DE RESULTADOS / INFORME FINAL (Expandido a lo ancho)
+   SECCIÓN DE RESULTADOS E HISTORIAL
    ======================================================== */
 .resultado-reporte-section {
     display: none;
@@ -358,4 +377,73 @@
 
 .btn-text-center {
     text-align: center;
+}
+
+/* Tarjetas de Historial en Lista */
+.historial-lista-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 1rem;
+}
+
+.historial-item-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.2s ease;
+}
+
+.historial-item-card:hover {
+    border-color: var(--finanzas-primary);
+    background: #ffffff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+}
+
+.historial-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.historial-item-fecha {
+    font-size: 0.78rem;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.historial-item-score {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #0f172a;
+    font-family: monospace;
+}
+
+.historial-item-nivel {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--finanzas-primary);
+}
+
+.btn-ver-detalle-historial {
+    background: var(--finanzas-primary);
+    color: #07090e;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-ver-detalle-historial:hover {
+    background: #059669;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
