@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asesoría Financiera | Finara Finanzas</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="../Style/image/favicon_esmeralda.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../Style/Asesoria.css"> <!-- O tu archivo de estilos global -->
+</head>
+
+<div class="seg-header">
+    <div>
+        <h1>Asesoría Financiera Personalizada</h1>
+        <p class="seg-subtitle">Completa tu evaluación de salud financiera para recibir un diagnóstico y recomendaciones
+            a la medida.</p>
+    </div>
+</div>
+
+<!-- Tarjeta del Formulario de Encuesta -->
+<section class="seg-tabla-card" style="max-width: 800px; margin: 0 auto;">
+    <div class="grafico-card-head">
+        <h3>Evaluación de Estado Financiero</h3>
+        <p>Tus datos son privados y se usan exclusivamente para calcular tu score.</p>
+    </div>
+
+    <form id="formEncuestaSalud" class="asesoria-form"
+        style="padding: 24px; display: flex; flex-direction: column; gap: 20px;">
+
+        <div class="form-group">
+            <label for="ingresosMensuales">1. ¿Cuáles son tus ingresos mensuales totales aproximados (COP)?</label>
+            <input type="number" id="ingresosMensuales" class="form-control" placeholder="Ej: 4500000" required min="0">
+        </div>
+
+        <div class="form-group">
+            <label for="gastosMensuales">2. ¿Cuánto sumas en tus gastos fijos mensuales (Arriendo, servicios,
+                mercado)?</label>
+            <input type="number" id="gastosMensuales" class="form-control" placeholder="Ej: 2800000" required min="0">
+        </div>
+
+        <div class="form-group">
+            <label for="deudaTotal">3. ¿Cuál es el monto total de tus deudas activas actuales (Tarjetas,
+                préstamos)?</label>
+            <input type="number" id="deudaTotal" class="form-control" placeholder="Ej: 5000000" required min="0">
+        </div>
+
+        <div class="form-group">
+            <label for="ahorroActual">4. ¿Cuánto tienes actualmente acumulado en ahorros o fondo de emergencia?</label>
+            <input type="number" id="ahorroActual" class="form-control" placeholder="Ej: 2000000" required min="0">
+        </div>
+
+        <div class="form-group">
+            <label for="metaPrincipal">5. ¿Cuál es tu principal objetivo o meta financiera a corto plazo?</label>
+            <select id="metaPrincipal" class="form-control" required>
+                <option value="" disabled selected>Selecciona una opción</option>
+                <option value="ahorro">Construir mi fondo de emergencia o ahorrar</option>
+                <option value="deudas">Salir de deudas rápidamente</option>
+                <option value="inversion">Comenzar a invertir</option>
+                <option value="control">Controlar mejor mis gastos diarios</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn-primary-finara"
+            style="background-color: #34d399; color: #0f172a; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.2s;">
+            Generar Mi Diagnóstico y Score
+        </button>
+    </form>
+</section>
+
+<script type="module" src="../../../Vanilla/Finanzas/SaludFinanciera.js"></script>
+</body>
+
+</html>
