@@ -222,67 +222,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    // ==========================================
-    // LÓGICA INTEGRADA DEL CHATBOT
-    // ==========================================
-    const btnToggleChat = document.getElementById("btnToggleChat");
-    const btnCloseChat = document.getElementById("btnCloseChat");
-    const windowChat = document.getElementById("windowChat");
-    const chatBody = document.getElementById("chatBody");
-
-    if (btnToggleChat && windowChat) {
-        btnToggleChat.addEventListener("click", () => {
-            windowChat.classList.toggle("hidden");
-            if (!windowChat.classList.contains("hidden")) {
-                renderOpcionesIniciales();
-            }
-        });
-
-        if (btnCloseChat) {
-            btnCloseChat.addEventListener("click", () => {
-                windowChat.classList.add("hidden");
-            });
-        }
-
-        const preguntasFrecuentes = [
-            { id: "saldos", texto: "💳 ¿Cómo consultar mis saldos?", respuesta: "Puedes revisar tus saldos y el consolidado general directamente en la sección de **Dashboard** o en la vista de **Saldos** en el menú lateral." },
-            { id: "transferir", texto: "🔄 ¿Cómo hacer una transferencia?", respuesta: "Dirígete a la sección **Transferencias**, selecciona la cuenta de origen, ingresa el número de destino y el monto a transferir de forma inmediata." },
-            { id: "consignar", texto: "➕ ¿Cómo realizar una consignación?", respuesta: "Entra a la opción **Consignar** en el menú, escoge la cuenta receptora, digita el monto y confirma la operación." },
-            { id: "bloquear", texto: "🔒 ¿Cómo bloquear una tarjeta?", respuesta: "Ve a la sección **Saldos**, ubica la tarjeta que deseas proteger y haz clic en el botón de **Bloquear** por seguridad." }
-        ];
-
-        function agregarMensaje(texto, tipo) {
-            const bubble = document.createElement("div");
-            bubble.className = `chat-bubble ${tipo === 'bot' ? 'bot-bubble' : 'user-bubble'}`;
-            bubble.innerHTML = texto;
-            chatBody.appendChild(bubble);
-            chatBody.scrollTop = chatBody.scrollHeight;
-        }
-
-        function renderOpcionesIniciales() {
-            if (chatBody.querySelector(".chat-options")) return;
-
-            const optionsContainer = document.createElement("div");
-            optionsContainer.className = "chat-options";
-
-            preguntasFrecuentes.forEach(item => {
-                const btn = document.createElement("button");
-                btn.className = "chat-option-btn";
-                btn.innerHTML = `<i class="fa-solid fa-chevron-right" style="font-size: 10px; color: var(--gold-main);"></i> ${item.texto}`;
-                btn.addEventListener("click", () => {
-                    agregarMensaje(item.texto, "user");
-                    optionsContainer.remove();
-
-                    setTimeout(() => {
-                        agregarMensaje(item.respuesta, "bot");
-                        setTimeout(renderOpcionesIniciales, 600);
-                    }, 400);
-                });
-                optionsContainer.appendChild(btn);
-            });
-
-            chatBody.appendChild(optionsContainer);
-            chatBody.scrollTop = chatBody.scrollHeight;
+    // El chatbot está desacoplado de app.js y usa el mismo router SPA.
+    // No se cargan datos bancarios en el chatbot.
+    if (!esAdmin) {
+        try {
+            const { initChatbot } = await import('../chatbot/chatbot.js');
+            initChatbot({ navegar: (vista) => {
+                marcarItemActivo(vista);
+                cargarVista(vista);
+                cerrarMenuMovil();
+            }});
+        } catch (error) {
+            console.error('No fue posible inicializar el chatbot:', error);
         }
     }
 
