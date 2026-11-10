@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finara Finanzas</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="../Style/image/favicon_esmeralda.svg">
+    <!-- Carga la hoja de estilos propia de Finara Finanzas -->
+    <link rel="stylesheet" href="../Style/global/styles_finanzas.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body class="general-body">
+    <div class="sidebar-backdrop hidden" id="sidebarBackdrop"></div>
+
+    <!-- ======= SIDEBAR ÚNICO Y PERSISTENTE ======= -->
+    <aside class="sidebar" id="sidebar">
+        <!-- BOTÓN CÍRCULO EN EL BORDE DERECHO -->
+        <button class="sidebar-edge-toggle" id="sidebarCollapseBtn" aria-label="Colapsar menú" title="Alternar menú">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
+        <div class="sidebar-header">
+            <img src="../Style/image/Logo_finara_esmeralda-01.svg" alt="Finara Finanzas Logo" class="sidebar-logo">
+            <img src="../Style/image/favicon_esmeralda.svg" alt="Finara Icon" class="sidebar-logo-small">
+        </div>
+
+        <!-- MENÚ DE NAVEGACIÓN PRINCIPAL (FINARA FINANZAS) -->
+        <nav class="sidebar-nav">
+            <ul>
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" data-view="dashboard" title="Dashboard">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-view="fondoEmergencia" title="Fondo de emergencia">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span>Fondo Emergencia</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-view="presupuesto" title="Elaboración de presupuesto">
+                        <i class="fa-solid fa-calculator"></i>
+                        <span>Presupuestos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-view="seguimiento" title="Seguimiento financiero">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Seguimiento</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-view="asesoriaPersonalizada" title="Asesoria personalizada">
+                        <i class="fa-solid fa-user-doctor"></i>
+                        <span>Salud Financiera</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-view="asesoriaEndeudamiento" title="Asesoría sobre endeudamiento">
+                        <i class="fa-solid fa-scale-balanced"></i>
+                        <span>Gestión de Deudas</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- SECCIÓN INFERIOR DEL SIDEBAR (SOLO CERRAR SESIÓN) -->
+        <div class="sidebar-footer">
+            <a href="#" class="btn-logout-sidebar" id="btnCerrarSesion" title="Cerrar sesión">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Cerrar sesión</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- ======= WRAPPER PRINCIPAL ======= -->
+    <div class="main-wrapper">
+        <header class="dashboard-navbar">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <button class="mobile-menu-btn" id="menuToggle" aria-label="Abrir menú navegación">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="user-greeting">
+                    <h2>Hola, <span id="greetingName">Usuario</span></h2>
+                </div>
+            </div>
+
+            <div class="navbar-actions">
+                <!-- BOTÓN PARA REGRESAR A FINARA BANK -->
+                <a href="app.html" class="btn-bank-navbar" title="Ir a Finara Bank">
+                    <i class="fa-solid fa-building-columns"></i>
+                    <span>Finara Bank</span>
+                </a>
+
+                <!-- BOTÓN VER PERFIL -->
+                <a href="#" class="btn-perfil-navbar" data-view="perfil" title="Mi perfil">
+                    <div class="navbar-user-avatar">
+                        <img src="../Style/image/profile/avatarDefault.png" alt="Avatar" id="navbarAvatarImg"
+                            style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                    </div>
+                    <div class="navbar-user-info">
+                        <strong id="sidebarUserName">Usuario</strong>
+                        <span>Ver perfil</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right navbar-user-arrow"></i>
+                </a>
+            </div>
+        </header>
+
+        <!-- CONTENEDOR DINÁMICO SPA FINANZAS -->
+        <main class="main-content" id="mainContent">
+            <!-- Vistas inyectadas por JS -->
+        </main>
+
+        <!-- ======= WIDGET Y VENTANA FLOTANTE DEL CHATBOT FINANZAS ======= -->
+        <div id="chatWidgetContainer">
+            <div id="windowChat" class="chatbot-window hidden">
+                <div class="chatbot-header">
+                    <div class="chatbot-info">
+                        <div class="bot-avatar-container">
+                            <img src="../Style/image/bot_finara.png" alt="Finara Bot" class="bot-avatar-img">
+                        </div>
+                        <div>
+                            <h6>Asistente Finanzas</h6>
+                            <small class="status-online">• En línea</small>
+                        </div>
+                    </div>
+                    <button id="btnCloseChat" class="close-chat-btn">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div id="chatBody" class="chatbot-body">
+                    <div class="chat-bubble bot-bubble">
+                        ¡Hola! 👋 Soy tu asesor de <strong>Finara Finanzas</strong>. ¿En qué puedo ayudarte hoy con tus metas de ahorro o presupuestos?
+                    </div>
+                </div>
+            </div>
+
+            <button id="btnToggleChat" class="chatbot-float-btn" title="Asesoría Financiera">
+                <img src="../Style/image/bot_finara.png" alt="Finara Bot" class="float-btn-img">
+            </button>
+        </div>
+    </div>
+
+    <!-- Script SPA de Finanzas -->
+    <script type="module" src="../Vanilla/Global/finanzas.js"></script>
+</body>
+
+</html>

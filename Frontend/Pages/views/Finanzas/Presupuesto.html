@@ -1,0 +1,172 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presupuesto | Finara Bank</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="../Style/image/favicon_esmeralda.svg">
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="../../../Style/Finanzas/Presupuesto.css">
+    <!-- SweetAlert2 CSS y JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<!-- ======= VISTA DE PRESUPUESTO ======= -->
+<div class="pre-header">
+    <div>
+        <h1>Elaboración de Presupuesto</h1>
+    </div>
+
+    <!-- Selector de Periodo Mensual Personalizado (Finara Dark & Gold) -->
+    <div class="pre-selector-periodo" id="selectorPeriodoContainer">
+        <button type="button" class="btn-periodo-nav" id="btnMesAnterior" title="Mes anterior">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
+        <div class="periodo-display-box" id="periodoDisplayBtn">
+            <i class="fa-regular fa-calendar-days color-dorado"></i>
+            <span id="periodoTextoLabel">Octubre 2026</span>
+            <i class="fa-solid fa-caret-down flecha-dropdown"></i>
+        </div>
+
+        <button type="button" class="btn-periodo-nav" id="btnMesSiguiente" title="Mes siguiente">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+
+        <!-- Dropdown personalizado de meses y años -->
+        <div class="pre-dropdown-meses hidden" id="dropdownMesesMenu">
+            <div class="dropdown-header-year">
+                <button type="button" class="btn-year-nav" id="btnYearPrev"><i
+                        class="fa-solid fa-chevron-left"></i></button>
+                <strong id="labelYearSeleccionado">2026</strong>
+                <button type="button" class="btn-year-nav" id="btnYearNext"><i
+                        class="fa-solid fa-chevron-right"></i></button>
+            </div>
+            <div class="grid-meses-dropdown" id="gridMesesDropdown">
+                <!-- Inyectado dinámicamente: Ene, Feb, Mar, etc. -->
+            </div>
+        </div>
+
+        <!-- Input oculto para compatibilidad con el valor de periodo (YYYY-MM) -->
+        <input type="hidden" id="selectPeriodo" value="2026-10">
+    </div>
+</div>
+
+<!-- Panel de Indicadores y Cálculo Automático de Saldo -->
+<section class="pre-metricas-grid">
+    <div class="pre-metrica-card">
+        <div class="pre-metrica-icono bg-ingreso">
+            <i class="fa-solid fa-arrow-trend-up"></i>
+        </div>
+        <div class="pre-metrica-info">
+            <span>Ingresos Estimados</span>
+            <h3 id="metricaIngresos" class="color-ingreso">$ 0</h3>
+            <small>Total presupuestado</small>
+        </div>
+    </div>
+
+    <div class="pre-metrica-card">
+        <div class="pre-metrica-icono bg-gasto">
+            <i class="fa-solid fa-arrow-trend-down"></i>
+        </div>
+        <div class="pre-metrica-info">
+            <span>Gastos Planificados</span>
+            <h3 id="metricaGastos" class="color-gasto">$ 0</h3>
+            <small id="metricaPorcentajeGastado">0% de los ingresos</small>
+        </div>
+    </div>
+
+    <div class="pre-metrica-card">
+        <div class="pre-metrica-icono bg-balance" id="iconoBalanceBox">
+            <i class="fa-solid fa-scale-balanced" id="iconoBalance"></i>
+        </div>
+        <div class="pre-metrica-info">
+            <span>Saldo Neto (Ingresos vs Gastos)</span>
+            <h3 id="metricaSaldoNeto">$ 0</h3>
+            <small id="metricaEstadoBalance">Balance equilibrado</small>
+        </div>
+    </div>
+</section>
+
+<!-- Barra de Progreso Presupuestaria -->
+<section class="pre-barra-progreso-card">
+    <div class="pre-progreso-info">
+        <span>Uso del presupuesto mensual</span>
+        <strong id="progresoTexto">0% consumido</strong>
+    </div>
+    <div class="pre-progreso-track">
+        <div class="pre-progreso-fill" id="progresoFill" style="width: 0%;"></div>
+    </div>
+</section>
+
+<!-- Panel de Creación / Registro de Ingreso y Gasto -->
+<section class="pre-registro-card">
+    <div class="pre-registro-head">
+        <h3><i class="fa-solid fa-circle-plus"></i> Registrar rubro de presupuesto</h3>
+    </div>
+    <form id="formRegistroRubro" class="pre-form-registro">
+        <div class="pre-campo">
+            <label for="rubroTipo">Tipo</label>
+            <select id="rubroTipo" required>
+                <option value="INGRESO">Ingreso Estimado</option>
+                <option value="GASTO">Gasto Presupuestado</option>
+            </select>
+        </div>
+
+        <div class="pre-campo">
+            <label for="rubroCategoria">Categoría</label>
+            <select id="rubroCategoria" required>
+                <!-- Opciones cargadas dinámicamente según el tipo -->
+            </select>
+        </div>
+
+        <div class="pre-campo">
+            <label for="rubroDescripcion">Concepto o Descripción</label>
+            <input type="text" id="rubroDescripcion" placeholder="Ej. Pago de arriendo, Salario principal" required>
+        </div>
+
+        <div class="pre-campo">
+            <label for="rubroMonto">Monto (COP)</label>
+            <input type="text" id="rubroMonto" placeholder="$ 0" required inputmode="numeric">
+        </div>
+
+        <div class="pre-campo-btn">
+            <button type="submit" class="btn-guardar-rubro" id="btnGuardarRubro">
+                <i class="fa-solid fa-plus"></i> Agregar Rubro
+            </button>
+        </div>
+    </form>
+</section>
+
+<!-- Listado de rubros por categoría -->
+<div class="pre-listados-grid">
+    <!-- Columna Ingresos -->
+    <div class="pre-columna-card">
+        <div class="pre-columna-head">
+            <h4><i class="fa-solid fa-arrow-down-long color-ingreso"></i> Ingresos Registrados</h4>
+            <span class="badge-total-col color-ingreso" id="totalColIngresos">$ 0</span>
+        </div>
+        <div class="pre-items-lista" id="listaIngresos">
+            <p class="pre-lista-vacia">No hay ingresos registrados en este mes.</p>
+        </div>
+    </div>
+
+    <!-- Columna Gastos -->
+    <div class="pre-columna-card">
+        <div class="pre-columna-head">
+            <h4><i class="fa-solid fa-arrow-up-long color-gasto"></i> Gastos Registrados</h4>
+            <span class="badge-total-col color-gasto" id="totalColGastos">$ 0</span>
+        </div>
+        <div class="pre-items-lista" id="listaGastos">
+            <p class="pre-lista-vacia">No hay gastos registrados en este mes.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Script del Módulo de Presupuesto -->
+<script type="module" src="../Vanilla/Presupuesto.js"></script>
+</body>
+
+</html>

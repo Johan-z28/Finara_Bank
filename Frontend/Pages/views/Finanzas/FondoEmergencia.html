@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fondo de Emergencia | Finara Finanzas</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="../Style/image/favicon_esmeralda.svg">
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="../../../Style/Finanzas/FondoEmergencia.css">
+    <!-- SweetAlert2 CSS y JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<!-- ======= CONTENEDOR PRINCIPAL ======= -->
+<div class="fe-header">
+    <div>
+        <h1>Fondo de Emergencia</h1>
+    </div>
+</div>
+
+<!-- Panel de Indicador de Avance hacia la Meta del Fondo -->
+<section class="fe-avance-card" id="panelAvanceFondo">
+    <div class="fe-avance-head">
+        <div>
+            <span class="fe-etiqueta-avance">Tu Estado de Preparación</span>
+            <h2 class="fe-avance-titulo" id="avanceTitulo">Monitoreo de Fondo de Emergencia</h2>
+        </div>
+        <div class="fe-badge-seguridad" id="badgeSeguridad">
+            <i class="fa-solid fa-shield-halved"></i> <span id="textoSeguridad">En progreso</span>
+        </div>
+    </div>
+
+    <div class="fe-avance-metricas-grid">
+        <div class="fe-metrica-caja">
+            <span class="fe-metrica-label">Ahorro Actual Acumulado</span>
+            <h3 class="fe-metrica-valor color-verde" id="avanceSaldoActual">$ 0</h3>
+            <small id="avanceCuentaDesc">Cuenta de ahorros</small>
+        </div>
+
+        <div class="fe-metrica-caja">
+            <span class="fe-metrica-label">Meta Definida</span>
+            <h3 class="fe-metrica-valor color-dorado" id="avanceMetaMonto">$ 0</h3>
+            <small id="avanceCoberturaMeses">Meta para 6 meses</small>
+        </div>
+
+        <div class="fe-metrica-caja">
+            <span class="fe-metrica-label">Faltante para la Meta</span>
+            <h3 class="fe-metrica-valor" id="avanceMontoFaltante">$ 0</h3>
+            <small id="avanceMesesCubiertos">0 meses cubiertos</small>
+        </div>
+    </div>
+
+    <!-- Barra de Progreso Dinámica -->
+    <div class="fe-barra-progreso-box">
+        <div class="fe-barra-info">
+            <span>Porcentaje de avance hacia tu meta</span>
+            <strong class="color-dorado" id="avancePorcentajeTexto">0% completado</strong>
+        </div>
+        <div class="fe-track-progreso">
+            <div class="fe-fill-progreso" id="avanceFillProgreso" style="width: 0%;"></div>
+        </div>
+    </div>
+</section>
+
+<!-- Calculadora de Fondo de Emergencia basada en Gastos Fijos -->
+<section class="fe-calculadora-card">
+    <div class="fe-card-head">
+        <div class="fe-badge-icono">
+            <i class="fa-solid fa-calculator"></i>
+        </div>
+        <div>
+            <h3>Calculadora de Fondo de Emergencia</h3>
+            <p>Determina cuánto dinero necesitas reservar según tus gastos fijos mensuales esenciales.</p>
+        </div>
+    </div>
+
+    <div class="fe-calc-grid">
+        <div class="fe-calc-form">
+            <div class="fe-campo">
+                <label for="inputGastosFijos">Gastos fijos mensuales promedio (COP)</label>
+                <div class="fe-input-wrapper">
+                    <span class="fe-currency-prefix">$</span>
+                    <input type="text" id="inputGastosFijos" placeholder="0" value="" inputmode="numeric">
+                </div>
+                <small class="fe-hint">Incluye vivienda, servicios públicos, alimentación, transporte y salud.</small>
+            </div>
+
+            <div class="fe-campo">
+                <label for="selectMesesCobertura">Meses de cobertura deseados</label>
+                <div class="fe-meses-selector" id="selectorMeses">
+                    <button type="button" class="btn-meses" data-meses="3">3 Meses (Mínimo)</button>
+                    <button type="button" class="btn-meses active" data-meses="6">6 Meses (Recomendado)</button>
+                    <button type="button" class="btn-meses" data-meses="9">9 Meses (Protegido)</button>
+                    <button type="button" class="btn-meses" data-meses="12">12 Meses (Óptimo)</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="fe-calc-resultado">
+            <div class="fe-res-header">
+                <span>Monto de fondo sugerido</span>
+                <span class="fe-pill" id="pillCobertura">Cobertura para 6 meses</span>
+            </div>
+            <h2 class="fe-monto-sugerido" id="montoSugeridoCalc">$ 0</h2>
+            <div class="fe-res-desglose">
+                <div class="fe-desglose-fila">
+                    <span>Cobertura Mínima (3 meses):</span>
+                    <strong id="resMinimo3m">$ 0</strong>
+                </div>
+                <div class="fe-desglose-fila">
+                    <span>Cobertura Óptima (6 meses):</span>
+                    <strong id="resOptimo6m" class="color-dorado">$ 0</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sección de Definición de Meta y Vinculación a Cuenta de Ahorro -->
+<section class="fe-meta-card">
+    <div class="fe-card-head">
+        <div class="fe-badge-icono"
+            style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3);">
+            <i class="fa-solid fa-bullseye"></i>
+        </div>
+        <div>
+            <h3>Definir Meta de Fondo y Vincular Ahorro</h3>
+            <p>Establece tu objetivo financiero y vincula tu cuenta bancaria para monitorear tu progreso.</p>
+        </div>
+    </div>
+
+    <form id="formDefinirMeta" class="fe-meta-form">
+        <div class="fe-meta-inputs-grid">
+            <div class="fe-campo">
+                <label for="inputMetaPersonalizada">Monto Objetivo / Meta (COP)</label>
+                <div class="fe-input-wrapper">
+                    <span class="fe-currency-prefix">$</span>
+                    <input type="text" id="inputMetaPersonalizada" placeholder="0" required inputmode="numeric">
+                </div>
+                <button type="button" class="btn-usar-sugerido" id="btnUsarSugerido">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Usar monto de la calculadora
+                </button>
+            </div>
+
+            <div class="fe-campo">
+                <label for="selectCuentaVinculada">Vincular a Cuenta (Ahorros o Corriente)</label>
+                <select id="selectCuentaVinculada" class="fe-select-cuenta" required>
+                    <option value="" disabled selected>Selecciona una cuenta</option>
+                    <!-- Opciones cargadas dinámicamente con cuentas del usuario -->
+                </select>
+                <small class="fe-hint">El progreso se alimentará automáticamente del saldo de esta cuenta.</small>
+            </div>
+        </div>
+
+        <div class="fe-meta-acciones">
+            <button type="submit" class="btn-guardar-meta" id="btnGuardarMeta">
+                <i class="fa-solid fa-check"></i> Fijar Meta y Vincular Ahorro
+            </button>
+        </div>
+    </form>
+</section>
+
+
+<script type="module" src="../Finanzas/FondoEmergencia.html"></script>
+</body>
+
+</html>

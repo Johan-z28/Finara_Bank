@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitud de Tarjeta | Finara Bank</title>
+    <title>Solicitud de Productos | Finara Bank</title>
     <link rel="icon" type="image/png" sizes="32x32" href="../Style/image/favicon.svg">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -15,111 +15,181 @@
     <main class="card-request-container">
         <div class="request-header">
             <h1>Solicitar Productos</h1>
+            <p class="prestamo-subtitle" style="color: var(--text-muted, #94a3b8); font-size: 0.9rem; margin-top: 4px;">
+                Explora nuestras soluciones financieras, cuentas, tarjetas y líneas de crédito a tu medida.</p>
         </div>
 
-        <!-- GRID DE CATALOGO CON TARJETAS PLÁSTICAS -->
-        <div class="catalog-grid">
+        <!-- SECCIÓN 1: TARJETAS Y CUENTAS BANCARIAS -->
+        <div class="productos-seccion" style="margin-bottom: 2rem;">
+            <h2
+                style="font-size: 1.25rem; font-weight: 700; color: #ffffff; margin-bottom: 1rem; border-left: 4px solid var(--gold-main, #e5a93c); padding-left: 10px;">
+                Cuentas y Tarjetas</h2>
+            <div class="catalog-grid">
 
-            <!-- 1. Cuenta de Ahorros + Débito (Plástico Dorado) -->
-            <div class="card-option-box" data-card="debito" data-account="ahorros">
-                <!-- Plástico físico 3D -->
-                <div class="tarjeta-plastico tarjeta-dorada">
-                    <div class="head-tarjeta">
-                        <img src="../Style/image/Logo_finara_black.svg" alt="Finara Logo" class="logo-svg">
-                        <i class="fa-solid fa-wifi card-contactless"></i>
+                <!-- 1. Cuenta de Ahorros + Débito -->
+                <div class="card-option-box" data-card="debito" data-account="ahorros">
+                    <div class="tarjeta-plastico tarjeta-dorada">
+                        <div class="head-tarjeta">
+                            <img src="../Style/image/Logo_finara_black.svg" alt="Finara Logo" class="logo-svg">
+                            <i class="fa-solid fa-wifi card-contactless"></i>
+                        </div>
+                        <div class="card-chip-area">
+                            <div class="chip"></div>
+                            <span class="card-tag">Débito</span>
+                        </div>
+                        <div class="foot-tarjeta">
+                            <span class="card-number">**** **** **** 1092</span>
+                            <span class="card-type">VISA</span>
+                        </div>
                     </div>
-                    <div class="card-chip-area">
-                        <div class="chip"></div>
-                        <span class="card-tag">Débito</span>
+
+                    <div class="card-content-top">
+                        <span class="card-type-tag tag-ahorros">
+                            <i class="fa-solid fa-piggy-bank"></i> Débito
+                        </span>
+                        <h3>Cuenta de Débito</h3>
+                        <p>Rentabiliza tu dinero y obtén tu tarjeta débito para compras y retiros.</p>
+                        <ul class="card-benefits">
+                            <li><i class="fa-solid fa-check"></i> Cero cuota de manejo</li>
+                            <li><i class="fa-solid fa-check"></i> Rentabilidad sobre saldo</li>
+                            <li><i class="fa-solid fa-check"></i> Incluye Tarjeta Débito</li>
+                        </ul>
                     </div>
-                    <div class="foot-tarjeta">
-                        <span class="card-number">**** **** **** 1092</span>
-                        <span class="card-type">VISA</span>
-                    </div>
+                    <button class="request-card-btn" data-producto="debito">Solicitar / Aperturar</button>
                 </div>
 
-                <div class="card-content-top">
-                    <span class="card-type-tag tag-ahorros">
-                        <i class="fa-solid fa-piggy-bank"></i> Débito
-                    </span>
-                    <h3>Cuenta de Débito</h3>
-                    <p>Rentabiliza tu dinero y obtén tu tarjeta débito para compras y retiros.</p>
-                    <ul class="card-benefits">
-                        <li><i class="fa-solid fa-check"></i> Cero cuota de manejo</li>
-                        <li><i class="fa-solid fa-check"></i> Rentabilidad sobre saldo</li>
-                        <li><i class="fa-solid fa-check"></i> Incluye Tarjeta Débito</li>
-                    </ul>
+                <!-- 2. Cuenta Corriente -->
+                <div class="card-option-box" data-card="corriente" data-account="corriente">
+                    <div class="tarjeta-plastico tarjeta-platino">
+                        <div class="head-tarjeta">
+                            <img src="../Style/image/Logo_finara_black.svg" alt="Finara Logo" class="logo-svg">
+                            <i class="fa-solid fa-wifi card-contactless"></i>
+                        </div>
+                        <div class="card-chip-area">
+                            <div class="chip"></div>
+                            <span class="card-tag">Corriente</span>
+                        </div>
+                        <div class="foot-tarjeta">
+                            <span class="card-number">**** **** **** 5541</span>
+                            <span class="card-type">VISA</span>
+                        </div>
+                    </div>
+
+                    <div class="card-content-top">
+                        <span class="card-type-tag tag-corriente">
+                            <i class="fa-solid fa-building-columns"></i> Corriente
+                        </span>
+                        <h3>Cuenta Corriente</h3>
+                        <p>Herramienta diseñada para transacciones ágiles con cupo de sobregiro.</p>
+                        <ul class="card-benefits">
+                            <li><i class="fa-solid fa-check"></i> Sobregiro autorizado</li>
+                            <li><i class="fa-solid fa-check"></i> Transferencias directas</li>
+                            <li><i class="fa-solid fa-check"></i> Incluye Tarjeta Corriente</li>
+                        </ul>
+                    </div>
+                    <button class="request-card-btn" data-producto="corriente">Solicitar / Aperturar</button>
                 </div>
-                <button class="request-card-btn" data-producto="debito">Solicitar / Aperturar</button>
+
+                <!-- 3. Tarjeta Crédito Gold -->
+                <div class="card-option-box" data-card="credito">
+                    <div class="tarjeta-plastico tarjeta-negra">
+                        <div class="head-tarjeta">
+                            <img src="../Style/image/Logo_finara.svg" alt="Finara Logo" class="logo-svg">
+                            <i class="fa-solid fa-wifi card-contactless"></i>
+                        </div>
+                        <div class="card-chip-area">
+                            <div class="chip"></div>
+                            <span class="card-tag">Crédito</span>
+                        </div>
+                        <div class="foot-tarjeta">
+                            <span class="card-number">**** **** **** 8821</span>
+                            <span class="card-type">VISA</span>
+                        </div>
+                    </div>
+
+                    <div class="card-content-top">
+                        <span class="card-type-tag tag-credito">
+                            <i class="fa-solid fa-credit-card"></i> Crédito
+                        </span>
+                        <h3>Tarjeta Crédito Gold</h3>
+                        <p>Financia tus proyectos y compras con líneas flexibles y puntos.</p>
+                        <ul class="card-benefits">
+                            <li><i class="fa-solid fa-check"></i> Cupo preaprobado dinámico</li>
+                            <li><i class="fa-solid fa-check"></i> Asistencia internacional</li>
+                            <li><i class="fa-solid fa-check"></i> 2% de cashback en compras</li>
+                        </ul>
+                    </div>
+                    <button class="request-card-btn" data-producto="credito">Solicitar</button>
+                </div>
+
             </div>
-
-            <!-- 2. Cuenta Corriente + Tarjeta (Plástico Platino) -->
-            <div class="card-option-box" data-card="corriente" data-account="corriente">
-                <!-- Plástico físico 3D -->
-                <div class="tarjeta-plastico tarjeta-platino">
-                    <div class="head-tarjeta">
-                        <img src="../Style/image/Logo_finara_black.svg" alt="Finara Logo" class="logo-svg">
-                        <i class="fa-solid fa-wifi card-contactless"></i>
-                    </div>
-                    <div class="card-chip-area">
-                        <div class="chip"></div>
-                        <span class="card-tag">Corriente</span>
-                    </div>
-                    <div class="foot-tarjeta">
-                        <span class="card-number">**** **** **** 5541</span>
-                        <span class="card-type">VISA</span>
-                    </div>
-                </div>
-
-                <div class="card-content-top">
-                    <span class="card-type-tag tag-corriente">
-                        <i class="fa-solid fa-building-columns"></i> Corriente
-                    </span>
-                    <h3>Cuenta Corriente</h3>
-                    <p>Herramienta diseñada para transacciones ágiles con cupo de sobregiro.</p>
-                    <ul class="card-benefits">
-                        <li><i class="fa-solid fa-check"></i> Sobregiro autorizado</li>
-                        <li><i class="fa-solid fa-check"></i> Transferencias directas</li>
-                        <li><i class="fa-solid fa-check"></i> Incluye Tarjeta Corriente</li>
-                    </ul>
-                </div>
-                <button class="request-card-btn" data-producto="corriente">Solicitar / Aperturar</button>
-            </div>
-
-            <!-- 3. Tarjeta Crédito Gold (Plástico Negro) -->
-            <div class="card-option-box" data-card="credito">
-                <!-- Plástico físico 3D -->
-                <div class="tarjeta-plastico tarjeta-negra">
-                    <div class="head-tarjeta">
-                        <img src="../Style/image/Logo_finara.svg" alt="Finara Logo" class="logo-svg">
-                        <i class="fa-solid fa-wifi card-contactless"></i>
-                    </div>
-                    <div class="card-chip-area">
-                        <div class="chip"></div>
-                        <span class="card-tag">Crédito</span>
-                    </div>
-                    <div class="foot-tarjeta">
-                        <span class="card-number">**** **** **** 8821</span>
-                        <span class="card-type">VISA</span>
-                    </div>
-                </div>
-
-                <div class="card-content-top">
-                    <span class="card-type-tag tag-credito">
-                        <i class="fa-solid fa-credit-card"></i> Crédito
-                    </span>
-                    <h3>Tarjeta Crédito Gold</h3>
-                    <p>Financia tus proyectos y compras con líneas flexibles y puntos.</p>
-                    <ul class="card-benefits">
-                        <li><i class="fa-solid fa-check"></i> Cupo preaprobado dinámico</li>
-                        <li><i class="fa-solid fa-check"></i> Asistencia internacional</li>
-                        <li><i class="fa-solid fa-check"></i> 2% de cashback en compras</li>
-                    </ul>
-                </div>
-                <button class="request-card-btn" data-producto="credito">Solicitar</button>
-            </div>
-
         </div>
+
+        <!-- SECCIÓN 2: CRÉDITOS Y PRÉSTAMOS (LOS 3 TIPOS) -->
+        <div class="productos-seccion" style="margin-bottom: 2rem;">
+            <h2 style="font-size: 1.25rem; font-weight: 700; color: #ffffff; margin-bottom: 1rem; border-left: 4px solid var(--gold-main, #e5a93c); padding-left: 10px;">Líneas de Crédito y Préstamos</h2>
+            <div class="catalog-grid">
+
+                <!-- 1. Libre Inversión -->
+                <div class="card-option-box">
+                    <div style="width: 100%; height: 110px; background: linear-gradient(135deg, rgba(229,169,60,0.15) 0%, rgba(17,20,29,0.9) 100%); border: 1px solid rgba(229,169,60,0.3); border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 0.8rem; box-shadow: 0 8px 20px rgba(0,0,0,0.4);">
+                        <i class="fa-solid fa-wallet" style="font-size: 2.8rem; color: #e5a93c;"></i>
+                    </div>
+
+                    <div class="card-content-top">
+                        <span class="card-type-tag tag-credito"><i class="fa-solid fa-percent"></i> 24% E.A. (1.8% E.M.)</span>
+                        <h3>Crédito de Libre Inversión</h3>
+                        <p>Ideal para cualquier proyecto personal, viajes o imprevistos de liquidez.</p>
+                        <ul class="card-benefits">
+                            <li><i class="fa-solid fa-check"></i> Plazo máximo de 36 meses</li>
+                            <li><i class="fa-solid fa-check"></i> Desembolso inmediato a ahorros</li>
+                            <li><i class="fa-solid fa-check"></i> Simulador y cuota fija</li>
+                        </ul>
+                    </div>
+                    <button class="request-card-btn btn-ir-prestamos" data-view="prestamos" data-tipo="libre">Solicitar Préstamo</button>
+                </div>
+
+                <!-- 2. Vehículo -->
+                <div class="card-option-box">
+                    <div style="width: 100%; height: 110px; background: linear-gradient(135deg, rgba(229,169,60,0.15) 0%, rgba(17,20,29,0.9) 100%); border: 1px solid rgba(229,169,60,0.3); border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 0.8rem; box-shadow: 0 8px 20px rgba(0,0,0,0.4);">
+                        <i class="fa-solid fa-car-side" style="font-size: 2.8rem; color: #e5a93c;"></i>
+                    </div>
+
+                    <div class="card-content-top">
+                        <span class="card-type-tag tag-credito"><i class="fa-solid fa-percent"></i> 18% E.A. (1.38% E.M.)</span>
+                        <h3>Financiación de Vehículo</h3>
+                        <p>Tasas preferenciales con prenda vehicular para estrenar carro o moto.</p>
+                        <ul class="card-benefits">
+                            <li><i class="fa-solid fa-check"></i> Plazo amplio hasta 60 meses</li>
+                            <li><i class="fa-solid fa-check"></i> Tasas preferenciales</li>
+                            <li><i class="fa-solid fa-check"></i> Estudio rápido de viabilidad</li>
+                        </ul>
+                    </div>
+                    <button class="request-card-btn btn-ir-prestamos" data-view="prestamos" data-tipo="vehiculo">Solicitar Préstamo</button>
+                </div>
+
+                <!-- 3. Hipotecario -->
+                <div class="card-option-box">
+                    <div style="width: 100%; height: 110px; background: linear-gradient(135deg, rgba(229,169,60,0.15) 0%, rgba(17,20,29,0.9) 100%); border: 1px solid rgba(229,169,60,0.3); border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 0.8rem; box-shadow: 0 8px 20px rgba(0,0,0,0.4);">
+                        <i class="fa-solid fa-house-chimney" style="font-size: 2.8rem; color: #e5a93c;"></i>
+                    </div>
+
+                    <div class="card-content-top">
+                        <span class="card-type-tag tag-credito"><i class="fa-solid fa-percent"></i> 14% E.A. (1.10% E.M.)</span>
+                        <h3>Crédito Hipotecario / Vivienda</h3>
+                        <p>El plazo más amplio y la cuota más baja del mercado para adquirir tu hogar.</p>
+                        <ul class="card-benefits">
+                            <li><i class="fa-solid fa-check"></i> Plazos hasta 180 meses</li>
+                            <li><i class="fa-solid fa-check"></i> Cuotas más bajas del mercado</li>
+                            <li><i class="fa-solid fa-check"></i> Financiación habitacional</li>
+                        </ul>
+                    </div>
+                    <button class="request-card-btn btn-ir-prestamos" data-view="prestamos" data-tipo="hipotecario">Solicitar Préstamo</button>
+                </div>
+
+            </div>
+        </div>
+
     </main>
 
     <!-- Módulo JS principal -->

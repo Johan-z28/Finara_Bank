@@ -218,6 +218,19 @@ function deshabilitarBotonProducto(btn, mensaje) {
 }
 
 function manejarClicTarjetaGlobal(e) {
+    // 🚀 Redirección directa al módulo de Préstamos
+    const botonIrPrestamos = e.target.closest("[data-view='prestamos']");
+    if (botonIrPrestamos) {
+        e.preventDefault();
+        const linkNav = document.querySelector('[data-view="prestamos"]');
+        if (linkNav) {
+            linkNav.click();
+        } else {
+            window.location.href = './app.html#prestamos';
+        }
+        return;
+    }
+
     const boton = e.target.closest(".request-card-btn, .btn-solicitar, button[data-producto]");
     if (!boton || boton.disabled) return;
 
@@ -337,7 +350,6 @@ function emitirTarjetaDirecta(usuarioActivo, tipoTarjeta, numeroOficial) {
     usuarioActivo.tarjetasAprobadas.push(datosTarjetaAprobada);
     localStorage.setItem("userProfile", JSON.stringify(usuarioActivo));
 
-    // Formatear el número oficial en bloques de 4 dígitos
     const numeroLimpio = String(numeroOficial).replace(/\D/g, '');
     const numeroFormateado = numeroLimpio.replace(/(\d{4})(?=\d)/g, '$1 ');
 

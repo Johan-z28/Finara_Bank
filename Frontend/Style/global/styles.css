@@ -2,7 +2,6 @@
 @import url('../Consignar.css');
 @import url('../CreditoSimulador.css');
 @import url('../Dashboard.css');
-@import url('../index.css');
 @import url('../Movimientos.css');
 @import url('../Perfil.css');
 @import url('../Prestamos.css');
@@ -31,6 +30,10 @@
   --font-main: 'Poppins', sans-serif;
   --radius-card: 20px;
   --shadow-card: 0 15px 35px rgba(0, 0, 0, 0.25);
+  
+  /* Paleta Finara Finanzas */
+  --finanzas-primary: #10b981;
+  --finanzas-primary-dark: #059669;
 }
 
 /* ==========================================
@@ -164,7 +167,6 @@ body,
   border-radius: 12px;
   transition: all 0.2s ease;
   position: relative;
-  /* Necesario para posicionar el tooltip */
 }
 
 .sidebar .nav-link i {
@@ -231,14 +233,12 @@ body,
 }
 
 /* ==========================================
-   EFECTO TOOLTIP FLOTANTE (SOLO CUANDO ESTÁ COLAPSADO)
+   EFECTO TOOLTIP FLOTANTE (MODO COLAPSADO)
    ========================================== */
 .sidebar.collapsed .nav-link::after {
   content: attr(title);
-  /* Extrae automáticamente el texto del atributo title del enlace */
   position: absolute;
   left: 90px;
-  /* Distancia respecto al sidebar reducido */
   top: 50%;
   transform: translateY(-50%) scale(0.9);
   background: rgba(13, 17, 26, 0.95);
@@ -258,14 +258,12 @@ body,
   pointer-events: none;
 }
 
-/* Muestra el tooltip al pasar el cursor */
 .sidebar.collapsed .nav-link:hover::after {
   opacity: 1;
   visibility: visible;
   transform: translateY(-50%) scale(1);
 }
 
-/* REGLAS MODO COLAPSADO */
 .sidebar.collapsed {
   width: 78px;
 }
@@ -361,6 +359,41 @@ body,
   -webkit-text-fill-color: transparent;
 }
 
+/* ACCIONES DE NAVBAR Y BOTÓN DE FINARA FINANZAS */
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-finanzas-navbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 20px;
+  color: #10b981 !important;
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(8px);
+}
+
+.btn-finanzas-navbar i {
+  font-size: 0.95rem;
+}
+
+.btn-finanzas-navbar:hover {
+  background: #10b981;
+  color: #0d111a !important;
+  border-color: #10b981;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+  transform: translateY(-1px);
+}
+
 .btn-perfil-navbar {
   display: flex;
   align-items: center;
@@ -403,9 +436,8 @@ body,
 }
 
 /* ==========================================
-   WIDGET Y VENTANA FLOTANTE DEL CHATBOT (REDESIGN)
+   6. WIDGET Y VENTANA FLOTANTE DEL CHATBOT
    ========================================== */
-
 #chatWidgetContainer {
   position: fixed;
   bottom: 24px;
@@ -463,7 +495,6 @@ body,
     opacity: 0;
     transform: scale(0.85);
   }
-
   to {
     opacity: 1;
     transform: scale(1);
@@ -567,7 +598,6 @@ body,
     opacity: 0;
     transform: translateY(8px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -623,17 +653,8 @@ body,
   box-shadow: 0 4px 12px rgba(229, 169, 60, 0.15);
 }
 
-@media (max-width: 576px) {
-  .chatbot-window {
-    width: calc(100vw - 28px);
-    height: 460px;
-    bottom: 75px;
-    right: -8px;
-  }
-}
-
 /* ==========================================
-   6. RESPONSIVO ADAPTATIVO (MEDIA QUERIES)
+   7. RESPONSIVO ADAPTATIVO (MEDIA QUERIES)
    ========================================== */
 @media (max-width: 992px) {
   .sidebar {
@@ -685,6 +706,25 @@ body,
     font-size: 0.95rem !important;
   }
 
+  .btn-finanzas-navbar span {
+    display: none;
+  }
+
+  .btn-finanzas-navbar {
+    padding: 0;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    min-height: 38px;
+    justify-content: center;
+  }
+
+  .btn-finanzas-navbar i {
+    font-size: 1.05rem;
+    margin: 0;
+  }
+
   .btn-perfil-navbar .navbar-user-info,
   .btn-perfil-navbar .navbar-user-arrow {
     display: none !important;
@@ -708,6 +748,13 @@ body,
     width: 100% !important;
     height: 100% !important;
     background: transparent !important;
+  }
+
+  .chatbot-window {
+    width: calc(100vw - 28px);
+    height: 460px;
+    bottom: 75px;
+    right: -8px;
   }
 
   .main-content {

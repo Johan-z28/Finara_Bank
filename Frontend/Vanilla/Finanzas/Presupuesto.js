@@ -1,7 +1,3 @@
-// Vanilla/Presupuesto.js
-// Controlador de interfaz para HU-23: Elaboración de presupuesto
-
-import { initGlobalComponents } from './Global/app.js';
 import {
     CATEGORIAS_INGRESO,
     CATEGORIAS_GASTO,
@@ -14,9 +10,7 @@ import {
     eliminarItemPresupuesto
 } from './presupuestoService.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-    initGlobalComponents();
-
+export async function initPresupuestoView() {
     const selectPeriodo = document.getElementById('selectPeriodo');
     const formRegistro = document.getElementById('formRegistroRubro');
     const rubroTipo = document.getElementById('rubroTipo');
@@ -37,6 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const iconoBalanceBox = document.getElementById('iconoBalanceBox');
     const progresoTexto = document.getElementById('progresoTexto');
     const progresoFill = document.getElementById('progresoFill');
+
+    if (!formRegistro || !selectPeriodo) return;
 
     // Nombres de los meses en español
     const MESES_NOMBRES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -64,12 +60,13 @@ document.addEventListener('DOMContentLoaded', () => {
         mesSeleccionado = mes;
         const clave = `${anio}-${String(mes).padStart(2, '0')}`;
         selectPeriodo.value = clave;
-        periodoTextoLabel.textContent = `${MESES_NOMBRES[mes - 1]} ${anio}`;
+        if (periodoTextoLabel) periodoTextoLabel.textContent = `${MESES_NOMBRES[mes - 1]} ${anio}`;
         renderizarPresupuestos();
         renderizarGridDropdown();
     }
 
     function renderizarGridDropdown() {
+        if (!labelYearSeleccionado || !gridMesesDropdown) return;
         labelYearSeleccionado.textContent = anioNavegandoDropdown;
         gridMesesDropdown.innerHTML = MESES_CORTOS.map((m, idx) => {
             const mesNum = idx + 1;
@@ -78,68 +75,72 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('');
     }
 
-    // Toggle Dropdown
-    periodoDisplayBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        dropdownMesesMenu.classList.toggle('hidden');
-        selectorPeriodoContainer.classList.toggle('abierto');
-        anioNavegandoDropdown = anioSeleccionado;
-        renderizarGridDropdown();
-    });
-
-    // Cerrar al hacer click afuera
-    document.addEventListener('click', (e) => {
-        if (!selectorPeriodoContainer.contains(e.target)) {
-            dropdownMesesMenu.classList.add('hidden');
-            selectorPeriodoContainer.classList.remove('abierto');
-        }
-    });
-
-    // Navegar mes anterior
-    btnMesAnterior.addEventListener('click', () => {
-        let m = mesSeleccionado - 1;
-        let y = anioSeleccionado;
-        if (m < 1) { m = 12; y--; }
-        actualizarPeriodoActivo(y, m);
-    });
-
-    // Navegar mes siguiente
-    btnMesSiguiente.addEventListener('click', () => {
-        let m = mesSeleccionado + 1;
-        let y = anioSeleccionado;
-        if (m > 12) { m = 1; y++; }
-        actualizarPeriodoActivo(y, m);
-    });
-
-    // Navegar años en el dropdown
-    btnYearPrev.addEventListener('click', (e) => {
-        e.stopPropagation();
-        anioNavegandoDropdown--;
-        renderizarGridDropdown();
-    });
-
-    btnYearNext.addEventListener('click', (e) => {
-        e.stopPropagation();
-        anioNavegandoDropdown++;
-        renderizarGridDropdown();
-    });
-
-    // Seleccionar mes del grid
-    gridMesesDropdown.addEventListener('click', (e) => {
-        const btnMes = e.target.closest('.btn-mes-item');
-        if (btnMes) {
+    if (periodoDisplayBtn && dropdownMesesMenu && selectorPeriodoContainer) {
+        periodoDisplayBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            const mesElegido = Number(btnMes.getAttribute('data-mes'));
-            actualizarPeriodoActivo(anioNavegandoDropdown, mesElegido);
-            dropdownMesesMenu.classList.add('hidden');
-            selectorPeriodoContainer.classList.remove('abierto');
-        }
-    });
+            dropdownMesesMenu.classList.toggle('hidden');
+            selectorPeriodoContainer.classList.toggle('abierto');
+            anioNavegandoDropdown = anioSeleccionado;
+            renderizarGridDropdown();
+        });
 
-    actualizarPeriodoActivo(anioActual, mesActualNum);
+        document.addEventListener('click', (e) => {
+            if (!selectorPeriodoContainer.contains(e.target)) {
+                dropdownMesesMenu.classList.add('hidden');
+                selectorPeriodoContainer.classList.remove('abierto');
+            }
+        });
+    }
 
-    // Actualizar select de categorías según el tipo seleccionado
+    if (btnMesAnterior) {
+        btnMesAnterior.addEventListener('click', () => {
+            let m = mesSeleccionado - 1;
+            let y = anioSeleccionado;
+            if (m < 1) { m = 12; y--; }
+            actualizarPeriodoActivo(y, m);
+        });
+    }
+
+    if (btnMesSiguiente) {
+        btnMesSiguiente.addEventListener('click', () => {
+            let m = mesSeleccionado + 1;
+            let y = anioSeleccionado;
+            if (m > 12) { m = 1; y++; }
+            actualizarPeriodoActivo(y, m);
+        });
+    }
+
+    if (btnYearPrev) {
+        btnYearPrev.addEventListener('click', (e) => {
+            e.stopPropagation();
+            anioNavegandoDropdown--;
+            renderizarGridDropdown();
+        });
+    }
+
+    if (btnYearNext) {
+        btnYearNext.addEventListener('click', (e) => {
+            e.stopPropagation();
+            anioNavegandoDropdown++;
+            renderizarGridDropdown();
+        });
+    }
+
+    if (gridMesesDropdown) {
+        gridMesesDropdown.addEventListener('click', (e) => {
+            const btnMes = e.target.closest('.btn-mes-item');
+            if (btnMes) {
+                e.stopPropagation();
+                const mesElegido = Number(btnMes.getAttribute('data-mes'));
+                actualizarPeriodoActivo(anioNavegandoDropdown, mesElegido);
+                if (dropdownMesesMenu) dropdownMesesMenu.classList.add('hidden');
+                if (selectorPeriodoContainer) selectorPeriodoContainer.classList.remove('abierto');
+            }
+        });
+    }
+
     function cargarCategorias() {
+        if (!rubroTipo || !rubroCategoria) return;
         const tipo = rubroTipo.value;
         const categorias = tipo === 'INGRESO' ? CATEGORIAS_INGRESO : CATEGORIAS_GASTO;
 
@@ -148,53 +149,55 @@ document.addEventListener('DOMContentLoaded', () => {
         `).join('');
     }
 
-    rubroTipo.addEventListener('change', cargarCategorias);
-    cargarCategorias();
+    if (rubroTipo) {
+        rubroTipo.addEventListener('change', cargarCategorias);
+        cargarCategorias();
+    }
 
-    // Formatear input de monto al escribir
-    rubroMonto.addEventListener('input', () => {
-        const digitos = rubroMonto.value.replace(/\D/g, '').slice(0, 11);
-        rubroMonto.value = digitos ? new Intl.NumberFormat('es-CO').format(Number(digitos)) : '';
-    });
+    if (rubroMonto) {
+        rubroMonto.addEventListener('input', () => {
+            const digitos = rubroMonto.value.replace(/\D/g, '').slice(0, 11);
+            rubroMonto.value = digitos ? new Intl.NumberFormat('es-CO').format(Number(digitos)) : '';
+        });
+    }
 
-    // Renderizar listado de ingresos y gastos con cálculo automático de balance
     function renderizarPresupuestos() {
-        const periodo = selectPeriodo.value || periodoActual;
+        const periodo = selectPeriodo.value || `${anioSeleccionado}-${String(mesSeleccionado).padStart(2, '0')}`;
         const resumen = calcularResumenPresupuesto(periodo);
 
-        // Actualizar métricas automáticas (Ingresos vs Gastos)
-        metricaIngresos.textContent = formatoCOP.format(resumen.totalIngresos);
-        metricaGastos.textContent = formatoCOP.format(resumen.totalGastos);
-        metricaSaldoNeto.textContent = formatoCOP.format(resumen.saldoNeto);
+        if (metricaIngresos) metricaIngresos.textContent = formatoCOP.format(resumen.totalIngresos);
+        if (metricaGastos) metricaGastos.textContent = formatoCOP.format(resumen.totalGastos);
+        if (metricaSaldoNeto) metricaSaldoNeto.textContent = formatoCOP.format(resumen.saldoNeto);
 
-        totalColIngresos.textContent = formatoCOP.format(resumen.totalIngresos);
-        totalColGastos.textContent = formatoCOP.format(resumen.totalGastos);
+        if (totalColIngresos) totalColIngresos.textContent = formatoCOP.format(resumen.totalIngresos);
+        if (totalColGastos) totalColGastos.textContent = formatoCOP.format(resumen.totalGastos);
 
-        // Indicador de uso y balance
-        metricaPorcentajeGastado.textContent = `${resumen.porcentajeGastado}% de los ingresos`;
-        progresoTexto.textContent = `${Math.min(resumen.porcentajeGastado, 100)}% consumido`;
-        progresoFill.style.width = `${Math.min(resumen.porcentajeGastado, 100)}%`;
+        if (metricaPorcentajeGastado) metricaPorcentajeGastado.textContent = `${resumen.porcentajeGastado}% de los ingresos`;
+        if (progresoTexto) progresoTexto.textContent = `${Math.min(resumen.porcentajeGastado, 100)}% consumido`;
+        if (progresoFill) progresoFill.style.width = `${Math.min(resumen.porcentajeGastado, 100)}%`;
 
-        if (resumen.totalIngresos === 0 && resumen.totalGastos === 0) {
-            metricaSaldoNeto.style.color = 'var(--text-muted)';
-            metricaEstadoBalance.textContent = 'Sin rubros registrados para este mes';
-            metricaEstadoBalance.style.color = 'var(--text-muted)';
-            iconoBalanceBox.className = 'pre-metrica-icono bg-balance';
-        } else if (resumen.esDeficit) {
-            metricaSaldoNeto.style.color = 'var(--color-gasto)';
-            metricaEstadoBalance.textContent = 'Déficit presupuestario (Gastos superan ingresos)';
-            metricaEstadoBalance.style.color = 'var(--color-gasto)';
-            iconoBalanceBox.className = 'pre-metrica-icono bg-balance--deficit';
-        } else if (resumen.esSuperavit) {
-            metricaSaldoNeto.style.color = 'var(--color-ingreso)';
-            metricaEstadoBalance.textContent = 'Superávit saludable (Ahorro potencial)';
-            metricaEstadoBalance.style.color = 'var(--color-ingreso)';
-            iconoBalanceBox.className = 'pre-metrica-icono bg-balance--superavit';
-        } else {
-            metricaSaldoNeto.style.color = 'var(--color-balance-positivo)';
-            metricaEstadoBalance.textContent = 'Presupuesto en equilibrio exacto';
-            metricaEstadoBalance.style.color = 'var(--text-muted)';
-            iconoBalanceBox.className = 'pre-metrica-icono bg-balance';
+        if (metricaSaldoNeto && metricaEstadoBalance && iconoBalanceBox) {
+            if (resumen.totalIngresos === 0 && resumen.totalGastos === 0) {
+                metricaSaldoNeto.style.color = 'var(--text-muted)';
+                metricaEstadoBalance.textContent = 'Sin rubros registrados para este mes';
+                metricaEstadoBalance.style.color = 'var(--text-muted)';
+                iconoBalanceBox.className = 'pre-metrica-icono bg-balance';
+            } else if (resumen.esDeficit) {
+                metricaSaldoNeto.style.color = 'var(--color-gasto)';
+                metricaEstadoBalance.textContent = 'Déficit presupuestario (Gastos superan ingresos)';
+                metricaEstadoBalance.style.color = 'var(--color-gasto)';
+                iconoBalanceBox.className = 'pre-metrica-icono bg-balance--deficit';
+            } else if (resumen.esSuperavit) {
+                metricaSaldoNeto.style.color = 'var(--color-ingreso)';
+                metricaEstadoBalance.textContent = 'Superávit saludable (Ahorro potencial)';
+                metricaEstadoBalance.style.color = 'var(--color-ingreso)';
+                iconoBalanceBox.className = 'pre-metrica-icono bg-balance--superavit';
+            } else {
+                metricaSaldoNeto.style.color = 'var(--color-balance-positivo)';
+                metricaEstadoBalance.textContent = 'Presupuesto en equilibrio exacto';
+                metricaEstadoBalance.style.color = 'var(--text-muted)';
+                iconoBalanceBox.className = 'pre-metrica-icono bg-balance';
+            }
         }
 
         const items = resumen.items;
@@ -207,6 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, {});
 
         function renderLista(contenedor, lista, colorClase, esVacioTexto) {
+            if (!contenedor) return;
             if (!lista.length) {
                 contenedor.innerHTML = `<p class="pre-lista-vacia">${esVacioTexto}</p>`;
                 return;
@@ -247,14 +251,13 @@ document.addEventListener('DOMContentLoaded', () => {
         renderLista(listaGastos, gastos, 'color-gasto', 'No hay gastos registrados en este mes.');
     }
 
-    // Delegación de eventos global para clicks en Editar o Eliminar rubros
     document.addEventListener('click', (e) => {
         const btnEditar = e.target.closest('.btn-editar-pre');
         if (btnEditar) {
             e.preventDefault();
             e.stopPropagation();
             const id = btnEditar.getAttribute('data-id');
-            const periodo = selectPeriodo.value || periodoActual;
+            const periodo = selectPeriodo.value;
             const items = obtenerPresupuestosUsuario(periodo);
             const item = items.find(i => i.id === id);
             if (item) abrirModalEditar(item);
@@ -266,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             e.stopPropagation();
             const id = btnEliminar.getAttribute('data-id');
-            const periodo = selectPeriodo.value || periodoActual;
+            const periodo = selectPeriodo.value;
             const items = obtenerPresupuestosUsuario(periodo);
             const item = items.find(i => i.id === id);
             if (item) confirmarEliminar(item);
@@ -274,7 +277,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Modal para editar / ajustar rubro
     async function abrirModalEditar(item) {
         const categorias = item.tipo === 'INGRESO' ? CATEGORIAS_INGRESO : CATEGORIAS_GASTO;
         const opcionesCat = categorias.map(c => `
@@ -349,7 +351,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Modal para confirmar eliminación
     async function confirmarEliminar(item) {
         if (window.Swal) {
             const res = await Swal.fire({
@@ -386,7 +387,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Evento de registrar rubro
     formRegistro.addEventListener('submit', (e) => {
         e.preventDefault();
         const montoNum = Number(rubroMonto.value.replace(/\D/g, ''));
@@ -412,7 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 categoria: rubroCategoria.value,
                 descripcion: rubroDescripcion.value,
                 monto: montoNum,
-                periodo: selectPeriodo.value || periodoActual
+                periodo: selectPeriodo.value
             });
 
             rubroDescripcion.value = '';
@@ -437,5 +437,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     selectPeriodo.addEventListener('change', renderizarPresupuestos);
 
-    renderizarPresupuestos();
-});
+    actualizarPeriodoActivo(anioActual, mesActualNum);
+}

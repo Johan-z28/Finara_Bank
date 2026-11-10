@@ -285,22 +285,28 @@ export async function ejecutarTransferencia({ origenId, destinoNumero, destinoTi
     }
 
     const fecha = new Date().toISOString();
-    const referencia = `FIN-${Math.floor(100000 + Math.random() * 900000)}`;
+    const referencia = esInterbancaria
+        ? `ACH-${Math.floor(10000000 + Math.random() * 90000000)}`
+        : `FIN-${Math.floor(100000 + Math.random() * 900000)}`;
 
     registrarNotificaciones(monto, destino ? destino.titular : 'Destino', referencia, v.usaSobregiro, v.esAvanceTC, esInterbancaria, comision);
 
     return {
         referencia, fecha, monto, concepto,
-        bancoDestino: 'Finara Bank',
+        bancoDestino: esInterbancaria ? (destino.banco || 'Red ACH') : 'Finara Bank',
         destino, saldoOrigen: origen.saldo,
         usaSobregiro: v.usaSobregiro,
-        esAvanceTC: v.esAvanceTC
+        esAvanceTC: v.esAvanceTC,
+        esInterbancaria,
+        comision,
+        totalDebitado: totalADebitar
     };
 }
 
 function registrarNotificaciones(monto, titular, referencia, usaSobregiro, esAvanceTC, esInterbancaria = false, comision = 0) {
-    let titulo = 'Transferencia exitosa';
-    let mensaje = `Enviaste ${formatoCOP.format(monto)} a ${titular}. Referencia ${referencia}.`;
+    let titulo = esInterbancaria ? 'Transferencia interbancaria ACH exitosa' : 'Transferencia exitosa';
+    let detalleComision = comision > 0 ? ` (Tarifa ACH: ${formatoCOP.format(comision)})` : '';
+    let mensaje = `Enviaste ${formatoCOP.format(monto)} a ${titular}${detalleComision}. Referencia ${referencia}.`;
 
     guardarNotificacion({
         titulo,

@@ -44,6 +44,11 @@ export async function initSaldosView() {
             return (t.includes('CREDITO') || t.includes('CRÉDITO')) && c.estado !== 'INACTIVA';
         });
 
+        const prestamo = cuentas.find(c => {
+            const t = String(c.tipo || '').toUpperCase();
+            return t.includes('PRESTAMO') && c.estado !== 'INACTIVA';
+        });
+
         const limpiarSaldo = (val) => {
             if (typeof val === 'number') return val;
             if (!val) return 0;
@@ -55,10 +60,8 @@ export async function initSaldosView() {
         const saldoCorriente = corriente ? limpiarSaldo(corriente.saldo) : 0;
         const cupoCredito = credito ? limpiarSaldo(credito.saldo || credito.cupoDisponible) : 0;
         
-        // El patrimonio consolidado SOLO suma cuentas de efectivo (Ahorros y Corriente)
+        // El patrimonio consolidado suma cuentas de efectivo (Ahorros y Corriente)
         const totalConsolidado = saldoAhorros + saldoCorriente;
-
-        // Si hay tarjeta de crédito, la liquidez incluye el cupo; si no, solo efectivo
         const sumaTotalLiquidez = totalConsolidado + (credito ? cupoCredito : 0);
 
         const elCreditoTotal = document.getElementById('montoCreditoTotal');
@@ -74,12 +77,10 @@ export async function initSaldosView() {
         const segAhorros = document.getElementById('segAhorros');
         const segCorriente = document.getElementById('segCorriente');
 
-        // Referencias a los elementos de la leyenda para ocultar/mostrar dinámicamente
         const itemCreditoLeyenda = elCreditoTotal ? elCreditoTotal.closest('.leyenda-item') : null;
         const itemAhorrosLeyenda = elAhorrosTotal ? elAhorrosTotal.closest('.leyenda-item') : null;
         const itemCorrienteLeyenda = elCorrienteTotal ? elCorrienteTotal.closest('.leyenda-item') : null;
 
-        // Controlar visibilidad en la leyenda y barras según existencia de productos
         if (itemCreditoLeyenda) itemCreditoLeyenda.style.display = credito ? 'block' : 'none';
         if (itemAhorrosLeyenda) itemAhorrosLeyenda.style.display = ahorros ? 'block' : 'none';
         if (itemCorrienteLeyenda) itemCorrienteLeyenda.style.display = corriente ? 'block' : 'none';
@@ -175,4 +176,4 @@ export async function initSaldosView() {
 
     pintarOjo();
     await cargar();
-}   
+}
