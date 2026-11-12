@@ -1,5 +1,123 @@
-/* Complemento no invasivo a los estilos actuales del chatbot. */
-#chatBody .finara-chat-options { display: flex; flex-direction: column; gap: 7px; margin: 10px 0 12px; }
-#chatBody .finara-chat-options .chat-option-btn { width: 100%; text-align: left; white-space: normal; cursor: pointer; }
-#chatBody .chat-bubble { overflow-wrap: anywhere; }
-#chatBody .finara-chat-options .chat-option-btn:focus-visible { outline: 2px solid #e5a93c; outline-offset: 2px; }
+/* ==========================================================================
+   Finara Bank - Chatbot Styles (HU-39 Complement)
+   ========================================================================== */
+
+#chatBody .finara-chat-options { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 7px; 
+    margin: 10px 0 12px; 
+}
+
+#chatBody .finara-chat-options .chat-option-btn { 
+    width: 100%; 
+    text-align: left; 
+    white-space: normal; 
+    cursor: pointer;
+    background: rgba(22, 27, 39, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #cbd5e1;
+    padding: 0.55rem 0.85rem;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    transition: all 0.2s ease;
+}
+
+#chatBody .finara-chat-options .chat-option-btn:hover {
+    background: rgba(229, 169, 60, 0.15);
+    border-color: rgba(229, 169, 60, 0.35);
+    color: #e5a93c;
+    transform: translateX(3px);
+}
+
+#chatBody .finara-chat-options .chat-option-btn:focus-visible { 
+    outline: 2px solid #e5a93c; 
+    outline-offset: 2px; 
+}
+
+#chatBody .chat-bubble { 
+    overflow-wrap: anywhere; 
+}
+
+/* ==========================================
+   TARJETAS DE GUÍA PASO A PASO (HU-39)
+   ========================================== */
+.chat-guide-card {
+    background: rgba(18, 22, 32, 0.95);
+    border: 1px solid rgba(229, 169, 60, 0.35);
+    border-radius: 12px;
+    padding: 0.85rem;
+    margin: 0.5rem 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
+    animation: fadeInGuide 0.3s ease;
+}
+
+@keyframes fadeInGuide {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.guide-step-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.6rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 0.4rem;
+}
+
+.guide-step-badge {
+    background: rgba(229, 169, 60, 0.2);
+    color: #e5a93c;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.2rem 0.55rem;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.guide-company-name {
+    color: #ffffff;
+    font-size: 0.88rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.guide-info-row {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    line-height: 1.45;
+    margin-bottom: 0.45rem;
+}
+
+.guide-info-row strong {
+    color: #e2e8f0;
+}
+
+.reference-highlight {
+    display: inline-block;
+    background: rgba(13, 17, 26, 0.9);
+    border: 1px dashed rgba(229, 169, 60, 0.4);
+    color: #e5a93c;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    margin: 0.2rem 0;
+}
+
+.guide-security-notice {
+    margin-top: 0.5rem;
+    padding-top: 0.45rem;
+    border-top: 1px dashed rgba(255, 255, 255, 0.08);
+    font-size: 0.7rem;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
