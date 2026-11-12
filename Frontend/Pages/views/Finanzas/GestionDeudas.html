@@ -27,7 +27,7 @@
             </div>
         </div>
         <div class="gd-ingreso-form">
-            <input type="number" id="inputIngresoMensual" class="gd-input-ingreso" placeholder="0" min="0" step="1000">
+            <input type="number" id="inputIngresoMensual" class="gd-input-ingreso" placeholder="0" min="0" step="any">
             <button type="button" class="gd-btn-presupuesto" id="btnUsarPresupuesto" title="Rellenar con los ingresos registrados en el módulo de Presupuestos">
                 <i class="fa-solid fa-calculator"></i>
                 <span>Usar del presupuesto</span>
@@ -172,24 +172,24 @@
                 <div class="gd-form-grid-2 gd-form-grid">
                     <div class="gd-form-group">
                         <label for="inputSaldoTotal">Saldo Total Pendiente *</label>
-                        <input type="number" id="inputSaldoTotal" class="gd-form-input" placeholder="0" min="1" step="1000" required>
+                        <input type="number" id="inputSaldoTotal" class="gd-form-input" placeholder="0" min="0.01" step="any" required>
                     </div>
 
                     <div class="gd-form-group">
                         <label for="inputCuotaMensual">Cuota Mensual *</label>
-                        <input type="number" id="inputCuotaMensual" class="gd-form-input" placeholder="0" min="1" step="100" required>
+                        <input type="number" id="inputCuotaMensual" class="gd-form-input" placeholder="0" min="0.01" step="any" required>
                     </div>
                 </div>
 
                 <div class="gd-form-grid-2 gd-form-grid">
                     <div class="gd-form-group">
                         <label for="inputTasaEA">Tasa E.A. (%) *</label>
-                        <input type="number" id="inputTasaEA" class="gd-form-input" placeholder="22.5" min="0" max="100" step="0.01" required>
+                        <input type="number" id="inputTasaEA" class="gd-form-input" placeholder="22.5" min="0" max="100" step="any" required>
                     </div>
 
                     <div class="gd-form-group">
                         <label for="inputPlazoMeses">Plazo Restante (Meses) *</label>
-                        <input type="number" id="inputPlazoMeses" class="gd-form-input" placeholder="12" min="1" max="360" step="1" required>
+                        <input type="number" id="inputPlazoMeses" class="gd-form-input" placeholder="12" min="1" max="360" step="any" required>
                     </div>
                 </div>
 
@@ -239,7 +239,7 @@
             </div>
             <div class="gd-extra-input-box">
                 <label for="inputAbonoExtra">Abono extra mensual:</label>
-                <input type="number" id="inputAbonoExtra" value="100000" min="0" step="50000">
+                <input type="number" id="inputAbonoExtra" value="100000" min="0" step="any">
             </div>
         </div>
 
