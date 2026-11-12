@@ -6,7 +6,14 @@ export const CATEGORIAS = [
     { id: 'clave', titulo: 'Olvidé mi contraseña', respuesta: 'Para recuperar tu acceso, vuelve a la pantalla de inicio de sesión y utiliza la opción de recuperación de contraseña si está disponible. El asistente no solicita ni almacena contraseñas, códigos OTP o datos completos de tarjetas. Si aún no existe esa opción, contacta al soporte oficial de Finara.', hu: 'HU-26' },
   ]},
   { id: 'cuentas', titulo: '💳 Cuentas y tarjetas', introduccion: 'Selecciona una consulta:', temas: [
-    { id: 'saldos', titulo: 'Consultar mis saldos', respuesta: 'Puedes revisar tus productos en Dashboard y consultar los detalles en Mis Cuentas / Saldos. Para proteger tu información, no mostraré aquí cifras privadas.', vista: 'saldos', etiqueta: 'Ir a mis cuentas', hu: 'HU-24 (consulta de saldo)' },
+    { 
+      id: 'saldos', 
+      titulo: '💳 Cómo consultar mis saldos y productos', 
+      respuesta: '🔒 Por tu seguridad y privacidad financiera, no revelo cifras de dinero ni números de cuenta en este chat.\n\n📌 Guía paso a paso para consultar tus saldos:\n• Paso 1: Ingresa a la sección "Mis Cuentas" desde el menú lateral o revisa el resumen en tu Dashboard.\n• Paso 2: Selecciona la tarjeta o cuenta que deseas consultar (Ahorros, Corriente o Crédito).\n• Paso 3: Haz clic en el icono del ojo 👁️ para alternar la visibilidad de tus saldos cuando te encuentres en un entorno seguro.\n\n💡 Conceptos clave de tu dinero:\n• Saldo Disponible: El dinero real y libre que puedes transferir, retirar o gastar de inmediato.\n• Saldo Total / En Canje: Incluye transferencias o cheques en proceso de validación contable.\n• Cupo Disponible (Tarjeta de Crédito): El límite autorizado menos tus compras facturadas pendientes de pago.', 
+      vista: 'saldos', 
+      etiqueta: 'Ir a Mis Cuentas (Saldos)', 
+      hu: 'HU-24 (consulta de saldo)' 
+    },
     { id: 'tarjeta-educacion', titulo: 'Entender mi tarjeta de crédito', respuesta: 'La fecha de corte cierra un período de compras; la fecha límite indica hasta cuándo pagar. El cupo disponible es el límite autorizado menos el cupo utilizado y otros ajustes que correspondan. Pagar el total facturado antes de la fecha límite suele evitar intereses sobre compras, sujeto a las condiciones del producto. Consulta siempre las condiciones de tu tarjeta.', vista: 'saldos', etiqueta: 'Ver mis productos', hu: 'HU-29' },
     { id: 'beneficiarios', titulo: 'Eliminar un beneficiario', respuesta: 'Revisa la sección de beneficiarios dentro del módulo correspondiente. Si existe la opción Eliminar, verifica el destinatario y confirma. Si la funcionalidad aún no está implementada, el asistente no puede realizar el cambio.', vista: 'transferencias', etiqueta: 'Ir a transferencias', hu: 'HU-09' },
     { id: 'beneficios', titulo: 'Beneficios de mis productos', respuesta: 'Los beneficios dependen del producto y las condiciones vigentes. Consulta la sección de beneficios cuando esté habilitada; el chatbot no puede prometer promociones ni beneficios específicos sin verificarlos.', hu: 'HU-08' },
