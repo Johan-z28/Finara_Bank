@@ -1,5 +1,15 @@
 // Vanilla/Prestamos.js
-import { calcularCuotaPrestamo, evaluarViabilidadPrestamo, registrarSolicitudPrestamo, buscarPrestamoPorRadicado, pagarCuotaPrestamo, TASA_INTERES_MENSUAL } from './prestamosService.js';
+import { 
+    calcularCuotaPrestamo, 
+    evaluarViabilidadPrestamo, 
+    registrarSolicitudPrestamo, 
+    buscarPrestamoPorRadicado, 
+    pagarCuotaPrestamo, 
+    obtenerPrestamosUsuario,
+    calcularSaldoCapital,
+    obtenerTasaNumericaPorTipo,
+    TASA_INTERES_MENSUAL 
+} from './prestamosService.js';
 import { obtenerUsuarioAutenticado, obtenerCuentas } from './cuentasService.js';
 
 const formatoCOP = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
@@ -16,6 +26,64 @@ const ocultarNumeroCuenta = (num) => {
     return `•••• ${ultimos4}`;
 };
 
+/**
+ * Escapar texto seguro para prevenir inyecciones XSS
+ */
+function escapeHTML(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+/**
+ * Calcula la fecha de pago de la próxima cuota y los días restantes
+ */
+function calcularProximaFechaPago(prestamo) {
+    const fechaBase = new Date(prestamo.fechaDesembolso || prestamo.fecha || Date.now());
+    const cuotaSiguiente = (Number(prestamo.cuotasPagadas) || 0) + 1;
+
+    // Sumar N meses a la fecha base
+    const proximaFecha = new Date(fechaBase);
+    proximaFecha.setMonth(proximaFecha.getMonth() + cuotaSiguiente);
+
+    const ahora = new Date();
+    // Diferencia en días
+    const diffMs = proximaFecha.getTime() - ahora.getTime();
+    const diasRestantes = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+    let claseBadge = 'badge-vigente';
+    let textoDias = `Faltan ${diasRestantes} días`;
+
+    if (diasRestantes < 0) {
+        claseBadge = 'badge-vencida';
+        textoDias = `Vencida hace ${Math.abs(diasRestantes)} días`;
+    } else if (diasRestantes <= 7) {
+        claseBadge = 'badge-urgente';
+        textoDias = diasRestantes === 0 ? '¡Vence hoy!' : `¡Faltan solo ${diasRestantes} días!`;
+    }
+
+    const formatoFechaStr = proximaFecha.toLocaleDateString('es-CO', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+    });
+
+    return {
+        fechaFormateada: formatoFechaStr,
+        diasRestantes,
+        textoDias,
+        claseBadge
+    };
+}
+
+let filtroSolicitudesActual = 'TODOS';
+let manejadorActualizacionPrestamos = null;
+let manejadorStoragePrestamos = null;
+
 export async function initPrestamosView() {
     if (!document.getElementById('prestamos-css-theme')) {
         const link = document.createElement('link');
@@ -31,7 +99,7 @@ export async function initPrestamosView() {
         return;
     }
 
-    // 1. SISTEMA GLOBAL DE PESTAÑAS POR DELEGACIÓN DE EVENTOS (A prueba de SPA)
+    // 1. SISTEMA GLOBAL DE PESTAÑAS
     if (!window._prestamosTabListenerInitialized) {
         window._prestamosTabListenerInitialized = true;
         document.addEventListener('click', (e) => {
@@ -61,6 +129,7 @@ export async function initPrestamosView() {
 
                 if (targetId === 'tab-dashboard') {
                     renderizarDashboardCreditos();
+                    renderizarSolicitudesCredito(filtroSolicitudesActual);
                 }
             }
 
@@ -82,8 +151,34 @@ export async function initPrestamosView() {
         });
     }
 
-    // Renderizar dashboard inicial al entrar a la vista
+    // Limpieza de listeners previos para evitar duplicación
+    if (manejadorActualizacionPrestamos) {
+        window.removeEventListener('finara:prestamos-actualizados', manejadorActualizacionPrestamos);
+    }
+    if (manejadorStoragePrestamos) {
+        window.removeEventListener('storage', manejadorStoragePrestamos);
+    }
+
+    // 4. ACTUALIZACIÓN EN TIEMPO REAL (CustomEvent y Storage para otras pestañas)
+    manejadorActualizacionPrestamos = () => {
+        renderizarDashboardCreditos();
+        renderizarSolicitudesCredito(filtroSolicitudesActual);
+    };
+
+    manejadorStoragePrestamos = (e) => {
+        if (e.key === 'finara_prestamos' || e.key === 'finara_cuentas') {
+            renderizarDashboardCreditos();
+            renderizarSolicitudesCredito(filtroSolicitudesActual);
+        }
+    };
+
+    window.addEventListener('finara:prestamos-actualizados', manejadorActualizacionPrestamos);
+    window.addEventListener('storage', manejadorStoragePrestamos);
+
+    // Renderizar dashboard y solicitudes iniciales
     renderizarDashboardCreditos();
+    renderizarSolicitudesCredito(filtroSolicitudesActual);
+    configurarFiltrosSolicitudes();
 
     // 2. SIMULADOR Y FORMULARIO (HU-14)
     const formPrestamo = document.getElementById('formPrestamo');
@@ -192,22 +287,49 @@ export async function initPrestamosView() {
             const cuotaMensual = calcularCuotaPrestamo(monto, meses, tasaInfo.em);
             const evaluacion = evaluarViabilidadPrestamo(monto);
 
-            if (evaluacion.estado === 'RECHAZADO') {
-                Swal.fire({ icon: 'error', title: 'Solicitud No Viable', text: evaluacion.mensaje, background: '#12151c', color: '#fff', confirmButtonColor: '#e5a93c' });
-                return;
-            }
-
+            // Requerimiento 5: Si es RECHAZADO, se registra en el historial pero sin desembolso
             try {
-                const solicitudCreada = registrarSolicitudPrestamo({ monto, meses, cuotaMensual, estadoEvaluacion: evaluacion, concepto, tipoId });
+                const solicitudCreada = registrarSolicitudPrestamo({ 
+                    monto, 
+                    meses, 
+                    cuotaMensual, 
+                    estadoEvaluacion: evaluacion, 
+                    concepto, 
+                    tipoId 
+                });
+
+                if (evaluacion.estado === 'RECHAZADO') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Solicitud No Viable',
+                        html: `
+                            <div style="text-align: left; font-size: 0.9rem; color: #cbd5e1; background: rgba(0,0,0,0.3); padding: 14px; border-radius: 12px;">
+                                <p style="margin:0 0 6px 0;"><strong>Radicado:</strong> <span style="color: #e5a93c; font-family: monospace;">${escapeHTML(solicitudCreada.radicado)}</span></p>
+                                <p style="margin:0 0 6px 0;"><strong>Estado:</strong> <span style="color: #f87171; font-weight: bold;">RECHAZADO</span></p>
+                                <p style="margin:0; font-size: 0.85rem; color: #94a3b8;">${escapeHTML(evaluacion.mensaje)}</p>
+                            </div>
+                        `,
+                        background: '#12151c',
+                        color: '#fff',
+                        confirmButtonColor: '#e5a93c'
+                    }).then(() => {
+                        formPrestamo.reset();
+                        window.actualizarSimulacionDinamica();
+                        const tabDashboard = document.querySelector('[data-tab="tab-dashboard"]');
+                        if (tabDashboard) tabDashboard.click();
+                    });
+                    return;
+                }
 
                 Swal.fire({
                     icon: 'success',
                     title: '¡Solicitud Registrada!',
                     html: `
                         <div style="text-align: left; font-size: 0.9rem; color: #cbd5e1; background: rgba(0,0,0,0.3); padding: 14px; border-radius: 12px;">
-                            <p><strong>Radicado:</strong> <span style="color: #e5a93c; font-family: monospace;">${solicitudCreada.radicado}</span></p>
-                            <p><strong>Estado:</strong> <span style="color: ${evaluacion.color};">${solicitudCreada.estado}</span></p>
-                            <p><strong>Cuota Mensual:</strong> ${formatoCOP.format(solicitudCreada.cuotaMensual)}</p>
+                            <p style="margin:0 0 6px 0;"><strong>Radicado:</strong> <span style="color: #e5a93c; font-family: monospace;">${escapeHTML(solicitudCreada.radicado)}</span></p>
+                            <p style="margin:0 0 6px 0;"><strong>Estado:</strong> <span style="color: ${evaluacion.color}; font-weight: bold;">${escapeHTML(solicitudCreada.estado)}</span></p>
+                            <p style="margin:0 0 6px 0;"><strong>Cuota Mensual:</strong> ${formatoCOP.format(solicitudCreada.cuotaMensual)}</p>
+                            <p style="margin:0; font-size: 0.82rem; color: #94a3b8;">${escapeHTML(evaluacion.mensaje)}</p>
                         </div>
                     `,
                     background: '#12151c',
@@ -243,88 +365,331 @@ export async function initPrestamosView() {
             const encontrado = buscarPrestamoPorRadicado(radVal);
 
             if (!encontrado) {
-                boxResultadoRadicado.innerHTML = `<p style="color: #f87171; text-align: center; margin: 1.5rem 0;">No se encontró ningún préstamo con el radicado: ${radVal}</p>`;
+                boxResultadoRadicado.innerHTML = `<p style="color: #f87171; text-align: center; margin: 1.5rem 0;">No se encontró ningún préstamo con el radicado: ${escapeHTML(radVal)}</p>`;
                 return;
             }
 
+            const colorEstado = encontrado.estado === 'APROBADO' ? '#34d399' : (encontrado.estado === 'RECHAZADO' ? '#f87171' : '#e5a93c');
+
             boxResultadoRadicado.innerHTML = `
                 <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem;">
-                    <p style="margin:0;"><strong>Radicado:</strong> <span style="color: #e5a93c; font-family: monospace;">${encontrado.radicado}</span></p>
-                    <p style="margin:0;"><strong>Concepto:</strong> ${encontrado.concepto}</p>
+                    <p style="margin:0;"><strong>Radicado:</strong> <span style="color: #e5a93c; font-family: monospace;">${escapeHTML(encontrado.radicado)}</span></p>
+                    <p style="margin:0;"><strong>Concepto:</strong> ${escapeHTML(encontrado.concepto)}</p>
                     <p style="margin:0;"><strong>Monto Solicitado:</strong> ${formatoCOP.format(encontrado.monto)}</p>
-                    <p style="margin:0;"><strong>Plazo:</strong> ${encontrado.meses} meses</p>
+                    <p style="margin:0;"><strong>Plazo:</strong> ${escapeHTML(encontrado.meses)} meses</p>
                     <p style="margin:0;"><strong>Cuota Mensual:</strong> ${formatoCOP.format(encontrado.cuotaMensual)}</p>
-                    <p style="margin:0;"><strong>Estado Actual:</strong> <span style="color: #34d399; font-weight: bold;">${encontrado.estado}</span></p>
-                    <p style="margin:0; font-size: 0.8rem; color: #94a3b8;">${encontrado.mensajeEstado}</p>
+                    <p style="margin:0;"><strong>Estado Actual:</strong> <span style="color: ${colorEstado}; font-weight: bold;">${escapeHTML(encontrado.estado)}</span></p>
+                    <p style="margin:0; font-size: 0.8rem; color: #94a3b8;">${escapeHTML(encontrado.mensajeEstado || '')}</p>
                 </div>
             `;
         });
     }
 }
 
-// 4. DASHBOARD DE CRÉDITOS ACTIVOS Y PAGO DE CUOTAS (HU-16)
-function renderizarDashboardCreditos() {
+// 4. DASHBOARD DE CRÉDITOS ACTIVOS (HU-13 / HU-16)
+export function renderizarDashboardCreditos() {
     const contenedor = document.getElementById('dashboardCreditosList');
+    const badgeContador = document.getElementById('badgeContadorActivos');
     if (!contenedor) return;
 
-    let prestamos = [];
-    try {
-        prestamos = JSON.parse(localStorage.getItem('finara_prestamos')) || [];
-    } catch {
-        prestamos = [];
+    // Préstamos aislados por usuario activo
+    const todosPrestamos = obtenerPrestamosUsuario();
+    const activos = todosPrestamos.filter(p => p.activo && p.estado !== 'PAGADO');
+
+    if (badgeContador) {
+        badgeContador.textContent = `${activos.length} Activo${activos.length === 1 ? '' : 's'}`;
     }
 
-    const activos = prestamos.filter(p => p.activo);
-
-    if (activos.length === 0) {
+    // Requerimiento 6: Si el usuario NO tiene ningún préstamo ni solicitud, mostrar estado vacío completo
+    if (todosPrestamos.length === 0) {
         contenedor.innerHTML = `
-            <div style="text-align: center; padding: 2rem; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 10px;">No tienes créditos o préstamos activos en este momento.</p>
-                <button type="button" class="btn-solicitar-prestamo" onclick="document.querySelector('[data-tab=\\'tab-solicitud\\']').click()" style="max-width: 220px; margin: 0 auto;">Simular un Préstamo</button>
+            <div class="prestamo-empty-state">
+                <div class="prestamo-empty-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+                <h4>Aún no tienes solicitudes ni préstamos activos</h4>
+                <p>Simula tu crédito en minutos con desembolso inmediato a tu cuenta o compara nuestras alternativas de financiación.</p>
+                <div class="prestamo-empty-actions">
+                    <button type="button" class="btn-solicitar-prestamo btn-ir-solicitud">
+                        <i class="fa-solid fa-plus"></i> Solicitar un préstamo
+                    </button>
+                    <button type="button" class="btn-prestamo-secundario btn-ir-comparador">
+                        <i class="fa-solid fa-scale-balanced"></i> Ver comparador de créditos
+                    </button>
+                </div>
             </div>
         `;
+
+        contenedor.querySelector('.btn-ir-solicitud')?.addEventListener('click', () => {
+            document.querySelector('[data-tab="tab-solicitud"]')?.click();
+        });
+        contenedor.querySelector('.btn-ir-comparador')?.addEventListener('click', () => {
+            document.querySelector('[data-tab="tab-comparador"]')?.click();
+        });
+        return;
+    }
+
+    // Si tiene solicitudes pero ninguna activa (ej: pendientes o rechazadas)
+    if (activos.length === 0) {
+        contenedor.innerHTML = `
+            <div class="prestamo-empty-state">
+                <div class="prestamo-empty-icon" style="background: rgba(229, 169, 60, 0.1);"><i class="fa-solid fa-clipboard-check"></i></div>
+                <h4>No tienes créditos activos en este momento</h4>
+                <p>Revisa más abajo el estado de tus solicitudes o postúlate a un nuevo crédito bancario.</p>
+                <div class="prestamo-empty-actions">
+                    <button type="button" class="btn-solicitar-prestamo btn-ir-solicitud">
+                        <i class="fa-solid fa-plus"></i> Solicitar un préstamo
+                    </button>
+                </div>
+            </div>
+        `;
+        contenedor.querySelector('.btn-ir-solicitud')?.addEventListener('click', () => {
+            document.querySelector('[data-tab="tab-solicitud"]')?.click();
+        });
         return;
     }
 
     contenedor.innerHTML = activos.map(p => {
-        const cuotasRestantes = p.meses - p.cuotasPagadas;
-        const saldoPendiente = cuotasRestantes * p.cuotaMensual;
+        const cuotasRestantes = Math.max(0, p.meses - p.cuotasPagadas);
+        const totalRestantePagar = cuotasRestantes * p.cuotaMensual;
+        const tasaNumerica = obtenerTasaNumericaPorTipo(p.tipoId);
+        const saldoCapitalRestante = calcularSaldoCapital(p.monto, p.meses, tasaNumerica, p.cuotasPagadas);
+        const porcentajeProgreso = Math.min(100, Math.round((p.cuotasPagadas / p.meses) * 100));
+        const proximaFecha = calcularProximaFechaPago(p);
         const tasaMostrar = p.tasaInteres || '1.8% E.M. (24% E.A.)';
+        const cantidadPagos = Array.isArray(p.pagos) ? p.pagos.length : 0;
 
         return `
-            <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.2rem; display: flex; flex-direction: column; gap: 10px;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <strong style="color: var(--text-white); font-size: 1.05rem;">${p.concepto}</strong>
-                    <span style="font-family: monospace; color: var(--gold-main); font-size: 0.85rem;">${p.radicado}</span>
+            <div class="prestamo-card-activo" data-radicado="${escapeHTML(p.radicado)}">
+                <div class="prestamo-card-activo-head">
+                    <div>
+                        <strong class="prestamo-card-titulo">${escapeHTML(p.concepto || 'Crédito de Consumo')}</strong>
+                        <span class="prestamo-card-subradicado">${escapeHTML(p.radicado)}</span>
+                    </div>
+                    <div class="prestamo-due-badge ${proximaFecha.claseBadge}" title="Fecha límite de tu próxima cuota">
+                        <i class="fa-regular fa-clock"></i> Próx. Cuota: ${proximaFecha.fechaFormateada} (${proximaFecha.textoDias})
+                    </div>
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; font-size: 0.85rem; color: var(--text-muted);">
-                    <div>Monto Inicial: <strong style="color: #fff;">${formatoCOP.format(p.monto)}</strong></div>
-                    <div>Cuota Mensual: <strong style="color: #e5a93c;">${formatoCOP.format(p.cuotaMensual)}</strong></div>
-                    <div>Tasa de Interés: <strong style="color: #fff;">${tasaMostrar}</strong></div>
-                    <div>Progreso: <strong style="color: #34d399;">${p.cuotasPagadas} / ${p.meses} cuotas</strong></div>
-                    <div>Saldo Pendiente: <strong style="color: #fff;">${formatoCOP.format(saldoPendiente)}</strong></div>
+
+                <div class="prestamo-card-metricas">
+                    <div class="prestamo-metrica-item">
+                        <span>Saldo Capital Pendiente:</span>
+                        <strong class="valor-capital">${formatoCOP.format(saldoCapitalRestante)}</strong>
+                        <small class="prestamo-subtexto">Total restante: ${formatoCOP.format(totalRestantePagar)}</small>
+                    </div>
+                    <div class="prestamo-metrica-item">
+                        <span>Valor Cuota Mensual:</span>
+                        <strong class="valor-cuota">${formatoCOP.format(p.cuotaMensual)}</strong>
+                        <small class="prestamo-subtexto">Tasa: ${escapeHTML(tasaMostrar)}</small>
+                    </div>
+                    <div class="prestamo-metrica-item">
+                        <span>Progreso de Amortización:</span>
+                        <strong class="valor-progreso">${p.cuotasPagadas} de ${p.meses} cuotas</strong>
+                        <div class="prestamo-progress-bar-bg">
+                            <div class="prestamo-progress-bar-fill" style="width: ${porcentajeProgreso}%;"></div>
+                        </div>
+                    </div>
                 </div>
-                <div style="display: flex; justify-content: flex-end; margin-top: 5px;">
-                    <button type="button" class="btn-pagar-cuota-action" data-radicado="${p.radicado}" style="background: rgba(229, 169, 60, 0.15); border: 1px solid rgba(229, 169, 60, 0.4); color: var(--gold-main); padding: 8px 16px; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">Pagar Cuota Mensual</button>
+
+                <div class="prestamo-card-activo-footer">
+                    <button type="button" class="btn-ver-historial-pagos" data-radicado="${escapeHTML(p.radicado)}">
+                        <i class="fa-solid fa-list-check"></i> Historial de pagos (${cantidadPagos})
+                    </button>
+                    <button type="button" class="btn-solicitar-prestamo btn-pagar-cuota-action" data-radicado="${escapeHTML(p.radicado)}">
+                        <i class="fa-solid fa-credit-card"></i> Pagar Cuota Mensual
+                    </button>
+                </div>
+
+                <!-- Contenedor desplegable del historial de pagos -->
+                <div id="historial-${escapeHTML(p.radicado)}" class="prestamo-historial-pagos-box" style="display: none;">
+                    ${renderizarTablaPagosHTML(p.pagos)}
                 </div>
             </div>
         `;
     }).join('');
 
-    // Vinculación directa de eventos
+    // Listeners de pagar cuota
     contenedor.querySelectorAll('.btn-pagar-cuota-action').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
             const radicado = btn.getAttribute('data-radicado');
-            if (radicado) {
-                abrirModalPagoCuota(radicado);
+            if (radicado) abrirModalPagoCuota(radicado);
+        });
+    });
+
+    // Listeners para desplegar historial de pagos
+    contenedor.querySelectorAll('.btn-ver-historial-pagos').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const radicado = btn.getAttribute('data-radicado');
+            const box = document.getElementById(`historial-${radicado}`);
+            if (box) {
+                const visible = box.style.display !== 'none';
+                box.style.display = visible ? 'none' : 'block';
+                btn.classList.toggle('active', !visible);
             }
         });
     });
 }
 
+function renderizarTablaPagosHTML(pagos) {
+    if (!Array.isArray(pagos) || pagos.length === 0) {
+        return `<p class="prestamo-historial-empty"><i class="fa-solid fa-circle-info"></i> Aún no has realizado pagos en este crédito.</p>`;
+    }
+
+    return `
+        <div class="prestamo-table-wrapper">
+            <table class="prestamo-table">
+                <thead>
+                    <tr>
+                        <th>Fecha y Hora</th>
+                        <th>Cuota</th>
+                        <th>Valor Pagado</th>
+                        <th>Cuenta Origen</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${pagos.map(pago => {
+                        const fechaStr = new Date(pago.fecha).toLocaleDateString('es-CO', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                        const tipoTexto = pago.tipo === 'TOTAL' ? 'Pago Total' : `Cuota ${pago.numeroCuota}`;
+                        const cuentaMask = ocultarNumeroCuenta(pago.cuentaNumero);
+
+                        return `
+                            <tr>
+                                <td>${fechaStr}</td>
+                                <td><strong>${tipoTexto}</strong></td>
+                                <td style="color: #34d399; font-weight: 600;">${formatoCOP.format(pago.valor)}</td>
+                                <td>${cuentaMask}</td>
+                                <td><span class="prestamo-badge-estado badge-aprobado">Aplicado</span></td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+
+// 5. SECCIÓN MIS SOLICITUDES CON FILTRO (HU-13)
+export function renderizarSolicitudesCredito(filtro = 'TODOS') {
+    const contenedor = document.getElementById('listaSolicitudesContainer');
+    const seccionFinalizados = document.getElementById('seccionCreditosFinalizados');
+    const contFinalizados = document.getElementById('listaCreditosPagados');
+    const badgePagados = document.getElementById('badgeContadorPagados');
+
+    if (!contenedor) return;
+
+    const todos = obtenerPrestamosUsuario();
+    let filtrados = todos;
+
+    if (filtro !== 'TODOS') {
+        filtrados = todos.filter(p => p.estado === filtro);
+    }
+
+    if (filtrados.length === 0) {
+        contenedor.innerHTML = `<p class="prestamo-loading-text" style="text-align: center; margin: 1.5rem 0;">No se encontraron solicitudes con el filtro: <strong>${escapeHTML(filtro)}</strong></p>`;
+    } else {
+        contenedor.innerHTML = filtrados.map(sol => {
+            const fechaStr = new Date(sol.fecha).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' });
+            let badgeClass = 'badge-revision';
+            let labelEstado = 'En Revisión';
+
+            if (sol.estado === 'APROBADO') {
+                badgeClass = 'badge-aprobado';
+                labelEstado = 'Aprobado';
+            } else if (sol.estado === 'RECHAZADO') {
+                badgeClass = 'badge-rechazado';
+                labelEstado = 'Rechazado';
+            } else if (sol.estado === 'PAGADO') {
+                badgeClass = 'badge-pagado';
+                labelEstado = 'Finalizado';
+            }
+
+            return `
+                <div class="prestamo-solicitud-card">
+                    <div class="prestamo-solicitud-main">
+                        <div>
+                            <span class="prestamo-badge-estado ${badgeClass}">${labelEstado}</span>
+                            <strong class="prestamo-solicitud-concepto">${escapeHTML(sol.concepto || 'Crédito')}</strong>
+                            <small class="prestamo-solicitud-radicado">${escapeHTML(sol.radicado)} · ${fechaStr}</small>
+                        </div>
+                        <div class="prestamo-solicitud-monto-box">
+                            <span class="monto-valor">${formatoCOP.format(sol.monto)}</span>
+                            <small class="monto-cuota">${sol.meses} meses · Cuota: ${formatoCOP.format(sol.cuotaMensual)}</small>
+                        </div>
+                    </div>
+                    ${sol.mensajeEstado ? `<p class="prestamo-solicitud-mensaje">${escapeHTML(sol.mensajeEstado)}</p>` : ''}
+                </div>
+            `;
+        }).join('');
+    }
+
+    // Manejo de la sección de Créditos Finalizados (Pagados)
+    if (seccionFinalizados && contFinalizados) {
+        const pagados = todos.filter(p => p.estado === 'PAGADO');
+        if (pagados.length > 0) {
+            seccionFinalizados.style.display = 'block';
+            if (badgePagados) badgePagados.textContent = `${pagados.length} Pagado${pagados.length === 1 ? '' : 's'}`;
+            contFinalizados.innerHTML = pagados.map(p => `
+                <div class="prestamo-card-activo" style="border-left: 4px solid #64748b;">
+                    <div class="prestamo-card-activo-head">
+                        <div>
+                            <strong class="prestamo-card-titulo">${escapeHTML(p.concepto)}</strong>
+                            <span class="prestamo-card-subradicado">${escapeHTML(p.radicado)}</span>
+                        </div>
+                        <span class="prestamo-badge-estado badge-pagado">Crédito Totalmente Saldado</span>
+                    </div>
+                    <div style="font-size: 0.85rem; color: #94a3b8; display: flex; gap: 20px; flex-wrap: wrap;">
+                        <div>Monto financiado: <strong style="color:#fff;">${formatoCOP.format(p.monto)}</strong></div>
+                        <div>Cuotas pagadas: <strong style="color:#34d399;">${p.cuotasPagadas} de ${p.meses}</strong></div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <button type="button" class="btn-ver-historial-pagos" data-radicado="${escapeHTML(p.radicado)}">
+                            <i class="fa-solid fa-receipt"></i> Ver historial de pagos (${Array.isArray(p.pagos) ? p.pagos.length : 0})
+                        </button>
+                    </div>
+                    <div id="historial-${escapeHTML(p.radicado)}" class="prestamo-historial-pagos-box" style="display: none;">
+                        ${renderizarTablaPagosHTML(p.pagos)}
+                    </div>
+                </div>
+            `).join('');
+
+            contFinalizados.querySelectorAll('.btn-ver-historial-pagos').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const rad = btn.getAttribute('data-radicado');
+                    const box = document.getElementById(`historial-${rad}`);
+                    if (box) {
+                        const visible = box.style.display !== 'none';
+                        box.style.display = visible ? 'none' : 'block';
+                    }
+                });
+            });
+        } else {
+            seccionFinalizados.style.display = 'none';
+        }
+    }
+}
+
+function configurarFiltrosSolicitudes() {
+    const btns = document.querySelectorAll('.btn-filtro-solicitud');
+    btns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            btns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            filtroSolicitudesActual = btn.getAttribute('data-filtro') || 'TODOS';
+            renderizarSolicitudesCredito(filtroSolicitudesActual);
+        });
+    });
+}
+
 function abrirModalPagoCuota(radicado) {
-    let prestamos = JSON.parse(localStorage.getItem('finara_prestamos')) || [];
+    let prestamos = obtenerPrestamosUsuario();
     const prestamo = prestamos.find(p => p.radicado === radicado);
     if (!prestamo) return;
 
@@ -341,14 +706,14 @@ function abrirModalPagoCuota(radicado) {
     const listaCuentas = Array.isArray(cuentasRaw) ? cuentasRaw : Object.values(cuentasRaw);
     const cuentasValidas = listaCuentas.filter(c => {
         const tipoStr = String(c.tipo || '').toLowerCase();
-        return tipoStr.includes('ahorro') || tipoStr.includes('corriente');
+        return (tipoStr.includes('ahorro') || tipoStr.includes('corriente')) && c.estado !== 'INACTIVA';
     });
 
     Swal.fire({
         title: 'Pagar Crédito o Cuota',
         html: `
             <div style="text-align: left; font-size: 0.9rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 12px;">
-                <p style="margin:0;"><strong>Radicado:</strong> <span style="color: #e5a93c;">${prestamo.radicado}</span></p>
+                <p style="margin:0;"><strong>Radicado:</strong> <span style="color: #e5a93c;">${escapeHTML(prestamo.radicado)}</span></p>
                 
                 <div class="prestamo-campo">
                     <label style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 6px; display: block;">Tipo de Pago:</label>
@@ -362,8 +727,7 @@ function abrirModalPagoCuota(radicado) {
                     <label style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 6px; display: block;">Selecciona la cuenta de pago:</label>
                     <div id="cuentasCardsContainer" style="display: flex; flex-direction: column; gap: 8px; max-height: 150px; overflow-y: auto;">
                         ${cuentasValidas.length > 0 ? cuentasValidas.map((c, index) => {
-                            const digitos = String(c.numero || c.id || '').replace(/\D/g, '');
-                            const numeroOculto = `•••• ${digitos.slice(-4)}`;
+                            const numeroOculto = ocultarNumeroCuenta(c.numero || c.id);
                             const tipoLabel = String(c.tipo || 'CUENTA').toUpperCase();
                             const saldoNum = Number(c.saldo) || 0;
                             return `
@@ -375,7 +739,7 @@ function abrirModalPagoCuota(radicado) {
                                     <span style="color: #34d399; font-weight: bold; font-size: 0.9rem;">${formatoCOP.format(saldoNum)}</span>
                                 </div>
                             `;
-                        }).join('') : '<p style="color: #94a3b8; text-align: center;">No hay cuentas disponibles</p>'}
+                        }).join('') : '<p style="color: #94a3b8; text-align: center;">No hay cuentas con fondos disponibles</p>'}
                     </div>
                     <input type="hidden" id="cuentaSeleccionadaId" value="${cuentasValidas.length > 0 ? (cuentasValidas[0].id || cuentasValidas[0].numero) : ''}">
                 </div>
@@ -429,6 +793,7 @@ function abrirModalPagoCuota(radicado) {
                 confirmButtonColor: '#e5a93c'
             }).then(() => {
                 renderizarDashboardCreditos();
+                renderizarSolicitudesCredito(filtroSolicitudesActual);
             });
         }
     });
