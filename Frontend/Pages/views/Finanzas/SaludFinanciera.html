@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asesoría Financiera Personalizada | Finara Finanzas</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="../Style/image/favicon_esmeralda.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../Style/Finanzas/Asesoria.css">
+</head>
+
+<body>
+    <main class="main-content" id="asesoriaApp">
+        <div class="fe-header">
+            <div>
+                <h1>Asesoría Financiera Personalizada</h1>
+                <p class="fe-subtitle">Conversa con tu asistente virtual para obtener un diagnóstico experto y tu score de salud financiera.</p>
+            </div>
+        </div>
+
+        <!-- CONTENEDOR PRINCIPAL DEL CHAT ASESOR -->
+        <section class="asesoria-chat-card" id="seccionChatCard">
+            <div class="fe-card-head chat-header-box">
+                <div class="fe-badge-icono">
+                    <img src="../Style/image/bot_finara_esmeralda.png" alt="Asesor Finara" class="bot-avatar-img-fluid">
+                </div>
+                <div>
+                    <h3>Asesor Finara</h3>
+                    <p>En línea • Diagnóstico de Salud Financiera</p>
+                </div>
+                <div class="chat-header-actions">
+                    <button type="button" id="btnHistorialAsesorias" class="btn-historial-pill" title="Ver historial de asesorías">
+                        <i class="fa-solid fa-clock-rotate-left"></i> Historial
+                    </button>
+                    <button type="button" id="btnReiniciarChat" class="btn-text-action" title="Reiniciar conversación">
+                        <i class="fa-solid fa-rotate-right"></i> Reiniciar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Cuerpo del Chat -->
+            <div id="chatConversacionBody" class="chat-body-content"></div>
+
+            <!-- Contenedor de Entrada Dinámica -->
+            <div id="chatInputContainer" class="chat-input-footer"></div>
+        </section>
+
+        <!-- SECCIÓN DE HISTORIAL DE ASESORÍAS (Nueva vista de lista) -->
+        <section id="seccionHistorialLista" class="asesoria-resultado-card resultado-reporte-section" style="display: none;">
+            <div class="fe-card-head resultado-header-box">
+                <div class="fe-badge-icono color-esmeralda-bg">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </div>
+                <div>
+                    <span class="resultado-tag">Registro de Evaluaciones</span>
+                    <h3>Historial de Asesorías Financieras</h3>
+                </div>
+                <button type="button" id="btnVolverAlChatDesdeHistorial" class="btn-historial-pill" style="margin-left: auto;">
+                    <i class="fa-solid fa-arrow-left"></i> Volver al Asesor
+                </button>
+            </div>
+
+            <div id="contenedorListaHistorial" class="historial-lista-grid">
+                <!-- Se inyecta dinámicamente desde JS -->
+            </div>
+        </section>
+
+        <!-- SECCIÓN DE RESULTADOS / INFORME FINAL -->
+        <section id="seccionResultado" class="asesoria-resultado-card resultado-reporte-section" style="display: none;">
+            <div class="fe-card-head resultado-header-box">
+                <div class="fe-badge-icono color-esmeralda-bg">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <div>
+                    <span class="resultado-tag">Diagnóstico Completo</span>
+                    <h3>Tu Reporte de Salud Financiera</h3>
+                </div>
+            </div>
+
+            <div class="resultado-grid-layout">
+                <div class="resultado-score-box">
+                    <span class="resultado-score-label">Score de Salud Financiera</span>
+                    <h1 id="lblScore" class="resultado-score-numero">0 / 100</h1>
+                    <p id="lblNivel" class="resultado-score-nivel">Nivel: -</p>
+                </div>
+
+                <div class="resultado-bloque-info asesor-destacado-box">
+                    <h4><i class="fa-solid fa-user-tie"></i> Análisis de tu Asesor Financiero</h4>
+                    <p id="txtEnfoqueAsesoria"></p>
+                </div>
+
+                <div class="resultado-columnas-grid">
+                    <div class="resultado-bloque-info">
+                        <h4 class="color-verde-text"><i class="fa-solid fa-check-circle"></i> Puntos Fuertes</h4>
+                        <ul id="listaPuntosFuertes" class="resultado-lista-ul"></ul>
+                    </div>
+
+                    <div class="resultado-bloque-info">
+                        <h4 class="color-rojo-text"><i class="fa-solid fa-triangle-exclamation"></i> Oportunidades de Mejora</h4>
+                        <ul id="listaOportunidades" class="resultado-lista-ul"></ul>
+                    </div>
+                </div>
+
+                <div class="resultado-bloque-info">
+                    <h4 class="color-azul-text"><i class="fa-solid fa-lightbulb"></i> Pasos a Seguir (Recomendaciones)</h4>
+                    <ul id="listaRecomendaciones" class="resultado-lista-ul"></ul>
+                </div>
+
+                <div class="reporte-acciones-wrapper">
+                    <button type="button" id="btnRepetirEvaluacion" class="btn-guardar-meta btn-flex-1">
+                        Nueva Asesoría
+                    </button>
+                    <button type="button" id="btnVerHistorialDesdeReporte" class="btn-meses btn-flex-1 btn-text-center">
+                        Ver Historial de Evaluaciones
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script type="module" src="../../../Vanilla/Finanzas/SaludFinanciera.js"></script>
+</body>
+</html>
