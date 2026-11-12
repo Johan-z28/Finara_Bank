@@ -1,0 +1,224 @@
+<!-- ======= VISTA DE SEGUIMIENTO FINANCIERO: SUSCRIPCIONES Y PAGOS (HU-22) ======= -->
+<div class="sp-view-container">
+
+    <!-- Encabezado Principal -->
+    <header class="sp-header">
+        <div>
+            <h1><i class="fa-solid fa-repeat"></i> Seguimiento Financiero</h1>
+            <p class="sp-subtitle">Control 2 en 1: Monitorea gastos fijos recurrentes, detecta gastos hormiga y mantén tu agenda de pagos al día.</p>
+        </div>
+        <div class="sp-header-actions">
+            <button type="button" class="sp-btn-sync" id="btnSyncFinara" title="Sincronizar productos de Finara Bank">
+                <i class="fa-solid fa-arrows-rotate"></i>
+                <span>Sincronizar Banco</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Fila de KPIs de Impacto Rápido -->
+    <section class="sp-kpis-grid" aria-label="Indicadores clave de seguimiento financiero y suscripciones">
+        <!-- KPI 1: Gasto Fijo Recurrente -->
+        <div class="sp-kpi-card">
+            <div class="sp-kpi-icon">
+                <i class="fa-solid fa-receipt"></i>
+            </div>
+            <div class="sp-kpi-info">
+                <div class="sp-kpi-label">Gasto Fijo Recurrente / Mes</div>
+                <div class="sp-kpi-valor" id="kpiGastoFijoMensual">$ 0</div>
+                <div class="sp-kpi-subtexto">Proyección a 1 año: <strong id="kpiGastoFijoAnual">$ 0</strong></div>
+            </div>
+        </div>
+
+        <!-- KPI 2: Ahorro Potencial -->
+        <div class="sp-kpi-card kpi-ahorro">
+            <div class="sp-kpi-icon">
+                <i class="fa-solid fa-piggy-bank"></i>
+            </div>
+            <div class="sp-kpi-info">
+                <div class="sp-kpi-label">Ahorro Potencial</div>
+                <div class="sp-kpi-valor" id="kpiAhorroMensual">$ 0 / mes</div>
+                <div class="sp-kpi-subtexto">Equivalente anual: <strong id="kpiAhorroAnual">$ 0 / año</strong></div>
+            </div>
+        </div>
+
+        <!-- KPI 3: Compromisos y Agenda -->
+        <div class="sp-kpi-card kpi-alerta">
+            <div class="sp-kpi-icon">
+                <i class="fa-solid fa-bell"></i>
+            </div>
+            <div class="sp-kpi-info">
+                <div class="sp-kpi-label">Compromisos Activos</div>
+                <div class="sp-kpi-valor" id="kpiSuscripcionesActivas">0 activas</div>
+                <div class="sp-kpi-subtexto"><strong id="kpiPagosAlerta">0 por vencer / vencidos</strong></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contenedor 2 en 1: Suscripciones & Pagos Pendientes -->
+    <div class="sp-paneles-container">
+
+        <!-- ==============================================================
+             PANEL 1: CONTROL DE SUSCRIPCIONES Y GASTOS HORMIGA
+             ============================================================== -->
+        <section class="sp-panel-card" aria-label="Panel de Suscripciones y Gastos Hormiga">
+            <div class="sp-panel-header">
+                <div class="sp-panel-titulo">
+                    <i class="fa-solid fa-bolt color-esmeralda"></i>
+                    <div>
+                        <h2>Suscripciones y Gastos Hormiga</h2>
+                        <p class="sp-panel-desc">Detecta "vampiros financieros" y calcula tu ahorro al pausar o cancelar.</p>
+                    </div>
+                </div>
+                <span class="sp-panel-badge" id="badgeTotalSuscripciones">0 registradas</span>
+            </div>
+
+            <!-- Formulario de Registro Rápido -->
+            <form id="formRegistroSuscripcion" class="sp-form-box" autocomplete="off">
+                <div class="sp-form-grid">
+                    <div class="sp-form-group">
+                        <label for="inputSuscNombre">Nombre o Servicio *</label>
+                        <input type="text" id="inputSuscNombre" class="sp-form-input" placeholder="Ej. Netflix, Spotify, Gym, Café diario..." required maxlength="60">
+                    </div>
+
+                    <div class="sp-form-grid-2 sp-form-grid">
+                        <div class="sp-form-group">
+                            <label for="selectSuscCategoria">Categoría</label>
+                            <select id="selectSuscCategoria" class="sp-form-select">
+                                <option value="Streaming">Streaming</option>
+                                <option value="Membresía">Membresía / Gym</option>
+                                <option value="Café y snacks">Café y snacks (Hormiga)</option>
+                                <option value="Apps y software">Apps y Software</option>
+                                <option value="Transporte">Transporte recurrente</option>
+                                <option value="Otro" selected>Otro</option>
+                            </select>
+                        </div>
+
+                        <div class="sp-form-group">
+                            <label for="selectSuscFrecuencia">Frecuencia</label>
+                            <select id="selectSuscFrecuencia" class="sp-form-select">
+                                <option value="SEMANAL">Semanal</option>
+                                <option value="MENSUAL" selected>Mensual</option>
+                                <option value="ANUAL">Anual</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="sp-form-group">
+                        <label for="inputSuscMonto">Monto (COP) *</label>
+                        <input type="number" id="inputSuscMonto" class="sp-form-input" placeholder="0" min="1" step="100" required>
+                    </div>
+
+                    <!-- Previsualización en vivo -->
+                    <div class="sp-live-preview" id="boxLivePreview">
+                        <div class="sp-preview-item">
+                            <span>Impacto mensual: </span>
+                            <strong id="previewCostoMensual">$ 0 COP</strong>
+                        </div>
+                        <div class="sp-preview-item">
+                            <span>Proyección a 1 año: </span>
+                            <strong id="previewCostoAnual">$ 0 COP</strong>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="sp-btn-submit" id="btnRegistrarSuscripcion">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Registrar Suscripción</span>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Barra de Filtros -->
+            <div class="sp-toolbar">
+                <div class="sp-filtro-chips" id="filtrosSuscripcion">
+                    <button type="button" class="sp-chip active" data-filtro="TODAS">Todas (<span id="contFiltroTodas">0</span>)</button>
+                    <button type="button" class="sp-chip" data-filtro="ACTIVA">Activas (<span id="contFiltroActivas">0</span>)</button>
+                    <button type="button" class="sp-chip" data-filtro="PAUSADA">Pausadas (<span id="contFiltroPausadas">0</span>)</button>
+                    <button type="button" class="sp-chip" data-filtro="CANCELADA">Canceladas (<span id="contFiltroCanceladas">0</span>)</button>
+                </div>
+            </div>
+
+            <!-- Listado Dinámico de Suscripciones -->
+            <div class="sp-suscripciones-list" id="listaSuscripciones">
+                <!-- Se inyecta dinámicamente -->
+            </div>
+        </section>
+
+        <!-- ==============================================================
+             PANEL 2: AGENDA DE PAGOS PENDIENTES (CUENTAS POR PAGAR)
+             ============================================================== -->
+        <section class="sp-panel-card" aria-label="Agenda de Pagos Pendientes">
+            <div class="sp-panel-header">
+                <div class="sp-panel-titulo">
+                    <i class="fa-solid fa-calendar-check color-esmeralda"></i>
+                    <div>
+                        <h2>Agenda de Pagos Pendientes</h2>
+                        <p class="sp-panel-desc">Compromisos del mes con semáforo y sincronización de cuotas bancarias.</p>
+                    </div>
+                </div>
+                <span class="sp-panel-badge" id="badgeTotalPagos">0 pendientes</span>
+            </div>
+
+            <!-- Formulario de Alta Manual de Pago -->
+            <form id="formRegistroPago" class="sp-form-box" autocomplete="off">
+                <div class="sp-form-grid">
+                    <div class="sp-form-group">
+                        <label for="inputPagoNombre">Concepto o Proveedor *</label>
+                        <input type="text" id="inputPagoNombre" class="sp-form-input" placeholder="Ej. Servicios Públicos, Internet, Cuota Colegio..." required maxlength="60">
+                    </div>
+
+                    <div class="sp-form-grid-2 sp-form-grid">
+                        <div class="sp-form-group">
+                            <label for="selectPagoTipo">Tipo de Compromiso</label>
+                            <select id="selectPagoTipo" class="sp-form-select">
+                                <option value="SERVICIO" selected>Servicio Público / Hogar</option>
+                                <option value="TARJETA">Tarjeta de Crédito</option>
+                                <option value="CUOTA">Cuota de Crédito / Préstamo</option>
+                                <option value="OTRO">Otro Compromiso</option>
+                            </select>
+                        </div>
+
+                        <div class="sp-form-group">
+                            <label for="inputPagoFecha">Fecha de Vencimiento *</label>
+                            <input type="date" id="inputPagoFecha" class="sp-form-input" required>
+                        </div>
+                    </div>
+
+                    <div class="sp-form-group">
+                        <label for="inputPagoMonto">Monto a Pagar (COP) *</label>
+                        <input type="number" id="inputPagoMonto" class="sp-form-input" placeholder="0" min="1" step="100" required>
+                    </div>
+
+                    <button type="submit" class="sp-btn-submit" id="btnRegistrarPago">
+                        <i class="fa-solid fa-calendar-plus"></i>
+                        <span>Agendar Pago Pendiente</span>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Tabla de Pagos Pendientes con Semáforo -->
+            <div class="sp-pagos-table-wrapper">
+                <table class="sp-table" id="tablaPagosPendientes">
+                    <thead>
+                        <tr>
+                            <th>Concepto</th>
+                            <th>Monto</th>
+                            <th>Vencimiento</th>
+                            <th style="text-align: right;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoTablaPagos">
+                        <!-- Filas inyectadas dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Resumen Mensual de la Agenda -->
+            <div class="sp-agenda-resumen">
+                <div>Por pagar: <strong id="resumenTotalPorPagar" class="color-gasto">$ 0</strong></div>
+                <div>Pagado: <strong id="resumenTotalPagado" class="color-ingreso">$ 0</strong></div>
+                <div>Vencidos: <strong id="resumenVencidos" style="color: #dc2626;">0</strong></div>
+            </div>
+        </section>
+
+    </div>
+</div>
