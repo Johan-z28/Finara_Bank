@@ -49,8 +49,15 @@ export function initChatbot({ navegar } = {}) {
 
   function inicio() {
     categoriaActual = null;
-    mensaje('¿Con qué tema necesitas ayuda? Selecciona una categoría:');
-    opciones(CATEGORIAS.map(c => ({label: c.titulo, accion: () => abrirCategoria(c.id)})));
+    mensaje('¿Con qué tema necesitas ayuda? Puedes seleccionar una categoría o ingresar a la guía de tus cuentas y saldos:');
+    
+    const temaSaldos = CATEGORIAS.find(c => c.id === 'cuentas')?.temas.find(t => t.id === 'saldos');
+
+    const listaOpciones = [
+      ...(temaSaldos ? [{ label: temaSaldos.titulo, accion: () => { categoriaActual = 'cuentas'; abrirTema(temaSaldos); } }] : []),
+      ...CATEGORIAS.map(c => ({ label: c.titulo, accion: () => abrirCategoria(c.id) }))
+    ];
+    opciones(listaOpciones);
   }
 
   function abrirCategoria(id) {
