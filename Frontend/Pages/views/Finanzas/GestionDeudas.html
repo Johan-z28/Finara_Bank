@@ -1,0 +1,292 @@
+<!-- ======= VISTA DE ASESORÍA SOBRE ENDEUDAMIENTO Y GESTIÓN DE DEUDAS (HU-20) ======= -->
+<div class="gd-view-container">
+
+    <!-- Encabezado Principal -->
+    <header class="gd-header">
+        <div>
+            <h1><i class="fa-solid fa-scale-balanced"></i> Asesoría sobre Endeudamiento</h1>
+            <p class="gd-subtitle">Consolida tus obligaciones financieras, evalúa tu nivel de endeudamiento y planifica tu libertad financiera.</p>
+        </div>
+        <div class="gd-header-actions">
+            <button type="button" class="gd-btn-sync" id="btnSyncFinara" title="Sincronizar productos activos de Finara Bank">
+                <i class="fa-solid fa-arrows-rotate"></i>
+                <span>Sincronizar Banco</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Bloque de Ingreso Mensual Neto -->
+    <section class="gd-ingreso-card" aria-label="Ingreso mensual neto">
+        <div class="gd-ingreso-left">
+            <div class="gd-ingreso-icon">
+                <i class="fa-solid fa-wallet"></i>
+            </div>
+            <div class="gd-ingreso-meta">
+                <h3>Tu Ingreso Mensual Neto</h3>
+                <p>Base fundamental para calcular tu capacidad de pago y porcentaje de endeudamiento.</p>
+            </div>
+        </div>
+        <div class="gd-ingreso-form">
+            <input type="number" id="inputIngresoMensual" class="gd-input-ingreso" placeholder="0" min="0" step="1000">
+            <button type="button" class="gd-btn-presupuesto" id="btnUsarPresupuesto" title="Rellenar con los ingresos registrados en el módulo de Presupuestos">
+                <i class="fa-solid fa-calculator"></i>
+                <span>Usar del presupuesto</span>
+            </button>
+            <button type="button" class="gd-btn-guardar-ingreso" id="btnGuardarIngreso">
+                <i class="fa-solid fa-check"></i>
+                <span>Guardar</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Fila de KPIs de Endeudamiento -->
+    <section class="gd-kpis-grid" aria-label="Indicadores clave de endeudamiento">
+        <!-- KPI 1: Deuda Total -->
+        <div class="gd-kpi-card">
+            <div class="gd-kpi-icon">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+            </div>
+            <div class="gd-kpi-info">
+                <div class="gd-kpi-label">Deuda Total Consolidada</div>
+                <div class="gd-kpi-valor" id="kpiDeudaTotal">$ 0</div>
+                <div class="gd-kpi-subtexto">Relación anual: <strong id="kpiRelacionAnual">0.0x</strong></div>
+            </div>
+        </div>
+
+        <!-- KPI 2: Cuota Mensual Total -->
+        <div class="gd-kpi-card">
+            <div class="gd-kpi-icon">
+                <i class="fa-solid fa-receipt"></i>
+            </div>
+            <div class="gd-kpi-info">
+                <div class="gd-kpi-label">Compromiso Mensual (Cuotas)</div>
+                <div class="gd-kpi-valor" id="kpiCuotaTotal">$ 0 / mes</div>
+                <div class="gd-kpi-subtexto">Interés est.: <strong id="kpiInteresesMes">$ 0 / mes</strong></div>
+            </div>
+        </div>
+
+        <!-- KPI 3: Nivel de Endeudamiento -->
+        <div class="gd-kpi-card kpi-semaforo" id="cardKpiEndeudamiento">
+            <div class="gd-kpi-icon">
+                <i class="fa-solid fa-gauge-high"></i>
+            </div>
+            <div class="gd-kpi-info">
+                <div class="gd-kpi-label">Nivel de Endeudamiento</div>
+                <div class="gd-kpi-valor" id="kpiNivelEndeudamiento">0.0%</div>
+                <div class="gd-kpi-subtexto"><strong id="kpiBadgeSemaforo">Sin evaluar</strong></div>
+            </div>
+        </div>
+
+        <!-- KPI 4: Ingreso Libre -->
+        <div class="gd-kpi-card">
+            <div class="gd-kpi-icon">
+                <i class="fa-solid fa-coins"></i>
+            </div>
+            <div class="gd-kpi-info">
+                <div class="gd-kpi-label">Ingreso Libre Después de Deudas</div>
+                <div class="gd-kpi-valor" id="kpiIngresoLibre">$ 0</div>
+                <div class="gd-kpi-subtexto">Disponible para gastos y ahorro</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resumen Visual: Medidor Semicircular + Distribución y Línea de Tiempo -->
+    <section class="gd-visual-section" aria-label="Resumen visual del endeudamiento">
+        <!-- Medidor circular -->
+        <div class="gd-gauge-card">
+            <h3 style="font-size: 0.95rem; font-weight: 700; color: #0f172a; margin-bottom: 4px;">Termómetro de Carga</h3>
+            <p style="font-size: 0.78rem; color: #64748b;">Límite saludable bancario: ≤ 30%</p>
+
+            <div class="gd-gauge-wrapper" id="gaugeWrapper">
+                <div class="gd-gauge-center">
+                    <span class="gd-gauge-pct" id="gaugePercent">0%</span>
+                    <span class="gd-gauge-title">Endeudamiento</span>
+                </div>
+            </div>
+
+            <span class="gd-gauge-status saludable" id="gaugeStatus">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Saludable</span>
+            </span>
+        </div>
+
+        <!-- Distribución de la deuda y Línea de tiempo -->
+        <div class="gd-distribucion-card">
+            <div class="gd-card-header">
+                <h2>Distribución del Saldo de Deudas</h2>
+                <span style="font-size: 0.8rem; color: #64748b;" id="totalObligacionesCount">0 obligaciones</span>
+            </div>
+
+            <!-- Barra Segmentada Multicolor -->
+            <div class="gd-distribucion-barra" id="distribucionBarra">
+                <!-- Segmentos inyectados dinámicamente -->
+            </div>
+
+            <!-- Leyenda de colores -->
+            <div class="gd-distribucion-leyenda" id="distribucionLeyenda">
+                <!-- Items de leyenda inyectados -->
+            </div>
+
+            <!-- Línea de tiempo de amortización -->
+            <div class="gd-timeline-container">
+                <div class="gd-timeline-header">
+                    <i class="fa-solid fa-hourglass-half color-esmeralda"></i>
+                    <span>Horizonte de Terminación (Meses Restantes)</span>
+                </div>
+                <div class="gd-timeline-lista" id="timelineLista">
+                    <!-- Filas inyectadas dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contenedor: Formulario de Obligaciones + Tabla Consolidada -->
+    <div class="gd-obligaciones-container">
+
+        <!-- Formulario para agregar / editar obligación -->
+        <section class="gd-form-card" aria-label="Formulario de obligaciones financieras">
+            <div class="gd-card-header">
+                <h2 id="formTitulo">Agregar Obligación</h2>
+            </div>
+
+            <form id="formObligacion" class="gd-form-grid" autocomplete="off">
+                <input type="hidden" id="inputObligacionId" value="">
+
+                <div class="gd-form-group">
+                    <label for="selectTipoObligacion">Tipo de Deuda *</label>
+                    <select id="selectTipoObligacion" class="gd-form-select" required>
+                        <option value="PRESTAMO">Crédito de Consumo / Libre Inversión</option>
+                        <option value="TARJETA">Tarjeta de Crédito</option>
+                        <option value="HIPOTECA">Crédito Hipotecario / Vivienda</option>
+                        <option value="VEHICULO">Financiación de Vehículo</option>
+                        <option value="LIBRANZA">Crédito de Libranza</option>
+                        <option value="OTRO">Otro acreedor / Familiar</option>
+                    </select>
+                </div>
+
+                <div class="gd-form-group">
+                    <label for="inputEntidad">Entidad o Acreedor *</label>
+                    <input type="text" id="inputEntidad" class="gd-form-input" placeholder="Ej. Banco Davivienda, Falabella, Icetex..." required maxlength="60">
+                </div>
+
+                <div class="gd-form-grid-2 gd-form-grid">
+                    <div class="gd-form-group">
+                        <label for="inputSaldoTotal">Saldo Total Pendiente *</label>
+                        <input type="number" id="inputSaldoTotal" class="gd-form-input" placeholder="0" min="1" step="1000" required>
+                    </div>
+
+                    <div class="gd-form-group">
+                        <label for="inputCuotaMensual">Cuota Mensual *</label>
+                        <input type="number" id="inputCuotaMensual" class="gd-form-input" placeholder="0" min="1" step="100" required>
+                    </div>
+                </div>
+
+                <div class="gd-form-grid-2 gd-form-grid">
+                    <div class="gd-form-group">
+                        <label for="inputTasaEA">Tasa E.A. (%) *</label>
+                        <input type="number" id="inputTasaEA" class="gd-form-input" placeholder="22.5" min="0" max="100" step="0.01" required>
+                    </div>
+
+                    <div class="gd-form-group">
+                        <label for="inputPlazoMeses">Plazo Restante (Meses) *</label>
+                        <input type="number" id="inputPlazoMeses" class="gd-form-input" placeholder="12" min="1" max="360" step="1" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="gd-btn-submit" id="btnGuardarObligacion">
+                    <i class="fa-solid fa-plus"></i>
+                    <span id="btnGuardarTexto">Guardar Obligación</span>
+                </button>
+                <button type="button" class="gd-btn-presupuesto hidden" id="btnCancelarEdicion" style="width: 100%; justify-content: center; margin-top: 4px;">
+                    Cancelar edición
+                </button>
+            </form>
+        </section>
+
+        <!-- Tabla Consolidada de Deudas -->
+        <section class="gd-lista-card" aria-label="Listado consolidado de obligaciones">
+            <div class="gd-card-header">
+                <h2>Obligaciones Financieras Consolidadas</h2>
+                <span class="gd-badge-finara"><i class="fa-solid fa-building-columns"></i> Incluye Finara Bank</span>
+            </div>
+
+            <div class="gd-table-wrapper">
+                <table class="gd-table" id="tablaObligaciones">
+                    <thead>
+                        <tr>
+                            <th>Obligación</th>
+                            <th>Saldo Pendiente</th>
+                            <th>Cuota / Mes</th>
+                            <th>Tasa E.A.</th>
+                            <th>Plazo</th>
+                            <th style="text-align: right;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoTablaObligaciones">
+                        <!-- Filas inyectadas -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- Comparador de Estrategias de Amortización (Avalancha vs Bola de Nieve) -->
+    <section class="gd-estrategias-card" aria-label="Comparador de estrategias de pago">
+        <div class="gd-estrategias-header">
+            <div>
+                <h2 style="font-size: 1.15rem; font-weight: 700; color: #0f172a;"><i class="fa-solid fa-rocket color-esmeralda"></i> Comparador de Estrategias de Salida</h2>
+                <p style="font-size: 0.8rem; color: #64748b;">Simula cómo pagar tus deudas más rápido inyectando un excedente mensual.</p>
+            </div>
+            <div class="gd-extra-input-box">
+                <label for="inputAbonoExtra">Abono extra mensual:</label>
+                <input type="number" id="inputAbonoExtra" value="100000" min="0" step="50000">
+            </div>
+        </div>
+
+        <div class="gd-estrategias-grid">
+            <!-- Estrategia Avalancha -->
+            <div class="gd-estrategia-box" id="boxAvalancha">
+                <span class="gd-estrategia-tag hidden" id="tagMejorAvalancha">Recomendada</span>
+                <div class="gd-estrategia-titulo">
+                    <i class="fa-solid fa-volcano" style="color: #ea580c;"></i>
+                    <span>Método Avalancha (Mayor Tasa)</span>
+                </div>
+                <p class="gd-estrategia-desc">Paga primero la deuda con la tasa de interés más alta. Matemáticamente es la estrategia que genera el mayor ahorro de dinero en intereses.</p>
+                <div class="gd-estrategia-metricas">
+                    <div class="gd-est-met-item">Tiempo libre de deuda: <strong id="estAvalanchaMeses">0 meses</strong></div>
+                    <div class="gd-est-met-item">Total intereses: <strong id="estAvalanchaIntereses">$ 0</strong></div>
+                    <div class="gd-est-met-item" style="grid-column: span 2;">Ahorro estimado en intereses: <strong id="estAvalanchaAhorro" class="color-ingreso">$ 0</strong></div>
+                </div>
+            </div>
+
+            <!-- Estrategia Bola de Nieve -->
+            <div class="gd-estrategia-box" id="boxBolaNieve">
+                <span class="gd-estrategia-tag hidden" id="tagMejorNieve">Recomendada</span>
+                <div class="gd-estrategia-titulo">
+                    <i class="fa-solid fa-snowflake" style="color: #0284c7;"></i>
+                    <span>Método Bola de Nieve (Menor Saldo)</span>
+                </div>
+                <p class="gd-estrategia-desc">Paga primero la deuda con el saldo más pequeño para liquidarla rápido. Brinda victorias psicológicas tempranas que motivan a continuar.</p>
+                <div class="gd-estrategia-metricas">
+                    <div class="gd-est-met-item">Tiempo libre de deuda: <strong id="estNieveMeses">0 meses</strong></div>
+                    <div class="gd-est-met-item">Total intereses: <strong id="estNieveIntereses">$ 0</strong></div>
+                    <div class="gd-est-met-item" style="grid-column: span 2;">Ahorro estimado en intereses: <strong id="estNieveAhorro" class="color-ingreso">$ 0</strong></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Consejos Dinámicos y Recomendaciones -->
+    <section aria-label="Consejos y recomendaciones">
+        <h2 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 1rem;"><i class="fa-solid fa-lightbulb color-esmeralda"></i> Recomendaciones Personalizadas de Amortización</h2>
+        <div class="gd-consejos-grid" id="contenedorConsejos">
+            <!-- Tarjetas de consejos inyectadas dinámicamente -->
+        </div>
+    </section>
+
+    <!-- Disclaimer Educativo -->
+    <p class="gd-disclaimer">
+        * Las proyecciones y simulaciones presentadas son estimaciones con fines educativos e informativos sobre planeación financiera. No constituyen una oferta contractual ni asesoría legal vinculante. Las tasas y condiciones reales dependen del contrato con cada entidad emisora.
+    </p>
+
+</div>
