@@ -9,7 +9,7 @@ public class GestorPrestamos {
 
     // Tasas de interés mensuales según el frontend
     public final double TASA_LIBRE = 0.018;
-    public final double TASA_VEHIVULO = 0.0138;
+    public final double TASA_VEHICULO = 0.0138;
     public final double TASA_HIPOTECARIO = 0.0110;
 
     public GestorPrestamos() {
@@ -20,7 +20,7 @@ public class GestorPrestamos {
         return prestamos;
     }
 
-    // Fórmula matemática de cuota fija (Amortización)
+    // Fórmula matemática de cuota fija (Amortización sistema francés)
     public double calcularCuota(double monto, int meses, double tasaMensual) {
         if (monto <= 0 || meses <= 0) return 0;
         double numerador = tasaMensual * Math.pow(1 + tasaMensual, meses);
@@ -29,45 +29,67 @@ public class GestorPrestamos {
         return Math.round(cuota);
     }
 
+    // Calcular saldo de capital restante según tabla de amortización
+    public double calcularSaldoCapital(double monto, int meses, double tasaMensual, int cuotasPagadas) {
+        if (monto <= 0 || meses <= 0) return 0;
+        if (cuotasPagadas >= meses) return 0;
+        if (cuotasPagadas <= 0) return Math.round(monto);
+
+        double cuota = calcularCuota(monto, meses, tasaMensual);
+        double saldo = monto;
+
+        for (int c = 1; c <= cuotasPagadas; c++) {
+            double interes = saldo * tasaMensual;
+            double abonoCapital = cuota - interes;
+            saldo -= abonoCapital;
+        }
+
+        return Math.max(0, Math.round(saldo));
+    }
+
     // Evaluar viabilidad del crédito según el monto
     public String evaluarViabilidad(double monto) {
-        if  (monto <= 5000000) {
+        if (monto <= 5000000) {
             return "APROBADO";
-        } else if  (monto <= 30000000) {
+        } else if (monto <= 30000000) {
             return "EN REVISIÓN";
         } else {
             return "RECHAZADO";
         }
     }
 
-    // Registrar solicitud de préstamo
-    public String solicitarPrestamo(double monto, int meses, String concepto, String tipoId) {
+    // Registrar solicitud de préstamo (incluyendo rechazadas para trazabilidad de historial)
+    public String solicitarPrestamo(double monto, int meses, String concepto, String tipoId, String usuario) {
         double tasaEM = TASA_LIBRE;
         String tasaTexto = "1.8% Mensual (24% E.A.)";
 
         if (tipoId.equalsIgnoreCase("vehiculo")) {
-            tasaEM = TASA_VEHIVULO;
+            tasaEM = TASA_VEHICULO;
             tasaTexto = "1.38% Mensual (18% E.A.)";
         } else if (tipoId.equalsIgnoreCase("hipotecario")) {
             tasaEM = TASA_HIPOTECARIO;
             tasaTexto = "1.10% Mensual (14% E.A.)";
         }
 
-        double cuota = calcularCuota(monto,meses,tasaEM);
+        double cuota = calcularCuota(monto, meses, tasaEM);
         String estadoEval = evaluarViabilidad(monto);
 
-        if (estadoEval.equals("RECHAZADO")) {
-            return "❌ Solicitud rechazada: El monto excede el límite máximo autorizado ($ 30.000.000 COP).";
-        }
-
-        // Generar un radicado automático de prueba
+        // Generar un radicado automático
         String radicado = "PRES-202611-" + (1000 + new Random().nextInt(9000));
         boolean esAprobado = estadoEval.equals("APROBADO");
 
-        Prestamos nuevo = new Prestamos(radicado, monto, meses, cuota, tasaTexto, estadoEval, concepto, tipoId, esAprobado);
-        prestamos.add(0,nuevo);
+        Prestamos nuevo = new Prestamos(radicado, monto, meses, cuota, tasaTexto, estadoEval, concepto, tipoId, esAprobado, usuario);
+        prestamos.add(0, nuevo);
+
+        if (estadoEval.equals("RECHAZADO")) {
+            return "❌ Solicitud rechazada pero registrada (Radicado: " + radicado + ").\n   - Motivo: El monto excede el cupo máximo autorizado ($ 30.000.000 COP).";
+        }
 
         return "✅ Solicitud registrada con éxito.\n   - Radicado: " + radicado + "\n   - Estado: " + estadoEval + "\n   - Cuota Mensual: $" + cuota;
+    }
+
+    public String solicitarPrestamo(double monto, int meses, String concepto, String tipoId) {
+        return solicitarPrestamo(monto, meses, concepto, tipoId, "usuario_demo");
     }
 
     // Buscar préstamo por número de radicado
