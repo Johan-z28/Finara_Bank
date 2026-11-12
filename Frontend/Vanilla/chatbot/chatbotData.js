@@ -1,5 +1,53 @@
 // Base de conocimiento: textos predefinidos. No contiene datos personales.
 // 'vista' es una clave que existe en el mapa de vistas de Global/app.js.
+
+export const CONVENIOS_SERVICIOS = [
+  {
+    id: 'energia',
+    categoria: '💡 Energía Eléctrica',
+    icono: 'fa-bolt',
+    empresas: ['Enel Colombia', 'EPM', 'Celsia', 'Air-e'],
+    dondeEstaReferencia: 'En el encabezado superior derecho de tu factura física o virtual, bajo "Número de cuenta o referencia de pago" (8 a 10 dígitos).',
+    ejemploReferencia: '20489102-1',
+    longitudReferencia: '8 a 10 dígitos numéricos',
+    tiempoAcreditacion: 'Inmediata o hasta 2 horas hábiles.',
+    requisitos: 'Tener una Cuenta de Ahorros o Corriente activa con saldo disponible y factura sin fecha de corte vencida.'
+  },
+  {
+    id: 'agua',
+    categoria: '💧 Agua y Alcantarillado',
+    icono: 'fa-droplet',
+    empresas: ['Acueducto de Bogotá', 'EPM Agua', 'Triple A', 'Emcali'],
+    dondeEstaReferencia: 'En la sección central bajo el código de barras, rotulada como "Referencia de Pago / Contrato" (10 dígitos).',
+    ejemploReferencia: '1098234501',
+    longitudReferencia: '10 dígitos numéricos',
+    tiempoAcreditacion: 'Mismo día hábil.',
+    requisitos: 'Verificar el número de contrato/instalación antes de confirmar el pago en la pasarela.'
+  },
+  {
+    id: 'gas',
+    categoria: '🔥 Gas Natural',
+    icono: 'fa-fire-flame-simple',
+    empresas: ['Vanti', 'Gases del Caribe', 'Efigas'],
+    dondeEstaReferencia: 'Ubicada debajo del cupón de pago con el nombre "Referencia de Recaudo" o número de factura.',
+    ejemploReferencia: '78401923',
+    longitudReferencia: '7 a 9 dígitos numéricos',
+    tiempoAcreditacion: 'Inmediata.',
+    requisitos: 'Pagar con al menos 24 horas de antelación a la fecha de suspensión para evitar cargos por reconexión.'
+  },
+  {
+    id: 'telecom',
+    categoria: '📱 Internet y Telefonía',
+    icono: 'fa-wifi',
+    empresas: ['Claro', 'Movistar', 'Tigo', 'ETB'],
+    dondeEstaReferencia: 'Tu número de cuenta o "Referencia de pago electrónico" indicada al frente del resumen de facturación.',
+    ejemploReferencia: '883920145',
+    longitudReferencia: '8 a 12 dígitos',
+    tiempoAcreditacion: 'Inmediata (restablecimiento de servicio en máx. 30 minutos).',
+    requisitos: 'Disponible para líneas hogar, postpago móvil y fibra óptica empresarial.'
+  }
+];
+
 export const CATEGORIAS = [
   { id: 'seguridad', titulo: '🔒 Seguridad y acceso', introduccion: '¿En qué necesitas ayuda?', temas: [
     { id: 'bloqueo', titulo: 'Me robaron o perdí mi tarjeta', respuesta: 'Si perdiste tu tarjeta o sospechas de un robo, bloquea la tarjeta cuanto antes desde la opción de bloqueo de tu producto, si está habilitada. Si no encuentras esa opción, utiliza exclusivamente los canales oficiales del banco. Nunca compartas claves ni códigos por el chat.', vista: 'saldos', etiqueta: 'Ir a mis productos', hu: 'HU-25' },
@@ -9,14 +57,14 @@ export const CATEGORIAS = [
     { id: 'saldos', titulo: 'Consultar mis saldos', respuesta: 'Puedes revisar tus productos en Dashboard y consultar los detalles en Mis Cuentas / Saldos. Para proteger tu información, no mostraré aquí cifras privadas.', vista: 'saldos', etiqueta: 'Ir a mis cuentas', hu: 'HU-24 (consulta de saldo)' },
     { id: 'tarjeta-educacion', titulo: 'Entender mi tarjeta de crédito', respuesta: 'La fecha de corte cierra un período de compras; la fecha límite indica hasta cuándo pagar. El cupo disponible es el límite autorizado menos el cupo utilizado y otros ajustes que correspondan. Pagar el total facturado antes de la fecha límite suele evitar intereses sobre compras, sujeto a las condiciones del producto. Consulta siempre las condiciones de tu tarjeta.', vista: 'saldos', etiqueta: 'Ver mis productos', hu: 'HU-29' },
     { id: 'beneficiarios', titulo: 'Eliminar un beneficiario', respuesta: 'Revisa la sección de beneficiarios dentro del módulo correspondiente. Si existe la opción Eliminar, verifica el destinatario y confirma. Si la funcionalidad aún no está implementada, el asistente no puede realizar el cambio.', vista: 'transferencias', etiqueta: 'Ir a transferencias', hu: 'HU-09' },
-    { id: 'beneficios', titulo: 'Beneficios de mis productos', respuesta: 'Los beneficios dependen del producto y las condiciones vigentes. Consulta la sección de beneficios cuando esté habilitada; el chatbot no puede prometer promociones ni beneficios específicos sin verificarlos.', hu: 'HU-08' },
+    { id: 'beneficios', titulo: 'Beneficios de mis productos', respuesta: 'Los beneficios dependen del producto y las condiciones vigentes. Consulta la sección de beneficios cuando esté habilitada; el chatbot no puede prometer promociones ni beneficios específicos sin verificarlos.', vista: 'beneficios', etiqueta: 'Ver mis beneficios', hu: 'HU-08' },
   ]},
   { id: 'operaciones', titulo: '💸 Transferencias y pagos', introduccion: '¿Qué operación quieres aprender a realizar?', temas: [
     { id: 'transferencia', titulo: 'Cómo realizar una transferencia', respuesta: '1. Abre Transferencias. 2. Selecciona la cuenta de origen. 3. Ingresa y verifica los datos del destinatario. 4. Indica el importe. 5. Revisa cuidadosamente el resumen y confirma únicamente desde el formulario oficial de Finara.', vista: 'transferencias', etiqueta: 'Ir a transferencias', hu: 'HU-35' },
     { id: 'interbancaria', titulo: 'Transferencia a otro banco', respuesta: 'Una transferencia interbancaria requiere verificar el banco de destino, tipo y número de cuenta, beneficiario y monto. Antes de confirmar, revisa los costos o comisiones informados. Si esta funcionalidad todavía no existe en tu versión de Finara, no se puede completar desde este asistente.', vista: 'transferencias', etiqueta: 'Ver módulo de transferencias', hu: 'HU-07' },
     { id: 'consignar', titulo: 'Cómo realizar una consignación', respuesta: 'Abre Consignar, identifica la cuenta receptora, introduce el monto y revisa la información antes de confirmar. La disponibilidad depende de las funciones habilitadas en Finara.', vista: 'consignar', etiqueta: 'Ir a consignar' },
     { id: 'retiros', titulo: 'Cómo realizar un retiro', respuesta: 'Abre Retiros y revisa las opciones habilitadas. Nunca compartas tu clave o códigos de validación mediante el chat.', vista: 'retiros', etiqueta: 'Ir a retiros' },
-    { id: 'servicios', titulo: 'Cómo pagar servicios', respuesta: 'Cuando el módulo de Pago de servicios esté disponible: 1. Busca el convenio o empresa. 2. Digita la referencia de la factura. 3. Verifica el importe presentado. 4. Selecciona la cuenta y confirma en el módulo oficial. El asistente no procesa pagos directamente.', hu: 'HU-39 / HU-10' },
+    { id: 'servicios', titulo: '💡 Guía de Pago de Servicios Públicos y Privados', respuesta: 'Iniciaremos el asistente interactivo paso a paso para pago de servicios.', esFlujoServicios: true, hu: 'HU-39 / HU-10' },
     { id: 'movimientos', titulo: 'Revisar mis movimientos', respuesta: 'Puedes consultar el historial de operaciones desde Movimientos. Allí podrás verificar los registros que Finara tenga disponibles.', vista: 'movimientos', etiqueta: 'Ir a movimientos' },
   ]},
   { id: 'creditos', titulo: '🏦 Préstamos y crédito', introduccion: '¿Qué deseas consultar?', temas: [
