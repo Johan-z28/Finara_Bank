@@ -1,0 +1,876 @@
+/* ========================================================
+   ESTILOS PLANIFICACIÓN FINANCIERA MENSUAL (HU-30)
+   Paleta Esmeralda Finara Finanzas & Dark Glassmorphism
+   Prefijo: pf-
+   ======================================================== */
+
+:root {
+    --pf-primary: #10b981;
+    --pf-primary-dark: #059669;
+    --pf-primary-light: rgba(16, 185, 129, 0.12);
+    --pf-primary-border: rgba(16, 185, 129, 0.25);
+    --pf-primary-glow: rgba(16, 185, 129, 0.2);
+
+    --pf-bg-card: #ffffff;
+    --pf-bg-card-dark: #0d111a;
+    --pf-bg-surface: #f8fafc;
+    --pf-border-color: #e2e8f0;
+    --pf-text-title: #0f172a;
+    --pf-text-body: #334155;
+    --pf-text-muted: #64748b;
+
+    --pf-status-green: #10b981;
+    --pf-status-green-bg: rgba(16, 185, 129, 0.12);
+    --pf-status-yellow: #f59e0b;
+    --pf-status-yellow-bg: rgba(245, 158, 11, 0.12);
+    --pf-status-red: #ef4444;
+    --pf-status-red-bg: rgba(239, 68, 68, 0.12);
+    --pf-status-blue: #0284c7;
+    --pf-status-blue-bg: rgba(2, 132, 199, 0.12);
+    --pf-status-gray: #94a3b8;
+    --pf-status-gray-bg: rgba(148, 163, 184, 0.12);
+}
+
+/* Contenedor General */
+.pf-container {
+    width: 100%;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3rem 1rem;
+    box-sizing: border-box;
+}
+
+/* Encabezado */
+.pf-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.pf-header-title-box h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--pf-text-title);
+    margin: 0 0 0.35rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.pf-header-title-box h1 i {
+    color: var(--pf-primary);
+}
+
+.pf-header-subtitle {
+    font-size: 0.92rem;
+    color: var(--pf-text-muted);
+    margin: 0;
+}
+
+/* Selector de Periodo */
+.pf-periodo-selector {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    background: var(--pf-bg-card-dark);
+    padding: 5px 8px;
+    border-radius: 14px;
+    border: 1px solid var(--pf-primary-border);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    gap: 6px;
+    user-select: none;
+}
+
+.pf-btn-periodo-nav {
+    background: transparent;
+    border: none;
+    color: var(--pf-primary);
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+.pf-btn-periodo-nav:hover {
+    background: var(--pf-primary-light);
+    color: #ffffff;
+}
+
+.pf-periodo-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 10px;
+    color: #f8fafc;
+    font-weight: 600;
+    font-size: 0.95rem;
+    background: rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.pf-periodo-display:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.pf-periodo-display i.fa-calendar-days {
+    color: var(--pf-primary);
+}
+
+.pf-btn-mes-hoy {
+    background: var(--pf-primary);
+    border: none;
+    color: #ffffff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.pf-btn-mes-hoy:hover {
+    background: var(--pf-primary-dark);
+}
+
+/* Pestañas de Vista (Plan vs Comparativa) */
+.pf-nav-tabs {
+    display: flex;
+    gap: 10px;
+    border-bottom: 2px solid var(--pf-border-color);
+    margin-bottom: 2rem;
+    padding-bottom: 0;
+}
+
+.pf-tab-btn {
+    background: transparent;
+    border: none;
+    padding: 0.75rem 1.25rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--pf-text-muted);
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.2s ease;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+}
+
+.pf-tab-btn:hover {
+    color: var(--pf-primary);
+}
+
+.pf-tab-btn.pf-tab-active {
+    color: var(--pf-primary);
+    border-bottom-color: var(--pf-primary);
+}
+
+/* Barra de Balance y Resumen en Vivo */
+.pf-balance-bar-card {
+    background: var(--pf-bg-card);
+    border-radius: 18px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--pf-border-color);
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.pf-balance-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.25rem;
+    align-items: center;
+}
+
+.pf-balance-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.pf-balance-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--pf-text-muted);
+}
+
+.pf-balance-value {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--pf-text-title);
+}
+
+.pf-balance-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    width: fit-content;
+}
+
+.pf-badge-equilibrado {
+    background: var(--pf-status-green-bg);
+    color: var(--pf-status-green);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.pf-badge-sobrante {
+    background: var(--pf-status-blue-bg);
+    color: var(--pf-status-blue);
+    border: 1px solid rgba(2, 132, 199, 0.3);
+}
+
+.pf-badge-deficit {
+    background: var(--pf-status-red-bg);
+    color: var(--pf-status-red);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.pf-badge-neutro {
+    background: var(--pf-status-gray-bg);
+    color: var(--pf-status-gray);
+    border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+/* Barra de Distribución Multi-Segmento */
+.pf-distribucion-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.pf-distribucion-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--pf-text-muted);
+    font-weight: 500;
+}
+
+.pf-distribucion-track {
+    height: 14px;
+    background: #e2e8f0;
+    border-radius: 999px;
+    overflow: hidden;
+    display: flex;
+    width: 100%;
+}
+
+.pf-distribucion-segment {
+    height: 100%;
+    transition: width 0.35s ease;
+    position: relative;
+}
+
+.pf-distribucion-leyenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 0.4rem;
+}
+
+.pf-leyenda-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    color: var(--pf-text-muted);
+}
+
+.pf-leyenda-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* Barra de Acciones del Plan */
+.pf-actions-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    margin-bottom: 2rem;
+}
+
+.pf-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.25rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.pf-btn-primary {
+    background: var(--pf-primary);
+    color: #ffffff;
+    box-shadow: 0 4px 14px var(--pf-primary-glow);
+}
+
+.pf-btn-primary:hover {
+    background: var(--pf-primary-dark);
+    transform: translateY(-1px);
+}
+
+.pf-btn-secondary {
+    background: #ffffff;
+    color: var(--pf-text-body);
+    border-color: var(--pf-border-color);
+}
+
+.pf-btn-secondary:hover {
+    background: var(--pf-bg-surface);
+    color: var(--pf-text-title);
+    border-color: #cbd5e1;
+}
+
+.pf-btn-danger-outline {
+    background: #ffffff;
+    color: var(--pf-status-red);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.pf-btn-danger-outline:hover {
+    background: var(--pf-status-red-bg);
+}
+
+/* Grid de Formulario de Planificación */
+.pf-plan-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 1.75rem;
+}
+
+@media (max-width: 992px) {
+    .pf-plan-form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.pf-section-card {
+    background: var(--pf-bg-card);
+    border-radius: 18px;
+    padding: 1.75rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--pf-border-color);
+}
+
+.pf-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--pf-border-color);
+}
+
+.pf-section-header h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--pf-text-title);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.pf-section-header h2 i {
+    color: var(--pf-primary);
+}
+
+.pf-section-total {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--pf-primary);
+}
+
+/* Filas de Categoría en el Planificador */
+.pf-category-rows-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.pf-category-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.85rem;
+    border-radius: 14px;
+    background: var(--pf-bg-surface);
+    border: 1px solid #edf2f7;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.pf-category-row:hover {
+    border-color: var(--pf-primary-border);
+    background: #ffffff;
+}
+
+.pf-category-icon-box {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    color: #ffffff;
+    flex-shrink: 0;
+}
+
+.pf-category-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.pf-category-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--pf-text-title);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pf-category-pct {
+    font-size: 0.8rem;
+    color: var(--pf-text-muted);
+}
+
+.pf-category-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 170px;
+}
+
+.pf-input-prefix {
+    position: absolute;
+    left: 12px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--pf-text-muted);
+    pointer-events: none;
+}
+
+.pf-input-number {
+    width: 100%;
+    padding: 0.55rem 0.75rem 0.55rem 1.9rem;
+    border-radius: 10px;
+    border: 1px solid var(--pf-border-color);
+    background: #ffffff;
+    font-family: inherit;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--pf-text-title);
+    text-align: right;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+}
+
+.pf-input-number:focus {
+    outline: none;
+    border-color: var(--pf-primary);
+    box-shadow: 0 0 0 3px var(--pf-primary-light);
+}
+
+/* Fila de Meta de Ahorro */
+.pf-ahorro-card {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(255, 255, 255, 0.9) 100%);
+    border: 1px dashed var(--pf-primary);
+    border-radius: 14px;
+    padding: 1rem 1.25rem;
+    margin-top: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.pf-ahorro-info {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.pf-ahorro-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--pf-primary);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.pf-ahorro-text h3 {
+    margin: 0;
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--pf-text-title);
+}
+
+.pf-ahorro-text p {
+    margin: 0.2rem 0 0 0;
+    font-size: 0.82rem;
+    color: var(--pf-text-muted);
+}
+
+/* ========================================================
+   VISTA COMPARATIVA (PLAN VS REAL)
+   ======================================================== */
+
+.pf-comparativa-section {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* Tarjetas de Resumen Comparativo */
+.pf-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.25rem;
+}
+
+.pf-kpi-card {
+    background: var(--pf-bg-card);
+    border-radius: 16px;
+    padding: 1.35rem;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--pf-border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.pf-kpi-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pf-kpi-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--pf-text-muted);
+    text-transform: uppercase;
+}
+
+.pf-kpi-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+.pf-kpi-main-value {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--pf-text-title);
+}
+
+.pf-kpi-details {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed var(--pf-border-color);
+    color: var(--pf-text-muted);
+}
+
+/* Banner de Alerta de Ritmo */
+.pf-banner-ritmo {
+    background: #ffffff;
+    border-left: 5px solid var(--pf-status-yellow);
+    border-radius: 14px;
+    padding: 1.2rem 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.pf-banner-ritmo i {
+    font-size: 1.4rem;
+    color: var(--pf-status-yellow);
+    margin-top: 2px;
+}
+
+.pf-banner-ritmo-text h4 {
+    margin: 0 0 0.25rem 0;
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--pf-text-title);
+}
+
+.pf-banner-ritmo-text p {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--pf-text-body);
+}
+
+/* Contenedor de Mensajes Automáticos */
+.pf-mensajes-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.pf-mensaje-card {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.9rem 1.25rem;
+    border-radius: 12px;
+    font-size: 0.88rem;
+    font-weight: 500;
+}
+
+.pf-msg-alerta {
+    background: var(--pf-status-red-bg);
+    color: #991b1b;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.pf-msg-advertencia {
+    background: var(--pf-status-yellow-bg);
+    color: #92400e;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.pf-msg-info {
+    background: var(--pf-status-blue-bg);
+    color: #075985;
+    border: 1px solid rgba(2, 132, 199, 0.2);
+}
+
+.pf-msg-exito {
+    background: var(--pf-status-green-bg);
+    color: #065f46;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+/* Tabla Comparativa */
+.pf-table-wrapper {
+    background: var(--pf-bg-card);
+    border-radius: 18px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--pf-border-color);
+    overflow: hidden;
+}
+
+.pf-table-scroll {
+    overflow-x: auto;
+}
+
+.pf-comparativa-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.pf-comparativa-table th {
+    background: var(--pf-bg-surface);
+    color: var(--pf-text-muted);
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--pf-border-color);
+    white-space: nowrap;
+}
+
+.pf-comparativa-table td {
+    padding: 1.1rem 1.25rem;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.92rem;
+    color: var(--pf-text-body);
+    vertical-align: middle;
+}
+
+.pf-comparativa-table tr:last-child td {
+    border-bottom: none;
+}
+
+.pf-comparativa-table tr:hover td {
+    background: #fbfcfe;
+}
+
+.pf-table-category-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+    color: var(--pf-text-title);
+}
+
+.pf-table-category-cell i {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.pf-progress-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 130px;
+}
+
+.pf-table-progress-track {
+    height: 7px;
+    background: #e2e8f0;
+    border-radius: 999px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.pf-table-progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.3s ease;
+}
+
+/* Badges de Estado */
+.pf-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.pf-status-badge.status-dentro {
+    background: var(--pf-status-green-bg);
+    color: var(--pf-status-green);
+}
+
+.pf-status-badge.status-limite {
+    background: var(--pf-status-yellow-bg);
+    color: var(--pf-status-yellow);
+}
+
+.pf-status-badge.status-excedido {
+    background: var(--pf-status-red-bg);
+    color: var(--pf-status-red);
+}
+
+.pf-status-badge.status-sin_plan {
+    background: var(--pf-status-gray-bg);
+    color: var(--pf-status-gray);
+}
+
+.pf-status-badge.status-neutro {
+    background: #f1f5f9;
+    color: #94a3b8;
+}
+
+/* Estado Vacío */
+.pf-empty-state-card {
+    background: var(--pf-bg-card);
+    border-radius: 18px;
+    padding: 3.5rem 1.5rem;
+    text-align: center;
+    border: 1px dashed var(--pf-border-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.pf-empty-icon {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: var(--pf-primary-light);
+    color: var(--pf-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+.pf-empty-state-card h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--pf-text-title);
+}
+
+.pf-empty-state-card p {
+    margin: 0;
+    max-width: 480px;
+    font-size: 0.92rem;
+    color: var(--pf-text-muted);
+}
+
+/* Utilidades de Texto */
+.pf-text-right {
+    text-align: right;
+}
+
+.pf-text-bold {
+    font-weight: 700;
+}
+
+.pf-color-positive {
+    color: var(--pf-primary) !important;
+}
+
+.pf-color-negative {
+    color: var(--pf-status-red) !important;
+}
+
+.pf-color-neutral {
+    color: var(--pf-text-muted) !important;
+}
+
+.pf-hidden {
+    display: none !important;
+}

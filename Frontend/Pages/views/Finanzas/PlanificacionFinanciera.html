@@ -1,0 +1,284 @@
+<!-- ======= VISTA DE PLANIFICACIÓN FINANCIERA MENSUAL (HU-30) ======= -->
+<div class="pf-container">
+    <!-- Encabezado con título y selector de periodo -->
+    <header class="pf-header">
+        <div class="pf-header-title-box">
+            <h1>
+                <i class="fa-solid fa-calendar-check"></i>
+                Planificación Financiera
+            </h1>
+            <p class="pf-header-subtitle">
+                Diseña tu presupuesto mensual por categoría, fija metas de ahorro y monitorea tu ejecución real.
+            </p>
+        </div>
+
+        <!-- Selector de Periodo Mensual -->
+        <div class="pf-periodo-selector">
+            <button type="button" class="pf-btn-periodo-nav" id="btnPfMesAnterior" title="Mes anterior">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
+            <div class="pf-periodo-display" id="pfPeriodoDisplay">
+                <i class="fa-regular fa-calendar-days"></i>
+                <span id="pfPeriodoTextoLabel">Mes Actual</span>
+            </div>
+
+            <button type="button" class="pf-btn-periodo-nav" id="btnPfMesSiguiente" title="Mes siguiente">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+
+            <button type="button" class="pf-btn-mes-hoy" id="btnPfMesHoy" title="Ir al mes actual">
+                Hoy
+            </button>
+
+            <input type="hidden" id="pfPeriodoInput" value="">
+        </div>
+    </header>
+
+    <!-- Pestañas de Navegación Interna -->
+    <nav class="pf-nav-tabs">
+        <button type="button" class="pf-tab-btn pf-tab-active" id="tabBtnPlanificador">
+            <i class="fa-solid fa-pen-ruler"></i>
+            Planificador Mensual
+        </button>
+        <button type="button" class="pf-tab-btn" id="tabBtnComparativa">
+            <i class="fa-solid fa-chart-pie"></i>
+            Comparativa vs. Real
+        </button>
+    </nav>
+
+    <!-- ==========================================
+         VISTA 1: PLANIFICADOR MENSUAL
+         ========================================== -->
+    <div id="pfVistaPlanificador">
+        <!-- Tarjeta de Balance en Vivo y Barra de Distribución -->
+        <section class="pf-balance-bar-card">
+            <div class="pf-balance-summary-grid">
+                <div class="pf-balance-item">
+                    <span class="pf-balance-label">Ingresos Estimados</span>
+                    <span class="pf-balance-value pf-color-positive" id="pfResumenIngresos">$ 0</span>
+                </div>
+                <div class="pf-balance-item">
+                    <span class="pf-balance-label">Total Asignado</span>
+                    <span class="pf-balance-value" id="pfResumenAsignado">$ 0</span>
+                </div>
+                <div class="pf-balance-item">
+                    <span class="pf-balance-label">Meta de Ahorro</span>
+                    <span class="pf-balance-value" id="pfResumenAhorro">$ 0</span>
+                </div>
+                <div class="pf-balance-item">
+                    <span class="pf-balance-label">Saldo por Asignar</span>
+                    <div id="pfBadgeSaldoContainer">
+                        <span class="pf-balance-badge pf-badge-neutro" id="pfBadgeSaldo">
+                            <i class="fa-solid fa-circle-notch"></i>
+                            $ 0
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Barra Multi-Segmento de Distribución -->
+            <div class="pf-distribucion-wrapper">
+                <div class="pf-distribucion-header">
+                    <span>Distribución del Plan</span>
+                    <span id="pfDistPctTotal">0% Asignado</span>
+                </div>
+                <div class="pf-distribucion-track" id="pfBarraDistribucion">
+                    <!-- Segmentos inyectados dinámicamente -->
+                </div>
+                <div class="pf-distribucion-leyenda" id="pfLeyendaDistribucion">
+                    <!-- Leyenda inyectada dinámicamente -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Barra de Acciones del Planificador -->
+        <div class="pf-actions-bar">
+            <button type="button" class="pf-btn pf-btn-secondary" id="btnPfCopiarMesAnterior" title="Copiar asignaciones del mes previo">
+                <i class="fa-solid fa-copy"></i>
+                Copiar mes anterior
+            </button>
+            <button type="button" class="pf-btn pf-btn-secondary" id="btnPfImportarPresupuesto" title="Importar rubros registrados en Presupuestos">
+                <i class="fa-solid fa-file-import"></i>
+                Importar de Presupuestos
+            </button>
+            <button type="button" class="pf-btn pf-btn-danger-outline" id="btnPfLimpiarPlan" title="Borrar datos del plan para este mes">
+                <i class="fa-solid fa-trash-can"></i>
+                Limpiar plan
+            </button>
+            <button type="button" class="pf-btn pf-btn-primary" id="btnPfGuardarPlan" title="Guardar cambios del plan">
+                <i class="fa-solid fa-floppy-disk"></i>
+                Guardar plan
+            </button>
+        </div>
+
+        <!-- Formulario Grid: Ingresos y Asignaciones -->
+        <div class="pf-plan-form-grid">
+            <!-- Columna Izquierda: Ingresos Estimados -->
+            <div class="pf-section-card">
+                <div class="pf-section-header">
+                    <h2>
+                        <i class="fa-solid fa-money-bill-trend-up"></i>
+                        Ingresos Estimados
+                    </h2>
+                    <span class="pf-section-total" id="pfTotalIngresosCol">$ 0</span>
+                </div>
+                <div class="pf-category-rows-container" id="pfContenedorIngresos">
+                    <!-- Inyectado dinámicamente según CATEGORIAS_INGRESO -->
+                </div>
+            </div>
+
+            <!-- Columna Derecha: Asignaciones de Gastos por Categoría -->
+            <div class="pf-section-card">
+                <div class="pf-section-header">
+                    <h2>
+                        <i class="fa-solid fa-tags"></i>
+                        Asignaciones de Gastos
+                    </h2>
+                    <span class="pf-section-total" id="pfTotalAsignacionesCol">$ 0</span>
+                </div>
+                <div class="pf-category-rows-container" id="pfContenedorAsignaciones">
+                    <!-- Inyectado dinámicamente según CATEGORIAS_GASTO -->
+                </div>
+
+                <!-- Meta de Ahorro Mensual -->
+                <div class="pf-ahorro-card">
+                    <div class="pf-ahorro-info">
+                        <div class="pf-ahorro-icon">
+                            <i class="fa-solid fa-piggy-bank"></i>
+                        </div>
+                        <div class="pf-ahorro-text">
+                            <h3>Meta de Ahorro Mensual</h3>
+                            <p>Monto que planeas reservar este mes para tus fondos o metas.</p>
+                        </div>
+                    </div>
+                    <div class="pf-category-input-wrapper">
+                        <span class="pf-input-prefix">$</span>
+                        <input type="number"
+                               class="pf-input-number"
+                               id="pfInputMetaAhorro"
+                               placeholder="0"
+                               min="0"
+                               step="any"
+                               aria-label="Meta de Ahorro Mensual">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         VISTA 2: COMPARATIVA PLAN VS. REAL
+         ========================================== -->
+    <div id="pfVistaComparativa" class="pf-comparativa-section pf-hidden">
+        <!-- Estado Vacío (si no hay plan guardado) -->
+        <div class="pf-empty-state-card pf-hidden" id="pfComparativaEmptyState">
+            <div class="pf-empty-icon">
+                <i class="fa-solid fa-clipboard-question"></i>
+            </div>
+            <h3>Sin plan guardado para este mes</h3>
+            <p>
+                Aún no has diseñado tu plan presupuestal para el periodo seleccionado. Crea tu plan para comparar tus estimaciones con los movimientos bancarios reales.
+            </p>
+            <button type="button" class="pf-btn pf-btn-primary" id="btnPfCrearPlanDesdeEmpty">
+                <i class="fa-solid fa-plus"></i>
+                Crear plan de este mes
+            </button>
+        </div>
+
+        <!-- Contenedor Principal de la Comparativa -->
+        <div id="pfComparativaContenido">
+            <!-- Grid de KPIs Resumen -->
+            <div class="pf-kpi-grid">
+                <div class="pf-kpi-card">
+                    <div class="pf-kpi-top">
+                        <span class="pf-kpi-title">Ingresos</span>
+                        <div class="pf-kpi-icon" style="background: var(--pf-status-green-bg); color: var(--pf-status-green);">
+                            <i class="fa-solid fa-arrow-down-long"></i>
+                        </div>
+                    </div>
+                    <div class="pf-kpi-main-value" id="pfKpiIngresosReal">$ 0</div>
+                    <div class="pf-kpi-details">
+                        <span>Estimado: <strong id="pfKpiIngresosEst">$ 0</strong></span>
+                        <span id="pfKpiIngresosDif" class="pf-text-bold">$ 0</span>
+                    </div>
+                </div>
+
+                <div class="pf-kpi-card">
+                    <div class="pf-kpi-top">
+                        <span class="pf-kpi-title">Gastos Ejecutados</span>
+                        <div class="pf-kpi-icon" style="background: var(--pf-status-red-bg); color: var(--pf-status-red);">
+                            <i class="fa-solid fa-arrow-up-long"></i>
+                        </div>
+                    </div>
+                    <div class="pf-kpi-main-value" id="pfKpiGastosReal">$ 0</div>
+                    <div class="pf-kpi-details">
+                        <span>Planificado: <strong id="pfKpiGastosPlan">$ 0</strong></span>
+                        <span id="pfKpiGastosDif" class="pf-text-bold">$ 0</span>
+                    </div>
+                </div>
+
+                <div class="pf-kpi-card">
+                    <div class="pf-kpi-top">
+                        <span class="pf-kpi-title">Ahorro Neto Real</span>
+                        <div class="pf-kpi-icon" style="background: var(--pf-status-blue-bg); color: var(--pf-status-blue);">
+                            <i class="fa-solid fa-vault"></i>
+                        </div>
+                    </div>
+                    <div class="pf-kpi-main-value" id="pfKpiAhorroReal">$ 0</div>
+                    <div class="pf-kpi-details">
+                        <span>Meta planificada: <strong id="pfKpiAhorroPlan">$ 0</strong></span>
+                        <span id="pfKpiAhorroDif" class="pf-text-bold">$ 0</span>
+                    </div>
+                </div>
+
+                <div class="pf-kpi-card">
+                    <div class="pf-kpi-top">
+                        <span class="pf-kpi-title">Cumplimiento del Plan</span>
+                        <div class="pf-kpi-icon" style="background: var(--pf-primary-light); color: var(--pf-primary);">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+                    </div>
+                    <div class="pf-kpi-main-value" id="pfKpiCumplimientoPct">0%</div>
+                    <div class="pf-kpi-details">
+                        <span id="pfKpiCumplimientoMsg">Dentro del límite</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Banner de Ritmo de Gasto (mes en curso) -->
+            <div id="pfBannerRitmoContainer">
+                <!-- Inyectado si aplica ritmo acelerado -->
+            </div>
+
+            <!-- Mensajes y Asesoría Automática -->
+            <div class="pf-mensajes-container" id="pfMensajesAsesoria">
+                <!-- Inyectado dinámicamente -->
+            </div>
+
+            <!-- Tabla Comparativa Detallada por Categoría -->
+            <div class="pf-table-wrapper">
+                <div class="pf-table-scroll">
+                    <table class="pf-comparativa-table">
+                        <thead>
+                            <tr>
+                                <th>Categoría</th>
+                                <th class="pf-text-right">Planificado</th>
+                                <th class="pf-text-right">Ejecutado Real</th>
+                                <th class="pf-text-right">Diferencia</th>
+                                <th>% Ejecución</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pfTablaComparativaBody">
+                            <!-- Inyectado dinámicamente -->
+                        </tbody>
+                        <tfoot id="pfTablaComparativaFooter">
+                            <!-- Totales inyectados dinámicamente -->
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

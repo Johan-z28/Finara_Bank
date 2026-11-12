@@ -75,6 +75,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 dashboard: 'views/finanzas/DashboardFinanzas.html',
                 fondoemergencia: 'views/Finanzas/FondoEmergencia.html',
                 presupuesto: 'views/Finanzas/Presupuesto.html',
+                planificacionfinanciera: 'views/Finanzas/PlanificacionFinanciera.html',
                 seguimiento: 'views/Finanzas/Seguimiento.html',
                 saludfinanciera: 'views/Finanzas/SaludFinanciera.html',
                 gestiondeudas: 'views/Finanzas/GestionDeudas.html',
@@ -99,6 +100,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                     break;
                 case "presupuesto":
                     try { const m = await import('../Finanzas/Presupuesto.js'); if (m.initPresupuestoView) await m.initPresupuestoView(); } catch (e) { }
+                    break;
+                case "planificacionfinanciera":
+                    try { const m = await import('../Finanzas/PlanificacionFinanciera.js'); if (m.initPlanificacionFinancieraView) await m.initPlanificacionFinancieraView(); } catch (e) { console.error(e); }
                     break;
                 case "seguimiento":
                     try { const m = await import('../Finanzas/Seguimiento.js'); if (m.initSeguimientoView) await m.initSeguimientoView(); } catch (e) { }
@@ -190,6 +194,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const preguntasFinanzas = [
             { id: "presupuesto", texto: "📊 ¿Cómo crear mi presupuesto 50/30/20?", respuesta: "Ingresa a **Presupuestos**, donde podrás distribuir tus ingresos en 50% Necesidades, 30% Deseos y 20% Ahorro." },
+            { id: "planificacion", texto: "📅 ¿Cómo funciona la Planificación Financiera mensual?", respuesta: "En **Planificación**, estimas tus ingresos, asignas montos por categoría y fijas una meta de ahorro. Además, podrás comparar en tiempo real lo planificado contra lo ejecutado en tus movimientos bancarios." },
             { id: "emergencia", texto: "🛡️ ¿Cuánto debo guardar en mi Fondo de Emergencia?", respuesta: "Lo ideal es acumular entre **3 y 6 meses** de tus gastos fijos mensuales. Puedes simularlo en la vista de **Fondo de Emergencia**." },
             { id: "deudas", texto: "⚖️ ¿Cómo evaluar mi nivel de endeudamiento?", respuesta: "Dirígete a **Gestión de Deudas**. Tu pago mensual de deudas no debería superar el **30% - 40%** de tus ingresos netos." },
             { id: "salud", texto: "💚 ¿Qué evalúa el indicador de Salud Financiera?", respuesta: "Analiza tu capacidad de ahorro, el nivel de endeudamiento, la liquidez y tu hábito de presupuesto en una sola calificación." }
