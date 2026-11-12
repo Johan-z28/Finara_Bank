@@ -76,6 +76,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 fondoemergencia: 'views/Finanzas/FondoEmergencia.html',
                 presupuesto: 'views/Finanzas/Presupuesto.html',
                 seguimiento: 'views/Finanzas/Seguimiento.html',
+                suscripcionespagos: 'views/Finanzas/SuscripcionesPagos.html',
                 saludfinanciera: 'views/Finanzas/SaludFinanciera.html',
                 gestiondeudas: 'views/Finanzas/GestionDeudas.html',
                 perfil: 'views/Perfil.html' // Comparte la vista del perfil de Finara
@@ -102,6 +103,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                     break;
                 case "seguimiento":
                     try { const m = await import('../Finanzas/Seguimiento.js'); if (m.initSeguimientoView) await m.initSeguimientoView(); } catch (e) { }
+                    break;
+                case "suscripcionespagos":
+                    try { const m = await import('../Finanzas/SuscripcionesPagos.js'); if (m.initSuscripcionesPagosView) await m.initSuscripcionesPagosView(); } catch (e) { console.error(e); }
                     break;
                 case "saludfinanciera":
                     try { const m = await import('../Finanzas/SaludFinanciera.js'); if (m.initSaludFinancieraView) await m.initSaludFinancieraView(); } catch (e) { }
@@ -191,6 +195,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const preguntasFinanzas = [
             { id: "presupuesto", texto: "📊 ¿Cómo crear mi presupuesto 50/30/20?", respuesta: "Ingresa a **Presupuestos**, donde podrás distribuir tus ingresos en 50% Necesidades, 30% Deseos y 20% Ahorro." },
             { id: "emergencia", texto: "🛡️ ¿Cuánto debo guardar en mi Fondo de Emergencia?", respuesta: "Lo ideal es acumular entre **3 y 6 meses** de tus gastos fijos mensuales. Puedes simularlo en la vista de **Fondo de Emergencia**." },
+            { id: "suscripciones", texto: "🔄 ¿Cómo controlo mis suscripciones y gastos hormiga?", respuesta: "Ingresa a **Seguimiento Financiero** para auditar tus suscripciones activas, calcular tu ahorro potencial al pausarlas y gestionar tu agenda de pagos del mes." },
             { id: "deudas", texto: "⚖️ ¿Cómo evaluar mi nivel de endeudamiento?", respuesta: "Dirígete a **Gestión de Deudas**. Tu pago mensual de deudas no debería superar el **30% - 40%** de tus ingresos netos." },
             { id: "salud", texto: "💚 ¿Qué evalúa el indicador de Salud Financiera?", respuesta: "Analiza tu capacidad de ahorro, el nivel de endeudamiento, la liquidez y tu hábito de presupuesto en una sola calificación." }
         ];
