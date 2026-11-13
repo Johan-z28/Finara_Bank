@@ -3,21 +3,14 @@ package presupuestos;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Servicio gestor para Presupuestos Mensuales y análisis de Regla 50/30/20 (HU-18 / HU-23).
+ * Servicio gestor para Elaboración de Presupuesto Mensual (HU-18 / HU-23).
+ * Alineado con la lógica de presupuestoService.js en el Frontend.
  */
 public class GestorPresupuestos {
-    private static final List<String> CATEGORIAS_NECESIDADES = Arrays.asList(
-            "vivienda", "alimentacion", "transporte", "educacion", "salud"
-    );
-    private static final List<String> CATEGORIAS_DESEOS = Arrays.asList(
-            "entretenimiento", "otros_gastos"
-    );
-
     private List<ItemPresupuesto> items;
     private AtomicInteger secuenciaId;
 
@@ -33,16 +26,11 @@ public class GestorPresupuestos {
         private int porcentajeGastado;
         private boolean esDeficit;
         private boolean esSuperavit;
+        private List<ItemPresupuesto> ingresos;
+        private List<ItemPresupuesto> gastos;
 
-        // Análisis Regla 50/30/20
-        private double necesidadesReal;
-        private double necesidadesIdeal50;
-        private double deseosReal;
-        private double deseosIdeal30;
-        private double ahorroReal;
-        private double ahorroIdeal20;
-
-        public ResumenPresupuesto(double totalIngresos, double totalGastos, double necesidadesReal, double deseosReal) {
+        public ResumenPresupuesto(double totalIngresos, double totalGastos,
+                                  List<ItemPresupuesto> ingresos, List<ItemPresupuesto> gastos) {
             this.totalIngresos = totalIngresos;
             this.totalGastos = totalGastos;
             this.saldoNeto = totalIngresos - totalGastos;
@@ -51,13 +39,8 @@ public class GestorPresupuestos {
                     : (totalGastos > 0 ? 100 : 0);
             this.esDeficit = this.saldoNeto < 0;
             this.esSuperavit = this.saldoNeto > 0;
-
-            this.necesidadesReal = necesidadesReal;
-            this.necesidadesIdeal50 = totalIngresos * 0.50;
-            this.deseosReal = deseosReal;
-            this.deseosIdeal30 = totalIngresos * 0.30;
-            this.ahorroReal = Math.max(0.0, this.saldoNeto);
-            this.ahorroIdeal20 = totalIngresos * 0.20;
+            this.ingresos = ingresos;
+            this.gastos = gastos;
         }
 
         public double getTotalIngresos() { return totalIngresos; }
@@ -66,13 +49,14 @@ public class GestorPresupuestos {
         public int getPorcentajeGastado() { return porcentajeGastado; }
         public boolean isEsDeficit() { return esDeficit; }
         public boolean isEsSuperavit() { return esSuperavit; }
+        public List<ItemPresupuesto> getIngresos() { return ingresos; }
+        public List<ItemPresupuesto> getGastos() { return gastos; }
 
-        public double getNecesidadesReal() { return necesidadesReal; }
-        public double getNecesidadesIdeal50() { return necesidadesIdeal50; }
-        public double getDeseosReal() { return deseosReal; }
-        public double getDeseosIdeal30() { return deseosIdeal30; }
-        public double getAhorroReal() { return ahorroReal; }
-        public double getAhorroIdeal20() { return ahorroIdeal20; }
+        public String getEstadoBalanceTexto() {
+            if (esDeficit) return "Déficit (Gastos superan ingresos)";
+            if (esSuperavit) return "Superávit disponible";
+            return "Balance equilibrado";
+        }
     }
 
     public String obtenerPeriodoActual() {
@@ -142,27 +126,22 @@ public class GestorPresupuestos {
 
     public ResumenPresupuesto calcularResumen(String username, String periodo) {
         List<ItemPresupuesto> lista = obtenerPorUsuarioYPeriodo(username, periodo);
+        List<ItemPresupuesto> ingresos = new ArrayList<>();
+        List<ItemPresupuesto> gastos = new ArrayList<>();
         double totalIngresos = 0.0;
         double totalGastos = 0.0;
-        double necesidades = 0.0;
-        double deseos = 0.0;
 
         for (ItemPresupuesto item : lista) {
             if ("INGRESO".equals(item.getTipo())) {
                 totalIngresos += item.getMonto();
+                ingresos.add(item);
             } else if ("GASTO".equals(item.getTipo())) {
                 totalGastos += item.getMonto();
-                if (CATEGORIAS_NECESIDADES.contains(item.getCategoria())) {
-                    necesidades += item.getMonto();
-                } else if (CATEGORIAS_DESEOS.contains(item.getCategoria())) {
-                    deseos += item.getMonto();
-                } else {
-                    deseos += item.getMonto();
-                }
+                gastos.add(item);
             }
         }
 
-        return new ResumenPresupuesto(totalIngresos, totalGastos, necesidades, deseos);
+        return new ResumenPresupuesto(totalIngresos, totalGastos, ingresos, gastos);
     }
 
     public ItemPresupuesto buscarPorId(String id) {

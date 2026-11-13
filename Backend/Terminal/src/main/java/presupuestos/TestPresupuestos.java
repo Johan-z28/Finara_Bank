@@ -3,37 +3,35 @@ package presupuestos;
 import java.util.List;
 
 /**
- * Pruebas unitarias básicas de consola para el módulo de Presupuestos 50/30/20 (HU-18 / HU-23).
+ * Pruebas unitarias básicas de consola para Elaboración de Presupuesto (HU-18 / HU-23).
  */
 public class TestPresupuestos {
     public static void main(String[] args) {
-        System.out.println("=== INICIANDO PRUEBAS DE PRESUPUESTOS 50/30/20 (HU-18) ===");
+        System.out.println("=== INICIANDO PRUEBAS DE ELABORACIÓN DE PRESUPUESTO (HU-18) ===");
         GestorPresupuestos gestor = new GestorPresupuestos();
         String usuario = "Juan";
         String periodo = "2026-11";
 
-        // 1. Registrar ingresos
-        ItemPresupuesto salario = gestor.crearItem(usuario, "INGRESO", "salario", "Salario mensual", 4000000, periodo);
+        // 1. Registrar ingreso estimado
+        ItemPresupuesto salario = gestor.crearItem(usuario, "INGRESO", "salario", "Salario principal", 4000000, periodo);
         assert salario.getId().startsWith("PRE-") : "Error en formato de ID";
-        System.out.println("[OK] Registro de ingreso");
+        System.out.println("[OK] Registro de ingreso estimado");
 
-        // 2. Registrar gastos (Necesidades y Deseos)
-        ItemPresupuesto arriendo = gestor.crearItem(usuario, "GASTO", "vivienda", "Arriendo apartamento", 1500000, periodo);
+        // 2. Registrar gastos presupuestados
+        ItemPresupuesto arriendo = gestor.crearItem(usuario, "GASTO", "vivienda", "Pago de arriendo", 1500000, periodo);
         gestor.crearItem(usuario, "GASTO", "alimentacion", "Mercado mensual", 500000, periodo);
-        gestor.crearItem(usuario, "GASTO", "entretenimiento", "Cine y streaming", 400000, periodo);
+        gestor.crearItem(usuario, "GASTO", "entretenimiento", "Cine y ocio", 400000, periodo);
 
-        // 3. Validar resumen y Regla 50/30/20
+        // 3. Validar métricas del Frontend (Ingresos, Gastos, Saldo Neto, % Uso y listas separadas)
         GestorPresupuestos.ResumenPresupuesto res = gestor.calcularResumen(usuario, periodo);
-        assert res.getTotalIngresos() == 4000000 : "Error en total ingresos";
-        assert res.getTotalGastos() == 2400000 : "Error en total gastos";
+        assert res.getTotalIngresos() == 4000000 : "Error en ingresos estimados";
+        assert res.getTotalGastos() == 2400000 : "Error en gastos planificados";
         assert res.getSaldoNeto() == 1600000 : "Error en saldo neto";
-        assert res.getPorcentajeGastado() == 60 : "Error en porcentaje gastado";
-        assert res.isEsSuperavit() : "Error en indicador de superávit";
-        assert res.getNecesidadesReal() == 2000000 : "Error en necesidades (50%)";
-        assert res.getNecesidadesIdeal50() == 2000000 : "Error en ideal 50%";
-        assert res.getDeseosReal() == 400000 : "Error en deseos (30%)";
-        assert res.getAhorroIdeal20() == 800000 : "Error en ideal 20%";
-        System.out.println("[OK] Cálculo de resumen presupuestal y Regla 50/30/20");
+        assert res.getPorcentajeGastado() == 60 : "Error en porcentaje consumido";
+        assert res.isEsSuperavit() : "Error en estado de superávit";
+        assert res.getIngresos().size() == 1 : "Error en listado de ingresos";
+        assert res.getGastos().size() == 3 : "Error en listado de gastos";
+        System.out.println("[OK] Cálculo de métricas, uso del presupuesto (60%) y listados separados");
 
         // 4. Actualizar un rubro
         gestor.actualizarItem(arriendo.getId(), null, null, "Arriendo + Administración", 1600000, periodo);
