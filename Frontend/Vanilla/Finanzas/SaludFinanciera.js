@@ -105,6 +105,23 @@ export function initSaludFinancieraView() {
 
             const inputEl = wrapper.querySelector('#chatInputVal');
 
+            if (paso.key === 'deudaTotal') {
+                try {
+                    const gdRaw = localStorage.getItem('finara_gestion_deudas');
+                    if (gdRaw) {
+                        const gd = JSON.parse(gdRaw);
+                        const activeUser = localStorage.getItem('userName') || 'maria17';
+                        const userGd = gd[activeUser] || Object.values(gd)[0];
+                        if (userGd && Array.isArray(userGd.obligaciones)) {
+                            const total = userGd.obligaciones.reduce((acc, o) => acc + (Number(o.saldoTotal) || 0), 0);
+                            if (total > 0 && !inputEl.value) {
+                                inputEl.value = total.toLocaleString('es-CO');
+                            }
+                        }
+                    }
+                } catch (e) { }
+            }
+
             inputEl.addEventListener('input', (e) => {
                 let val = e.target.value.replace(/\D/g, '');
                 if (val !== '') {

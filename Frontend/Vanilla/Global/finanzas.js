@@ -111,7 +111,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     try { const m = await import('../Finanzas/SaludFinanciera.js'); if (m.initSaludFinancieraView) await m.initSaludFinancieraView(); } catch (e) { }
                     break;
                 case "gestiondeudas":
-                    try { const m = await import('../Finanzas/GestionDeudas.js'); if (m.initGestionDeudasView) await m.initGestionDeudasView(); } catch (e) { }
+                    try { const m = await import('../Finanzas/GestionDeudas.js'); if (m.initGestionDeudasView) await m.initGestionDeudasView(); } catch (e) { console.error(e); }
                     break;
                 case "perfil":
                     try { const m = await import('../Perfil.js'); if (m.initPerfilView) await m.initPerfilView(); } catch (e) { }
@@ -195,6 +195,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const preguntasFinanzas = [
             { id: "presupuesto", texto: "📊 ¿Cómo crear mi presupuesto 50/30/20?", respuesta: "Ingresa a **Presupuestos**, donde podrás distribuir tus ingresos en 50% Necesidades, 30% Deseos y 20% Ahorro." },
             { id: "emergencia", texto: "🛡️ ¿Cuánto debo guardar en mi Fondo de Emergencia?", respuesta: "Lo ideal es acumular entre **3 y 6 meses** de tus gastos fijos mensuales. Puedes simularlo en la vista de **Fondo de Emergencia**." },
+            { id: "deudas", texto: "⚖️ ¿Cómo evaluar mi nivel de endeudamiento?", respuesta: "Dirígete a **Gestión de Deudas** para consolidar tus obligaciones, conocer tu porcentaje de endeudamiento y simular estrategias como Bola de Nieve o Avalancha." },
             { id: "suscripciones", texto: "🔄 ¿Cómo controlo mis suscripciones y gastos hormiga?", respuesta: "Ingresa a **Seguimiento Financiero** para auditar tus suscripciones activas, calcular tu ahorro potencial al pausarlas y gestionar tu agenda de pagos del mes." },
             { id: "deudas", texto: "⚖️ ¿Cómo evaluar mi nivel de endeudamiento?", respuesta: "Dirígete a **Gestión de Deudas**. Tu pago mensual de deudas no debería superar el **30% - 40%** de tus ingresos netos." },
             { id: "salud", texto: "💚 ¿Qué evalúa el indicador de Salud Financiera?", respuesta: "Analiza tu capacidad de ahorro, el nivel de endeudamiento, la liquidez y tu hábito de presupuesto en una sola calificación." }
