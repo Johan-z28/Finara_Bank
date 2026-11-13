@@ -1,0 +1,694 @@
+/* ==============================================================
+   ESTILOS SUSCRIPCIONES Y PAGOS PENDIENTES (HU-22 - FINARA FINANZAS)
+   Módulo: Seguimiento Financiero / Suscripciones y Pagos
+   Prefijo: sp-
+   ============================================================== */
+
+@import url('../global/styles_finanzas.css');
+
+/* Header principal */
+.sp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+    margin-bottom: 1.8rem;
+}
+
+.sp-header h1 {
+    font-size: 1.65rem;
+    font-weight: 700;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0.3rem;
+}
+
+.sp-header h1 i {
+    color: var(--finanzas-primary, #10b981);
+}
+
+.sp-subtitle {
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+/* Acciones del header (sync button) */
+.sp-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sp-btn-sync {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--finanzas-primary, #10b981);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.sp-btn-sync:hover {
+    background: rgba(16, 185, 129, 0.18);
+    transform: translateY(-1px);
+}
+
+/* ==============================================================
+   FILA DE KPIS DE IMPACTO RÁPIDO
+   ============================================================== */
+.sp-kpis-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.2rem;
+    margin-bottom: 2rem;
+}
+
+.sp-kpi-card {
+    background: #ffffff;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 16px;
+    padding: 1.3rem 1.4rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.sp-kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.07);
+}
+
+.sp-kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--finanzas-primary, #10b981);
+    border-radius: 4px 0 0 4px;
+}
+
+.sp-kpi-card.kpi-ahorro::before {
+    background: #059669;
+}
+
+.sp-kpi-card.kpi-alerta::before {
+    background: #f59e0b;
+}
+
+.sp-kpi-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    background: rgba(16, 185, 129, 0.12);
+    color: var(--finanzas-primary, #10b981);
+}
+
+.sp-kpi-card.kpi-ahorro .sp-kpi-icon {
+    background: rgba(5, 150, 105, 0.12);
+    color: #059669;
+}
+
+.sp-kpi-card.kpi-alerta .sp-kpi-icon {
+    background: rgba(245, 158, 11, 0.12);
+    color: #d97706;
+}
+
+.sp-kpi-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.sp-kpi-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.sp-kpi-valor {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sp-kpi-subtexto {
+    font-size: 0.78rem;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+.sp-kpi-subtexto strong {
+    color: var(--finanzas-primary, #10b981);
+    font-weight: 600;
+}
+
+/* ==============================================================
+   CONTENEDOR DE DOS PANELES (GRID 2 EN 1)
+   ============================================================== */
+.sp-paneles-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+}
+
+@media (min-width: 1080px) {
+    .sp-paneles-container {
+        grid-template-columns: 1fr 1fr;
+        align-items: start;
+    }
+}
+
+.sp-panel-card {
+    background: #ffffff;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 18px;
+    padding: 1.6rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+.sp-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    margin-bottom: 1.2rem;
+}
+
+.sp-panel-titulo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sp-panel-titulo h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.sp-panel-titulo .sp-panel-badge {
+    font-size: 0.72rem;
+    padding: 3px 8px;
+    border-radius: 20px;
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+    font-weight: 600;
+}
+
+.sp-panel-desc {
+    font-size: 0.83rem;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+/* ==============================================================
+   FORMULARIO DE ALTA RÁPIDA (SUSCRIPCIÓN & PAGO)
+   ============================================================== */
+.sp-form-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1.2rem;
+    margin-bottom: 1.5rem;
+}
+
+.sp-form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+}
+
+@media (min-width: 580px) {
+    .sp-form-grid-2 {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.sp-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.sp-form-group label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+.sp-form-input,
+.sp-form-select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    background: #ffffff;
+    color: #0f172a;
+    font-family: inherit;
+    font-size: 0.88rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.sp-form-input:focus,
+.sp-form-select:focus {
+    border-color: var(--finanzas-primary, #10b981);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+/* Previsualización en vivo de valores */
+.sp-live-preview {
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px dashed rgba(16, 185, 129, 0.35);
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin: 0.5rem 0 0.85rem 0;
+}
+
+.sp-preview-item {
+    font-size: 0.78rem;
+    color: #475569;
+}
+
+.sp-preview-item strong {
+    color: #059669;
+    font-weight: 700;
+}
+
+.sp-btn-submit {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+
+.sp-btn-submit:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+}
+
+/* ==============================================================
+   FILTROS Y BARRA DE HERRAMIENTAS
+   ============================================================== */
+.sp-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 1rem;
+}
+
+.sp-filtro-chips {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.sp-chip {
+    background: #f1f5f9;
+    color: #64748b;
+    border: 1px solid transparent;
+    padding: 4px 11px;
+    border-radius: 20px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.sp-chip:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.sp-chip.active {
+    background: rgba(16, 185, 129, 0.15);
+    color: #059669;
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+/* ==============================================================
+   LISTADO DE SUSCRIPCIONES (CARDS)
+   ============================================================== */
+.sp-suscripciones-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    max-height: 520px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.sp-suscripcion-item {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.sp-suscripcion-item:hover {
+    border-color: rgba(16, 185, 129, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.sp-suscripcion-item.is-top {
+    border-left: 4px solid #f59e0b;
+}
+
+.sp-suscripcion-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.sp-cat-icono {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: #f1f5f9;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.sp-suscripcion-meta {
+    min-width: 0;
+}
+
+.sp-suscripcion-titulo-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.sp-suscripcion-nombre {
+    font-weight: 600;
+    font-size: 0.92rem;
+    color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sp-tag-top {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: #fef3c7;
+    color: #b45309;
+    text-transform: uppercase;
+}
+
+.sp-suscripcion-detalles {
+    font-size: 0.76rem;
+    color: #64748b;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 2px;
+}
+
+.sp-suscripcion-right {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.sp-suscripcion-monto {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #0f172a;
+}
+
+.sp-suscripcion-anual {
+    font-size: 0.72rem;
+    color: #64748b;
+}
+
+/* Badges de estado */
+.sp-badge {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.sp-badge-activa {
+    background: #ecfdf5;
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.sp-badge-pausada {
+    background: #fffbeb;
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.sp-badge-cancelada {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Acciones por item */
+.sp-item-actions {
+    display: flex;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.sp-btn-action {
+    background: transparent;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: all 0.15s;
+}
+
+.sp-btn-action:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #cbd5e1;
+}
+
+.sp-btn-action.btn-pause:hover {
+    color: #d97706;
+    border-color: #d97706;
+    background: #fffbeb;
+}
+
+.sp-btn-action.btn-resume:hover {
+    color: #059669;
+    border-color: #059669;
+    background: #ecfdf5;
+}
+
+.sp-btn-action.btn-cancel:hover,
+.sp-btn-action.btn-delete:hover {
+    color: #dc2626;
+    border-color: #dc2626;
+    background: #fef2f2;
+}
+
+/* ==============================================================
+   TABLA DE AGENDA DE PAGOS PENDIENTES
+   ============================================================== */
+.sp-pagos-table-wrapper {
+    overflow-x: auto;
+    max-height: 520px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+}
+
+.sp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.84rem;
+    text-align: left;
+}
+
+.sp-table th {
+    background: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+    padding: 10px 14px;
+    border-bottom: 1px solid #e2e8f0;
+    white-space: nowrap;
+}
+
+.sp-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #0f172a;
+    vertical-align: middle;
+}
+
+.sp-table tr:hover td {
+    background: #f8fafc;
+}
+
+.sp-table tr.fila-pagada td {
+    opacity: 0.65;
+    background: #fcfcfc;
+}
+
+/* Semáforo de vencimiento */
+.sp-semaforo-badge {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+}
+
+.sp-semaforo-badge.al-dia {
+    background: #ecfdf5;
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.sp-semaforo-badge.proximo {
+    background: #fffbeb;
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.sp-semaforo-badge.vencido {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Etiqueta de origen automático Finara Bank */
+.sp-origen-tag {
+    font-size: 0.68rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 3px;
+}
+
+/* Resumen del mes en agenda */
+.sp-agenda-resumen {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.sp-agenda-resumen strong {
+    color: #0f172a;
+}
+
+/* Estado Vacío */
+.sp-empty-state {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: #94a3b8;
+}
+
+.sp-empty-state i {
+    font-size: 2.4rem;
+    color: #cbd5e1;
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+.sp-empty-state h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 4px;
+}
+
+.sp-empty-state p {
+    font-size: 0.8rem;
+    color: #64748b;
+}

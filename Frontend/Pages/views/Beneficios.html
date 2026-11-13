@@ -1,0 +1,74 @@
+<!-- Frontend/Pages/views/Beneficios.html -->
+<div class="beneficios-container">
+    <!-- HERO HEADER -->
+    <header class="beneficios-hero">
+        <div class="hero-content">
+            <span class="hero-pill"><i class="fa-solid fa-crown"></i> Programa Exclusivo</span>
+            <h2>Mis Beneficios y Recompensas Finara</h2>
+            <p>Descubre las ventajas exclusivas por usar tus productos financieros de Finara Bank. Redime promociones aliadas, acumula puntos y disfruta de beneficios en tus tarjetas y cuentas.</p>
+        </div>
+        <div class="hero-actions">
+            <button id="btnGirarRuleta" class="btn-hero-action">
+                <i class="fa-solid fa-dice"></i>
+                <span>Descubrir Nuevos Beneficios</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- BARRA DE MÉTRICAS / RESUMEN -->
+    <section class="beneficios-metrics-grid">
+        <div class="metric-card">
+            <div class="metric-icon-wrap icon-disponibles">
+                <i class="fa-solid fa-gift"></i>
+            </div>
+            <div class="metric-info">
+                <span>Beneficios Disponibles</span>
+                <strong id="statDisponibles">0</strong>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon-wrap icon-redimidos">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div class="metric-info">
+                <span>Beneficios Redimidos</span>
+                <strong id="statRedimidos">0</strong>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon-wrap icon-puntos">
+                <i class="fa-solid fa-coins"></i>
+            </div>
+            <div class="metric-info">
+                <span>Puntos Finara Estimados</span>
+                <strong id="statPuntos">0 pts</strong>
+            </div>
+        </div>
+    </section>
+
+    <!-- FILTROS RÁPIDOS POR CATEGORÍA -->
+    <nav class="beneficios-tabs-bar" id="tabsCategorias">
+        <button class="tab-pill active" data-categoria="TODOS">
+            <i class="fa-solid fa-border-all"></i> Todos
+        </button>
+        <button class="tab-pill" data-categoria="Cashback">
+            <i class="fa-solid fa-money-bill-wave"></i> Cashback
+        </button>
+        <button class="tab-pill" data-categoria="Descuento">
+            <i class="fa-solid fa-percent"></i> Descuentos
+        </button>
+        <button class="tab-pill" data-categoria="Puntos Finara">
+            <i class="fa-solid fa-coins"></i> Puntos Finara
+        </button>
+        <button class="tab-pill" data-categoria="Viajes">
+            <i class="fa-solid fa-plane-departure"></i> Viajes & Entretenimiento
+        </button>
+    </nav>
+
+    <!-- GRID DINÁMICO DE TARJETAS -->
+    <main class="beneficios-grid" id="gridBeneficios">
+        <!-- Tarjetas inyectadas dinámicamente desde Beneficios.js -->
+    </main>
+</div>
