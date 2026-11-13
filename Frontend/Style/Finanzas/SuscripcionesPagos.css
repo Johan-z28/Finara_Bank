@@ -73,8 +73,8 @@
 }
 
 .sp-kpi-card {
-    background: #ffffff;
-    border: 1px solid rgba(16, 185, 129, 0.2);
+    background: #111318;
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 16px;
     padding: 1.3rem 1.4rem;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
@@ -88,7 +88,7 @@
 
 .sp-kpi-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.07);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
 }
 
 .sp-kpi-card::before {
@@ -141,7 +141,7 @@
 .sp-kpi-label {
     font-size: 0.8rem;
     font-weight: 500;
-    color: #64748b;
+    color: #94a3b8;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 4px;
@@ -150,7 +150,7 @@
 .sp-kpi-valor {
     font-size: 1.45rem;
     font-weight: 700;
-    color: #0f172a;
+    color: #ffffff;
     line-height: 1.2;
     white-space: nowrap;
     overflow: hidden;
@@ -159,7 +159,7 @@
 
 .sp-kpi-subtexto {
     font-size: 0.78rem;
-    color: #64748b;
+    color: #94a3b8;
     margin-top: 4px;
 }
 
@@ -654,17 +654,17 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 10px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background: #111318;
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
     padding: 10px 14px;
     margin-top: 1rem;
     font-size: 0.8rem;
-    color: #64748b;
+    color: #94a3b8;
 }
 
 .sp-agenda-resumen strong {
-    color: #0f172a;
+    color: #ffffff;
 }
 
 /* Estado Vacío */
