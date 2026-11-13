@@ -1,9 +1,12 @@
 package suscripcionesPagos;
 
+import java.io.Serializable;
+
 /**
  * Modelo de Suscripción o Gasto Hormiga recurrente (HU-22).
  */
-public class Suscripcion {
+public class Suscripcion implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String id;
     private String username;
     private String nombre;

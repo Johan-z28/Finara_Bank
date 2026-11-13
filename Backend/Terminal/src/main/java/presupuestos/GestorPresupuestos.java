@@ -1,5 +1,7 @@
 package presupuestos;
 
+import core.BaseDatosFinara;
+
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -8,16 +10,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Servicio gestor para Elaboración de Presupuesto Mensual (HU-18 / HU-23).
- * Alineado con la lógica de presupuestoService.js en el Frontend.
+ * Persistido por usuario en BaseDatosFinara.
  */
 public class GestorPresupuestos {
-    private List<ItemPresupuesto> items;
-    private AtomicInteger secuenciaId;
-
-    public GestorPresupuestos() {
-        this.items = new ArrayList<>();
-        this.secuenciaId = new AtomicInteger(1);
-    }
+    private static final AtomicInteger secuenciaId = new AtomicInteger(1);
 
     public static class ResumenPresupuesto {
         private double totalIngresos;
@@ -70,27 +66,27 @@ public class GestorPresupuestos {
         String id = "PRE-" + System.currentTimeMillis() + "-" + secuenciaId.getAndIncrement();
 
         ItemPresupuesto nuevo = new ItemPresupuesto(id, userNorm, tipo, categoria, descripcion, monto, periodoFinal);
-        items.add(0, nuevo);
+        BaseDatosFinara.getInstancia().getPresupuestosUsuario(userNorm).add(0, nuevo);
         return nuevo;
     }
 
     public List<ItemPresupuesto> obtenerPorUsuarioYPeriodo(String username, String periodo) {
         String userNorm = normalizarUsuario(username);
+        List<ItemPresupuesto> items = BaseDatosFinara.getInstancia().getPresupuestosUsuario(userNorm);
         List<ItemPresupuesto> resultado = new ArrayList<>();
 
         for (ItemPresupuesto item : items) {
-            boolean coincideUsuario = item.getUsername().equalsIgnoreCase(userNorm);
             boolean coincidePeriodo = (periodo == null || periodo.trim().isEmpty()) || item.getPeriodo().equals(periodo.trim());
-            if (coincideUsuario && coincidePeriodo) {
+            if (coincidePeriodo) {
                 resultado.add(item);
             }
         }
         return resultado;
     }
 
-    public ItemPresupuesto actualizarItem(String id, String tipo, String categoria,
+    public ItemPresupuesto actualizarItem(String username, String id, String tipo, String categoria,
                                           String descripcion, double monto, String periodo) {
-        ItemPresupuesto objetivo = buscarPorId(id);
+        ItemPresupuesto objetivo = buscarPorId(username, id);
         if (objetivo == null) {
             throw new IllegalArgumentException("El rubro de presupuesto no existe: " + id);
         }
@@ -116,12 +112,31 @@ public class GestorPresupuestos {
         return objetivo;
     }
 
-    public boolean eliminarItem(String id) {
-        ItemPresupuesto objetivo = buscarPorId(id);
+    public ItemPresupuesto actualizarItem(String id, String tipo, String categoria,
+                                          String descripcion, double monto, String periodo) {
+        ItemPresupuesto objetivo = buscarPorIdGlobal(id);
+        if (objetivo == null) {
+            throw new IllegalArgumentException("El rubro de presupuesto no existe: " + id);
+        }
+        return actualizarItem(objetivo.getUsername(), id, tipo, categoria, descripcion, monto, periodo);
+    }
+
+    public boolean eliminarItem(String username, String id) {
+        String userNorm = normalizarUsuario(username);
+        List<ItemPresupuesto> lista = BaseDatosFinara.getInstancia().getPresupuestosUsuario(userNorm);
+        ItemPresupuesto objetivo = buscarPorId(userNorm, id);
         if (objetivo == null) {
             throw new IllegalArgumentException("El rubro de presupuesto no fue encontrado: " + id);
         }
-        return items.remove(objetivo);
+        return lista.remove(objetivo);
+    }
+
+    public boolean eliminarItem(String id) {
+        ItemPresupuesto objetivo = buscarPorIdGlobal(id);
+        if (objetivo == null) {
+            throw new IllegalArgumentException("El rubro de presupuesto no fue encontrado: " + id);
+        }
+        return eliminarItem(objetivo.getUsername(), id);
     }
 
     public ResumenPresupuesto calcularResumen(String username, String periodo) {
@@ -144,14 +159,24 @@ public class GestorPresupuestos {
         return new ResumenPresupuesto(totalIngresos, totalGastos, ingresos, gastos);
     }
 
-    public ItemPresupuesto buscarPorId(String id) {
+    public ItemPresupuesto buscarPorId(String username, String id) {
         if (id == null) return null;
-        for (ItemPresupuesto item : items) {
+        for (ItemPresupuesto item : BaseDatosFinara.getInstancia().getPresupuestosUsuario(normalizarUsuario(username))) {
             if (item.getId().equals(id)) {
                 return item;
             }
         }
         return null;
+    }
+
+    public ItemPresupuesto buscarPorIdGlobal(String id) {
+        if (id == null) return null;
+        for (String correo : new ArrayList<>(BaseDatosFinara.getInstancia().getUsuarios().keySet())) {
+            ItemPresupuesto found = buscarPorId(correo, id);
+            if (found != null) return found;
+        }
+        // Fallback para pruebas unitarias aisladas (ej. "juan")
+        return buscarPorId("juan", id);
     }
 
     private String normalizarUsuario(String username) {

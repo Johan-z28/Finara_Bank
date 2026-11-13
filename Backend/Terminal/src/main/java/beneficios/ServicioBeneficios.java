@@ -1,20 +1,21 @@
 package beneficios;
 
+import core.BaseDatosFinara;
+import core.RepositorioCuentas;
+
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.Set;
 
 /**
- * Servicio encargado de la gestión, asignación aleatoria y consulta de beneficios por cliente (HU-08).
+ * Servicio encargado de la gestión, asignación por productos reales y redención de beneficios (HU-08).
  */
 public class ServicioBeneficios {
 
+    public static final int PUNTOS_POR_REDENCION = 100;
     private static final List<Beneficio> CATALOGO_GLOBAL_BENEFICIOS = new ArrayList<>();
-    // Relaciona el correo/usuario con su lista de beneficios asignados
-    private static final Map<String, List<Beneficio>> REPOSITORIO_BENEFICIOS_USUARIO = new HashMap<>();
 
     static {
         inicializarCatalogo();
@@ -32,66 +33,109 @@ public class ServicioBeneficios {
     }
 
     /**
-     * Obtiene los beneficios asignados al cliente. Si no tiene, se le generan de forma aleatoria.
+     * Sincroniza sin borrar los beneficios ya asignados/redimidos y retorna la lista del cliente
+     * filtrada por sus productos activos reales en RepositorioCuentas.
      */
     public static List<Beneficio> obtenerBeneficiosCliente(String correoUsuario) {
-        if (correoUsuario == null || correoUsuario.trim().isEmpty()) {
-            correoUsuario = "cliente_general";
-        }
-        correoUsuario = correoUsuario.trim().toLowerCase();
-
-        if (!REPOSITORIO_BENEFICIOS_USUARIO.containsKey(correoUsuario) || REPOSITORIO_BENEFICIOS_USUARIO.get(correoUsuario).isEmpty()) {
-            generarBeneficiosAleatoriosParaUsuario(correoUsuario, 3);
-        }
-
-        return REPOSITORIO_BENEFICIOS_USUARIO.get(correoUsuario);
+        String correo = normalizar(correoUsuario);
+        sincronizarBeneficiosElegibles(correo);
+        return BaseDatosFinara.getInstancia().getBeneficiosUsuario(correo);
     }
 
     /**
-     * Genera beneficios de forma aleatoria para el usuario a partir del catálogo global.
+     * Agrega beneficios elegibles que correspondan a productos que el cliente posee y que aún no tenga.
+     * Nunca elimina beneficios ya asignados ni borra los redimidos.
      */
-    public static List<Beneficio> generarBeneficiosAleatoriosParaUsuario(String correoUsuario, int cantidad) {
-        if (correoUsuario == null || correoUsuario.trim().isEmpty()) {
-            correoUsuario = "cliente_general";
-        }
-        correoUsuario = correoUsuario.trim().toLowerCase();
+    public static List<Beneficio> sincronizarBeneficiosElegibles(String correoUsuario) {
+        String correo = normalizar(correoUsuario);
+        BaseDatosFinara db = BaseDatosFinara.getInstancia();
+        RepositorioCuentas repo = db.getRepositorioCuentas();
+        List<Beneficio> actuales = db.getBeneficiosUsuario(correo);
 
-        List<Beneficio> pool = new ArrayList<>(CATALOGO_GLOBAL_BENEFICIOS);
-        Collections.shuffle(pool, new Random());
-
-        int n = Math.min(cantidad, pool.size());
-        List<Beneficio> asignados = new ArrayList<>();
-
-        for (int i = 0; i < n; i++) {
-            Beneficio base = pool.get(i);
-            // Crear instancia fresca para el usuario
-            Beneficio b = new Beneficio(
-                    base.getIdBeneficio(),
-                    base.getCategoria(),
-                    base.getTitulo(),
-                    base.getDescripcion(),
-                    base.getProductoAplica(),
-                    base.getVigencia(),
-                    base.getCodigoPromocional()
-            );
-            asignados.add(b);
+        int totalProductos = repo.contarProductosUsuario(correo);
+        if (totalProductos == 0) {
+            return Collections.emptyList();
         }
 
-        REPOSITORIO_BENEFICIOS_USUARIO.put(correoUsuario, asignados);
-        return asignados;
+        boolean tieneAhorros = repo.tieneProductoTipo(correo, "AHORROS");
+        boolean tieneCredito = repo.tieneProductoTipo(correo, "CREDITO");
+        boolean tieneCorriente = repo.tieneProductoTipo(correo, "CORRIENTE");
+
+        Set<String> idsExistentes = new HashSet<>();
+        for (Beneficio b : actuales) {
+            idsExistentes.add(b.getIdBeneficio());
+        }
+
+        List<Beneficio> agregados = new ArrayList<>();
+        for (Beneficio base : CATALOGO_GLOBAL_BENEFICIOS) {
+            if (idsExistentes.contains(base.getIdBeneficio())) {
+                continue;
+            }
+            if (esElegibleParaCliente(base.getProductoAplica(), totalProductos, tieneAhorros, tieneCredito, tieneCorriente)) {
+                Beneficio copia = new Beneficio(
+                        base.getIdBeneficio(),
+                        base.getCategoria(),
+                        base.getTitulo(),
+                        base.getDescripcion(),
+                        base.getProductoAplica(),
+                        base.getVigencia(),
+                        base.getCodigoPromocional()
+                );
+                actuales.add(copia);
+                agregados.add(copia);
+                idsExistentes.add(copia.getIdBeneficio());
+            }
+        }
+
+        if (!agregados.isEmpty()) {
+            BaseDatosFinara.guardar();
+        }
+        return agregados;
+    }
+
+    private static boolean esElegibleParaCliente(
+            String productoAplica, int totalProductos,
+            boolean tieneAhorros, boolean tieneCredito, boolean tieneCorriente) {
+
+        if (totalProductos <= 0) {
+            return false;
+        }
+        if ("Todos".equalsIgnoreCase(productoAplica)) {
+            return true;
+        }
+        if ("Tarjeta Débito".equalsIgnoreCase(productoAplica) || "Cuenta de Ahorros".equalsIgnoreCase(productoAplica)) {
+            return tieneAhorros;
+        }
+        if ("Tarjeta de Crédito Gold".equalsIgnoreCase(productoAplica)) {
+            return tieneCredito;
+        }
+        if ("Tarjeta Cuenta Corriente".equalsIgnoreCase(productoAplica)) {
+            return tieneCorriente;
+        }
+        return false;
+    }
+
+    public static int obtenerPuntosFinara(String correoUsuario) {
+        return BaseDatosFinara.getInstancia().getPuntosFinara(normalizar(correoUsuario));
     }
 
     /**
-     * Redime un beneficio asignado al usuario mediante su ID o código promocional.
+     * Redime un beneficio disponible para el cliente y suma +100 puntos Finara.
      */
     public static boolean redimirBeneficio(String correoUsuario, String idOCodigo) {
-        List<Beneficio> lista = obtenerBeneficiosCliente(correoUsuario);
-        if (lista == null || idOCodigo == null) return false;
-
+        String correo = normalizar(correoUsuario);
+        if (idOCodigo == null || idOCodigo.trim().isEmpty()) {
+            return false;
+        }
+        List<Beneficio> lista = obtenerBeneficiosCliente(correo);
         String query = idOCodigo.trim().toUpperCase();
+
         for (Beneficio b : lista) {
-            if ((b.getIdBeneficio().equalsIgnoreCase(query) || b.getCodigoPromocional().equalsIgnoreCase(query)) && !b.isRedimido()) {
+            if ((b.getIdBeneficio().equalsIgnoreCase(query) || b.getCodigoPromocional().equalsIgnoreCase(query))
+                    && !b.isRedimido()) {
                 b.setRedimido(true);
+                BaseDatosFinara.getInstancia().sumarPuntosFinara(correo, PUNTOS_POR_REDENCION);
+                BaseDatosFinara.guardar();
                 return true;
             }
         }
@@ -100,5 +144,9 @@ public class ServicioBeneficios {
 
     public static List<Beneficio> getCatalogoGlobal() {
         return Collections.unmodifiableList(CATALOGO_GLOBAL_BENEFICIOS);
+    }
+
+    private static String normalizar(String correo) {
+        return (correo == null || correo.trim().isEmpty()) ? "cliente_general" : correo.trim().toLowerCase();
     }
 }

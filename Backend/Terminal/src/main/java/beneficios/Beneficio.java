@@ -1,9 +1,12 @@
 package beneficios;
 
+import java.io.Serializable;
+
 /**
  * Representa un beneficio o recompensa que puede recibir un cliente en Finara Bank (HU-08).
  */
-public class Beneficio {
+public class Beneficio implements Serializable {
+    private static final long serialVersionUID = 1L;
     private final String idBeneficio;
     private final String categoria; // Cashback, Descuento, Puntos Finara, Tasa Preferencial, Seguro
     private final String titulo;

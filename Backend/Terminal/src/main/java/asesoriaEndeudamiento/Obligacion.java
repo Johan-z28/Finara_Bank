@@ -1,6 +1,9 @@
 package asesoriaEndeudamiento;
 
-public class Obligacion {
+import java.io.Serializable;
+
+public class Obligacion implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String id;
     private String tipo; // TARJETA, PRESTAMO, HIPOTECA, VEHICULO, LIBRANZA, OTRO
     private String entidad;

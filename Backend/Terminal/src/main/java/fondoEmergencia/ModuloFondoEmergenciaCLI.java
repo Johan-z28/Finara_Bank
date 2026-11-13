@@ -1,27 +1,41 @@
 package fondoEmergencia;
 
-import java.text.NumberFormat;
-import java.util.Locale;
+import core.BaseDatosFinara;
+import core.Consola;
+import core.RepositorioCuentas;
+
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 /**
- * Interfaz de terminal (CLI) independiente para el módulo Fondo de Emergencia (HU-19).
+ * Interfaz de terminal (CLI) integrada para el módulo Fondo de Emergencia (HU-19).
  */
 public class ModuloFondoEmergenciaCLI {
-    private GestorFondoEmergencia gestor;
-    private Scanner scanner;
-    private NumberFormat formatoCOP;
+    private final GestorFondoEmergencia gestor;
+    private final Scanner scanner;
 
     public ModuloFondoEmergenciaCLI() {
+        this(Consola.getScanner());
+    }
+
+    public ModuloFondoEmergenciaCLI(Scanner scanner) {
         this.gestor = new GestorFondoEmergencia();
-        this.scanner = new Scanner(System.in);
-        this.formatoCOP = NumberFormat.getCurrencyInstance(new Locale("es", "CO"));
-        this.formatoCOP.setMaximumFractionDigits(0);
+        this.scanner = scanner != null ? scanner : Consola.getScanner();
     }
 
     public static void main(String[] args) {
-        ModuloFondoEmergenciaCLI cli = new ModuloFondoEmergenciaCLI();
+        BaseDatosFinara.cargar();
+        ModuloFondoEmergenciaCLI cli = new ModuloFondoEmergenciaCLI(Consola.getScanner());
         cli.iniciar("Juan");
+    }
+
+    public static void iniciar(Scanner scanner, Map<String, String> datosUsuario) {
+        String correo = datosUsuario != null
+                ? datosUsuario.getOrDefault("correo", datosUsuario.getOrDefault("email", "Juan"))
+                : "Juan";
+        ModuloFondoEmergenciaCLI cli = new ModuloFondoEmergenciaCLI(scanner);
+        cli.iniciar(correo);
     }
 
     public void iniciar(String usuarioActivo) {
@@ -29,45 +43,40 @@ public class ModuloFondoEmergenciaCLI {
         boolean salir = false;
 
         while (!salir) {
-            System.out.println("\n========================================================");
-            System.out.println("     FINARA FINANZAS - FONDO DE EMERGENCIA (HU-19)      ");
-            System.out.println("     Usuario: " + usuario);
-            System.out.println("========================================================");
+            Consola.titulo("FINARA FINANZAS - FONDO DE EMERGENCIA (HU-19)");
+            System.out.println("Usuario: " + usuario);
+            System.out.println("-------------------------------------------------------");
             System.out.println("1. Ver estado y progreso del Fondo de Emergencia");
             System.out.println("2. Simular meta sugerida (3 a 12 meses de gastos fijos)");
             System.out.println("3. Configurar / Actualizar meta y cuenta vinculada");
-            System.out.println("4. Registrar abono al fondo");
-            System.out.println("5. Proyectar tiempo para alcanzar la meta (plan de aportes)");
+            System.out.println("4. Registrar abono al fondo (debitando cuenta real)");
+            System.out.println("5. Proyectar tiempo para alcanzar la meta");
             System.out.println("6. Eliminar meta actual");
-            System.out.println("0. Salir");
-            System.out.print("Seleccione una opción: ");
+            System.out.println("0. Volver al menú anterior");
 
-            String opcion = scanner.nextLine().trim();
+            int opcion = Consola.leerEntero(scanner, "Seleccione una opción (0-6): ", 0, 6);
             switch (opcion) {
-                case "1":
+                case 1:
                     verEstadoFondo(usuario);
                     break;
-                case "2":
+                case 2:
                     simularMetaSugerida();
                     break;
-                case "3":
+                case 3:
                     configurarMeta(usuario);
                     break;
-                case "4":
+                case 4:
                     registrarAbono(usuario);
                     break;
-                case "5":
+                case 5:
                     proyectarTiempoMeta(usuario);
                     break;
-                case "6":
+                case 6:
                     eliminarMeta(usuario);
                     break;
-                case "0":
+                case 0:
                     salir = true;
-                    System.out.println("Saliendo del módulo de Fondo de Emergencia...");
                     break;
-                default:
-                    System.out.println("[!] Opción inválida. Intente de nuevo.");
             }
         }
     }
@@ -79,71 +88,73 @@ public class ModuloFondoEmergenciaCLI {
             return;
         }
 
-        System.out.println("\n--- RESUMEN DEL FONDO DE EMERGENCIA ---");
+        Consola.subtitulo("RESUMEN DEL FONDO DE EMERGENCIA");
         System.out.println("ID Meta             : " + fondo.getId());
         System.out.println("Estado de Seguridad : " + fondo.getNivelSeguridad());
-        System.out.println("Meta Definida       : " + formatoCOP.format(fondo.getMetaMonto()) + " (" + fondo.getMesesCobertura() + " meses)");
-        System.out.println("Gastos Fijos Base   : " + formatoCOP.format(fondo.getGastosFijosMensuales()));
-        System.out.println("Cuenta Vinculada    : #" + fondo.getCuentaVinculadaNumero() + " (ID: " + fondo.getCuentaVinculadaId() + ")");
-        System.out.println("Saldo Actual        : " + formatoCOP.format(fondo.getSaldoActual()));
+        System.out.println("Meta Definida       : " + Consola.formatoCOP(fondo.getMetaMonto()) + " (" + fondo.getMesesCobertura() + " meses)");
+        System.out.println("Gastos Fijos Base   : " + Consola.formatoCOP(fondo.getGastosFijosMensuales()));
+        System.out.println("Cuenta Vinculada    : " + fondo.getCuentaVinculadaId() + " (" + Consola.enmascararCuenta(fondo.getCuentaVinculadaNumero()) + ")");
+        System.out.println("Saldo en Fondo      : " + Consola.formatoCOP(fondo.getSaldoActual()));
         System.out.println("Avance              : " + fondo.getPorcentajeReal() + "% (Barra: " + fondo.getPorcentajeAvance() + "%)");
-        System.out.println("Monto Faltante      : " + formatoCOP.format(fondo.getMontoFaltante()));
+        System.out.println("Monto Faltante      : " + Consola.formatoCOP(fondo.getMontoFaltante()));
         System.out.printf("Meses Cubiertos     : %.1f meses%n", fondo.getMesesCubiertos());
         System.out.println("Última Actualización: " + fondo.getFechaActualizacion());
     }
 
     private void simularMetaSugerida() {
-        System.out.println("\n--- SIMULADOR DE FONDO SUGERIDO ---");
-        System.out.print("Ingrese el valor promedio de sus gastos fijos mensuales: ");
-        double gastos = leerMonto();
-        if (gastos <= 0) {
-            System.out.println("[!] El valor de los gastos debe ser mayor a cero.");
-            return;
-        }
+        Consola.subtitulo("SIMULADOR DE FONDO SUGERIDO");
+        double gastos = Consola.leerMonto(scanner, "Gastos fijos mensuales promedio en COP (0 cancelar): ");
+        if (gastos <= 0) return;
 
-        System.out.print("Ingrese los meses de cobertura deseados (1 - 12, recomendado 6): ");
-        int meses = leerEntero(6);
+        int meses = Consola.leerEnteroConDefecto(scanner, "Meses de cobertura deseados (1-12, Enter=6): ", 6, 1, 12);
 
         GestorFondoEmergencia.ResultadoSimulacion res = gestor.calcularFondoSugerido(gastos, meses);
         System.out.println("\nResultados de la Simulación:");
-        System.out.println(" - Gastos Fijos Base          : " + formatoCOP.format(res.getGastosFijosMensuales()));
-        System.out.println(" - Cobertura Mínima (3 meses) : " + formatoCOP.format(res.getCoberturaMinima()));
-        System.out.println(" - Cobertura Ideal (6 meses)  : " + formatoCOP.format(res.getCoberturaRecomendada()));
-        System.out.println(" - Meta Sugerida (" + res.getMesesCobertura() + " meses)   : " + formatoCOP.format(res.getTotalSugerido()));
+        System.out.println(" - Gastos Fijos Base          : " + Consola.formatoCOP(res.getGastosFijosMensuales()));
+        System.out.println(" - Cobertura Mínima (3 meses) : " + Consola.formatoCOP(res.getCoberturaMinima()));
+        System.out.println(" - Cobertura Ideal (6 meses)  : " + Consola.formatoCOP(res.getCoberturaRecomendada()));
+        System.out.println(" - Meta Sugerida (" + res.getMesesCobertura() + " meses)   : " + Consola.formatoCOP(res.getTotalSugerido()));
     }
 
     private void configurarMeta(String usuario) {
-        System.out.println("\n--- CONFIGURAR / ACTUALIZAR META ---");
-        System.out.print("Gastos fijos mensuales estimados: ");
-        double gastos = leerMonto();
+        Consola.subtitulo("CONFIGURAR / ACTUALIZAR META");
+        double gastos = Consola.leerMonto(scanner, "Gastos fijos mensuales estimados en COP (0 cancelar): ");
+        if (gastos <= 0) return;
 
-        System.out.print("Meses de cobertura objetivo (1 - 12): ");
-        int meses = leerEntero(6);
+        int meses = Consola.leerEnteroConDefecto(scanner, "Meses de cobertura objetivo (1-12, Enter=6): ", 6, 1, 12);
+        double metaSugerida = gastos * meses;
+        System.out.println("Meta sugerida calculada: " + Consola.formatoCOP(metaSugerida));
+        double metaOpt = Consola.leerMontoOpcional(scanner, "Meta definitiva en COP (Enter para usar la sugerida): ");
+        double metaDefinitiva = (metaOpt <= 0) ? metaSugerida : metaOpt;
 
-        double metaSugerida = gastos * Math.max(1, Math.min(12, meses));
-        System.out.println("Meta sugerida calculada: " + formatoCOP.format(metaSugerida));
-        System.out.print("Ingrese la meta definitiva (o presione Enter para usar la sugerida): ");
-        String metaStr = scanner.nextLine().trim();
-        double metaDefinitiva = metaStr.isEmpty() ? metaSugerida : parsearMonto(metaStr);
-
-        if (metaDefinitiva <= 0) {
-            System.out.println("[!] La meta definitiva debe ser mayor a cero.");
-            return;
+        RepositorioCuentas repo = BaseDatosFinara.getInstancia().getRepositorioCuentas();
+        List<Map<String, String>> cuentas = repo.obtenerCuentasDebitoODeposito(usuario);
+        String ctaId;
+        String ctaNum;
+        if (!cuentas.isEmpty()) {
+            System.out.println("\nSeleccione la cuenta vinculada para aportes al fondo:");
+            for (int i = 0; i < cuentas.size(); i++) {
+                Map<String, String> c = cuentas.get(i);
+                System.out.printf("%d. %-10s %s | Saldo: %s%n",
+                        (i + 1), c.get("tipo"), Consola.enmascararCuenta(c.get("numero")),
+                        Consola.formatoCOP(RepositorioCuentas.parsearNumero(c.get("saldo"))));
+            }
+            int idx = Consola.leerEntero(scanner, "Cuenta (1-" + cuentas.size() + ", 0 cancelar): ", 1, cuentas.size());
+            if (idx <= 0) return;
+            Map<String, String> sel = cuentas.get(idx - 1);
+            ctaId = sel.get("tipo");
+            ctaNum = sel.get("numero");
+        } else {
+            ctaId = "SIN_CUENTA";
+            ctaNum = "0000";
         }
 
-        System.out.print("ID de cuenta de ahorros/corriente a vincular (ej. CTA-01): ");
-        String ctaId = scanner.nextLine().trim();
-        if (ctaId.isEmpty()) ctaId = "CTA-01";
-
-        System.out.print("Número de cuenta (ej. 4001-2345-6789): ");
-        String ctaNum = scanner.nextLine().trim();
-        if (ctaNum.isEmpty()) ctaNum = "4001-0000-1234";
-
-        System.out.print("Saldo inicial en la cuenta vinculada: ");
-        double saldoInicial = leerMonto();
+        double saldoActualPrevio = gestor.obtenerMetaUsuario(usuario) != null
+                ? gestor.obtenerMetaUsuario(usuario).getSaldoActual() : 0.0;
 
         try {
-            FondoEmergencia guardado = gestor.guardarMetaUsuario(usuario, metaDefinitiva, gastos, meses, ctaId, ctaNum, saldoInicial);
+            FondoEmergencia guardado = gestor.guardarMetaUsuario(usuario, metaDefinitiva, gastos, meses, ctaId, ctaNum, saldoActualPrevio);
+            BaseDatosFinara.guardar();
             System.out.println("\n[✓] Meta guardada exitosamente (" + guardado.getId() + "). Avance actual: " + guardado.getPorcentajeReal() + "%");
         } catch (IllegalArgumentException e) {
             System.out.println("[!] Error: " + e.getMessage());
@@ -157,14 +168,37 @@ public class ModuloFondoEmergenciaCLI {
             return;
         }
 
-        System.out.print("Ingrese el valor del abono a realizar: ");
-        double abono = leerMonto();
+        List<Map<String, String>> cuentas = BaseDatosFinara.getInstancia()
+                .getRepositorioCuentas().obtenerCuentasDebitoODeposito(usuario);
+        if (cuentas.isEmpty()) {
+            System.out.println("\n[!] Necesitas tener al menos una Cuenta de Ahorros o Corriente activa con saldo para realizar abonos reales.");
+            return;
+        }
+
+        System.out.println("\nSeleccione la cuenta origen para el abono:");
+        for (int i = 0; i < cuentas.size(); i++) {
+            Map<String, String> c = cuentas.get(i);
+            System.out.printf("%d. %-10s %s | Saldo: %s%n",
+                    (i + 1), c.get("tipo"), Consola.enmascararCuenta(c.get("numero")),
+                    Consola.formatoCOP(RepositorioCuentas.parsearNumero(c.get("saldo"))));
+        }
+        int idx = Consola.leerEntero(scanner, "Cuenta origen (1-" + cuentas.size() + ", 0 cancelar): ", 1, cuentas.size());
+        if (idx <= 0) return;
+        Map<String, String> cuentaOrigen = cuentas.get(idx - 1);
+
+        double abono = Consola.leerMonto(scanner, "Valor del abono en COP (0 cancelar): ");
+        if (abono <= 0) return;
+
+        if (!Consola.confirmar(scanner, "¿Confirma transferir " + Consola.formatoCOP(abono) + " al Fondo de Emergencia?")) {
+            return;
+        }
+
         try {
-            FondoEmergencia actualizado = gestor.registrarAbono(usuario, abono);
-            System.out.println("[✓] Abono registrado. Nuevo saldo: " + formatoCOP.format(actualizado.getSaldoActual())
+            FondoEmergencia actualizado = gestor.registrarAbonoDesdeCuenta(usuario, abono, cuentaOrigen);
+            System.out.println("[✓] Abono registrado. Saldo del fondo: " + Consola.formatoCOP(actualizado.getSaldoActual())
                     + " (" + actualizado.getPorcentajeReal() + "% de la meta).");
         } catch (Exception e) {
-            System.out.println("[!] Error: " + e.getMessage());
+            System.out.println("[X] " + e.getMessage());
         }
     }
 
@@ -174,59 +208,29 @@ public class ModuloFondoEmergenciaCLI {
             System.out.println("\n[!] Primero debes configurar una meta (opción 3).");
             return;
         }
-
         double faltante = fondo.getMontoFaltante();
         if (faltante <= 0) {
             System.out.println("\n[✓] ¡Ya alcanzaste el 100% de tu Fondo de Emergencia!");
             return;
         }
 
-        System.out.println("\nMonto faltante para completar tu meta: " + formatoCOP.format(faltante));
-        System.out.print("¿Cuánto planeas aportar mensualmente?: ");
-        double aporte = leerMonto();
+        System.out.println("\nMonto faltante para completar tu meta: " + Consola.formatoCOP(faltante));
+        double aporte = Consola.leerMonto(scanner, "¿Cuánto planeas aportar mensualmente? (0 cancelar): ");
+        if (aporte <= 0) return;
 
         int mesesEstimados = gestor.simularMesesParaMeta(faltante, aporte);
-        if (mesesEstimados < 0) {
-            System.out.println("[!] El aporte mensual debe ser mayor a cero para calcular la proyección.");
-        } else {
-            System.out.println("Con aportes mensuales de " + formatoCOP.format(aporte)
-                    + ", completarás tu Fondo de Emergencia en aproximadamente " + mesesEstimados + " mes(es).");
-        }
+        System.out.println("Con aportes mensuales de " + Consola.formatoCOP(aporte)
+                + ", completarás tu Fondo de Emergencia en aproximadamente " + mesesEstimados + " mes(es).");
     }
 
     private void eliminarMeta(String usuario) {
-        System.out.print("¿Estás seguro de eliminar tu meta de Fondo de Emergencia? (s/n): ");
-        String confirm = scanner.nextLine().trim();
-        if (confirm.equalsIgnoreCase("s")) {
+        if (Consola.confirmar(scanner, "¿Estás seguro de eliminar tu meta de Fondo de Emergencia?")) {
             if (gestor.eliminarMetaUsuario(usuario)) {
+                BaseDatosFinara.guardar();
                 System.out.println("[✓] Meta eliminada correctamente.");
             } else {
                 System.out.println("[!] No había ninguna meta configurada.");
             }
-        }
-    }
-
-    private double leerMonto() {
-        return parsearMonto(scanner.nextLine().trim());
-    }
-
-    private double parsearMonto(String input) {
-        try {
-            String limpio = input.replace("$", "").replace(".", "").replace(",", ".");
-            if (limpio.isEmpty()) return 0.0;
-            return Math.max(0.0, Double.parseDouble(limpio));
-        } catch (Exception e) {
-            return 0.0;
-        }
-    }
-
-    private int leerEntero(int valorDefecto) {
-        try {
-            String input = scanner.nextLine().trim();
-            if (input.isEmpty()) return valorDefecto;
-            return Integer.parseInt(input);
-        } catch (Exception e) {
-            return valorDefecto;
         }
     }
 }

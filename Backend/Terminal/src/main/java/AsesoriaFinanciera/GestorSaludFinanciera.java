@@ -1,99 +1,114 @@
 package AsesoriaFinanciera;
 
+import core.BaseDatosFinara;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.UUID;
 
+/**
+ * Motor de evaluación de Salud Financiera (score base 100, reglas de liquidez, deuda y fondo de emergencia).
+ * Persiste historial por usuario en BaseDatosFinara.
+ */
 public class GestorSaludFinanciera {
-    private List<EvaluacionFinanciera> historialEvaluaciones;
+    private final String correoUsuario;
 
     public GestorSaludFinanciera() {
-        this.historialEvaluaciones = new ArrayList<>();
+        this("cliente@finara.com");
     }
 
-    public List<EvaluacionFinanciera> getHistorialEvaluaciones() {
-        return historialEvaluaciones;
+    public GestorSaludFinanciera(String correoUsuario) {
+        this.correoUsuario = BaseDatosFinara.normalizarCorreo(
+                correoUsuario == null || correoUsuario.isEmpty() ? "cliente@finara.com" : correoUsuario
+        );
     }
 
-    // Motor de reglas financiero
-    public EvaluacionFinanciera evaluarSaludFinanciera(double ingresosMensuales, double gastosMensuales,
-                                                       double deudaTotal, double ahorroActual, String metaPrincipal) {
+    public EvaluacionFinanciera generarDiagnostico(
+            double ingresos, double gastos, double deudaTotal, double ahorroActual, String meta) {
+
         int score = 100;
+        List<String> fuertes = new ArrayList<>();
+        List<String> mejoras = new ArrayList<>();
         List<String> recomendaciones = new ArrayList<>();
-        List<String> puntosFuertes = new ArrayList<>();
-        List<String> oportunidadesMejora = new ArrayList<>();
 
-        // 1. Regla de Liquidez / Capacidad de Ahorro
-        double flujoLibre = ingresosMensuales - gastosMensuales;
-        double porcentajeAhorro = ingresosMensuales > 0 ? (flujoLibre / ingresosMensuales) * 100 : 0;
+        // REGLA 1: Capacidad de ahorro / liquidez mensual
+        double capacidadAhorro = ingresos - gastos;
+        double porcentajeAhorro = (ingresos > 0) ? (capacidadAhorro / ingresos) * 100 : 0;
 
         if (porcentajeAhorro < 10) {
             score -= 30;
-            oportunidadesMejora.add("Tus gastos fijos consumen casi la totalidad de tus ingresos, dejando poco margen de maniobra.");
-        } else if (porcentajeAhorro >= 20) {
-            puntosFuertes.add("Tienes una excelente capacidad de ahorro mensual superior al 20%.");
-        } else {
+            mejoras.add("Capacidad de ahorro muy baja (menor al 10% mensual).");
+            recomendaciones.add("Aplica la regla 50/30/20: reduce gastos no esenciales hasta ahorrar al menos 15% de tus ingresos.");
+        } else if (porcentajeAhorro < 20) {
             score -= 15;
-            oportunidadesMejora.add("Tu margen de ahorro es moderado; intenta optimizar tus gastos hormiga.");
+            mejoras.add("Ahorro moderado (entre 10% y 20%). Puedes optimizar tus gastos fijos.");
+        } else {
+            fuertes.add("Excelente liquidez mensual: ahorras más del 20% de tus ingresos.");
         }
 
-        // 2. Regla de Endeudamiento
-        if (ingresosMensuales > 0 && deudaTotal > ingresosMensuales * 3) {
+        // REGLA 2: Nivel de endeudamiento
+        if (deudaTotal > (ingresos * 3)) {
             score -= 30;
-            oportunidadesMejora.add("El nivel de tus deudas es elevado en relación con tus ingresos actuales.");
-            recomendaciones.add("Prioriza el pago de deudas con mayores tasas de interés (método avalancha o bola de nieve).");
+            mejoras.add("Nivel de deuda alto: tus deudas superan 3 veces tus ingresos mensuales.");
+            recomendaciones.add("Usa el Simulador de Endeudamiento (Avalancha/Bola de Nieve) antes de tomar créditos nuevos.");
         } else if (deudaTotal == 0) {
-            puntosFuertes.add("¡Felicitaciones! Te encuentras libre de deudas activas.");
+            fuertes.add("Cero deudas acumuladas: mantienes tu capacidad crediticia limpia.");
         } else {
             score -= 10;
-            recomendaciones.add("Mantén tus pagos al día para evitar sobrecargar tus finanzas con intereses.");
+            recomendaciones.add("Destina parte de tu liquidez mensual a reducir tu saldo de deuda actual.");
         }
 
-        // 3. Regla del Fondo de Emergencia (mínimo 3 meses de gastos básicos)
-        double mesesColchon = gastosMensuales > 0 ? ahorroActual / gastosMensuales : 0;
-
-        if (mesesColchon < 1) {
+        // REGLA 3: Fondo de Emergencia
+        double mesesCubiertos = (gastos > 0) ? (ahorroActual / gastos) : 0;
+        if (mesesCubiertos < 1) {
             score -= 25;
-            oportunidadesMejora.add("No cuentas con un fondo de emergencia sólido para imprevistos.");
-            recomendaciones.add("Destina una pequeña parte de tus ingresos mensuales a construir un fondo de emergencia equivalente a 3 meses de tus gastos fijos.");
-        } else if (mesesColchon >= 3) {
-            puntosFuertes.add("Tienes un fondo de emergencia saludable que cubre 3 o más meses de tus gastos.");
-        } else {
+            mejoras.add("Sin fondo de emergencia suficiente: tus ahorros cubren menos de 1 mes de gastos.");
+            recomendaciones.add("Prioridad #1: construye un colchón de al menos 3 meses de gastos en 'Fondo de Emergencia'.");
+        } else if (mesesCubiertos < 3) {
             score -= 10;
-            recomendaciones.add("Estás cerca de la meta de tu fondo de emergencia, ¡continúa ahorrando con constancia!");
+            mejoras.add("Fondo de emergencia en desarrollo (cubre entre 1 y 3 meses de gastos).");
+        } else {
+            fuertes.add("Sólido respaldo financiero: cuentas con ahorro superior a 3 meses de tus gastos.");
         }
 
-        // Asegurar que el score no baje de 0 ni suba de 100
         score = Math.max(0, Math.min(100, score));
 
-        // Determinar nivel de salud
-        String nivelSalud = "Crítico";
+        String nivel;
         if (score >= 80) {
-            nivelSalud = "Excelente";
+            nivel = "EXCELENTE / ÓPTIMO";
         } else if (score >= 60) {
-            nivelSalud = "Saludable / Estable";
+            nivel = "SALUDABLE / ESTABLE";
         } else if (score >= 40) {
-            nivelSalud = "En Observación";
+            nivel = "EN OBSERVACIÓN / MEJORABLE";
+        } else {
+            nivel = "CRÍTICO / ALERTA FINANCIERA";
         }
 
-        // Generar identificador único de evaluación
-        String idEvaluacion = "SALUD-202611-" + (1000 + new Random().nextInt(9000));
+        if (meta != null && !meta.trim().isEmpty()) {
+            recomendaciones.add("Para tu meta '" + meta.trim() + "': automatiza un ahorro mensual acorde a tu superávit.");
+        }
 
+        String idEval = "EVAL-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         EvaluacionFinanciera evaluacion = new EvaluacionFinanciera(
-                idEvaluacion, ingresosMensuales, gastosMensuales, deudaTotal, ahorroActual, metaPrincipal,
-                score, nivelSalud, puntosFuertes, oportunidadesMejora, recomendaciones
+                idEval, ingresos, gastos, deudaTotal, ahorroActual, meta, score, nivel,
+                fuertes, mejoras, recomendaciones
         );
 
-        // Almacenar en el historial en memoria (orden más reciente primero)
-        historialEvaluaciones.add(0, evaluacion);
-
+        BaseDatosFinara.getInstancia().getEvaluacionesSaludUsuario(correoUsuario).add(0, evaluacion);
+        BaseDatosFinara.guardar();
         return evaluacion;
     }
 
-    public EvaluacionFinanciera buscarEvaluacionPorId(String idEvaluacion) {
-        return historialEvaluaciones.stream()
-                .filter(e -> e.getIdEvaluacion().equalsIgnoreCase(idEvaluacion.trim()))
-                .findFirst()
-                .orElse(null);
+    public List<EvaluacionFinanciera> obtenerHistorial() {
+        return BaseDatosFinara.getInstancia().getEvaluacionesSaludUsuario(correoUsuario);
+    }
+
+    public EvaluacionFinanciera buscarPorId(String id) {
+        for (EvaluacionFinanciera ev : obtenerHistorial()) {
+            if (ev.getIdEvaluacion().equalsIgnoreCase(id)) {
+                return ev;
+            }
+        }
+        return null;
     }
 }

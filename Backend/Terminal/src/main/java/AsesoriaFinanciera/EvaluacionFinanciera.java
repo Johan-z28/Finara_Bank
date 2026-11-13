@@ -1,10 +1,12 @@
 package AsesoriaFinanciera;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-public class EvaluacionFinanciera {
+public class EvaluacionFinanciera implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String idEvaluacion;
     private double ingresosMensuales;
     private double gastosMensuales;

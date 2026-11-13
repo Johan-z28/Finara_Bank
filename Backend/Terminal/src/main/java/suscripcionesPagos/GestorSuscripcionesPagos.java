@@ -1,25 +1,22 @@
 package suscripcionesPagos;
 
+import Prestamos.Prestamos;
+import core.BaseDatosFinara;
+import core.Consola;
+import core.RepositorioCuentas;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Gestor de lógica de negocio para el Módulo 2 en 1: Suscripciones, Gastos Hormiga y Pagos Pendientes (HU-22).
+ * Gestor de lógica de negocio para Suscripciones, Gastos Hormiga y Pagos Pendientes (HU-22).
+ * Persiste por usuario en BaseDatosFinara y proyecta cuotas de préstamos y tarjetas Finara.
  */
 public class GestorSuscripcionesPagos {
-    private Map<String, List<Suscripcion>> suscripcionesPorUsuario;
-    private Map<String, List<PagoPendiente>> pagosPorUsuario;
-    private AtomicInteger secuencia;
-
-    public GestorSuscripcionesPagos() {
-        this.suscripcionesPorUsuario = new HashMap<>();
-        this.pagosPorUsuario = new HashMap<>();
-        this.secuencia = new AtomicInteger(1);
-    }
+    private static final AtomicInteger secuencia = new AtomicInteger(1);
 
     public static class AhorroPotencial {
         private long mensual;
@@ -42,19 +39,17 @@ public class GestorSuscripcionesPagos {
         String user = normalizarUsuario(username);
         String id = "SUS-" + System.currentTimeMillis() + "-" + secuencia.getAndIncrement();
         Suscripcion s = new Suscripcion(id, user, nombre, categoria, monto, frecuencia);
-        suscripcionesPorUsuario.computeIfAbsent(user, k -> new ArrayList<>()).add(0, s);
+        BaseDatosFinara.getInstancia().getSuscripcionesUsuario(user).add(0, s);
         return s;
     }
 
     public List<Suscripcion> obtenerSuscripciones(String username) {
-        String user = normalizarUsuario(username);
-        return new ArrayList<>(suscripcionesPorUsuario.getOrDefault(user, new ArrayList<>()));
+        return new ArrayList<>(BaseDatosFinara.getInstancia().getSuscripcionesUsuario(normalizarUsuario(username)));
     }
 
     public Suscripcion cambiarEstadoSuscripcion(String username, String id, String nuevoEstado) {
         String user = normalizarUsuario(username);
-        List<Suscripcion> lista = suscripcionesPorUsuario.getOrDefault(user, new ArrayList<>());
-        for (Suscripcion s : lista) {
+        for (Suscripcion s : BaseDatosFinara.getInstancia().getSuscripcionesUsuario(user)) {
             if (s.getId().equals(id)) {
                 s.setEstado(nuevoEstado);
                 if ("PAUSADA".equals(s.getEstado()) || "CANCELADA".equals(s.getEstado())) {
@@ -67,10 +62,8 @@ public class GestorSuscripcionesPagos {
     }
 
     public boolean eliminarSuscripcion(String username, String id) {
-        String user = normalizarUsuario(username);
-        List<Suscripcion> lista = suscripcionesPorUsuario.get(user);
-        if (lista == null) return false;
-        return lista.removeIf(s -> s.getId().equals(id));
+        return BaseDatosFinara.getInstancia().getSuscripcionesUsuario(normalizarUsuario(username))
+                .removeIf(s -> s.getId().equals(id));
     }
 
     public PagoPendiente crearPagoPendiente(String username, String nombre, String tipo,
@@ -78,19 +71,66 @@ public class GestorSuscripcionesPagos {
         String user = normalizarUsuario(username);
         String id = "PAG-" + System.currentTimeMillis() + "-" + secuencia.getAndIncrement();
         PagoPendiente p = new PagoPendiente(id, user, nombre, tipo, monto, fechaVencimiento);
-        pagosPorUsuario.computeIfAbsent(user, k -> new ArrayList<>()).add(0, p);
+        BaseDatosFinara.getInstancia().getPagosUsuario(user).add(0, p);
         return p;
+    }
+
+    /**
+     * Proyecta automáticamente cuotas próximas de préstamos activos y deuda de tarjetas Finara
+     * sin duplicar registros existentes.
+     */
+    public void sincronizarPagosFinara(String username) {
+        String user = normalizarUsuario(username);
+        BaseDatosFinara db = BaseDatosFinara.getInstancia();
+        List<PagoPendiente> lista = db.getPagosUsuario(user);
+
+        // Quitar proyecciones automáticas previas no pagadas para reflejar saldos actualizados
+        lista.removeIf(p -> !p.isPagado() && (p.getId().startsWith("AUTO-PRE-") || p.getId().startsWith("AUTO-TC-")));
+
+        // 1. Préstamos activos
+        for (Prestamos pr : db.getPrestamosUsuario(user)) {
+            if ("APROBADO".equalsIgnoreCase(pr.getEstado()) && pr.isActivo()) {
+                LocalDate fechaVenc = pr.getFechaProximaCuota() != null ? pr.getFechaProximaCuota() : LocalDate.now().plusMonths(1);
+                String idAuto = "AUTO-PRE-" + pr.getRadicado();
+                String nombre = "Cuota #" + (pr.getCuotasPagadas() + 1) + "/" + pr.getMeses() + " Préstamo " + pr.getRadicado();
+                lista.add(new PagoPendiente(idAuto, user, nombre, "CUOTA", pr.getCuotaMensual(), fechaVenc));
+            }
+        }
+
+        // 2. Tarjetas de crédito con deuda actual > 0
+        for (Map<String, String> c : db.getRepositorioCuentas().obtenerCuentasCredito(user)) {
+            double deuda = RepositorioCuentas.parsearNumero(c.get("deudaActual"));
+            if (deuda > 0) {
+                String num = Consola.limpiarNumeroCuenta(c.get("numero"));
+                String idAuto = "AUTO-TC-" + num;
+                double pagoMin = Math.min(deuda, Math.max(50000.0, deuda * 0.10));
+                lista.add(new PagoPendiente(idAuto, user,
+                        "Pago Mínimo Tarjeta " + Consola.enmascararCuenta(num),
+                        "TARJETA", pagoMin, LocalDate.now().plusDays(5)));
+            }
+        }
     }
 
     public List<PagoPendiente> obtenerPagosPendientes(String username) {
         String user = normalizarUsuario(username);
-        return new ArrayList<>(pagosPorUsuario.getOrDefault(user, new ArrayList<>()));
+        sincronizarPagosFinara(user);
+        return new ArrayList<>(BaseDatosFinara.getInstancia().getPagosUsuario(user));
+    }
+
+    public List<PagoPendiente> obtenerPagosProximosOVencidos(String username) {
+        List<PagoPendiente> alertas = new ArrayList<>();
+        for (PagoPendiente p : obtenerPagosPendientes(username)) {
+            String estado = p.getEstadoPago();
+            if ("VENCIDO".equals(estado) || "PROXIMO".equals(estado)) {
+                alertas.add(p);
+            }
+        }
+        return alertas;
     }
 
     public PagoPendiente marcarPagoComoPagado(String username, String id) {
         String user = normalizarUsuario(username);
-        List<PagoPendiente> lista = pagosPorUsuario.getOrDefault(user, new ArrayList<>());
-        for (PagoPendiente p : lista) {
+        for (PagoPendiente p : BaseDatosFinara.getInstancia().getPagosUsuario(user)) {
             if (p.getId().equals(id)) {
                 p.marcarComoPagado();
                 return p;
@@ -100,10 +140,8 @@ public class GestorSuscripcionesPagos {
     }
 
     public boolean eliminarPagoPendiente(String username, String id) {
-        String user = normalizarUsuario(username);
-        List<PagoPendiente> lista = pagosPorUsuario.get(user);
-        if (lista == null) return false;
-        return lista.removeIf(p -> p.getId().equals(id));
+        return BaseDatosFinara.getInstancia().getPagosUsuario(normalizarUsuario(username))
+                .removeIf(p -> p.getId().equals(id));
     }
 
     public AhorroPotencial calcularAhorroPotencial(String username) {

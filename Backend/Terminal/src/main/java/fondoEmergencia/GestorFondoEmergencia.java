@@ -1,19 +1,17 @@
 package fondoEmergencia;
 
-import java.util.HashMap;
+import core.BaseDatosFinara;
+import core.Consola;
+import core.RepositorioCuentas;
+
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Servicio gestor del Fondo de Emergencia (HU-19).
- * Maneja la simulación, cálculo de cobertura mínima y recomendada,
- * almacenamiento por usuario, registro de abonos y proyección de metas.
+ * Estado persistido por usuario en BaseDatosFinara y abonos integrados con cuentas reales.
  */
 public class GestorFondoEmergencia {
-    private Map<String, FondoEmergencia> fondosPorUsuario;
-
-    public GestorFondoEmergencia() {
-        this.fondosPorUsuario = new HashMap<>();
-    }
 
     public static class ResultadoSimulacion {
         private double gastosFijosMensuales;
@@ -51,7 +49,8 @@ public class GestorFondoEmergencia {
         }
 
         String clave = normalizarUsuario(username);
-        FondoEmergencia existente = fondosPorUsuario.get(clave);
+        BaseDatosFinara db = BaseDatosFinara.getInstancia();
+        FondoEmergencia existente = db.getFondoEmergencia(clave);
 
         if (existente != null) {
             existente.setMetaMonto(metaMonto);
@@ -67,13 +66,12 @@ public class GestorFondoEmergencia {
         FondoEmergencia nuevo = new FondoEmergencia(
                 nuevoId, clave, gastosFijos, mesesCobertura, metaMonto, cuentaId, cuentaNumero, saldoActual
         );
-        fondosPorUsuario.put(clave, nuevo);
+        db.setFondoEmergencia(clave, nuevo);
         return nuevo;
     }
 
     public FondoEmergencia obtenerMetaUsuario(String username) {
-        String clave = normalizarUsuario(username);
-        return fondosPorUsuario.get(clave);
+        return BaseDatosFinara.getInstancia().getFondoEmergencia(normalizarUsuario(username));
     }
 
     public FondoEmergencia registrarAbono(String username, double montoAbono) {
@@ -88,19 +86,60 @@ public class GestorFondoEmergencia {
         return fondo;
     }
 
+    /**
+     * Registra un abono real debitando la cuenta bancaria de ahorros/corriente seleccionada.
+     */
+    public FondoEmergencia registrarAbonoDesdeCuenta(String correo, double montoAbono, Map<String, String> cuentaOrigen) {
+        if (montoAbono <= 0) {
+            throw new IllegalArgumentException("El abono debe ser mayor a cero.");
+        }
+        FondoEmergencia fondo = obtenerMetaUsuario(correo);
+        if (fondo == null) {
+            throw new IllegalStateException("Primero debe configurar una meta de Fondo de Emergencia.");
+        }
+        if (cuentaOrigen == null || RepositorioCuentas.esBloqueada(cuentaOrigen)) {
+            throw new IllegalArgumentException("Debe seleccionar una cuenta origen activa.");
+        }
+        double saldoCuenta = RepositorioCuentas.parsearNumero(cuentaOrigen.get("saldo"));
+        if (montoAbono > saldoCuenta) {
+            throw new IllegalArgumentException("Saldo insuficiente en la cuenta origen. Disponible: " + Consola.formatoCOP(saldoCuenta));
+        }
+
+        double nuevoSaldoCuenta = saldoCuenta - montoAbono;
+        RepositorioCuentas.actualizarSaldo(cuentaOrigen, nuevoSaldoCuenta);
+        fondo.setSaldoActual(fondo.getSaldoActual() + montoAbono);
+
+        String ref = "FE-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+        BaseDatosFinara.getInstancia().getRepositorioMovimientos().registrarMovimiento(
+                correo,
+                ref,
+                cuentaOrigen.get("numero"),
+                cuentaOrigen.getOrDefault("tipo", "AHORROS"),
+                "Ahorro",
+                "EGRESO",
+                montoAbono,
+                nuevoSaldoCuenta,
+                "Abono a Fondo de Emergencia (" + fondo.getId() + ")"
+        );
+        BaseDatosFinara.guardar();
+        return fondo;
+    }
+
     public int simularMesesParaMeta(double montoFaltante, double aporteMensual) {
         if (montoFaltante <= 0) {
             return 0;
         }
         if (aporteMensual <= 0) {
-            return -1; // No alcanzable sin aporte positivo
+            return -1;
         }
         return (int) Math.ceil(montoFaltante / aporteMensual);
     }
 
     public boolean eliminarMetaUsuario(String username) {
         String clave = normalizarUsuario(username);
-        return fondosPorUsuario.remove(clave) != null;
+        boolean existia = BaseDatosFinara.getInstancia().getFondoEmergencia(clave) != null;
+        BaseDatosFinara.getInstancia().setFondoEmergencia(clave, null);
+        return existia;
     }
 
     private String normalizarUsuario(String username) {

@@ -1,12 +1,14 @@
 package fondoEmergencia;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
  * Modelo que representa la meta del Fondo de Emergencia de un usuario (HU-19).
  */
-public class FondoEmergencia {
+public class FondoEmergencia implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String id;
     private String username;
     private double gastosFijosMensuales;

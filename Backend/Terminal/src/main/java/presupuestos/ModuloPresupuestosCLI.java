@@ -1,28 +1,40 @@
 package presupuestos;
 
-import java.text.NumberFormat;
+import core.BaseDatosFinara;
+import core.Consola;
+
 import java.util.List;
-import java.util.Locale;
+import java.util.Map;
 import java.util.Scanner;
 
 /**
- * Interfaz de terminal (CLI) orientada al Frontend para Elaboración de Presupuesto (HU-18 / HU-23).
+ * Interfaz de terminal (CLI) integrada para Elaboración de Presupuesto (HU-18 / HU-23).
  */
 public class ModuloPresupuestosCLI {
-    private GestorPresupuestos gestor;
-    private Scanner scanner;
-    private NumberFormat formatoCOP;
+    private final GestorPresupuestos gestor;
+    private final Scanner scanner;
 
     public ModuloPresupuestosCLI() {
+        this(Consola.getScanner());
+    }
+
+    public ModuloPresupuestosCLI(Scanner scanner) {
         this.gestor = new GestorPresupuestos();
-        this.scanner = new Scanner(System.in);
-        this.formatoCOP = NumberFormat.getCurrencyInstance(new Locale("es", "CO"));
-        this.formatoCOP.setMaximumFractionDigits(0);
+        this.scanner = scanner != null ? scanner : Consola.getScanner();
     }
 
     public static void main(String[] args) {
-        ModuloPresupuestosCLI cli = new ModuloPresupuestosCLI();
+        BaseDatosFinara.cargar();
+        ModuloPresupuestosCLI cli = new ModuloPresupuestosCLI(Consola.getScanner());
         cli.iniciar("Juan");
+    }
+
+    public static void iniciar(Scanner scanner, Map<String, String> datosUsuario) {
+        String correo = datosUsuario != null
+                ? datosUsuario.getOrDefault("correo", datosUsuario.getOrDefault("email", "Juan"))
+                : "Juan";
+        ModuloPresupuestosCLI cli = new ModuloPresupuestosCLI(scanner);
+        cli.iniciar(correo);
     }
 
     public void iniciar(String usuarioActivo) {
@@ -31,39 +43,36 @@ public class ModuloPresupuestosCLI {
         boolean salir = false;
 
         while (!salir) {
-            System.out.println("\n========================================================");
-            System.out.println("     FINARA FINANZAS - ELABORACIÓN DE PRESUPUESTO       ");
-            System.out.println("     Usuario: " + usuario + " | Periodo: " + periodo);
-            System.out.println("========================================================");
+            Consola.titulo("FINARA FINANZAS - ELABORACIÓN DE PRESUPUESTO");
+            System.out.println("Usuario: " + usuario + " | Periodo: " + periodo);
+            System.out.println("-------------------------------------------------------");
             System.out.println("1. Ver Métricas y Uso del Presupuesto Mensual");
             System.out.println("2. Registrar Rubro de Presupuesto (Ingreso / Gasto)");
             System.out.println("3. Ver Ingresos y Gastos Registrados");
             System.out.println("4. Editar Rubro existente");
             System.out.println("5. Eliminar Rubro");
             System.out.println("6. Cambiar Periodo Mensual (YYYY-MM)");
-            System.out.println("0. Salir");
-            System.out.print("Seleccione una opción: ");
+            System.out.println("0. Volver al menú anterior");
 
-            String opcion = scanner.nextLine().trim();
+            int opcion = Consola.leerEntero(scanner, "Seleccione una opción (0-6): ", 0, 6);
             switch (opcion) {
-                case "1":
+                case 1:
                     mostrarMetricasYProgreso(usuario, periodo);
                     break;
-                case "2":
+                case 2:
                     registrarRubroMenu(usuario, periodo);
                     break;
-                case "3":
+                case 3:
                     mostrarListadosSeparados(usuario, periodo);
                     break;
-                case "4":
+                case 4:
                     editarRubro(usuario, periodo);
                     break;
-                case "5":
+                case 5:
                     eliminarRubro(usuario, periodo);
                     break;
-                case "6":
-                    System.out.print("Ingrese nuevo periodo (YYYY-MM, ej. 2026-11): ");
-                    String nuevo = scanner.nextLine().trim();
+                case 6:
+                    String nuevo = Consola.leerLinea(scanner, "Ingrese nuevo periodo (YYYY-MM, ej. 2026-11): ");
                     if (nuevo.matches("^\\d{4}-\\d{2}$")) {
                         periodo = nuevo;
                         System.out.println("[✓] Periodo cambiado a " + periodo);
@@ -71,12 +80,9 @@ public class ModuloPresupuestosCLI {
                         System.out.println("[!] Formato inválido. Use YYYY-MM.");
                     }
                     break;
-                case "0":
+                case 0:
                     salir = true;
-                    System.out.println("Saliendo del módulo de Presupuestos...");
                     break;
-                default:
-                    System.out.println("[!] Opción inválida. Intente de nuevo.");
             }
         }
     }
@@ -84,14 +90,13 @@ public class ModuloPresupuestosCLI {
     private void mostrarMetricasYProgreso(String usuario, String periodo) {
         GestorPresupuestos.ResumenPresupuesto res = gestor.calcularResumen(usuario, periodo);
 
-        System.out.println("\n--- MÉTRICAS DEL PRESUPUESTO (" + periodo + ") ---");
-        System.out.println("Ingresos Estimados   : " + formatoCOP.format(res.getTotalIngresos()) + " (Total presupuestado)");
-        System.out.println("Gastos Planificados  : " + formatoCOP.format(res.getTotalGastos()) + " (" + res.getPorcentajeGastado() + "% de los ingresos)");
-        System.out.println("Saldo Neto           : " + formatoCOP.format(res.getSaldoNeto()) + " (" + res.getEstadoBalanceTexto() + ")");
+        Consola.subtitulo("MÉTRICAS DEL PRESUPUESTO (" + periodo + ")");
+        System.out.println("Ingresos Estimados   : " + Consola.formatoCOP(res.getTotalIngresos()) + " (Total presupuestado)");
+        System.out.println("Gastos Planificados  : " + Consola.formatoCOP(res.getTotalGastos()) + " (" + res.getPorcentajeGastado() + "% de los ingresos)");
+        System.out.println("Saldo Neto           : " + Consola.formatoCOP(res.getSaldoNeto()) + " (" + res.getEstadoBalanceTexto() + ")");
 
-        // Barra de progreso presupuestaria
         int pctBarra = Math.min(100, res.getPorcentajeGastado());
-        int bloquesLlenos = pctBarra / 5; // Barra de 20 caracteres
+        int bloquesLlenos = pctBarra / 5;
         StringBuilder barra = new StringBuilder("[");
         for (int i = 0; i < 20; i++) {
             barra.append(i < bloquesLlenos ? "█" : "░");
@@ -99,40 +104,36 @@ public class ModuloPresupuestosCLI {
         barra.append("]");
 
         System.out.println("\nUso del presupuesto mensual: " + res.getPorcentajeGastado() + "% consumido");
-        System.out.println(barra.toString());
+        System.out.println(barra);
     }
 
     private void registrarRubroMenu(String usuario, String periodo) {
-        System.out.println("\n--- REGISTRAR RUBRO DE PRESUPUESTO ---");
-        System.out.println("Tipo:");
+        Consola.subtitulo("REGISTRAR RUBRO DE PRESUPUESTO");
         System.out.println("  1. Ingreso Estimado (INGRESO)");
         System.out.println("  2. Gasto Presupuestado (GASTO)");
-        System.out.print("Seleccione tipo (1 o 2): ");
-        String tipoOpt = scanner.nextLine().trim();
+        System.out.println("  0. Cancelar");
+        int tipoOpt = Consola.leerEntero(scanner, "Seleccione tipo (0-2): ", 0, 2);
+        if (tipoOpt <= 0) return;
 
         String tipo;
-        if ("1".equals(tipoOpt) || "INGRESO".equalsIgnoreCase(tipoOpt)) {
+        if (tipoOpt == 1) {
             tipo = "INGRESO";
             System.out.println("Categorías de Ingreso: salario | honorarios | inversiones | otros_ingresos");
-        } else if ("2".equals(tipoOpt) || "GASTO".equalsIgnoreCase(tipoOpt)) {
+        } else {
             tipo = "GASTO";
             System.out.println("Categorías de Gasto: vivienda | alimentacion | transporte | educacion | salud | entretenimiento | otros_gastos");
-        } else {
-            System.out.println("[!] Tipo inválido.");
-            return;
         }
 
-        System.out.print("Categoría: ");
-        String categoria = scanner.nextLine().trim();
+        String categoria = Consola.leerLineaObligatoria(scanner, "Categoría (0 cancelar): ");
+        if (categoria == null) return;
 
-        System.out.print("Concepto o Descripción: ");
-        String descripcion = scanner.nextLine().trim();
-
-        System.out.print("Monto (COP): ");
-        double monto = leerMonto();
+        String descripcion = Consola.leerLinea(scanner, "Concepto o Descripción: ");
+        double monto = Consola.leerMonto(scanner, "Monto en COP (0 cancelar): ");
+        if (monto <= 0) return;
 
         try {
             ItemPresupuesto creado = gestor.crearItem(usuario, tipo, categoria, descripcion, monto, periodo);
+            BaseDatosFinara.guardar();
             System.out.println("[✓] Rubro agregado correctamente con ID: " + creado.getId());
         } catch (IllegalArgumentException e) {
             System.out.println("[!] Error: " + e.getMessage());
@@ -144,40 +145,39 @@ public class ModuloPresupuestosCLI {
         List<ItemPresupuesto> ingresos = res.getIngresos();
         List<ItemPresupuesto> gastos = res.getGastos();
 
-        System.out.println("\n--- INGRESOS REGISTRADOS | Total: " + formatoCOP.format(res.getTotalIngresos()) + " ---");
+        Consola.subtitulo("INGRESOS REGISTRADOS | Total: " + Consola.formatoCOP(res.getTotalIngresos()));
         if (ingresos.isEmpty()) {
             System.out.println("  No hay ingresos registrados en este mes.");
         } else {
             for (ItemPresupuesto item : ingresos) {
                 System.out.printf("  [%s] %-14s | %-25s | %s%n",
-                        item.getId(), item.getCategoria(), item.getDescripcion(), formatoCOP.format(item.getMonto()));
+                        item.getId(), item.getCategoria(), item.getDescripcion(), Consola.formatoCOP(item.getMonto()));
             }
         }
 
-        System.out.println("\n--- GASTOS REGISTRADOS | Total: " + formatoCOP.format(res.getTotalGastos()) + " ---");
+        Consola.subtitulo("GASTOS REGISTRADOS | Total: " + Consola.formatoCOP(res.getTotalGastos()));
         if (gastos.isEmpty()) {
             System.out.println("  No hay gastos registrados en este mes.");
         } else {
             for (ItemPresupuesto item : gastos) {
                 System.out.printf("  [%s] %-14s | %-25s | %s%n",
-                        item.getId(), item.getCategoria(), item.getDescripcion(), formatoCOP.format(item.getMonto()));
+                        item.getId(), item.getCategoria(), item.getDescripcion(), Consola.formatoCOP(item.getMonto()));
             }
         }
     }
 
     private void editarRubro(String usuario, String periodo) {
         mostrarListadosSeparados(usuario, periodo);
-        System.out.print("\nIngrese el ID del rubro a editar: ");
-        String id = scanner.nextLine().trim();
+        String id = Consola.leerLinea(scanner, "\nIngrese el ID del rubro a editar (0 cancelar): ");
+        if ("0".equals(id) || id.isEmpty()) return;
 
-        System.out.print("Nueva descripción (deje vacío para conservar): ");
-        String desc = scanner.nextLine().trim();
-
-        System.out.print("Nuevo monto (COP): ");
-        double monto = leerMonto();
+        String desc = Consola.leerLinea(scanner, "Nueva descripción (deje vacío para conservar): ");
+        double monto = Consola.leerMonto(scanner, "Nuevo monto en COP (0 cancelar): ");
+        if (monto <= 0) return;
 
         try {
-            gestor.actualizarItem(id, null, null, desc.isEmpty() ? null : desc, monto, periodo);
+            gestor.actualizarItem(usuario, id, null, null, desc.isEmpty() ? null : desc, monto, periodo);
+            BaseDatosFinara.guardar();
             System.out.println("[✓] Rubro actualizado exitosamente.");
         } catch (IllegalArgumentException e) {
             System.out.println("[!] Error: " + e.getMessage());
@@ -186,23 +186,15 @@ public class ModuloPresupuestosCLI {
 
     private void eliminarRubro(String usuario, String periodo) {
         mostrarListadosSeparados(usuario, periodo);
-        System.out.print("\nIngrese el ID del rubro a eliminar: ");
-        String id = scanner.nextLine().trim();
+        String id = Consola.leerLinea(scanner, "\nIngrese el ID del rubro a eliminar (0 cancelar): ");
+        if ("0".equals(id) || id.isEmpty()) return;
+
         try {
-            gestor.eliminarItem(id);
+            gestor.eliminarItem(usuario, id);
+            BaseDatosFinara.guardar();
             System.out.println("[✓] Rubro eliminado correctamente.");
         } catch (IllegalArgumentException e) {
             System.out.println("[!] Error: " + e.getMessage());
-        }
-    }
-
-    private double leerMonto() {
-        try {
-            String limpio = scanner.nextLine().trim().replace("$", "").replace(".", "").replace(",", ".");
-            if (limpio.isEmpty()) return 0.0;
-            return Double.parseDouble(limpio);
-        } catch (Exception e) {
-            return 0.0;
         }
     }
 }
