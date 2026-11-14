@@ -1,0 +1,138 @@
+/* Importación de la base de estilos general y de Fondo de Emergencia */
+@import url('../global/styles_finanzas.css');
+@import url('./FondoEmergencia.css');
+
+/* Contenedor principal con diseño amplio para escritorios */
+.finara-dash-container {
+    padding: 1rem 2rem 3rem 2rem;
+    max-width: 1450px;
+    margin: 0 auto;
+}
+
+/* Distribución de Grid de Escritorio */
+.grid-kpis {
+    grid-template-columns: repeat(3, 1fr) !important;
+    margin-bottom: 1.8rem;
+}
+
+.grid-main-row {
+    grid-template-columns: 1.4fr 1fr !important;
+    margin-bottom: 1.8rem;
+}
+
+.grid-bottom-row {
+    grid-template-columns: repeat(2, 1fr) !important;
+}
+
+/* Tarjetas con Fondo Oscuro Elegante (Combinación moderna) */
+.kpi-dark-card,
+.card-dark-main {
+    background: linear-gradient(135deg, rgba(20, 24, 33, 0.95) 0%, rgba(13, 17, 24, 0.98) 100%) !important;
+    border: 1px solid rgba(16, 185, 129, 0.3) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35) !important;
+}
+
+.kpi-card-item { margin-bottom: 0 !important; }
+.kpi-head-tight { margin-bottom: 0 !important; }
+
+.icon-success-dark { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4); }
+.icon-danger-dark { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+.icon-primary-dark { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+
+.kpi-title-dark { font-size: 0.82rem; color: #94a3b8; font-weight: 500; }
+.kpi-val-dark { font-size: 1.5rem; font-weight: 700; color: #ffffff !important; font-family: monospace; }
+.kpi-sub-dark { font-size: 0.75rem; color: #94a3b8; margin-top: 2px; }
+
+.text-white-custom { color: #ffffff !important; }
+.text-muted-custom { color: #94a3b8 !important; font-size: 0.82rem; }
+
+/* Gráfico de flujo en tarjeta oscura */
+.chart-box-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    height: 160px;
+    padding: 10px 0;
+}
+
+.chart-bars-container {
+    display: flex;
+    align-items: flex-end;
+    gap: 24px;
+    height: 100%;
+}
+
+.chart-column-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    height: 100%;
+    justify-content: flex-end;
+}
+
+.chart-track-dark {
+    width: 28px;
+    height: 110px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+}
+
+.chart-fill-bar {
+    width: 100%;
+    border-radius: 6px 6px 0 0;
+    transition: height 0.5s ease;
+}
+
+.bar-bg-success { background: #10b981; }
+.bar-bg-danger { background: #f87171; }
+.bar-bg-primary { background: #3b82f6; }
+
+.chart-label-dark { font-size: 0.72rem; color: #94a3b8; }
+
+.chart-legend-box-dark {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+.legend-item-row { display: flex; align-items: center; gap: 8px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+.card-flex-space { margin-bottom: 0 !important; display: flex; flex-direction: column; justify-content: space-between; }
+.head-compact { margin-bottom: 1rem !important; }
+
+.fund-label-sub { font-size: 0.82rem; color: #64748b; margin-bottom: 6px; }
+.fund-amount-val { font-size: 1.4rem; font-weight: 700; color: #0f172a; margin-bottom: 1rem; font-family: monospace; }
+.progress-custom-space { background: #f1f5f9; margin-bottom: 1rem; }
+.fund-footer-row { display: flex; justify-content: space-between; font-size: 0.8rem; color: #64748b; margin-bottom: 1.5rem; }
+
+.btn-full-width { width: 100%; justify-content: center; }
+.card-title-flex { font-size: 1.05rem; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 8px; }
+.text-success-custom { color: #10b981; }
+
+.card-no-margin { margin-bottom: 0 !important; }
+.icon-warning-custom { background: rgba(245, 158, 11, 0.12); color: #f59e0b; border-color: rgba(245, 158, 11, 0.3); }
+.head-between-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+.badge-status-neutral { font-size: 0.72rem; font-weight: 600; padding: 3px 10px; border-radius: 10px; background: #f1f5f9; color: #64748b; }
+
+.module-data-stack { display: flex; flex-direction: column; gap: 10px; margin-bottom: 1.5rem; }
+.row-bg-light { background: #f8fafc; padding: 10px 14px; border-radius: 10px; }
+.text-dark-bold { color: #0f172a !important; font-family: monospace; }
+.btn-dark-action { background: #0f172a; color: #fff; }
+
+.icon-info-custom { background: rgba(59, 130, 246, 0.12); color: #3b82f6; border-color: rgba(59, 130, 246, 0.3); }
+.pill-info-custom { background: rgba(59, 130, 246, 0.12); color: #3b82f6; border-color: rgba(59, 130, 246, 0.3); }
+.text-dark-custom { color: #0f172a; }
+
+/* Adaptabilidad responsive */
+@media (max-width: 1024px) {
+    .grid-kpis, .grid-main-row, .grid-bottom-row {
+        grid-template-columns: 1fr !important;
+    }
+}

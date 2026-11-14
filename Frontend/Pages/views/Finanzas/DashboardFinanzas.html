@@ -1,0 +1,187 @@
+<link rel="stylesheet" href="../../Style/Finanzas/DashboardFinanzas.css">
+
+<div class="fe-header">
+    <div>
+        <h1>Panel General de Salud Financiera</h1>
+    </div>
+    <div class="fe-pill">
+        <i class="fa-solid fa-calendar-days"></i> Periodo Actual
+    </div>
+</div>
+
+<!-- Fila 1: Tarjetas de Métricas Principales (KPIs con diseño oscuro de alto contraste) -->
+<div class="fe-meta-inputs-grid grid-kpis">
+    
+    <div class="fe-calculadora-card kpi-dark-card">
+        <div class="fe-card-head kpi-head-tight">
+            <div class="fe-badge-icono icon-success-dark">
+                <i class="fa-solid fa-arrow-trend-up"></i>
+            </div>
+            <div>
+                <span class="kpi-title-dark">Ingresos Totales</span>
+                <div id="dashIngresosTotal" class="kpi-val-dark">$ 0 COP</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="fe-calculadora-card kpi-dark-card">
+        <div class="fe-card-head kpi-head-tight">
+            <div class="fe-badge-icono icon-danger-dark">
+                <i class="fa-solid fa-arrow-trend-down"></i>
+            </div>
+            <div>
+                <span class="kpi-title-dark">Gastos Totales</span>
+                <div id="dashGastosTotal" class="kpi-val-dark">$ 0 COP</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="fe-calculadora-card kpi-dark-card">
+        <div class="fe-card-head kpi-head-tight">
+            <div class="fe-badge-icono icon-primary-dark">
+                <i class="fa-solid fa-wallet"></i>
+            </div>
+            <div>
+                <span class="kpi-title-dark">Balance Neto (Ahorro)</span>
+                <div id="dashSaldoNeto" class="kpi-val-dark">$ 0 COP</div>
+                <div id="dashEstadoBalance" class="kpi-sub-dark">Calculando balance...</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Fila 2: Sección de Gráficos y Fondo de Emergencia -->
+<div class="fe-calc-grid grid-main-row">
+    
+    <!-- Tarjeta Gráfico Estadístico de Flujo (Estilo oscuro elegante) -->
+    <div class="fe-calculadora-card card-dark-main">
+        <div class="fe-card-head head-compact">
+            <div class="fe-badge-icono icon-primary-dark">
+                <i class="fa-solid fa-chart-pie"></i>
+            </div>
+            <div>
+                <h3 class="text-white-custom">Análisis de Flujo Mensual</h3>
+                <p class="text-muted-custom">Comparativa visual entre tus ingresos, egresos y capacidad de ahorro.</p>
+            </div>
+        </div>
+
+        <div class="chart-box-container">
+            <div class="chart-bars-container">
+                <div class="chart-column-item">
+                    <div class="chart-track-dark">
+                        <div id="barIngresosFill" class="chart-fill-bar bar-bg-success" style="height: 0%;"></div>
+                    </div>
+                    <span class="chart-label-dark">Ingresos</span>
+                </div>
+                <div class="chart-column-item">
+                    <div class="chart-track-dark">
+                        <div id="barGastosFill" class="chart-fill-bar bar-bg-danger" style="height: 0%;"></div>
+                    </div>
+                    <span class="chart-label-dark">Gastos</span>
+                </div>
+                <div class="chart-column-item">
+                    <div class="chart-track-dark">
+                        <div id="barBalanceFill" class="chart-fill-bar bar-bg-primary" style="height: 0%;"></div>
+                    </div>
+                    <span class="chart-label-dark">Neto</span>
+                </div>
+            </div>
+
+            <div class="chart-legend-box-dark">
+                <div class="legend-item-row"><span class="legend-dot bg-success"></span> Ingresos</div>
+                <div class="legend-item-row"><span class="legend-dot bg-danger"></span> Gastos fijos</div>
+                <div class="legend-item-row"><span class="legend-dot bg-primary"></span> Capacidad neta</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tarjeta Mini Fondo de Emergencia (Fondo claro limpio) -->
+    <div class="fe-calculadora-card card-flex-space">
+        <div>
+            <div class="fe-card-head head-compact">
+                <h3 class="card-title-flex">
+                    <i class="fa-solid fa-shield-halved text-success-custom"></i> Fondo de Emergencia
+                </h3>
+                <span id="dashFondoPorcentaje" class="fe-pill">0%</span>
+            </div>
+            <div class="fund-label-sub">Saldo acumulado actual:</div>
+            <div id="dashFondoSaldoActual" class="fund-amount-val">$ 0 COP</div>
+            
+            <div class="fe-track-progreso progress-custom-space">
+                <div id="dashFondoProgresoBar" class="fe-fill-progreso" style="width: 0%;"></div>
+            </div>
+            
+            <div class="fund-footer-row">
+                <span>Meta establecida</span>
+                <strong id="dashFondoMeta" class="text-dark-custom">$ 0 COP</strong>
+            </div>
+        </div>
+
+        <button type="button" class="btn-guardar-meta btn-full-width" data-view="fondoemergencia">
+            Gestionar Fondo <i class="fa-solid fa-arrow-right"></i>
+        </button>
+    </div>
+
+</div>
+
+<!-- Fila 3: Módulos Inferiores (Deudas y Suscripciones) -->
+<div class="fe-calc-grid grid-bottom-row">
+    
+    <!-- Módulo Deudas -->
+    <div class="fe-calculadora-card card-no-margin">
+        <div class="fe-card-head head-compact">
+            <div class="fe-badge-icono icon-warning-custom">
+                <i class="fa-solid fa-scale-balanced"></i>
+            </div>
+            <div class="head-between-row">
+                <h3>Nivel de Endeudamiento</h3>
+                <span id="dashDeudaBadge" class="badge-status-neutral">Sin evaluar</span>
+            </div>
+        </div>
+
+        <div class="module-data-stack">
+            <div class="fe-desglose-fila row-bg-light">
+                <span>Deuda Total Acumulada:</span>
+                <strong id="dashDeudaTotal" class="text-dark-bold">$ 0 COP</strong>
+            </div>
+            <div class="fe-desglose-fila row-bg-light">
+                <span>Cuota Mensual Obligaciones:</span>
+                <strong id="dashDeudaCuota" class="text-dark-bold">$ 0 / mes</strong>
+            </div>
+        </div>
+
+        <button type="button" class="btn-guardar-meta btn-full-width btn-dark-action" data-view="gestiondeudas">
+            Ver Estrategias de Pago <i class="fa-solid fa-arrow-right"></i>
+        </button>
+    </div>
+
+    <!-- Módulo Suscripciones -->
+    <div class="fe-calculadora-card card-no-margin">
+        <div class="fe-card-head head-compact">
+            <div class="fe-badge-icono icon-info-custom">
+                <i class="fa-solid fa-receipt"></i>
+            </div>
+            <div class="head-between-row">
+                <h3>Control de Suscripciones</h3>
+                <span id="dashSuscripcionesTotal" class="fe-pill pill-info-custom">0 activas</span>
+            </div>
+        </div>
+
+        <div class="module-data-stack">
+            <div class="fe-desglose-fila row-bg-light">
+                <span>Gasto Fijo Recurrente:</span>
+                <strong id="dashSuscripcionesMonto" class="text-dark-bold">$ 0 / mes</strong>
+            </div>
+            <div class="fe-desglose-fila row-bg-light">
+                <span>Agenda de Pagos:</span>
+                <strong id="dashPagosPendientesCount" class="text-dark-bold">0 pendientes</strong>
+            </div>
+        </div>
+
+        <button type="button" class="btn-guardar-meta btn-full-width btn-dark-action" data-view="suscripcionespagos">
+            Auditar Suscripciones <i class="fa-solid fa-arrow-right"></i>
+        </button>
+    </div>
+
+</div>

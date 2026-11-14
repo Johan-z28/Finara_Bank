@@ -72,10 +72,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             // Mapa de rutas a vistas HTML dentro de Frontend/Pages/finanzas/
             const mapaVistas = {
-                dashboard: 'views/finanzas/DashboardFinanzas.html',
+                dashboard: 'views/Finanzas/DashboardFinanzas.html',
                 fondoemergencia: 'views/Finanzas/FondoEmergencia.html',
                 presupuesto: 'views/Finanzas/Presupuesto.html',
-                seguimiento: 'views/Finanzas/Seguimiento.html',
                 suscripcionespagos: 'views/Finanzas/SuscripcionesPagos.html',
                 saludfinanciera: 'views/Finanzas/SaludFinanciera.html',
                 gestiondeudas: 'views/Finanzas/GestionDeudas.html',
@@ -100,9 +99,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     break;
                 case "presupuesto":
                     try { const m = await import('../Finanzas/Presupuesto.js'); if (m.initPresupuestoView) await m.initPresupuestoView(); } catch (e) { }
-                    break;
-                case "seguimiento":
-                    try { const m = await import('../Finanzas/Seguimiento.js'); if (m.initSeguimientoView) await m.initSeguimientoView(); } catch (e) { }
                     break;
                 case "suscripcionespagos":
                     try { const m = await import('../Finanzas/SuscripcionesPagos.js'); if (m.initSuscripcionesPagosView) await m.initSuscripcionesPagosView(); } catch (e) { console.error(e); }
