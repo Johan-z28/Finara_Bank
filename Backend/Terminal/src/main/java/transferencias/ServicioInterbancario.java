@@ -66,7 +66,14 @@ public class ServicioInterbancario {
 
         String tipo = cuentaOrigen.getOrDefault("tipo", "AHORROS").toUpperCase();
         if (tipo.contains("CREDITO")) {
-            return Math.max(0.0, Math.floor(saldo * TOPE_AVANCE_CREDITO));
+            String cupoStr = cuentaOrigen.getOrDefault("cupoDisponible", cuentaOrigen.getOrDefault("saldo", "0")).replaceAll("[^0-9.-]", "");
+            double cupo = 0.0;
+            try {
+                cupo = Double.parseDouble(cupoStr);
+            } catch (NumberFormatException ignored) {
+                cupo = 0.0;
+            }
+            return Math.max(0.0, Math.floor(cupo * TOPE_AVANCE_CREDITO));
         } else if (tipo.contains("CORRIENTE")) {
             double sobregiro = Math.max(0.0, saldo * SOBREGIRO_CORRIENTE);
             return Math.max(0.0, saldo + sobregiro);
@@ -127,10 +134,20 @@ public class ServicioInterbancario {
             throw new IllegalArgumentException(validacion.getMensajeError());
         }
 
-        String saldoStr = cuentaOrigen.getOrDefault("saldo", "0").replaceAll("[^0-9.-]", "");
-        double saldoAnterior = Double.parseDouble(saldoStr);
-        double nuevoSaldo = saldoAnterior - validacion.getTotalDebitar();
-        cuentaOrigen.put("saldo", String.valueOf((long) nuevoSaldo));
+        String tipoOrigen = cuentaOrigen.getOrDefault("tipo", "AHORROS").toUpperCase();
+        double nuevoSaldo;
+        if (tipoOrigen.contains("CREDITO")) {
+            double cupoActual = Double.parseDouble(cuentaOrigen.getOrDefault("cupoDisponible", "0").replaceAll("[^0-9.-]", ""));
+            double deudaActual = Double.parseDouble(cuentaOrigen.getOrDefault("deudaActual", "0").replaceAll("[^0-9.-]", ""));
+            nuevoSaldo = Math.max(0.0, cupoActual - validacion.getTotalDebitar());
+            cuentaOrigen.put("cupoDisponible", String.valueOf((long) nuevoSaldo));
+            cuentaOrigen.put("deudaActual", String.valueOf((long) (deudaActual + validacion.getTotalDebitar())));
+        } else {
+            String saldoStr = cuentaOrigen.getOrDefault("saldo", "0").replaceAll("[^0-9.-]", "");
+            double saldoAnterior = Double.parseDouble(saldoStr);
+            nuevoSaldo = saldoAnterior - validacion.getTotalDebitar();
+            cuentaOrigen.put("saldo", String.valueOf((long) nuevoSaldo));
+        }
 
         Random random = new Random();
         long numeroAleatorio = 10000000L + (long)(random.nextDouble() * 90000000L);

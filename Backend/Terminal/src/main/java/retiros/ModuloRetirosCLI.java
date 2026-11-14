@@ -1,150 +1,137 @@
 package retiros;
 
-import java.text.NumberFormat;
-import java.util.HashMap;
-import java.util.Locale;
+import core.BaseDatosFinara;
+import core.Consola;
+import core.RepositorioCuentas;
+import core.RepositorioMovimientos;
+
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
 /**
- * Módulo CLI interactivo para retiros de dinero (HU-28).
- * Se puede ejecutar de forma aislada o invocarse desde main.java con iniciar(scanner, datosUsuario).
+ * Interfaz CLI integrada para el módulo de Retiro de Dinero (HU-28).
+ * Opera directamente sobre las cuentas reales compartidas del cliente.
  */
 public class ModuloRetirosCLI {
 
     public static void iniciar(Scanner scanner, Map<String, String> datosUsuario) {
-        NumberFormat formatoCOP = NumberFormat.getCurrencyInstance(new Locale("es", "CO"));
-        formatoCOP.setMaximumFractionDigits(0);
-
-        // Cuenta demo para operar en memoria
-        Map<String, String> cuenta = new HashMap<>();
-        cuenta.put("tipo", "Cuenta de Ahorros");
-        cuenta.put("numero", "4021376783977068");
-        cuenta.put("titular", datosUsuario.getOrDefault("nombre", "Juan Manuel Vélez"));
-        cuenta.put("saldo", datosUsuario.getOrDefault("saldo", "3500000"));
-        cuenta.put("estado", "ACTIVA");
+        if (datosUsuario == null || datosUsuario.isEmpty()) {
+            System.out.println("[!] Debe iniciar sesión para retirar dinero.");
+            return;
+        }
+        String correo = datosUsuario.getOrDefault("correo", datosUsuario.getOrDefault("email", "")).toLowerCase();
+        RepositorioCuentas repo = BaseDatosFinara.getInstancia().getRepositorioCuentas();
+        RepositorioMovimientos repoMovs = BaseDatosFinara.getInstancia().getRepositorioMovimientos();
 
         boolean enModulo = true;
-
         while (enModulo) {
-            double disponible = ServicioRetiros.calcularDisponible(cuenta);
-            System.out.println("\n=======================================================");
-            System.out.println("        MÓDULO DE RETIROS DE DINERO - FINARA BANK      ");
-            System.out.println("=======================================================");
-            System.out.println(" Producto:            " + cuenta.get("tipo") + " •••• " + cuenta.get("numero").substring(12));
-            System.out.println(" Saldo Real:          " + formatoCOP.format(Double.parseDouble(cuenta.get("saldo"))));
-            System.out.println(" Monto Disponible:    " + formatoCOP.format(disponible));
-            System.out.println(" Rendimiento Ahorros: 1.5% mensual aplicado al retiro");
-            System.out.println("-------------------------------------------------------");
-            System.out.println("1. Retirar Dinero (Cajero Automático / Corresponsal)");
-            System.out.println("2. Cambiar Tipo de Producto de Demostración (Ahorros / Corriente / Crédito)");
-            System.out.println("3. Volver al menú anterior");
-            System.out.print("Seleccione una opción (1-3): ");
+            List<Map<String, String>> cuentas = repo.obtenerCuentasUsuario(correo);
+            Consola.titulo("MÓDULO DE RETIROS DE DINERO - FINARA BANK");
+            if (cuentas.isEmpty()) {
+                System.out.println("[!] No tienes productos activos en este momento.");
+                System.out.println("    Solicita una Cuenta de Ahorros, Corriente o Tarjeta desde el menú principal.");
+                return;
+            }
 
-            String opcion = scanner.nextLine().trim();
+            System.out.println("1. Realizar un Retiro o Avance en Efectivo");
+            System.out.println("2. Consultar Capacidad Disponible de Retiro");
+            System.out.println("0. Volver al menú anterior");
 
+            int opcion = Consola.leerEntero(scanner, "Seleccione una opción (0-2): ", 0, 2);
             switch (opcion) {
-                case "1":
-                    ejecutarRetiro(scanner, cuenta, formatoCOP);
+                case 1:
+                    ejecutarRetiroInteractivo(scanner, correo, cuentas, repoMovs);
                     break;
-                case "2":
-                    cambiarProductoDemo(scanner, cuenta);
+                case 2:
+                    mostrarCapacidades(cuentas);
                     break;
-                case "3":
+                case 0:
                     enModulo = false;
-                    System.out.println("Saliendo del módulo de retiros...");
                     break;
-                default:
-                    System.out.println("❌ Opción inválida.");
             }
         }
     }
 
-    private static void ejecutarRetiro(Scanner scanner, Map<String, String> cuenta, NumberFormat formatoCOP) {
-        System.out.println("\n--- PASO 1: DATOS DEL RETIRO ---");
-        System.out.print("Ingrese el monto a retirar (COP): ");
-        String montoStr = scanner.nextLine().trim().replaceAll("[^0-9]", "");
-        double monto = 0;
-        try {
-            monto = Double.parseDouble(montoStr);
-        } catch (NumberFormatException e) {
-            System.out.println("❌ Monto inválido. Operación cancelada.");
-            return;
+    private static Map<String, String> seleccionarCuenta(Scanner scanner, List<Map<String, String>> cuentas) {
+        System.out.println("\nSeleccione el producto de origen:");
+        for (int i = 0; i < cuentas.size(); i++) {
+            Map<String, String> c = cuentas.get(i);
+            String tipo = c.getOrDefault("tipo", "AHORROS").toUpperCase();
+            double disp = ServicioRetiros.calcularDisponible(c);
+            System.out.printf("%d. %-10s %s | Estado: %-8s | Disp. retiro: %s%n",
+                    (i + 1), tipo, Consola.enmascararCuenta(c.get("numero")),
+                    c.getOrDefault("estado", "ACTIVA"), Consola.formatoCOP(disp));
         }
+        System.out.println("0. Cancelar");
+        int idx = Consola.leerEntero(scanner, "Opción (0-" + cuentas.size() + "): ", 1, cuentas.size());
+        return idx <= 0 ? null : cuentas.get(idx - 1);
+    }
 
-        System.out.print("Concepto o motivo del retiro (opcional): ");
-        String concepto = scanner.nextLine().trim();
-
-        System.out.println("Seleccione el canal de retiro:");
-        System.out.println(" 1. Cajero Automático Finara");
-        System.out.println(" 2. Red de Corresponsales Bancarios");
-        System.out.println(" 3. Retiro sin tarjeta con Token");
-        System.out.print("Opción (1-3): ");
-        String opcCanal = scanner.nextLine().trim();
-        String canal = "Cajero Automático Finara";
-        if ("2".equals(opcCanal)) canal = "Corresponsal Bancario";
-        else if ("3".equals(opcCanal)) canal = "Retiro con Token";
-
-        // PASO 2: Validación previa y desglose
-        ServicioRetiros.ResultadoValidacionRetiro val = ServicioRetiros.validarRetiro(cuenta, monto);
-        if (!val.isValido()) {
-            System.out.println("\n❌ ERROR: " + val.getMensajeError());
-            return;
-        }
-
-        System.out.println("\n=======================================================");
-        System.out.println("          PASO 2: RESUMEN PREVIO Y CONFIRMACIÓN        ");
-        System.out.println("=======================================================");
-        System.out.println(" Producto:             " + cuenta.get("tipo") + " •••• " + cuenta.get("numero").substring(cuenta.get("numero").length() - 4));
-        System.out.println(" Monto Solicitado:     " + formatoCOP.format(monto));
-        if (val.getInteresRendimiento() > 0) {
-            System.out.println(" Rendimiento Abonado:  +" + formatoCOP.format(val.getInteresRendimiento()) + " (1.5% beneficio)");
-        }
-        if (val.isUsaSobregiro()) {
-            System.out.println(" Sobregiro Aplicado:   " + formatoCOP.format(val.getSobregiroUsado()));
-        }
-        System.out.println(" Total a Debitar:      " + formatoCOP.format(monto));
-        System.out.println(" Saldo Resultante:     " + formatoCOP.format(val.getNuevoSaldo()));
-        System.out.println(" Comisión de Retiro:   $0 COP");
-        System.out.println("-------------------------------------------------------");
-        System.out.print("¿Desea confirmar el retiro de dinero? (S/N): ");
-        String confirm = scanner.nextLine().trim();
-
-        if (!confirm.equalsIgnoreCase("S") && !confirm.equalsIgnoreCase("SI")) {
-            System.out.println("❌ Retiro cancelado por el usuario.");
-            return;
-        }
-
-        try {
-            ComprobanteRetiro comp = ServicioRetiros.procesarRetiro(cuenta, monto, canal, concepto);
-            System.out.println("\n✅ ¡RETIRO EXITOSO!");
-            comp.imprimirComprobante();
-        } catch (Exception e) {
-            System.out.println("❌ Error inesperado: " + e.getMessage());
+    private static void mostrarCapacidades(List<Map<String, String>> cuentas) {
+        Consola.subtitulo("DISPONIBILIDAD DE RETIRO POR PRODUCTO");
+        for (Map<String, String> c : cuentas) {
+            String tipo = c.getOrDefault("tipo", "AHORROS").toUpperCase();
+            double disp = ServicioRetiros.calcularDisponible(c);
+            System.out.println(" • " + tipo + " " + Consola.enmascararCuenta(c.get("numero"))
+                    + " -> Máximo disponible para retiro: " + Consola.formatoCOP(disp));
         }
     }
 
-    private static void cambiarProductoDemo(Scanner scanner, Map<String, String> cuenta) {
-        System.out.println("\nSeleccione el tipo de producto:");
-        System.out.println(" 1. Cuenta de Ahorros (Con 1.5% rendimiento)");
-        System.out.println(" 2. Cuenta Corriente (Con 20% sobregiro)");
-        System.out.println(" 3. Tarjeta de Crédito (Con 50% avance de cupo)");
-        System.out.print("Opción (1-3): ");
-        String opc = scanner.nextLine().trim();
+    private static void ejecutarRetiroInteractivo(
+            Scanner scanner, String correo, List<Map<String, String>> cuentas, RepositorioMovimientos repoMovs) {
 
-        if ("2".equals(opc)) {
-            cuenta.put("tipo", "Cuenta Corriente");
-            cuenta.put("saldo", "2000000");
-            System.out.println("✔ Cambiado a Cuenta Corriente con saldo $2.000.000 (Disponible con sobregiro: $2.400.000)");
-        } else if ("3".equals(opc)) {
-            cuenta.put("tipo", "Tarjeta de Crédito");
-            cuenta.put("saldo", "6000000");
-            cuenta.put("cupoDisponible", "6000000");
-            System.out.println("✔ Cambiado a Tarjeta de Crédito con cupo $6.000.000 (Disponible para avance 50%: $3.000.000)");
-        } else {
-            cuenta.put("tipo", "Cuenta de Ahorros");
-            cuenta.put("saldo", "3500000");
-            System.out.println("✔ Cambiado a Cuenta de Ahorros con saldo $3.500.000");
+        Map<String, String> cuenta = seleccionarCuenta(scanner, cuentas);
+        if (cuenta == null) {
+            System.out.println("Operación cancelada.");
+            return;
+        }
+
+        double monto = Consola.leerMonto(scanner, "Monto a retirar en COP (ej. 50000, 0 para cancelar): ");
+        if (monto <= 0) {
+            System.out.println("Retiro cancelado.");
+            return;
+        }
+
+        String nota = Consola.leerLinea(scanner, "Nota / concepto del retiro (opcional): ");
+        ServicioRetiros.ResultadoValidacionRetiro val = ServicioRetiros.validarRetiro(cuenta, monto);
+        if (!val.isValido()) {
+            System.out.println("\n[X] VALIDACIÓN FALLIDA: " + val.getMensajeError());
+            return;
+        }
+
+        System.out.println("\n--- CONFIRMACIÓN DE RETIRO ---");
+        System.out.println("Producto : " + cuenta.get("tipo") + " " + Consola.enmascararCuenta(cuenta.get("numero")));
+        System.out.println("Monto    : " + Consola.formatoCOP(monto));
+        if (!Consola.confirmar(scanner, "¿Confirma realizar este retiro?")) {
+            System.out.println("Retiro cancelado por el usuario.");
+            return;
+        }
+
+        try {
+            ComprobanteRetiro comp = ServicioRetiros.procesarRetiro(cuenta, monto, "Terminal Finara", nota);
+            comp.imprimirComprobante();
+
+            String tipoProducto = cuenta.getOrDefault("tipo", "AHORROS");
+            double saldoResultante = tipoProducto.contains("CREDITO")
+                    ? comp.getNuevoCupoDisponible() : comp.getNuevoSaldo();
+            String desc = nota.isEmpty()
+                    ? "Retiro en canal Finara (" + tipoProducto + ")"
+                    : nota;
+            repoMovs.registrarMovimiento(
+                    correo,
+                    comp.getReferencia(),
+                    cuenta.get("numero"),
+                    tipoProducto,
+                    "Retiro",
+                    "EGRESO",
+                    monto,
+                    saldoResultante,
+                    desc
+            );
+            BaseDatosFinara.guardar();
+        } catch (Exception e) {
+            System.out.println("\n[X] Error al procesar retiro: " + e.getMessage());
         }
     }
 }

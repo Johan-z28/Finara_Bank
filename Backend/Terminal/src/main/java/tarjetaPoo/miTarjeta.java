@@ -1,9 +1,11 @@
 package tarjetaPoo;
 
+import java.io.Serializable;
 import java.util.Random;
 
 // Clase Padre Abstracta
-public abstract class miTarjeta {
+public abstract class miTarjeta implements Serializable {
+    private static final long serialVersionUID = 1L;
     protected String tipo;
     protected String titulo;
     protected String numeroTarjeta;
@@ -30,6 +32,11 @@ public abstract class miTarjeta {
 
     public String getTitulo() { return titulo; }
     public String getNumeroTarjeta() { return numeroTarjeta; }
+    public void setNumeroTarjeta(String numeroTarjeta) {
+        if (numeroTarjeta != null && !numeroTarjeta.trim().isEmpty()) {
+            this.numeroTarjeta = numeroTarjeta.trim();
+        }
+    }
     public String getTipo() { return tipo; }
 
     public void mostrarDetalles() {

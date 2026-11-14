@@ -1,29 +1,41 @@
 package suscripcionesPagos;
 
-import java.text.NumberFormat;
+import core.BaseDatosFinara;
+import core.Consola;
+
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Locale;
+import java.util.Map;
 import java.util.Scanner;
 
 /**
- * Interfaz de terminal (CLI) orientada al Frontend para Suscripciones, Gastos Hormiga y Pagos Pendientes (HU-22).
+ * Interfaz CLI integrada para Suscripciones, Gastos Hormiga y Pagos Pendientes (HU-22).
  */
 public class ModuloSuscripcionesPagosCLI {
-    private GestorSuscripcionesPagos gestor;
-    private Scanner scanner;
-    private NumberFormat formatoCOP;
+    private final GestorSuscripcionesPagos gestor;
+    private final Scanner scanner;
 
     public ModuloSuscripcionesPagosCLI() {
+        this(Consola.getScanner());
+    }
+
+    public ModuloSuscripcionesPagosCLI(Scanner scanner) {
         this.gestor = new GestorSuscripcionesPagos();
-        this.scanner = new Scanner(System.in);
-        this.formatoCOP = NumberFormat.getCurrencyInstance(new Locale("es", "CO"));
-        this.formatoCOP.setMaximumFractionDigits(0);
+        this.scanner = scanner != null ? scanner : Consola.getScanner();
     }
 
     public static void main(String[] args) {
-        ModuloSuscripcionesPagosCLI cli = new ModuloSuscripcionesPagosCLI();
+        BaseDatosFinara.cargar();
+        ModuloSuscripcionesPagosCLI cli = new ModuloSuscripcionesPagosCLI(Consola.getScanner());
         cli.iniciar("Juan");
+    }
+
+    public static void iniciar(Scanner scanner, Map<String, String> datosUsuario) {
+        String correo = datosUsuario != null
+                ? datosUsuario.getOrDefault("correo", datosUsuario.getOrDefault("email", "Juan"))
+                : "Juan";
+        ModuloSuscripcionesPagosCLI cli = new ModuloSuscripcionesPagosCLI(scanner);
+        cli.iniciar(correo);
     }
 
     public void iniciar(String usuarioActivo) {
@@ -31,49 +43,44 @@ public class ModuloSuscripcionesPagosCLI {
         boolean salir = false;
 
         while (!salir) {
-            System.out.println("\n=============================================================");
-            System.out.println("   FINARA FINANZAS - SUSCRIPCIONES Y PAGOS PENDIENTES (HU-22)");
-            System.out.println("   Usuario: " + usuario);
-            System.out.println("=============================================================");
+            Consola.titulo("FINARA FINANZAS - SUSCRIPCIONES Y PAGOS PENDIENTES");
+            System.out.println("Usuario: " + usuario);
+            System.out.println("-------------------------------------------------------");
             System.out.println("1. Ver Resumen 2 en 1 (Gasto Fijo, Ahorro Potencial y Alertas)");
             System.out.println("2. Ver Suscripciones y Gastos Hormiga");
             System.out.println("3. Agregar nueva Suscripción / Gasto Hormiga");
             System.out.println("4. Pausar / Reactivar / Cancelar Suscripción");
-            System.out.println("5. Ver Agenda de Pagos Pendientes");
-            System.out.println("6. Registrar nuevo Pago Pendiente");
-            System.out.println("7. Marcar Pago Pendiente como Pagado");
-            System.out.println("0. Salir");
-            System.out.print("Seleccione una opción: ");
+            System.out.println("5. Ver Agenda de Pagos Pendientes (incluye cuotas Finara)");
+            System.out.println("6. Registrar nuevo Pago Pendiente manual");
+            System.out.println("7. Marcar Pago Pendiente manual como Pagado");
+            System.out.println("0. Volver al menú anterior");
 
-            String opcion = scanner.nextLine().trim();
+            int opcion = Consola.leerEntero(scanner, "Seleccione una opción (0-7): ", 0, 7);
             switch (opcion) {
-                case "1":
+                case 1:
                     mostrarResumen(usuario);
                     break;
-                case "2":
+                case 2:
                     listarSuscripciones(usuario);
                     break;
-                case "3":
+                case 3:
                     crearSuscripcionMenu(usuario);
                     break;
-                case "4":
+                case 4:
                     cambiarEstadoSuscripcionMenu(usuario);
                     break;
-                case "5":
+                case 5:
                     listarPagosPendientes(usuario);
                     break;
-                case "6":
+                case 6:
                     crearPagoPendienteMenu(usuario);
                     break;
-                case "7":
+                case 7:
                     marcarPagoPagadoMenu(usuario);
                     break;
-                case "0":
+                case 0:
                     salir = true;
-                    System.out.println("Saliendo del módulo de Suscripciones y Pagos...");
                     break;
-                default:
-                    System.out.println("[!] Opción inválida. Intente de nuevo.");
             }
         }
     }
@@ -85,66 +92,67 @@ public class ModuloSuscripcionesPagosCLI {
         GestorSuscripcionesPagos.AhorroPotencial ahorro = gestor.calcularAhorroPotencial(usuario);
         int alertas = gestor.contarAlertasVencimiento(usuario);
 
-        System.out.println("\n--- RESUMEN MÓDULO 2 EN 1 ---");
-        System.out.println("Gasto Suscripciones Activas (Mes): " + formatoCOP.format(gastoSuscripciones));
-        System.out.println("Pagos Pendientes por Pagar       : " + formatoCOP.format(pagosPorPagar));
-        System.out.println("Gasto Fijo Recurrente Mensual    : " + formatoCOP.format(gastoFijoTotal));
-        System.out.println("Ahorro Potencial (Pausadas/Canc.): " + formatoCOP.format(ahorro.getMensual())
-                + "/mes | " + formatoCOP.format(ahorro.getAnual()) + "/año");
-        System.out.println("Alertas de Vencimiento (<=3 días): " + alertas);
+        Consola.subtitulo("RESUMEN MÓDULO 2 EN 1");
+        System.out.println("Gasto Suscripciones Activas (Mes): " + Consola.formatoCOP(gastoSuscripciones));
+        System.out.println("Pagos Pendientes por Pagar       : " + Consola.formatoCOP(pagosPorPagar));
+        System.out.println("Gasto Fijo Recurrente Mensual    : " + Consola.formatoCOP(gastoFijoTotal));
+        System.out.println("Ahorro Potencial (Pausadas/Canc.): " + Consola.formatoCOP(ahorro.getMensual())
+                + "/mes | " + Consola.formatoCOP(ahorro.getAnual()) + "/año");
+        System.out.println("Alertas de Vencimiento (<=7 días): " + alertas);
     }
 
     private void listarSuscripciones(String usuario) {
         List<Suscripcion> lista = gestor.obtenerSuscripciones(usuario);
         if (lista.isEmpty()) {
-            System.out.println("\n[!] No tienes suscripciones ni gastos hormiga registrados.");
+            System.out.println("\n[i] No tienes suscripciones ni gastos hormiga registrados.");
             return;
         }
-
-        System.out.println("\n--- SUSCRIPCIONES Y GASTOS HORMIGA ---");
+        Consola.subtitulo("SUSCRIPCIONES Y GASTOS HORMIGA");
         for (Suscripcion s : lista) {
             System.out.printf("  [%s] %-18s | %-15s | %-8s | %10s (%s/mes | %s/año) [%s]%n",
                     s.getId(), s.getNombre(), s.getCategoria(), s.getFrecuencia(),
-                    formatoCOP.format(s.getMonto()),
-                    formatoCOP.format(s.calcularCostoMensual()),
-                    formatoCOP.format(s.calcularCostoAnual()),
+                    Consola.formatoCOP(s.getMonto()),
+                    Consola.formatoCOP(s.calcularCostoMensual()),
+                    Consola.formatoCOP(s.calcularCostoAnual()),
                     s.getEstado());
         }
     }
 
     private void crearSuscripcionMenu(String usuario) {
-        System.out.println("\n--- NUEVA SUSCRIPCIÓN / GASTO HORMIGA ---");
-        System.out.print("Nombre (ej. Netflix, Café diario): ");
-        String nombre = scanner.nextLine().trim();
+        Consola.subtitulo("NUEVA SUSCRIPCIÓN / GASTO HORMIGA");
+        String nombre = Consola.leerLineaObligatoria(scanner, "Nombre (ej. Netflix, Café diario, 0 cancelar): ");
+        if (nombre == null) return;
 
         System.out.println("Categorías: Streaming | Membresía | Café y snacks | Apps y software | Transporte | Otro");
-        System.out.print("Categoría: ");
-        String categoria = scanner.nextLine().trim();
-
-        System.out.print("Frecuencia (SEMANAL / MENSUAL / ANUAL): ");
-        String frecuencia = scanner.nextLine().trim();
-
-        System.out.print("Monto (COP): ");
-        double monto = leerMonto();
+        String categoria = Consola.leerLinea(scanner, "Categoría: ");
+        String frecuencia = Consola.leerLinea(scanner, "Frecuencia (SEMANAL / MENSUAL / ANUAL): ");
+        double monto = Consola.leerMonto(scanner, "Monto en COP (0 cancelar): ");
+        if (monto <= 0) return;
 
         try {
             Suscripcion s = gestor.crearSuscripcion(usuario, nombre, categoria, monto, frecuencia);
+            BaseDatosFinara.guardar();
             System.out.println("[✓] Suscripción creada con ID: " + s.getId()
-                    + " | Impacto anual: " + formatoCOP.format(s.calcularCostoAnual()));
+                    + " | Impacto anual: " + Consola.formatoCOP(s.calcularCostoAnual()));
         } catch (IllegalArgumentException e) {
             System.out.println("[!] Error: " + e.getMessage());
         }
     }
 
     private void cambiarEstadoSuscripcionMenu(String usuario) {
+        List<Suscripcion> lista = gestor.obtenerSuscripciones(usuario);
+        if (lista.isEmpty()) {
+            System.out.println("\n[i] No tienes suscripciones registradas.");
+            return;
+        }
         listarSuscripciones(usuario);
-        System.out.print("\nIngrese el ID de la suscripción: ");
-        String id = scanner.nextLine().trim();
-        System.out.print("Nuevo estado (ACTIVA / PAUSADA / CANCELADA): ");
-        String estado = scanner.nextLine().trim();
+        String id = Consola.leerLinea(scanner, "\nID de la suscripción (0 cancelar): ");
+        if ("0".equals(id) || id.isEmpty()) return;
+        String estado = Consola.leerLinea(scanner, "Nuevo estado (ACTIVA / PAUSADA / CANCELADA): ");
 
         try {
             Suscripcion s = gestor.cambiarEstadoSuscripcion(usuario, id, estado);
+            BaseDatosFinara.guardar();
             System.out.println("[✓] Estado actualizado a " + s.getEstado() + ".");
         } catch (IllegalArgumentException e) {
             System.out.println("[!] Error: " + e.getMessage());
@@ -154,61 +162,54 @@ public class ModuloSuscripcionesPagosCLI {
     private void listarPagosPendientes(String usuario) {
         List<PagoPendiente> lista = gestor.obtenerPagosPendientes(usuario);
         if (lista.isEmpty()) {
-            System.out.println("\n[!] No tienes pagos pendientes registrados.");
+            System.out.println("\n[i] No tienes pagos pendientes registrados ni cuotas Finara próximas.");
             return;
         }
-
-        System.out.println("\n--- AGENDA DE PAGOS PENDIENTES ---");
+        Consola.subtitulo("AGENDA DE PAGOS PENDIENTES");
         for (PagoPendiente p : lista) {
-            System.out.printf("  [%s] %-20s | %-9s | Vence: %s | %10s | Estado: %s%n",
+            System.out.printf("  [%s] %-26s | %-8s | Vence: %s | %11s | Estado: %s%n",
                     p.getId(), p.getNombre(), p.getTipo(), p.getFechaVencimiento(),
-                    formatoCOP.format(p.getMonto()), p.getEstadoPago());
+                    Consola.formatoCOP(p.getMonto()), p.getEstadoPago());
         }
     }
 
     private void crearPagoPendienteMenu(String usuario) {
-        System.out.println("\n--- NUEVO PAGO PENDIENTE ---");
-        System.out.print("Concepto (ej. Internet, Tarjeta Finara): ");
-        String nombre = scanner.nextLine().trim();
+        Consola.subtitulo("NUEVO PAGO PENDIENTE");
+        String nombre = Consola.leerLineaObligatoria(scanner, "Concepto (ej. Internet, Agua, 0 cancelar): ");
+        if (nombre == null) return;
 
-        System.out.print("Tipo (SERVICIO / TARJETA / CUOTA / OTRO): ");
-        String tipo = scanner.nextLine().trim();
+        String tipo = Consola.leerLinea(scanner, "Tipo (SERVICIO / TARJETA / CUOTA / OTRO): ");
+        double monto = Consola.leerMonto(scanner, "Monto en COP (0 cancelar): ");
+        if (monto <= 0) return;
 
-        System.out.print("Monto (COP): ");
-        double monto = leerMonto();
-
-        System.out.print("Fecha de vencimiento (YYYY-MM-DD, ej. " + LocalDate.now().plusDays(2) + "): ");
-        String fechaStr = scanner.nextLine().trim();
+        String fechaStr = Consola.leerLinea(scanner,
+                "Fecha vencimiento (AAAA-MM-DD, ej. " + LocalDate.now().plusDays(3) + "): ");
 
         try {
             LocalDate fecha = LocalDate.parse(fechaStr);
             PagoPendiente p = gestor.crearPagoPendiente(usuario, nombre, tipo, monto, fecha);
+            BaseDatosFinara.guardar();
             System.out.println("[✓] Pago agendado con ID: " + p.getId() + " (" + p.getEstadoPago() + ")");
         } catch (Exception e) {
-            System.out.println("[!] Error: Verifica los datos y el formato de fecha YYYY-MM-DD.");
+            System.out.println("[!] Error: Verifica los datos y el formato de fecha AAAA-MM-DD.");
         }
     }
 
     private void marcarPagoPagadoMenu(String usuario) {
         listarPagosPendientes(usuario);
-        System.out.print("\nIngrese el ID del pago a marcar como PAGADO: ");
-        String id = scanner.nextLine().trim();
+        String id = Consola.leerLinea(scanner, "\nID del pago a marcar como PAGADO (0 cancelar): ");
+        if ("0".equals(id) || id.isEmpty()) return;
 
+        if (id.startsWith("AUTO-PRE-") || id.startsWith("AUTO-TC-")) {
+            System.out.println("[i] Los pagos Finara automáticos se liquidan desde 'Préstamos' o 'Consignar / Pagar tarjeta'.");
+            return;
+        }
         try {
             PagoPendiente p = gestor.marcarPagoComoPagado(usuario, id);
+            BaseDatosFinara.guardar();
             System.out.println("[✓] Pago '" + p.getNombre() + "' marcado como PAGADO.");
         } catch (IllegalArgumentException e) {
             System.out.println("[!] Error: " + e.getMessage());
-        }
-    }
-
-    private double leerMonto() {
-        try {
-            String limpio = scanner.nextLine().trim().replace("$", "").replace(".", "").replace(",", ".");
-            if (limpio.isEmpty()) return 0.0;
-            return Double.parseDouble(limpio);
-        } catch (Exception e) {
-            return 0.0;
         }
     }
 }

@@ -1,12 +1,14 @@
 package presupuestos;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
  * Modelo que representa un rubro de ingreso o gasto dentro del Presupuesto Mensual (HU-18 / HU-23).
  */
-public class ItemPresupuesto {
+public class ItemPresupuesto implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String id;
     private String username;
     private String tipo; // "INGRESO" o "GASTO"

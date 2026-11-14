@@ -1,5 +1,8 @@
 package form;
 
+import core.BaseDatosFinara;
+import core.Seguridad;
+
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
@@ -16,8 +19,12 @@ public class signUp {
         System.out.println("-----------------------------------------");
 
         // 1. Nombre completo
-        System.out.print("Ingrese su nombre completo: ");
+        System.out.print("Ingrese su nombre completo (0 para cancelar): ");
         String nombre = scanner.nextLine().trim();
+        if ("0".equals(nombre)) {
+            System.out.println("Registro cancelado.");
+            return;
+        }
         if (nombre.isEmpty()) {
             System.out.println("Error: El nombre no puede estar vacío.");
             return;
@@ -25,7 +32,7 @@ public class signUp {
 
         // 2. Correo electrónico (Validación con regex y duplicados)
         System.out.print("Ingrese su correo electrónico: ");
-        String correo = scanner.nextLine().trim();
+        String correo = scanner.nextLine().trim().toLowerCase();
         String regexCorreo = "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$";
         if (!correo.matches(regexCorreo)) {
             System.out.println("Error: Formato de correo electrónico inválido.");
@@ -95,22 +102,32 @@ public class signUp {
         }
 
         // Construir el diccionario de datos del usuario
+        String usernameBase = correo.contains("@") ? correo.substring(0, correo.indexOf('@')) : correo;
         Map<String, String> datosUsuario = new HashMap<>();
         datosUsuario.put("nombre", nombre);
         datosUsuario.put("correo", correo);
+        datosUsuario.put("email", correo);
+        datosUsuario.put("username", usernameBase);
         datosUsuario.put("documento", documento);
         datosUsuario.put("telefono", telefono);
         datosUsuario.put("fechaNacimiento", fechaStr);
-        datosUsuario.put("password", password);
+        datosUsuario.put("password", Seguridad.hashPassword(password));
         datosUsuario.put("direccion", direccion);
         datosUsuario.put("rol", "Cliente");
+        datosUsuario.put("estado", "ACTIVA");
+        datosUsuario.put("bloqueada", "false");
+        datosUsuario.put("intentosFallidos", "0");
         datosUsuario.put("productosActivos", "0");
         datosUsuario.put("saldoDisponible", "$ 0");
 
-        // Almacenar en la base de datos temporal en memoria (Map principal usando el correo como clave)
+        // Almacenar usando correo normalizado como clave
         baseDatosUsuarios.put(correo, datosUsuario);
+        if (baseDatosUsuarios == BaseDatosFinara.getInstancia().getUsuarios()) {
+            BaseDatosFinara.guardar();
+        }
 
-        System.out.println("\n ¡Registro exitoso en Finara Bank!");
-        System.out.println("Bienvenido/a, " + nombre + ". Ya puede iniciar sesión en el sistema.");
+        System.out.println("\n✔ ¡Registro exitoso en Finara Bank!");
+        System.out.println("Bienvenido/a, " + nombre + ". Usuario de acceso: " + correo + " (" + usernameBase + ").");
+        System.out.println("Nota: Como cliente nuevo inicia con 0 productos; solicite su primera cuenta o tarjeta desde el menú.");
     }
 }

@@ -1,12 +1,14 @@
 package suscripcionesPagos;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
 /**
  * Modelo de Pago Pendiente en la agenda mensual (HU-22).
  */
-public class PagoPendiente {
+public class PagoPendiente implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String id;
     private String username;
     private String nombre;
@@ -70,7 +72,7 @@ public class PagoPendiente {
         if (diasRestantes < 0) {
             return "VENCIDO";
         }
-        if (diasRestantes <= 3) {
+        if (diasRestantes <= 7) {
             return "PROXIMO";
         }
         return "PENDIENTE";

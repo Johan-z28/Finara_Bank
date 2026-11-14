@@ -1,5 +1,6 @@
 package movimientos;
 
+import java.io.Serializable;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -8,7 +9,8 @@ import java.util.Locale;
 /**
  * Representa un registro de movimiento financiero en Finara Bank (HU-05).
  */
-public class MovimientoFinanciero {
+public class MovimientoFinanciero implements Serializable {
+    private static final long serialVersionUID = 1L;
     private final String idMovimiento;
     private final String referencia;
     private final String numeroCuenta;
@@ -61,5 +63,21 @@ public class MovimientoFinanciero {
                 formatoCOP.format(saldoPosterior),
                 descripcion.length() > 28 ? descripcion.substring(0, 25) + "..." : descripcion
         );
+    }
+
+    public String formatoResumenLinea() {
+        NumberFormat cop = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-CO"));
+        cop.setMaximumFractionDigits(0);
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        String ultimos4 = numeroCuenta.length() > 4 ? numeroCuenta.substring(numeroCuenta.length() - 4) : numeroCuenta;
+        String signo = "INGRESO".equalsIgnoreCase(tipoOperacion) ? "+" : "-";
+        return String.format("%s | •••• %-4s | %-15s | %1s%-12s | Saldo: %-12s | %s",
+                fechaHora.format(dtf),
+                ultimos4,
+                categoria,
+                signo,
+                cop.format(valor),
+                cop.format(saldoPosterior),
+                descripcion);
     }
 }

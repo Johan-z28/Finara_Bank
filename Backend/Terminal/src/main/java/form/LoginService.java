@@ -1,5 +1,7 @@
 package form;
 
+import core.Seguridad;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -57,9 +59,13 @@ public class LoginService {
         Map<String, String> usuario = null;
         if (baseDatosUsuarios.containsKey(idLimpio)) {
             usuario = baseDatosUsuarios.get(idLimpio);
+        } else if (baseDatosUsuarios.containsKey(idLimpio.toLowerCase())) {
+            usuario = baseDatosUsuarios.get(idLimpio.toLowerCase());
         } else {
             for (Map<String, String> u : baseDatosUsuarios.values()) {
-                if (idLimpio.equalsIgnoreCase(u.get("username")) || idLimpio.equalsIgnoreCase(u.get("correo"))) {
+                if (idLimpio.equalsIgnoreCase(u.get("username"))
+                        || idLimpio.equalsIgnoreCase(u.get("correo"))
+                        || idLimpio.equalsIgnoreCase(u.get("email"))) {
                     usuario = u;
                     break;
                 }
@@ -88,8 +94,8 @@ public class LoginService {
             intentosFallidos = 0;
         }
 
-        // 2. Comprobar contraseña
-        if (usuario.getOrDefault("password", "").equals(password)) {
+        // 2. Comprobar contraseña (soporta hash SHA-256 + salt y texto plano en tests aislados)
+        if (Seguridad.verificarPassword(password, usuario.getOrDefault("password", ""))) {
             // Éxito: Resetear contador de intentos fallidos
             usuario.put("intentosFallidos", "0");
             return new ResultadoAutenticacion(true, false, MAX_INTENTOS_FALLIDOS,

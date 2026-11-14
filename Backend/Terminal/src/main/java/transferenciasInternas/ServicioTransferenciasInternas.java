@@ -115,14 +115,22 @@ public class ServicioTransferenciasInternas {
             throw new IllegalArgumentException(val.getMensajeError());
         }
 
-        double saldoActualOrigen = parsearDouble(origen.getOrDefault("saldo", "0"));
-        double nuevoSaldoOrigen = saldoActualOrigen - val.getTotalDebitar();
+        String tipoOrigen = origen.getOrDefault("tipo", "AHORROS").toUpperCase();
+        double nuevoSaldoOrigen;
+        if (tipoOrigen.contains("CREDITO") || tipoOrigen.contains("CRÉDITO")) {
+            double cupoActual = parsearDouble(origen.getOrDefault("cupoDisponible", origen.getOrDefault("saldo", "0")));
+            double deudaActual = parsearDouble(origen.getOrDefault("deudaActual", "0"));
+            nuevoSaldoOrigen = Math.max(0.0, cupoActual - val.getTotalDebitar());
+            origen.put("cupoDisponible", String.valueOf((long) nuevoSaldoOrigen));
+            origen.put("deudaActual", String.valueOf((long) (deudaActual + val.getTotalDebitar())));
+        } else {
+            double saldoActualOrigen = parsearDouble(origen.getOrDefault("saldo", "0"));
+            nuevoSaldoOrigen = saldoActualOrigen - val.getTotalDebitar();
+            origen.put("saldo", String.valueOf((long) nuevoSaldoOrigen));
+        }
 
         double saldoActualDestino = parsearDouble(destino.getOrDefault("saldo", "0"));
         double nuevoSaldoDestino = saldoActualDestino + monto;
-
-        // Atomicidad: Débito en origen y Crédito en destino
-        origen.put("saldo", String.valueOf((long) nuevoSaldoOrigen));
         destino.put("saldo", String.valueOf((long) nuevoSaldoDestino));
 
         String ref = "TRF-INT-" + System.currentTimeMillis() + "-" + (1000 + new Random().nextInt(9000));
