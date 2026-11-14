@@ -1,3 +1,4 @@
+
 /* ==============================================================
    ESTILOS SUSCRIPCIONES Y PAGOS PENDIENTES (HU-22 - FINARA FINANZAS)
    Módulo: Seguimiento Financiero / Suscripciones y Pagos
@@ -35,7 +36,7 @@
     font-size: 0.9rem;
 }
 
-/* Acciones del header (sync button) */
+/* Acciones del header */
 .sp-header-actions {
     display: flex;
     align-items: center;
@@ -169,7 +170,7 @@
 }
 
 /* ==============================================================
-   CONTENEDOR DE DOS PANELES (GRID 2 EN 1)
+   CONTENEDOR DE DOS PANELES
    ============================================================== */
 .sp-paneles-container {
     display: grid;
@@ -215,13 +216,16 @@
     color: #0f172a;
 }
 
-.sp-panel-titulo .sp-panel-badge {
-    font-size: 0.72rem;
+/* CORRECCIÓN: VISIBILIDAD DE LOS CONTADORES */
+.sp-panel-header .sp-panel-badge {
+    font-size: 0.78rem;
     padding: 3px 8px;
     border-radius: 20px;
     background: rgba(16, 185, 129, 0.1);
     color: #059669;
     font-weight: 600;
+    opacity: 1;
+    visibility: visible;
 }
 
 .sp-panel-desc {
@@ -231,7 +235,7 @@
 }
 
 /* ==============================================================
-   FORMULARIO DE ALTA RÁPIDA (SUSCRIPCIÓN & PAGO)
+   FORMULARIO DE ALTA RÁPIDA
    ============================================================== */
 .sp-form-box {
     background: #f8fafc;
@@ -286,7 +290,7 @@
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
 }
 
-/* Previsualización en vivo de valores */
+/* Previsualización en vivo */
 .sp-live-preview {
     background: rgba(16, 185, 129, 0.08);
     border: 1px dashed rgba(16, 185, 129, 0.35);
@@ -374,7 +378,7 @@
 }
 
 /* ==============================================================
-   LISTADO DE SUSCRIPCIONES (CARDS)
+   LISTADO DE SUSCRIPCIONES
    ============================================================== */
 .sp-suscripciones-list {
     display: flex;
