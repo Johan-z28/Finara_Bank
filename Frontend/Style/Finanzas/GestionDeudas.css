@@ -3,9 +3,7 @@
    Módulo: Asesoría sobre Endeudamiento, Consolidación y Estrategias
    Prefijo: gd-
    ============================================================== */
-
 @import url('../global/styles_finanzas.css');
-
 /* Header principal */
 .gd-header {
     display: flex;
@@ -15,7 +13,6 @@
     gap: 1.2rem;
     margin-bottom: 1.8rem;
 }
-
 .gd-header h1 {
     font-size: 1.65rem;
     font-weight: 700;
@@ -25,23 +22,19 @@
     gap: 10px;
     margin-bottom: 0.3rem;
 }
-
 .gd-header h1 i {
     color: var(--finanzas-primary, #10b981);
 }
-
 .gd-subtitle {
     color: #64748b;
     font-size: 0.9rem;
 }
-
 /* Header actions */
 .gd-header-actions {
     display: flex;
     align-items: center;
     gap: 10px;
 }
-
 .gd-btn-sync {
     background: rgba(16, 185, 129, 0.1);
     color: var(--finanzas-primary, #10b981);
@@ -56,12 +49,10 @@
     gap: 8px;
     transition: all 0.2s ease;
 }
-
 .gd-btn-sync:hover {
     background: rgba(16, 185, 129, 0.18);
     transform: translateY(-1px);
 }
-
 /* ==============================================================
    BLOQUE DE INGRESO MENSUAL NETO
    ============================================================== */
@@ -78,13 +69,11 @@
     flex-wrap: wrap;
     gap: 1.2rem;
 }
-
 .gd-ingreso-left {
     display: flex;
     align-items: center;
     gap: 14px;
 }
-
 .gd-ingreso-icon {
     width: 44px;
     height: 44px;
@@ -96,26 +85,22 @@
     justify-content: center;
     font-size: 1.2rem;
 }
-
 .gd-ingreso-meta h3 {
     font-size: 1rem;
     font-weight: 700;
     color: #0f172a;
     margin-bottom: 2px;
 }
-
 .gd-ingreso-meta p {
     font-size: 0.8rem;
     color: #64748b;
 }
-
 .gd-ingreso-form {
     display: flex;
     align-items: center;
     gap: 10px;
     flex-wrap: wrap;
 }
-
 .gd-input-ingreso {
     width: 200px;
     padding: 8px 12px;
@@ -127,12 +112,10 @@
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
 }
-
 .gd-input-ingreso:focus {
     border-color: var(--finanzas-primary, #10b981);
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
 }
-
 .gd-btn-presupuesto {
     background: #f1f5f9;
     color: #475569;
@@ -147,12 +130,10 @@
     gap: 6px;
     transition: all 0.2s;
 }
-
 .gd-btn-presupuesto:hover {
     background: #e2e8f0;
     color: #0f172a;
 }
-
 .gd-btn-guardar-ingreso {
     background: var(--finanzas-primary, #10b981);
     color: #ffffff;
@@ -164,40 +145,38 @@
     cursor: pointer;
     transition: background 0.2s;
 }
-
 .gd-btn-guardar-ingreso:hover {
     background: var(--finanzas-primary-dark, #059669);
 }
-
 /* ==============================================================
    FILA DE KPIS
    ============================================================== */
 .gd-kpis-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 1.2rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.8rem;
 }
-
 .gd-kpi-card {
-    background: #ffffff;
-    border: 1px solid rgba(16, 185, 129, 0.2);
+    background: linear-gradient(145deg, #151a24 0%, #111318 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 16px;
-    padding: 1.3rem 1.4rem;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+    padding: 1.25rem 1.35rem;
+    min-width: 0;
+    min-height: 118px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2);
     display: flex;
     align-items: center;
     gap: 14px;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
     position: relative;
     overflow: hidden;
 }
-
 .gd-kpi-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.07);
+    transform: translateY(-3px);
+    border-color: rgba(16, 185, 129, 0.3);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
 }
-
 .gd-kpi-card::before {
     content: '';
     position: absolute;
@@ -207,11 +186,9 @@
     height: 100%;
     background: var(--finanzas-primary, #10b981);
 }
-
 .gd-kpi-card.kpi-semaforo::before {
     background: var(--semaforo-color, #10b981);
 }
-
 .gd-kpi-icon {
     width: 46px;
     height: 46px;
@@ -221,110 +198,101 @@
     justify-content: center;
     font-size: 1.2rem;
     flex-shrink: 0;
-    background: rgba(16, 185, 129, 0.12);
-    color: var(--finanzas-primary, #10b981);
+    background: rgba(16, 185, 129, 0.14);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.2);
 }
-
 .gd-kpi-info {
     flex: 1;
     min-width: 0;
 }
-
 .gd-kpi-label {
-    font-size: 0.78rem;
-    font-weight: 500;
-    color: #64748b;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: #94a3b8;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
+    letter-spacing: 0.45px;
+    line-height: 1.45;
+    margin-bottom: 5px;
 }
-
 .gd-kpi-valor {
-    font-size: 1.35rem;
+    font-size: clamp(1.05rem, 1.3vw, 1.35rem);
     font-weight: 700;
-    color: #0f172a;
-    line-height: 1.2;
+    color: #ffffff;
+    line-height: 1.25;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
 .gd-kpi-subtexto {
     font-size: 0.76rem;
-    color: #64748b;
-    margin-top: 4px;
+    color: #94a3b8;
+    line-height: 1.45;
+    margin-top: 5px;
 }
-
 /* ==============================================================
    SECCIÓN DE RESUMEN VISUAL (MEDIDOR + DISTRIBUCIÓN)
    ============================================================== */
 .gd-visual-section {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+    grid-template-columns: minmax(390px, 0.9fr) minmax(0, 1.65fr);
+    gap: 1rem;
+    margin-bottom: 1.05rem;
+    align-items: stretch;
 }
-
-@media (min-width: 992px) {
-    .gd-visual-section {
-        grid-template-columns: 320px 1fr;
-    }
-}
-
 .gd-gauge-card {
-    background: #ffffff;
-    border: 1px solid rgba(16, 185, 129, 0.2);
+    background: linear-gradient(145deg, #151a24 0%, #111318 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 18px;
-    padding: 1.6rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    padding: 1.6rem 1.3rem;
+    min-width: 0;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.22);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
+    gap: 0.25rem;
 }
-
 /* Medidor Circular con CSS conic-gradient */
 .gd-gauge-wrapper {
     position: relative;
     width: 170px;
     height: 170px;
+    max-width: 100%;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 1rem 0;
-    background: conic-gradient(var(--gauge-color, #10b981) 0% var(--gauge-percent, 0%), #e2e8f0 var(--gauge-percent, 0%) 100%);
-    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.1);
+    margin: 1.15rem 0;
+    background: conic-gradient(var(--gauge-color, #10b981) 0% var(--gauge-percent, 0%), #273244 var(--gauge-percent, 0%) 100%);
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
 }
-
 .gd-gauge-center {
     width: 130px;
     height: 130px;
-    background: #ffffff;
+    background: #1b2230;
+    border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 50%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
-
 .gd-gauge-pct {
     font-size: 1.8rem;
     font-weight: 800;
-    color: #0f172a;
+    color: #ffffff;
     line-height: 1;
 }
-
 .gd-gauge-title {
     font-size: 0.72rem;
     font-weight: 600;
-    color: #64748b;
+    color: #aab6c8;
     text-transform: uppercase;
-    margin-top: 4px;
+    margin-top: 6px;
 }
-
 .gd-gauge-status {
     font-size: 0.88rem;
     font-weight: 700;
@@ -335,200 +303,249 @@
     align-items: center;
     gap: 6px;
 }
-
 .gd-gauge-status.saludable {
-    background: #ecfdf5;
-    color: #059669;
+    background: rgba(16, 185, 129, 0.14);
+    color: #34d399;
     border: 1px solid rgba(16, 185, 129, 0.3);
 }
-
 .gd-gauge-status.precaucion {
-    background: #fffbeb;
-    color: #d97706;
+    background: rgba(245, 158, 11, 0.14);
+    color: #fbbf24;
     border: 1px solid rgba(245, 158, 11, 0.3);
 }
-
 .gd-gauge-status.riesgo-alto {
-    background: #fff7ed;
-    color: #ea580c;
+    background: rgba(234, 88, 12, 0.14);
+    color: #fb923c;
     border: 1px solid rgba(234, 88, 12, 0.3);
 }
-
 .gd-gauge-status.critico {
-    background: #fef2f2;
-    color: #dc2626;
+    background: rgba(239, 68, 68, 0.14);
+    color: #f87171;
     border: 1px solid rgba(239, 68, 68, 0.3);
 }
-
 /* Tarjeta de distribución y línea de tiempo */
 .gd-distribucion-card {
-    background: #ffffff;
-    border: 1px solid rgba(16, 185, 129, 0.2);
+    background: linear-gradient(145deg, #151a24 0%, #111318 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 18px;
     padding: 1.6rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    min-width: 0;
+    min-height: 100%;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.22);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    gap: 1rem;
 }
-
 .gd-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
-    border-bottom: 1px solid #f1f5f9;
-    padding-bottom: 0.8rem;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 0.9rem;
 }
-
-.gd-card-header h2 {
-    font-size: 1.15rem;
+.gd-distribucion-card .gd-card-header h2 {
+    font-size: 1.12rem;
     font-weight: 700;
-    color: #0f172a;
+    color: #ffffff;
+    line-height: 1.4;
 }
-
 /* Barra multicolor de distribución */
 .gd-distribucion-barra {
     display: flex;
+    width: 100%;
     height: 16px;
     border-radius: 10px;
     overflow: hidden;
-    background: #e2e8f0;
-    margin: 1rem 0;
+    background: #273244;
+    margin: 0.7rem 0;
 }
-
 .gd-barra-segmento {
     height: 100%;
     transition: width 0.4s ease;
 }
-
 .gd-distribucion-leyenda {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 1.4rem;
+    gap: 10px 16px;
+    margin: 0.2rem 0 0.8rem;
 }
-
 .gd-leyenda-item {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 0.76rem;
-    color: #475569;
+    gap: 7px;
+    font-size: 0.78rem;
+    color: #cbd5e1;
+    line-height: 1.5;
 }
-
 .gd-leyenda-color {
     width: 10px;
     height: 10px;
     border-radius: 3px;
     flex-shrink: 0;
 }
-
 /* Línea de tiempo simple de amortización */
 .gd-timeline-container {
-    margin-top: 0.8rem;
+    margin-top: auto;
+    padding-top: 0.6rem;
 }
-
 .gd-timeline-header {
-    font-size: 0.85rem;
+    font-size: 0.88rem;
     font-weight: 600;
-    color: #334155;
-    margin-bottom: 8px;
+    color: #f1f5f9;
+    margin-bottom: 12px;
 }
-
 .gd-timeline-lista {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
     max-height: 180px;
     overflow-y: auto;
+    padding-right: 4px;
 }
-
 .gd-timeline-row {
     display: grid;
-    grid-template-columns: 140px 1fr 70px;
+    grid-template-columns: minmax(110px, 0.7fr) minmax(80px, 2fr) 70px;
     align-items: center;
-    gap: 10px;
-    font-size: 0.78rem;
+    gap: 12px;
+    font-size: 0.79rem;
 }
-
 .gd-timeline-entidad {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: #0f172a;
+    color: #e2e8f0;
     font-weight: 500;
 }
-
 .gd-timeline-bar-track {
-    background: #f1f5f9;
-    height: 8px;
+    background: #273244;
+    height: 9px;
     border-radius: 6px;
     overflow: hidden;
 }
-
 .gd-timeline-bar-fill {
     background: var(--finanzas-primary, #10b981);
     height: 100%;
     border-radius: 6px;
 }
-
 .gd-timeline-meses {
     text-align: right;
-    color: #64748b;
+    color: #aab6c8;
     font-weight: 600;
+    white-space: nowrap;
 }
-
 /* ==============================================================
    FORMULARIO Y TABLA DE OBLIGACIONES
    ============================================================== */
 .gd-obligaciones-container {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1.8rem;
-    margin-bottom: 2rem;
+    align-items: stretch;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
 }
-
-@media (min-width: 1024px) {
-    .gd-obligaciones-container {
-        grid-template-columns: 360px 1fr;
-        align-items: start;
-    }
-}
-
 .gd-form-card,
 .gd-lista-card {
-    background: #ffffff;
+    min-width: 0;
+    height: 100%;
+    box-sizing: border-box;
+    background: #ffffff; color: #0f172a;
     border: 1px solid rgba(16, 185, 129, 0.2);
     border-radius: 18px;
-    padding: 1.6rem;
+    padding: 1.4rem;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
 }
-
 .gd-form-grid {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.85rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+    gap: 0.85rem 0.75rem;
 }
-
-@media (min-width: 580px) and (max-width: 1023px) {
-    .gd-form-grid-2 {
-        grid-template-columns: 1fr 1fr;
+.gd-form-grid > .gd-form-group {
+    min-width: 0;
+}
+.gd-form-grid > .gd-form-grid-2 {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+.gd-form-grid > .gd-btn-submit,
+.gd-form-grid > #btnCancelarEdicion {
+    grid-column: 1 / -1;
+    margin-top: 0.15rem;
+}
+.gd-form-group {
+    min-width: 0;
+}
+.gd-form-input,
+.gd-form-select {
+    min-width: 0;
+    min-height: 43px;
+}
+.gd-lista-card {
+    display: flex;
+    flex-direction: column;
+}
+.gd-lista-card .gd-table-wrapper {
+    width: 100%;
+    min-width: 0;
+    flex: 1;
+    max-height: none;
+}
+.gd-table {
+    width: 100%;
+    min-width: 700px;
+}
+.gd-table th,
+.gd-table td {
+    padding: 12px 11px;
+}
+@media (min-width: 1100px) {
+    .gd-obligaciones-container {
+        grid-template-columns: minmax(390px, 0.9fr) minmax(0, 1.65fr);
     }
 }
-
+@media (max-width: 900px) {
+    .gd-form-card,
+    .gd-lista-card {
+        height: auto;
+    }
+    .gd-lista-card .gd-table-wrapper {
+        flex: initial;
+        max-height: 480px;
+    }
+}
+@media (max-width: 580px) {
+    .gd-form-card,
+    .gd-lista-card {
+        padding: 1rem;
+    }
+    .gd-form-grid {
+        grid-template-columns: 1fr;
+    }
+    .gd-form-grid > .gd-form-grid-2,
+    .gd-form-grid > .gd-btn-submit,
+    .gd-form-grid > #btnCancelarEdicion {
+        grid-column: 1;
+    }
+    .gd-form-grid > .gd-form-grid-2 {
+        grid-template-columns: 1fr;
+    }
+}
 .gd-form-group {
     display: flex;
     flex-direction: column;
     gap: 5px;
 }
-
 .gd-form-group label {
     font-size: 0.78rem;
     font-weight: 600;
     color: #475569;
 }
-
 .gd-form-input,
 .gd-form-select {
     width: 100%;
@@ -543,13 +560,11 @@
     outline: none;
     box-sizing: border-box;
 }
-
 .gd-form-input:focus,
 .gd-form-select:focus {
     border-color: var(--finanzas-primary, #10b981);
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
 }
-
 .gd-btn-submit {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: #ffffff;
@@ -568,12 +583,10 @@
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
     margin-top: 0.5rem;
 }
-
 .gd-btn-submit:hover {
     transform: translateY(-1px);
     box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
 }
-
 /* Tabla de obligaciones */
 .gd-table-wrapper {
     overflow-x: auto;
@@ -581,14 +594,12 @@
     border-radius: 12px;
     max-height: 480px;
 }
-
 .gd-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.84rem;
     text-align: left;
 }
-
 .gd-table th {
     background: #f8fafc;
     color: #475569;
@@ -597,18 +608,15 @@
     border-bottom: 1px solid #e2e8f0;
     white-space: nowrap;
 }
-
 .gd-table td {
     padding: 12px 14px;
     border-bottom: 1px solid #f1f5f9;
     color: #0f172a;
     vertical-align: middle;
 }
-
 .gd-table tr:hover td {
     background: #f8fafc;
 }
-
 .gd-badge-finara {
     font-size: 0.68rem;
     padding: 2px 6px;
@@ -621,13 +629,11 @@
     gap: 4px;
     margin-top: 2px;
 }
-
 .gd-action-btns {
     display: flex;
     gap: 6px;
     justify-content: flex-end;
 }
-
 .gd-btn-action {
     background: transparent;
     border: 1px solid #e2e8f0;
@@ -642,18 +648,15 @@
     font-size: 0.75rem;
     transition: all 0.15s;
 }
-
 .gd-btn-action:hover {
     background: #f1f5f9;
     color: #0f172a;
 }
-
 .gd-btn-action.btn-delete:hover {
     color: #dc2626;
     border-color: #dc2626;
     background: #fef2f2;
 }
-
 /* ==============================================================
    COMPARADOR DE ESTRATEGIAS (AVALANCHA VS BOLA DE NIEVE)
    ============================================================== */
@@ -663,9 +666,8 @@
     border-radius: 18px;
     padding: 1.6rem;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-    margin-bottom: 2rem;
+    margin-bottom: 1.4rem;
 }
-
 .gd-estrategias-header {
     display: flex;
     justify-content: space-between;
@@ -674,7 +676,6 @@
     gap: 1rem;
     margin-bottom: 1.4rem;
 }
-
 .gd-extra-input-box {
     display: flex;
     align-items: center;
@@ -682,7 +683,6 @@
     font-size: 0.85rem;
     color: #475569;
 }
-
 .gd-extra-input-box input {
     width: 140px;
     padding: 6px 10px;
@@ -691,19 +691,16 @@
     font-size: 0.85rem;
     outline: none;
 }
-
 .gd-estrategias-grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: 1.4rem;
 }
-
 @media (min-width: 768px) {
     .gd-estrategias-grid {
         grid-template-columns: 1fr 1fr;
     }
 }
-
 .gd-estrategia-box {
     border: 1px solid #e2e8f0;
     border-radius: 14px;
@@ -712,13 +709,11 @@
     position: relative;
     transition: all 0.2s;
 }
-
 .gd-estrategia-box.is-best {
     border-color: var(--finanzas-primary, #10b981);
     background: rgba(16, 185, 129, 0.04);
     box-shadow: 0 4px 15px rgba(16, 185, 129, 0.1);
 }
-
 .gd-estrategia-tag {
     position: absolute;
     top: -10px;
@@ -731,7 +726,6 @@
     border-radius: 12px;
     text-transform: uppercase;
 }
-
 .gd-estrategia-titulo {
     font-size: 1.05rem;
     font-weight: 700;
@@ -741,14 +735,12 @@
     gap: 8px;
     margin-bottom: 6px;
 }
-
 .gd-estrategia-desc {
     font-size: 0.78rem;
     color: #64748b;
     margin-bottom: 1rem;
     line-height: 1.4;
 }
-
 .gd-estrategia-metricas {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -756,12 +748,10 @@
     border-top: 1px solid #e2e8f0;
     padding-top: 0.8rem;
 }
-
 .gd-est-met-item {
     font-size: 0.76rem;
     color: #64748b;
 }
-
 .gd-est-met-item strong {
     display: block;
     font-size: 1.05rem;
@@ -769,7 +759,6 @@
     font-weight: 700;
     margin-top: 2px;
 }
-
 /* ==============================================================
    TARJETAS DE CONSEJOS Y RECOMENDACIONES
    ============================================================== */
@@ -779,7 +768,6 @@
     gap: 1rem;
     margin-bottom: 1.5rem;
 }
-
 .gd-consejo-card {
     background: #ffffff;
     border-radius: 14px;
@@ -790,47 +778,38 @@
     gap: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
-
 .gd-consejo-card.info {
     border-left: 4px solid #3b82f6;
 }
-
 .gd-consejo-card.warning {
     border-left: 4px solid #f59e0b;
 }
-
 .gd-consejo-card.danger {
     border-left: 4px solid #ef4444;
 }
-
 .gd-consejo-card.success {
     border-left: 4px solid #10b981;
 }
-
 .gd-consejo-icon {
     font-size: 1.25rem;
     flex-shrink: 0;
     margin-top: 2px;
 }
-
 .gd-consejo-card.info .gd-consejo-icon { color: #3b82f6; }
 .gd-consejo-card.warning .gd-consejo-icon { color: #f59e0b; }
 .gd-consejo-card.danger .gd-consejo-icon { color: #ef4444; }
 .gd-consejo-card.success .gd-consejo-icon { color: #10b981; }
-
 .gd-consejo-body h4 {
     font-size: 0.88rem;
     font-weight: 700;
     color: #0f172a;
     margin-bottom: 3px;
 }
-
 .gd-consejo-body p {
     font-size: 0.78rem;
     color: #475569;
     line-height: 1.4;
 }
-
 /* Aviso Legal */
 .gd-disclaimer {
     font-size: 0.74rem;
@@ -839,29 +818,67 @@
     margin-top: 1rem;
     line-height: 1.4;
 }
-
 /* Estado Vacío */
 .gd-empty-state {
     text-align: center;
     padding: 2.2rem 1rem;
     color: #94a3b8;
 }
-
 .gd-empty-state i {
     font-size: 2.4rem;
     color: #cbd5e1;
     margin-bottom: 0.75rem;
     display: block;
 }
-
 .gd-empty-state h3 {
     font-size: 1rem;
     font-weight: 600;
     color: #475569;
     margin-bottom: 4px;
 }
-
 .gd-empty-state p {
     font-size: 0.8rem;
     color: #64748b;
+}
+/* Ajustes de contraste exclusivos del resumen de endeudamiento */
+.gd-gauge-card h3 { color: #ffffff !important; }
+.gd-gauge-card p { color: #aab6c8 !important; }
+.gd-distribucion-card .gd-card-header span { color: #aab6c8 !important; }
+@media (max-width: 1100px) {
+    .gd-kpis-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .gd-visual-section {
+        grid-template-columns: minmax(340px, 0.95fr) minmax(0, 1.4fr);
+    }
+}
+@media (max-width: 900px) {
+    .gd-visual-section {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    .gd-gauge-card {
+        padding: 1.4rem 1rem;
+    }
+    .gd-distribucion-card {
+        padding: 1.25rem;
+    }
+}
+@media (max-width: 560px) {
+    .gd-kpis-grid {
+        grid-template-columns: 1fr;
+        gap: 0.9rem;
+    }
+    .gd-kpi-card {
+        min-height: 108px;
+        padding: 1.1rem 1.15rem;
+    }
+    .gd-timeline-row {
+        grid-template-columns: minmax(85px, 1fr) minmax(65px, 1.5fr) 58px;
+        gap: 8px;
+        font-size: 0.72rem;
+    }
+    .gd-card-header {
+        align-items: flex-start;
+    }
 }
