@@ -1,0 +1,5 @@
+/* Complemento no invasivo a los estilos actuales del chatbot. */
+#chatBody .finara-chat-options { display: flex; flex-direction: column; gap: 7px; margin: 10px 0 12px; }
+#chatBody .finara-chat-options .chat-option-btn { width: 100%; text-align: left; white-space: normal; cursor: pointer; }
+#chatBody .chat-bubble { overflow-wrap: anywhere; }
+#chatBody .finara-chat-options .chat-option-btn:focus-visible { outline: 2px solid #e5a93c; outline-offset: 2px; }

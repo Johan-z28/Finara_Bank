@@ -1,0 +1,501 @@
+@import url('global/styles.css');
+
+/* ==========================================
+   ESTILOS ESPECÍFICOS - VISTA CONSIGNAR (FINARA)
+   ========================================== */
+
+.tr-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    box-sizing: border-box !important;
+}
+
+.tr-header { 
+    margin-bottom: 0.5rem; 
+    width: 100%;
+}
+
+.tr-header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    color: #ffffff;
+}
+
+/* Layout principal alineado idéntico a transferencias */
+.deposit-container-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.8fr) minmax(300px, 1fr);
+    gap: 1.5rem;
+    align-items: start;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Tarjetas y contenedores principales unificados */
+.deposit-card-form, 
+.tr-side-card, 
+.tr-side-summary, 
+.deposit-sidebar-info > .info-widget {
+    background: var(--bg-card-dark-glass, rgba(17, 20, 29, 0.85)) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--bg-card-border, rgba(255, 255, 255, 0.08)) !important;
+    border-radius: var(--radius-card, 16px);
+    padding: 1.8rem;
+    box-shadow: var(--shadow-card, 0 10px 30px rgba(0, 0, 0, 0.4));
+    box-sizing: border-box;
+    color: #ffffff !important;
+}
+
+.card-title-box {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 1.4rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.card-icon-gold {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(229, 169, 60, 0.15);
+    color: #e5a93c;
+    font-size: 1.1rem;
+}
+
+.card-title-box h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-white, #ffffff);
+}
+
+.card-title-box span {
+    font-size: 0.8rem;
+    color: var(--text-muted, #94a3b8);
+}
+
+/* Formulario */
+.deposit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 0.8rem;
+    color: var(--text-muted, #94a3b8);
+    font-weight: 500;
+}
+
+.form-group select {
+    background: rgba(0, 0, 0, 0.4);
+    color: var(--text-white, #ffffff);
+    border: 1px solid var(--bg-card-border, rgba(255, 255, 255, 0.1));
+    border-radius: 12px;
+    padding: 12px 36px 12px 14px;
+    font-family: inherit;
+    font-size: 0.92rem;
+    width: 100%;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 16px;
+}
+
+.form-group input {
+    background: rgba(0, 0, 0, 0.4);
+    color: var(--text-white, #ffffff);
+    border: 1px solid var(--bg-card-border, rgba(255, 255, 255, 0.1));
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-family: inherit;
+    font-size: 0.92rem;
+    width: 100%;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+.form-group select option {
+    background: #11141d;
+    color: #ffffff;
+}
+
+.form-group select:hover, .form-group select:focus,
+.form-group input:hover, .form-group input:focus {
+    border-color: var(--gold-main, #e5a93c);
+    box-shadow: 0 0 0 3px rgba(229, 169, 60, 0.15);
+    outline: none;
+}
+
+.amount-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.amount-input-wrapper span {
+    position: absolute;
+    left: 16px;
+    color: var(--gold-main, #e5a93c);
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+.amount-input-wrapper input {
+    padding-left: 36px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--gold-main, #e5a93c);
+}
+
+.helper-text {
+    font-size: 0.78rem;
+    color: var(--text-muted, #94a3b8);
+}
+
+/* Botón de envío */
+.btn-submit-deposit {
+    font-family: inherit;
+    font-size: 0.92rem;
+    font-weight: 700;
+    padding: 12px 26px;
+    border-radius: 12px;
+    cursor: pointer;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #e5a93c 0%, #c48b28 100%);
+    color: #07090e;
+    box-shadow: 0 4px 16px rgba(229, 169, 60, 0.25);
+    transition: all 0.25s ease;
+    margin-top: 0.5rem;
+}
+
+.btn-submit-deposit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(229, 169, 60, 0.4);
+}
+
+/* Sidebar lateral de resumen */
+.deposit-sidebar-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.tr-side-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.tr-side-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tr-side-card__label {
+    font-size: 0.78rem;
+    color: var(--text-muted, #94a3b8) !important;
+}
+
+.tr-side-card__badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 12px;
+    text-transform: uppercase;
+}
+
+.badge--activa {
+    background: rgba(52, 211, 153, 0.15);
+    color: #34d399 !important;
+    border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.badge--bloqueada {
+    background: rgba(248, 113, 113, 0.15);
+    color: #f87171 !important;
+    border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+.tr-side-card__monto {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gold-main, #e5a93c) !important;
+}
+
+.tr-side-card__sub {
+    font-size: 0.8rem;
+    color: #cbd5e1 !important;
+}
+
+.tr-side-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.tr-side-summary h4 {
+    font-size: 0.85rem;
+    color: var(--text-white, #ffffff) !important;
+    margin-bottom: 4px;
+}
+
+.tr-side-summary__row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    color: var(--text-muted, #94a3b8) !important;
+}
+
+.tr-side-summary__row strong {
+    color: var(--text-white, #ffffff) !important;
+}
+
+.gold-text { color: var(--gold-main, #e5a93c) !important; }
+.green-text { color: #34d399 !important; }
+
+.widget-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.widget-header i {
+    font-size: 1.2rem;
+    color: var(--gold-main, #e5a93c);
+}
+
+.widget-header h4 {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--text-white, #ffffff);
+}
+
+.info-widget p {
+    color: var(--text-muted, #94a3b8);
+    font-size: 0.84rem;
+    line-height: 1.4;
+    margin: 0;
+}
+
+/* ==========================================
+   ESTILOS UNIFICADOS - SIDEBAR LATERAL (CONSIGNAR)
+   ========================================== */
+
+.deposit-sidebar-info, .tr-info {
+    background: var(--bg-card-dark-glass, rgba(17, 20, 29, 0.85)) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--bg-card-border, rgba(255, 255, 255, 0.08)) !important;
+    border-radius: var(--radius-card, 16px);
+    padding: 1.8rem;
+    box-shadow: var(--shadow-card, 0 10px 30px rgba(0, 0, 0, 0.4));
+    box-sizing: border-box;
+    color: #ffffff !important;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.deposit-sidebar-info h3, .tr-info h3 {
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    color: var(--text-white, #ffffff) !important;
+    margin-bottom: 0.2rem !important;
+}
+
+.tr-side-card {
+    background: rgba(0, 0, 0, 0.4) !important;
+    border: 1px solid rgba(229, 169, 60, 0.25) !important;
+    border-radius: 14px !important;
+    padding: 1.1rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+}
+
+.tr-side-card__header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+.tr-side-card__label {
+    font-size: 0.78rem !important;
+    color: var(--text-muted, #94a3b8) !important;
+}
+
+.tr-side-card__badge {
+    font-size: 0.7rem !important;
+    font-weight: 700 !important;
+    padding: 2px 8px !important;
+    border-radius: 12px !important;
+    text-transform: uppercase !important;
+}
+
+.badge--activa {
+    background: rgba(52, 211, 153, 0.15) !important;
+    color: #34d399 !important;
+    border: 1px solid rgba(52, 211, 153, 0.3) !important;
+}
+
+.tr-side-card__monto {
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    color: var(--gold-main, #e5a93c) !important;
+}
+
+.tr-side-card__sub {
+    font-size: 0.8rem !important;
+    color: #cbd5e1 !important;
+}
+
+.tr-side-summary {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 12px !important;
+    padding: 1rem !important;
+}
+
+.tr-side-summary h4 {
+    font-size: 0.85rem !important;
+    color: var(--text-white, #ffffff) !important;
+    margin-bottom: 4px !important;
+}
+
+.tr-side-summary__row {
+    display: flex !important;
+    justify-content: space-between !important;
+    font-size: 0.82rem !important;
+    color: var(--text-muted, #94a3b8) !important;
+}
+
+.tr-side-summary__row strong {
+    color: var(--text-white, #ffffff) !important;
+}
+
+.gold-text { color: var(--gold-main, #e5a93c) !important; }
+.green-text { color: #34d399 !important; }
+
+.tr-divider {
+    border: none !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    margin: 4px 0 !important;
+}
+
+.tr-info-features { 
+    list-style: none !important; 
+    display: flex !important; 
+    flex-direction: column !important; 
+    gap: 1rem !important; 
+    padding: 0 !important; 
+    margin: 0 !important;
+}
+
+.tr-info-features li { 
+    display: flex !important; 
+    gap: 0.9rem !important; 
+    align-items: flex-start !important; 
+}
+
+.tr-info-features li i {
+    width: 36px !important; 
+    height: 36px !important; 
+    flex-shrink: 0 !important;
+    display: flex !important; 
+    align-items: center !important; 
+    justify-content: center !important;
+    border-radius: 10px !important; 
+    color: var(--gold-main, #e5a93c) !important;
+    background: rgba(229, 169, 60, 0.12) !important;
+    border: 1px solid rgba(229, 169, 60, 0.2) !important;
+    font-size: 0.95rem !important;
+}
+
+.tr-info-features strong { 
+    display: block !important; 
+    font-size: 0.88rem !important; 
+    color: var(--text-white, #ffffff) !important; 
+    margin-bottom: 2px !important; 
+}
+
+.tr-info-features span { 
+    color: var(--text-muted, #94a3b8) !important; 
+    font-size: 0.78rem !important; 
+    line-height: 1.4 !important; 
+}
+
+/* ==========================================
+   CORRECCIÓN DEFINITIVA DE IMPRESIÓN - CONSIGNAR
+   ========================================== */
+@media print {
+    @page {
+        margin: 10mm;
+    }
+    
+    /* Ocultar todo el sitio web por defecto */
+    body * {
+        display: none !important;
+    }
+
+    /* Mostrar el voucher y absolutamente todos sus elementos internos sin excepción */
+    #impresionVoucher,
+    #impresionVoucher * {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    #impresionVoucher {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        background: #121620 !important;
+        color: #ffffff !important;
+    }
+
+    /* Asegurar que las filas de detalles mantengan su diseño de columnas separadas */
+    #impresionVoucher div[style*="display: flex"] {
+        display: flex !important;
+    }
+}
+
+@media (max-width: 992px) {
+    .deposit-container-grid { grid-template-columns: 1fr; }
+}

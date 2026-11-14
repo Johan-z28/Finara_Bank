@@ -1,0 +1,509 @@
+/* ==========================================
+   ESTILOS ASESORÍA FINANCIERA (HU-17)
+   Línea visual nítida y limpia estilo Presupuestos
+   ========================================== */
+
+@import url('../global/styles_finanzas.css');
+
+.color-esmeralda { color: var(--finanzas-primary) !important; }
+.color-verde { color: #10b981 !important; }
+
+/* Contenedor principal del chat expandido a lo ancho */
+.asesoria-chat-card {
+    background: #ffffff;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: var(--radius-card, 16px);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.chat-header-box {
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 1.2rem;
+    margin-bottom: 1.4rem !important;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.chat-header-actions {
+    display: flex;
+    gap: 10px;
+    margin-left: auto;
+    align-items: center;
+}
+
+.bot-avatar-img-fluid {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+/* Botón Historial Estilizado y Elegante */
+.btn-historial-pill {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--finanzas-primary);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    padding: 7px 14px;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-historial-pill:hover {
+    background: var(--finanzas-primary);
+    color: #07090e;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+
+.btn-text-action {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.2s;
+}
+
+.btn-text-action:hover {
+    color: var(--finanzas-primary);
+}
+
+/* Cuerpo del Chat fluido */
+.chat-body-content {
+    padding: 1rem 0;
+    max-height: 450px;
+    min-height: 300px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background: #ffffff;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Filas del Chat: Estilo WhatsApp robusto */
+.chat-message-wrapper {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    width: 100%;
+}
+
+.bot-message-row {
+    justify-content: flex-start;
+}
+
+/* Forzar fila del usuario estrictamente a la derecha */
+.user-message-row {
+    justify-content: flex-end !important;
+}
+
+.chat-bubble-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1.5px solid var(--finanzas-primary);
+    background: #0f172a;
+    flex-shrink: 0;
+    margin-bottom: 2px;
+}
+
+/* Burbujas */
+.chat-bubble {
+    padding: 12px 16px;
+    border-radius: 14px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    max-width: 80%;
+    word-break: break-word;
+}
+
+.bot-bubble {
+    background: #f1f5f9;
+    color: #0f172a !important;
+    border-top-left-radius: 4px;
+    border: 1px solid #e2e8f0;
+}
+
+.user-bubble {
+    background: var(--finanzas-primary);
+    color: #ffffff!important;
+    font-weight: 600;
+    border-radius: 14px;
+    border-top-right-radius: 4px;
+    white-space: nowrap !important;
+    padding: 12px 18px;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+/* Pie de entrada y controles */
+.chat-input-footer {
+    padding-top: 1rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.chat-input-form {
+    display: flex;
+    gap: 10px;
+}
+
+.chat-input-form input[type="text"]::-webkit-outer-spin-button,
+.chat-input-form input[type="text"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.chat-input-form input {
+    background: #ffffff;
+    color: #0f172a;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    width: 100%;
+    transition: all 0.2s ease;
+}
+
+.chat-input-form input:focus {
+    border-color: var(--finanzas-primary);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.25);
+    outline: none;
+}
+
+.chat-input-form button {
+    background: var(--finanzas-primary);
+    color: #07090e;
+    border: none;
+    padding: 0 22px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.chat-input-form button:hover {
+    background: #059669;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
+}
+
+/* Opciones de Meta Financiera compactas en Grid */
+.chat-options-stack {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
+}
+
+.chat-option-chip {
+    background: #f8fafc;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    padding: 12px 14px;
+    text-align: center;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.chat-option-chip:hover {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: var(--finanzas-primary);
+    color: #0f172a;
+}
+
+/* ========================================================
+   SECCIÓN DE RESULTADOS / INFORME FINAL (Estilo Claro)
+   ======================================================== */
+.resultado-reporte-section {
+    display: none;
+    width: 100%;
+}
+
+.asesoria-resultado-card {
+    background: #ffffff;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    border-radius: var(--radius-card, 16px);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.resultado-header-box {
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 1.2rem;
+    margin-bottom: 1.4rem !important;
+}
+
+.color-esmeralda-bg {
+    background: rgba(16, 185, 129, 0.15) !important;
+    border: 1px solid rgba(16, 185, 129, 0.3) !important;
+}
+
+.resultado-tag {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--finanzas-primary);
+    font-weight: 700;
+    display: inline-block;
+    margin-bottom: 2px;
+}
+
+.resultado-grid-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.resultado-score-box {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    border-radius: 14px;
+    padding: 1.8rem;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.resultado-score-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+.resultado-score-numero {
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 8px 0 4px 0;
+    font-family: monospace;
+}
+
+.resultado-score-nivel {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.resultado-bloque-info {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.25rem 1.4rem;
+    transition: all 0.2s ease;
+}
+
+.resultado-bloque-info:hover {
+    border-color: rgba(16, 185, 129, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.asesor-destacado-box {
+    background: rgba(16, 185, 129, 0.06);
+    border-left: 4px solid var(--finanzas-primary);
+    border-color: rgba(16, 185, 129, 0.25);
+}
+
+.resultado-bloque-info h4 {
+    font-size: 0.92rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #0f172a;
+}
+
+.color-verde-text { color: #059669 !important; }
+.color-rojo-text { color: #dc2626 !important; }
+.color-azul-text { color: #0284c7 !important; }
+
+.resultado-bloque-info p {
+    color: #334155;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.resultado-columnas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.2rem;
+}
+
+.resultado-lista-ul {
+    list-style: disc;
+    padding-left: 20px;
+    color: #334155;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* ==========================================
+   ACCIONES DEL REPORTE INFERIOR (BOTONES)
+   ========================================== */
+.reporte-acciones-wrapper {
+    display: flex;
+    gap: 16px;
+    margin-top: 1.5rem;
+    align-items: center;
+}
+
+.btn-flex-1 {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+/* Botón principal (Nueva Asesoría - Esmeralda Finara) */
+#btnRepetirEvaluacion.btn-guardar-meta {
+    background: var(--finanzas-primary) !important;
+    color: #ffffff !important;
+    border: none;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25);
+}
+
+#btnRepetirEvaluacion.btn-guardar-meta:hover {
+    background: #059669 !important;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+    transform: translateY(-1px);
+}
+
+/* Botón secundario (Ver Historial - Tarjeta Clara con Borde Esmeralda) */
+#btnVerHistorialDesdeReporte.btn-meses {
+    background: #ffffff !important;
+    color: #334155 !important;
+    border: 1px solid rgba(16, 185, 129, 0.3) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+#btnVerHistorialDesdeReporte.btn-meses:hover {
+    background: rgba(16, 185, 129, 0.08) !important;
+    border-color: var(--finanzas-primary) !important;
+    color: #0f172a !important;
+    transform: translateY(-1px);
+}
+
+/* ==========================================
+   TARJETAS DE HISTORIAL EN LISTA
+   ========================================== */
+.historial-lista-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 1rem;
+}
+
+.historial-item-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.2s ease;
+}
+
+.historial-item-card:hover {
+    border-color: var(--finanzas-primary);
+    background: #ffffff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+}
+
+.historial-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.historial-item-fecha {
+    font-size: 0.78rem;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.historial-item-score {
+    font-size: 1.2rem;
+    font-weight: 700;
+    font-family: monospace;
+}
+
+.historial-item-nivel {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.btn-ver-detalle-historial {
+    background: var(--finanzas-primary);
+    color: #07090e;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-ver-detalle-historial:hover {
+    background: #059669;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* ==========================================
+   ESTILOS DINÁMICOS DE SCORE POR COLORES
+   ========================================== */
+
+/* Score Crítico / Riesgo (< 40) -> Rojo */
+.score-critico { color: #ef4444 !important; }
+.nivel-critico { color: #f87171 !important; }
+
+/* Score En Observación (40 - 59) -> Amarillo / Ámbar */
+.score-observacion { color: #f59e0b !important; }
+.nivel-observacion { color: #fbbf24 !important; }
+
+/* Score Saludable / Estable (60 - 79) -> Verde Esmeralda Finara */
+.score-estable { color: var(--finanzas-primary) !important; }
+.nivel-estable { color: #4ade80 !important; }
+
+/* Score Excelente (>= 80) -> Verde Brillante */
+.score-excelente { color: #34d399 !important; }
+.nivel-excelente { color: #6ee7b7 !important; }

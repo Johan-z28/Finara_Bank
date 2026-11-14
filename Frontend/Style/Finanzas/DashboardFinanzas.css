@@ -1,0 +1,211 @@
+/* Importación de la base de estilos general y de Fondo de Emergencia */
+@import url('../global/styles_finanzas.css');
+@import url('./FondoEmergencia.css');
+
+/* ==========================================================================
+   CONTENEDOR PRINCIPAL DASHBOARD FINANZAS
+   ========================================================================== */
+.finara-dash-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 1.5rem 2.5rem 3rem 2.5rem !important;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+}
+
+/* Encabezado */
+.finara-dash-container .fe-header {
+    margin-bottom: 0 !important;
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.finara-dash-container .fe-header h1 {
+    color: #0f172a !important;
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* ==========================================================================
+   DISTRIBUCIÓN DE FILAS Y GRIDS (DISTRIBUCIÓN SIMÉTRICA IDÉNTICA A BANK)
+   ========================================================================== */
+
+/* Fila 1: KPIs - 3 tarjetas horizontales distribuidas de manera uniforme */
+.grid-kpis {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important; /* 3 columnas idénticas de lado a lado */
+    gap: 1.5rem !important;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Fila 2: Gráfico de Flujo y Mini Fondo */
+.grid-main-row {
+    display: grid !important;
+    grid-template-columns: 1.15fr 1fr !important;
+    gap: 1.5rem !important;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Fila 3: Módulos Inferiores (Deudas y Suscripciones) */
+.grid-bottom-row {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1.5rem !important;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   TARJETAS Y MÓDULOS DEL DASHBOARD
+   ========================================================================== */
+
+.kpi-dark-card,
+.card-dark-main {
+    background: linear-gradient(135deg, #141821 0%, #0d1118 100%) !important;
+    border: 1px solid rgba(16, 185, 129, 0.35) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
+    border-radius: 16px !important;
+    padding: 1.6rem !important;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.kpi-head-tight {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 0 !important;
+}
+
+.icon-success-dark { background: rgba(16, 185, 129, 0.18); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4); }
+.icon-danger-dark { background: rgba(239, 68, 68, 0.18); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+.icon-primary-dark { background: rgba(59, 130, 246, 0.18); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+
+.kpi-title-dark { font-size: 0.85rem; color: #94a3b8 !important; font-weight: 500; display: block; margin-bottom: 4px; }
+.kpi-val-dark { font-size: 1.5rem; font-weight: 700; color: #ffffff !important; font-family: monospace; letter-spacing: -0.5px; }
+.kpi-sub-dark { font-size: 0.78rem; color: #34d399 !important; margin-top: 4px; font-weight: 500; }
+
+.text-white-custom { color: #ffffff !important; }
+.text-muted-custom { color: #94a3b8 !important; font-size: 0.85rem; margin: 4px 0 0 0; }
+
+/* Gráfico de flujo */
+.chart-box-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    gap: 2rem;
+    height: 165px;
+    padding: 15px 0 5px 0;
+}
+
+.chart-bars-container {
+    display: flex;
+    align-items: flex-end;
+    gap: 25px;
+    height: 100%;
+}
+
+.chart-column-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    height: 100%;
+    justify-content: flex-end;
+}
+
+.chart-track-dark {
+    width: 28px;
+    height: 110px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+}
+
+.chart-fill-bar {
+    width: 100%;
+    border-radius: 6px 6px 0 0;
+    transition: height 0.5s ease;
+}
+
+.bar-bg-success { background: #10b981; }
+.bar-bg-danger { background: #f87171; }
+.bar-bg-primary { background: #3b82f6; }
+
+.chart-label-dark { font-size: 0.75rem; color: #94a3b8 !important; }
+
+.chart-legend-box-dark {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-size: 0.82rem;
+    color: #cbd5e1 !important;
+}
+
+.legend-item-row { display: flex; align-items: center; gap: 10px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+/* Tarjetas Claras */
+.card-flex-space,
+.card-no-margin {
+    background: #ffffff !important;
+    border: 1px solid rgba(16, 185, 129, 0.2) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04) !important;
+    border-radius: 16px !important;
+    padding: 1.6rem !important;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.head-compact { margin-bottom: 1.2rem !important; display: flex; align-items: center; gap: 12px; }
+
+.fund-label-sub { font-size: 0.85rem; color: #64748b !important; margin-bottom: 6px; }
+.fund-amount-val { font-size: 1.4rem; font-weight: 700; color: #0f172a !important; margin-bottom: 1rem; font-family: monospace; }
+.progress-custom-space { background: #f1f5f9; margin-bottom: 1rem; height: 8px; border-radius: 4px; overflow: hidden; }
+.fund-footer-row { display: flex; justify-content: space-between; font-size: 0.82rem; color: #64748b !important; margin-bottom: 1.4rem; }
+
+.btn-full-width { width: 100%; justify-content: center; }
+.card-title-flex { font-size: 1.1rem; color: #0f172a !important; margin: 0; display: flex; align-items: center; gap: 10px; }
+.text-success-custom { color: #10b981 !important; }
+
+.icon-warning-custom { background: rgba(245, 158, 11, 0.12); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+.head-between-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+.badge-status-neutral { font-size: 0.75rem; font-weight: 600; padding: 4px 10px; border-radius: 10px; background: #f1f5f9; color: #64748b; }
+
+.module-data-stack { display: flex; flex-direction: column; gap: 10px; margin-bottom: 1.4rem; }
+.row-bg-light { background: #f8fafc; padding: 10px 14px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f1f5f9; }
+.row-bg-light span { color: #475569 !important; font-size: 0.85rem; }
+.text-dark-bold { color: #0f172a !important; font-family: monospace; font-size: 0.9rem; }
+.btn-dark-action { background: #0f172a !important; color: #ffffff !important; border: none; }
+.btn-dark-action:hover { background: #1e293b !important; }
+
+.icon-info-custom { background: rgba(59, 130, 246, 0.12); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
+.pill-info-custom { background: rgba(59, 130, 246, 0.12); color: #3b82f6 !important; border: 1px solid rgba(59, 130, 246, 0.3); }
+.text-dark-custom { color: #0f172a !important; }
+
+/* ==========================================================================
+   ADAPTABILIDAD RESPONSIVE
+   ========================================================================== */
+@media (max-width: 1024px) {
+    .grid-kpis, .grid-main-row, .grid-bottom-row {
+        grid-template-columns: 1fr !important;
+    }
+    .chart-box-container {
+        justify-content: center;
+        gap: 3rem;
+    }
+}

@@ -1,0 +1,99 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saldos | Finara Bank</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body class="general-body">
+    <div class="saldos-container">
+        <!-- CABECERA DE SALDOS -->
+        <div class="saldos-header">
+            <div>
+                <h1>Mis cuentas</h1>
+            </div>
+
+            <!-- BOTÓN SOLICITAR PRODUCTO Y TOGGLE DE SALDOS EN CABECERA -->
+            <div class="saldos-actions-group">
+                <button class="btn-solicitar-cabecera" data-view="solicitarproductos" title="Solicitar nuevo producto">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Solicitar Producto</span>
+                </button>
+                <button class="toggle-saldos" id="toggleSaldos" aria-pressed="false" aria-label="Ocultar saldos"
+                    title="Mostrar/Ocultar saldos">
+                    <i class="fa-regular fa-eye"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- GRILLA DE TARJETAS ANCHAS -->
+        <section class="cuentas-grid" id="cuentasLista" aria-live="polite" aria-busy="true"></section>
+        <div class="cuentas-estado hidden" id="cuentasEstado" role="status"></div>
+
+        <!-- ANALÍTICA Y PATRIMONIO -->
+        <div class="saldos-analitica-grid">
+            <div class="analitica-card">
+                <div>
+                    <h2 class="analitica-card__title">Distribución de Liquidez</h2>
+                    <p class="analitica-card__subtitle">Proporción de saldo entre tus productos activos</p>
+                </div>
+
+                <div class="barra-distribucion">
+                    <div id="segCredito" class="barra-segmento--credito" style="width: 0%;"></div>
+                    <div id="segAhorros" class="barra-segmento--debito" style="width: 0%;"></div>
+                    <div id="segCorriente" class="barra-segmento--corriente" style="width: 0%;"></div>
+                </div>
+
+                <div class="distribucion-leyenda-grid">
+                    <div class="leyenda-item">
+                        <span class="leyenda-col-header">
+                            <span class="leyenda-dot leyenda-dot--credito"></span> Crédito
+                        </span>
+                        <span id="montoCreditoTotal" class="leyenda-monto-val">$ 0</span>
+                        <span id="porcentajeCredito" class="leyenda-pct-val">0%</span>
+                    </div>
+
+                    <div class="leyenda-item">
+                        <span class="leyenda-col-header">
+                            <span class="leyenda-dot leyenda-dot--debito"></span> Débito
+                        </span>
+                        <span id="montoAhorrosTotal" class="leyenda-monto-val">$ 0</span>
+                        <span id="porcentajeAhorros" class="leyenda-pct-val">0%</span>
+                    </div>
+
+                    <div class="leyenda-item">
+                        <span class="leyenda-col-header">
+                            <span class="leyenda-dot leyenda-dot--corriente"></span> Corriente
+                        </span>
+                        <span id="montoCorrienteTotal" class="leyenda-monto-val">$ 0</span>
+                        <span id="porcentajeCorriente" class="leyenda-pct-val">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="analitica-card">
+                <div>
+                    <h2 class="analitica-card__title">Patrimonio Disponible</h2>
+                    <p class="analitica-card__subtitle">Suma total de tus cuentas activas</p>
+                </div>
+
+                <div class="patrimonio-monto-box">
+                    <span class="patrimonio-label">Saldo Total Consolidado</span>
+                    <div id="saldoTotalConsolidado" class="patrimonio-valor">$ 0</div>
+                    <div class="patrimonio-badge">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Fondos disponibles para operaciones</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="../../Vanilla/Saldos.js"></script>
+</body>
+
+</html>

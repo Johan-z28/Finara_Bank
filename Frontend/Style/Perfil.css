@@ -1,13 +1,1037 @@
-@import url('Styles.css');
+/* ==========================================================================
+   FINARA BANK & FINARA FINANZAS - ESTILOS UNIFICADOS DE PERFIL
+   Diseño responsivo y adaptativo para sesiones de Bank (Gold/Dark) y Finanzas (Emerald/Light)
+   ========================================================================== */
 
-/* ==========================================
-   ESTILOS ESPECÍFICOS DEL INTERIOR DEL DASHBOARD
-   ========================================== */
+/* ==========================================================================
+   1. ESTRUCTURA Y LAYOUT GENERAL (COMPARTIDO)
+   ========================================================================== */
 
-/* Ejemplo: Títulos de sección */
-.main-content h1 {
-    font-size: 1.5rem;
+.profile-container {
+    width: 100% !important;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1.5rem 2.5rem 3rem 2.5rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+    transition: all 0.3s ease;
+}
+
+/* ENCABEZADO */
+.profile-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 0.2rem;
+    gap: 1.5rem;
+}
+
+.profile-page-header h1 {
+    margin: 0;
+    font-size: 1.85rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.profile-page-subtitle {
+    margin: 5px 0 0 0;
+    font-size: 0.92rem;
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+.btn-edit-profile {
+    padding: 11px 22px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+    border: none;
+}
+
+/* ==========================================================================
+   TARJETA HERO DEL PERFIL (AVATAR, NOMBRE, ROL, VERIFICACIÓN)
+   ========================================================================== */
+
+.profile-hero {
+    position: relative;
+    border-radius: 20px;
+    padding: 2.2rem 2.6rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    overflow: hidden;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 190px;
+}
+
+.profile-user {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    position: relative;
+    z-index: 2;
+}
+
+.profile-avatar {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.profile-avatar img {
+    width: 124px;
+    height: 124px;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.change-photo {
+    position: absolute;
+    right: 3px;
+    bottom: 3px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    z-index: 3;
+}
+
+.profile-data {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.profile-name {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.profile-name h2 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+#profileHeroRole {
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
     font-weight: 600;
-    margin-bottom: 1.5rem;
-    color: var(--text-white);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.verification-badge-container {
+    margin-top: 4px;
+}
+
+#verificationStatusBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.84rem;
+    font-weight: 600;
+}
+
+.profile-security {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    position: relative;
+    z-index: 2;
+}
+
+.profile-sec-deco {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.deco-plant {
+    font-size: 60px;
+    transition: transform 0.3s ease;
+}
+
+.profile-hero:hover .deco-plant {
+    transform: scale(1.08) rotate(5deg);
+}
+
+.deco-shield {
+    width: 72px;
+    height: 86px;
+    clip-path: polygon(50% 0%, 95% 15%, 95% 65%, 50% 100%, 5% 65%, 5% 15%);
+    font-size: 32px;
+}
+
+/* ==========================================================================
+   GRID PRINCIPAL (3 TARJETAS)
+   ========================================================================== */
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr 1fr;
+    gap: 1.6rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.profile-card {
+    border-radius: 18px;
+    padding: 1.8rem;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    min-height: 310px;
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 1.3rem;
+}
+
+.card-title h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    flex-shrink: 0;
+}
+
+/* FILAS DE INFORMACIÓN */
+.info-row {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr 36px;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 0;
+}
+
+.info-row span {
+    font-size: 0.88rem;
+    font-weight: 500;
+}
+
+.info-row strong {
+    font-size: 0.94rem;
+    font-weight: 600;
+    word-break: break-word;
+}
+
+.info-row button {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+/* FILAS DE CONFIGURACIÓN */
+.setting-row {
+    display: grid;
+    grid-template-columns: 28px 1fr 20px;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 6px;
+    font-size: 0.92rem;
+    font-weight: 500;
+}
+
+/* ITEMS DE RESUMEN */
+.summary-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    border-radius: 14px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.summary-item > div:nth-child(2) {
+    flex: 1;
+}
+
+.summary-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.summary-item small {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.summary-item strong {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+/* ==========================================================================
+   BLOQUE INFERIOR (2 TARJETAS)
+   ========================================================================== */
+
+.profile-bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.6rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.bottom-card {
+    border-radius: 18px;
+    padding: 1.8rem;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    box-sizing: border-box;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.bottom-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    flex-shrink: 0;
+}
+
+.bottom-card div:nth-child(2) {
+    flex: 1;
+}
+
+.bottom-card h3 {
+    margin: 0 0 5px 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+.bottom-card p {
+    margin: 0;
+    font-size: 0.86rem;
+    line-height: 1.4;
+}
+
+.bottom-card button {
+    margin-left: auto;
+    white-space: nowrap;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 0.86rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Input en modo edición */
+.input-edit-perfil {
+    width: 100%;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.92rem;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+
+/* ==========================================================================
+   2. TEMA FINARA BANK (DARK & GOLD LUXURY)
+   Aplica en app.html (.theme-bank o por defecto)
+   ========================================================================== */
+
+.profile-container.theme-bank,
+body.theme-bank .profile-container,
+body:not(.theme-finanzas) .profile-container {
+    color: #f1f5f9;
+}
+
+/* Encabezado */
+.profile-container.theme-bank .profile-page-header h1,
+body.theme-bank .profile-page-header h1,
+body:not(.theme-finanzas) .profile-page-header h1 {
+    color: #ffffff;
+}
+
+.profile-container.theme-bank .profile-page-subtitle,
+body.theme-bank .profile-page-subtitle,
+body:not(.theme-finanzas) .profile-page-subtitle {
+    color: #94a3b8;
+}
+
+.profile-container.theme-bank .btn-edit-profile,
+body.theme-bank .btn-edit-profile,
+body:not(.theme-finanzas) .btn-edit-profile {
+    background: linear-gradient(135deg, #e5a93c 0%, #c48b28 100%);
+    border: 1px solid #fce09b;
+    color: #0c0f17;
+    box-shadow: 0 4px 18px rgba(229, 169, 60, 0.25);
+}
+
+.profile-container.theme-bank .btn-edit-profile:hover,
+body.theme-bank .btn-edit-profile:hover,
+body:not(.theme-finanzas) .btn-edit-profile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(229, 169, 60, 0.4);
+}
+
+/* Hero */
+.profile-container.theme-bank .profile-hero,
+body.theme-bank .profile-hero,
+body:not(.theme-finanzas) .profile-hero {
+    background: linear-gradient(135deg, rgba(20, 25, 37, 0.96) 0%, rgba(12, 16, 24, 0.98) 100%) !important;
+    border: 1px solid rgba(229, 169, 60, 0.35) !important;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6) !important;
+}
+
+.profile-container.theme-bank .profile-hero::after,
+body.theme-bank .profile-hero::after,
+body:not(.theme-finanzas) .profile-hero::after {
+    content: "";
+    position: absolute;
+    width: 480px;
+    height: 220px;
+    right: -100px;
+    top: -50px;
+    border-radius: 50%;
+    border-top: 25px solid rgba(229, 169, 60, 0.28);
+    transform: rotate(-14deg);
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.profile-container.theme-bank .profile-avatar img,
+body.theme-bank .profile-avatar img,
+body:not(.theme-finanzas) .profile-avatar img {
+    border: 3.5px solid #e5a93c;
+    background: #0d111a;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+}
+
+.profile-container.theme-bank .change-photo,
+body.theme-bank .change-photo,
+body:not(.theme-finanzas) .change-photo {
+    background: #111520;
+    border: 2px solid #e5a93c;
+    color: #e5a93c;
+}
+
+.profile-container.theme-bank .change-photo:hover,
+body.theme-bank .change-photo:hover,
+body:not(.theme-finanzas) .change-photo:hover {
+    background: #e5a93c;
+    color: #0c0f17;
+    transform: scale(1.08);
+}
+
+.profile-container.theme-bank .profile-name h2,
+body.theme-bank .profile-name h2,
+body:not(.theme-finanzas) .profile-name h2 {
+    color: #ffffff;
+}
+
+.profile-container.theme-bank #profileHeroRole,
+body.theme-bank #profileHeroRole,
+body:not(.theme-finanzas) #profileHeroRole {
+    background: rgba(229, 169, 60, 0.15);
+    color: #f4b936;
+    border: 1px solid rgba(229, 169, 60, 0.4);
+}
+
+.profile-container.theme-bank .deco-plant,
+body.theme-bank .deco-plant,
+body:not(.theme-finanzas) .deco-plant {
+    color: #e5a93c;
+    filter: drop-shadow(0 0 18px rgba(229, 169, 60, 0.35));
+}
+
+.profile-container.theme-bank .deco-shield,
+body.theme-bank .deco-shield,
+body:not(.theme-finanzas) .deco-shield {
+    background: rgba(229, 169, 60, 0.12);
+    border: 2px solid rgba(229, 169, 60, 0.38);
+    color: #e5a93c;
+}
+
+/* Tarjetas Grid */
+.profile-container.theme-bank .profile-card,
+body.theme-bank .profile-card,
+body:not(.theme-finanzas) .profile-card {
+    background: linear-gradient(145deg, rgba(18, 23, 34, 0.95) 0%, rgba(12, 16, 24, 0.98) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+}
+
+.profile-container.theme-bank .profile-card:hover,
+body.theme-bank .profile-card:hover,
+body:not(.theme-finanzas) .profile-card:hover {
+    border-color: rgba(229, 169, 60, 0.35);
+}
+
+.profile-container.theme-bank .card-title h3,
+body.theme-bank .card-title h3,
+body:not(.theme-finanzas) .card-title h3 {
+    color: #ffffff;
+}
+
+.profile-container.theme-bank .card-icon,
+body.theme-bank .card-icon,
+body:not(.theme-finanzas) .card-icon {
+    background: rgba(229, 169, 60, 0.14);
+    color: #e5a93c;
+    border: 1px solid rgba(229, 169, 60, 0.25);
+}
+
+.profile-container.theme-bank .info-row,
+body.theme-bank .info-row,
+body:not(.theme-finanzas) .info-row {
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.profile-container.theme-bank .info-row span,
+body.theme-bank .info-row span,
+body:not(.theme-finanzas) .info-row span {
+    color: #94a3b8;
+}
+
+.profile-container.theme-bank .info-row strong,
+body.theme-bank .info-row strong,
+body:not(.theme-finanzas) .info-row strong {
+    color: #f1f5f9;
+}
+
+.profile-container.theme-bank .info-row button,
+body.theme-bank .info-row button,
+body:not(.theme-finanzas) .info-row button {
+    background: rgba(229, 169, 60, 0.12);
+    color: #e5a93c;
+    border: 1px solid rgba(229, 169, 60, 0.25);
+}
+
+.profile-container.theme-bank .info-row button:hover,
+body.theme-bank .info-row button:hover,
+body:not(.theme-finanzas) .info-row button:hover {
+    background: #e5a93c;
+    color: #0c0f17;
+}
+
+.profile-container.theme-bank .setting-row,
+body.theme-bank .setting-row,
+body:not(.theme-finanzas) .setting-row {
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    color: #e2e8f0;
+}
+
+.profile-container.theme-bank .setting-row:hover,
+body.theme-bank .setting-row:hover,
+body:not(.theme-finanzas) .setting-row:hover {
+    background: rgba(229, 169, 60, 0.08);
+}
+
+.profile-container.theme-bank .setting-row > i:first-child,
+.profile-container.theme-bank .setting-row > i:last-child,
+body.theme-bank .setting-row > i:first-child,
+body.theme-bank .setting-row > i:last-child,
+body:not(.theme-finanzas) .setting-row > i:first-child,
+body:not(.theme-finanzas) .setting-row > i:last-child {
+    color: #e5a93c;
+}
+
+.profile-container.theme-bank .summary-item,
+body.theme-bank .summary-item,
+body:not(.theme-finanzas) .summary-item {
+    background: rgba(14, 18, 28, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.profile-container.theme-bank .summary-item:hover,
+body.theme-bank .summary-item:hover,
+body:not(.theme-finanzas) .summary-item:hover {
+    border-color: rgba(229, 169, 60, 0.35);
+    transform: translateX(4px);
+}
+
+.profile-container.theme-bank .summary-item small,
+body.theme-bank .summary-item small,
+body:not(.theme-finanzas) .summary-item small {
+    color: #94a3b8;
+}
+
+.profile-container.theme-bank .summary-item strong,
+body.theme-bank .summary-item strong,
+body:not(.theme-finanzas) .summary-item strong {
+    color: #ffffff;
+}
+
+.profile-container.theme-bank .summary-icon.green,
+body.theme-bank .summary-icon.green,
+body:not(.theme-finanzas) .summary-icon.green {
+    background: rgba(16, 185, 129, 0.16);
+    color: #34d399;
+}
+
+.profile-container.theme-bank .summary-icon.gold,
+body.theme-bank .summary-icon.gold,
+body:not(.theme-finanzas) .summary-icon.gold {
+    background: rgba(229, 169, 60, 0.16);
+    color: #f4b936;
+}
+
+.profile-container.theme-bank .item-saldo strong,
+body.theme-bank .item-saldo strong,
+body:not(.theme-finanzas) .item-saldo strong {
+    color: #f4b936;
+}
+
+/* Tarjetas Inferiores */
+.profile-container.theme-bank .bottom-card,
+body.theme-bank .bottom-card,
+body:not(.theme-finanzas) .bottom-card {
+    background: linear-gradient(145deg, rgba(18, 23, 34, 0.95) 0%, rgba(12, 16, 24, 0.98) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+.profile-container.theme-bank .bottom-icon,
+body.theme-bank .bottom-icon,
+body:not(.theme-finanzas) .bottom-icon {
+    background: rgba(229, 169, 60, 0.14);
+    color: #e5a93c;
+    border: 1px solid rgba(229, 169, 60, 0.25);
+}
+
+.profile-container.theme-bank .bottom-card h3,
+body.theme-bank .bottom-card h3,
+body:not(.theme-finanzas) .bottom-card h3 {
+    color: #ffffff;
+}
+
+.profile-container.theme-bank .bottom-card p,
+body.theme-bank .bottom-card p,
+body:not(.theme-finanzas) .bottom-card p {
+    color: #94a3b8;
+}
+
+.profile-container.theme-bank .bottom-card button,
+body.theme-bank .bottom-card button,
+body:not(.theme-finanzas) .bottom-card button {
+    background: rgba(229, 169, 60, 0.15);
+    border: 1px solid rgba(229, 169, 60, 0.4);
+    color: #f4b936;
+}
+
+.profile-container.theme-bank .bottom-card button:hover,
+body.theme-bank .bottom-card button:hover,
+body:not(.theme-finanzas) .bottom-card button:hover {
+    background: #e5a93c;
+    color: #0c0f17;
+    box-shadow: 0 4px 16px rgba(229, 169, 60, 0.35);
+}
+
+.profile-container.theme-bank .input-edit-perfil,
+body.theme-bank .input-edit-perfil,
+body:not(.theme-finanzas) .input-edit-perfil {
+    background: #141824;
+    color: #ffffff;
+    border: 1px solid #e5a93c;
+}
+
+
+/* ==========================================================================
+   3. TEMA FINARA FINANZAS (CLEAN NEUTRAL & EMERALD GREEN)
+   Aplica en finanzas.html (.theme-finanzas)
+   ========================================================================== */
+
+.profile-container.theme-finanzas,
+body.theme-finanzas .profile-container {
+    color: #1e293b;
+}
+
+/* Encabezado */
+.profile-container.theme-finanzas .profile-page-header h1,
+body.theme-finanzas .profile-page-header h1 {
+    color: #0f172a;
+}
+
+.profile-container.theme-finanzas .profile-page-subtitle,
+body.theme-finanzas .profile-page-subtitle {
+    color: #64748b;
+}
+
+.profile-container.theme-finanzas .btn-edit-profile,
+body.theme-finanzas .btn-edit-profile {
+    background: #10b981;
+    border: 1px solid #059669;
+    color: #ffffff;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+}
+
+.profile-container.theme-finanzas .btn-edit-profile:hover,
+body.theme-finanzas .btn-edit-profile:hover {
+    background: #059669;
+    box-shadow: 0 6px 22px rgba(16, 185, 129, 0.45);
+    transform: translateY(-2px);
+}
+
+/* Hero Finanzas */
+.profile-container.theme-finanzas .profile-hero,
+body.theme-finanzas .profile-hero {
+    background: linear-gradient(135deg, rgba(6, 78, 59, 0.96) 0%, rgba(13, 22, 30, 0.98) 100%) !important;
+    border: 1px solid rgba(16, 185, 129, 0.45) !important;
+    box-shadow: 0 12px 35px rgba(16, 185, 129, 0.16), 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+.profile-container.theme-finanzas .profile-hero::after,
+body.theme-finanzas .profile-hero::after {
+    content: "";
+    position: absolute;
+    width: 480px;
+    height: 220px;
+    right: -100px;
+    top: -50px;
+    border-radius: 50%;
+    border-top: 25px solid rgba(16, 185, 129, 0.35);
+    transform: rotate(-14deg);
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.profile-container.theme-finanzas .profile-avatar img,
+body.theme-finanzas .profile-avatar img {
+    border: 3.5px solid #10b981;
+    background: #064e3b;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.profile-container.theme-finanzas .change-photo,
+body.theme-finanzas .change-photo {
+    background: #022c22;
+    border: 2px solid #10b981;
+    color: #34d399;
+}
+
+.profile-container.theme-finanzas .change-photo:hover,
+body.theme-finanzas .change-photo:hover {
+    background: #10b981;
+    color: #ffffff;
+    transform: scale(1.08);
+}
+
+.profile-container.theme-finanzas .profile-name h2,
+body.theme-finanzas .profile-name h2 {
+    color: #ffffff;
+}
+
+.profile-container.theme-finanzas #profileHeroRole,
+body.theme-finanzas #profileHeroRole {
+    background: rgba(16, 185, 129, 0.22);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.45);
+}
+
+.profile-container.theme-finanzas #verificationStatusBadge,
+body.theme-finanzas #verificationStatusBadge {
+    background: rgba(16, 185, 129, 0.25) !important;
+    border: 1px solid #10b981 !important;
+    color: #a7f3d0 !important;
+}
+
+.profile-container.theme-finanzas .deco-plant,
+body.theme-finanzas .deco-plant {
+    color: #34d399;
+    filter: drop-shadow(0 0 18px rgba(16, 185, 129, 0.4));
+}
+
+.profile-container.theme-finanzas .deco-shield,
+body.theme-finanzas .deco-shield {
+    background: rgba(16, 185, 129, 0.16);
+    border: 2px solid rgba(16, 185, 129, 0.45);
+    color: #34d399;
+}
+
+/* Tarjetas Grid Finanzas (Blancas, modernas y limpias) */
+.profile-container.theme-finanzas .profile-card,
+body.theme-finanzas .profile-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.profile-container.theme-finanzas .profile-card:hover,
+body.theme-finanzas .profile-card:hover {
+    border-color: rgba(16, 185, 129, 0.4);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.12);
+}
+
+.profile-container.theme-finanzas .card-title h3,
+body.theme-finanzas .card-title h3 {
+    color: #0f172a;
+}
+
+.profile-container.theme-finanzas .card-icon,
+body.theme-finanzas .card-icon {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.profile-container.theme-finanzas .info-row,
+body.theme-finanzas .info-row {
+    border-top: 1px solid #f1f5f9;
+}
+
+.profile-container.theme-finanzas .info-row span,
+body.theme-finanzas .info-row span {
+    color: #64748b;
+}
+
+.profile-container.theme-finanzas .info-row strong,
+body.theme-finanzas .info-row strong {
+    color: #0f172a;
+}
+
+.profile-container.theme-finanzas .info-row button,
+body.theme-finanzas .info-row button {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.profile-container.theme-finanzas .info-row button:hover,
+body.theme-finanzas .info-row button:hover {
+    background: #10b981;
+    color: #ffffff;
+}
+
+.profile-container.theme-finanzas .setting-row,
+body.theme-finanzas .setting-row {
+    border-top: 1px solid #f1f5f9;
+    color: #1e293b;
+}
+
+.profile-container.theme-finanzas .setting-row:hover,
+body.theme-finanzas .setting-row:hover {
+    background: rgba(16, 185, 129, 0.06);
+}
+
+.profile-container.theme-finanzas .setting-row > i:first-child,
+.profile-container.theme-finanzas .setting-row > i:last-child,
+body.theme-finanzas .setting-row > i:first-child,
+body.theme-finanzas .setting-row > i:last-child {
+    color: #10b981;
+}
+
+.profile-container.theme-finanzas .summary-item,
+body.theme-finanzas .summary-item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+
+.profile-container.theme-finanzas .summary-item:hover,
+body.theme-finanzas .summary-item:hover {
+    border-color: rgba(16, 185, 129, 0.4);
+    transform: translateX(4px);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.08);
+}
+
+.profile-container.theme-finanzas .summary-item small,
+body.theme-finanzas .summary-item small {
+    color: #64748b;
+}
+
+.profile-container.theme-finanzas .summary-item strong,
+body.theme-finanzas .summary-item strong {
+    color: #0f172a;
+}
+
+.profile-container.theme-finanzas .summary-icon.green,
+.profile-container.theme-finanzas .summary-icon.gold,
+body.theme-finanzas .summary-icon.green,
+body.theme-finanzas .summary-icon.gold {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.profile-container.theme-finanzas .item-saldo strong,
+body.theme-finanzas .item-saldo strong {
+    color: #047857;
+}
+
+/* Tarjetas Inferiores Finanzas */
+.profile-container.theme-finanzas .bottom-card,
+body.theme-finanzas .bottom-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.profile-container.theme-finanzas .bottom-card:hover,
+body.theme-finanzas .bottom-card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.profile-container.theme-finanzas .bottom-icon,
+body.theme-finanzas .bottom-icon {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.profile-container.theme-finanzas .bottom-card h3,
+body.theme-finanzas .bottom-card h3 {
+    color: #0f172a;
+}
+
+.profile-container.theme-finanzas .bottom-card p,
+body.theme-finanzas .bottom-card p {
+    color: #64748b;
+}
+
+.profile-container.theme-finanzas .bottom-card button,
+body.theme-finanzas .bottom-card button {
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    color: #047857;
+}
+
+.profile-container.theme-finanzas .bottom-card button:hover,
+body.theme-finanzas .bottom-card button:hover {
+    background: #10b981;
+    color: #ffffff;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.25);
+}
+
+.profile-container.theme-finanzas .input-edit-perfil,
+body.theme-finanzas .input-edit-perfil {
+    background: #ffffff;
+    color: #0f172a;
+    border: 1.5px solid #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
+}
+
+
+/* ==========================================================================
+   4. RESPONSIVIDAD Y ADAPTACIÓN EN DISPOSITIVOS MÓVILES
+   ========================================================================== */
+
+@media (max-width: 1100px) {
+    .profile-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    .profile-card.account-summary {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .profile-container {
+        padding: 1rem 1rem 2.5rem 1rem !important;
+        gap: 1.25rem;
+    }
+
+    .profile-page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .btn-edit-profile {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .profile-hero {
+        padding: 1.6rem 1.4rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+    }
+
+    .profile-security {
+        display: none;
+    }
+
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-card.account-summary {
+        grid-column: span 1;
+    }
+
+    .profile-bottom {
+        grid-template-columns: 1fr;
+    }
+
+    .bottom-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .bottom-card button {
+        margin-left: 0;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .info-row {
+        grid-template-columns: 1fr 1fr 34px;
+        font-size: 0.85rem;
+    }
 }

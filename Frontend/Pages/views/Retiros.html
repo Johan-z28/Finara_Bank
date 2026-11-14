@@ -1,0 +1,200 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retiros | Finara Bank</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="../Style/image/favicon.svg">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Librería para la generación del PDF del Voucher -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+<body class="general-body">
+    <div class="tr-container">
+        <div class="tr-header">
+            <h1>Retiro de Dinero</h1>
+        </div>
+
+        <!-- Indicador de pasos -->
+        <ol class="tr-pasos" aria-label="Progreso del retiro">
+            <li class="tr-paso activo" data-paso="1" aria-current="step"><span>1</span> Datos</li>
+            <li class="tr-paso" data-paso="2"><span>2</span> Confirmar</li>
+            <li class="tr-paso" data-paso="3"><span>3</span> Listo</li>
+        </ol>
+
+        <div class="withdraw-container-grid">
+            <!-- Columna Izquierda: Vistas dinámicas por pasos -->
+            <div class="withdraw-card-form">
+                
+                <!-- PASO 1: Formulario de Retiro -->
+                <section id="vistaForm">
+                    <div class="card-title-box">
+                        <div>
+                            <h3>Realizar Retiro</h3>
+                        </div>
+                    </div>
+
+                    <form id="formRetiro" class="withdraw-form" novalidate>
+                        <div class="form-group">
+                            <label for="cuentaOrigenSelect">Cuenta de Origen</label>
+                            <select id="cuentaOrigenSelect" required>
+                                <option value="" disabled selected>Cargando tus cuentas...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="monto-header-row">
+                                <label for="montoRetirar">Monto a Retirar</label>
+                                <button type="button" class="btn-max-amount" id="btnMaxAmount">Retirar todo</button>
+                            </div>
+                            <div class="amount-input-wrapper">
+                                <span>$</span>
+                                <input type="text" id="montoRetirar" placeholder="0" inputmode="numeric" required autocomplete="off">
+                            </div>
+                            <div class="chips-monto-container">
+                                <button type="button" class="chip-monto" data-monto="50000">$ 50.000</button>
+                                <button type="button" class="chip-monto" data-monto="100000">$ 100.000</button>
+                                <button type="button" class="chip-monto" data-monto="200000">$ 200.000</button>
+                                <button type="button" class="chip-monto" data-monto="500000">$ 500.000</button>
+                            </div>
+                            <small class="helper-text" id="helperMonto">Monto mínimo por retiro: $ 10.000 COP</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="conceptoRetiro">Concepto (Opcional)</label>
+                            <input type="text" id="conceptoRetiro" placeholder="Ej. Retiro cajero, gastos personales..." maxlength="60">
+                        </div>
+
+                        <button type="submit" class="btn-submit-withdraw" id="btnSubmitWithdraw">
+                            <i class="fa-solid fa-arrow-right"></i> Continuar
+                        </button>
+                    </form>
+                </section>
+
+                <!-- PASO 2: Resumen y Confirmación -->
+                <section class="hidden" id="vistaResumen">
+                    <h2>Revisa y confirma tu retiro</h2>
+                    <dl class="tr-lista" id="resumenLista"></dl>
+                    <p class="tr-aviso hidden" id="resumenAlerta" role="alert"></p>
+                    <p class="tr-alerta-error hidden" id="resumenError" role="alert"></p>
+                    <div class="tr-acciones" style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button type="button" class="btn-submit-withdraw" id="btnEditar" style="background: rgba(255,255,255,0.06); color: #fff; border: 1px solid rgba(255,255,255,0.12);">
+                            <i class="fa-solid fa-arrow-left"></i> Editar
+                        </button>
+                        <button type="button" class="btn-submit-withdraw" id="btnConfirmar">
+                            Confirmar retiro
+                        </button>
+                    </div>
+                </section>
+
+                <!-- PASO 3: Comprobante y Voucher de Éxito -->
+                <section class="hidden" id="vistaExito">
+                    <div class="tr-exito-header">
+                        <div class="tr-exito-icono">
+                            <i class="fa-solid fa-check" aria-hidden="true"></i>
+                        </div>
+                        <span class="tr-badge-exito">Retiro completado</span>
+                        <h2 class="tr-exito-titulo">¡Operación exitosa!</h2>
+                        <p class="tr-exito-sub">El dinero ha sido retirado correctamente y el recibo fue generado.</p>
+                    </div>
+
+                    <dl class="tr-lista" id="exitoLista"></dl>
+
+                    <div class="tr-acciones tr-acciones--exito" style="display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1.5rem;">
+                        <button type="button" class="btn-submit-withdraw" id="btnDescargarPDF">
+                            <i class="fa-solid fa-file-pdf"></i> Descargar comprobante (PDF)
+                        </button>
+                        <div style="display: flex; gap: 0.8rem; width: 100%;">
+                            <button type="button" class="btn-submit-withdraw" id="btnVerMovimientos" style="background: rgba(255,255,255,0.06); color: #fff; border: 1px solid rgba(255,255,255,0.12); flex: 1;">
+                                <i class="fa-solid fa-list-check"></i> Ver movimientos
+                            </button>
+                            <button type="button" class="btn-submit-withdraw" id="btnNueva" style="background: rgba(255,255,255,0.06); color: #fff; border: 1px solid rgba(255,255,255,0.12); flex: 1;">
+                                <i class="fa-solid fa-rotate-right"></i> Nuevo retiro
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- Columna Derecha: Panel Lateral Unificado -->
+            <aside class="withdraw-sidebar-info" aria-label="Información">
+                <h3>Retiro sin complicaciones</h3>
+
+                <!-- Tarjeta de Saldo del producto seleccionado -->
+                <div class="tr-side-card">
+                    <div class="tr-side-card__header">
+                        <span class="tr-side-card__label">Saldo del producto seleccionado</span>
+                        <span id="accountTypeBadge" class="tr-side-card__badge badge--activa">Activa</span>
+                    </div>
+                    <div id="accountCurrentBalance" class="tr-side-card__monto">$ 0</div>
+                    <div id="accountSubTxt" class="tr-side-card__sub">Selecciona un producto</div>
+                </div>
+
+                <!-- Resumen previo -->
+                <div class="tr-side-summary">
+                    <h4>Resumen previo</h4>
+                    <div class="tr-side-summary__row">
+                        <span>Monto solicitado:</span>
+                        <strong id="bdMontoSolicitado" class="gold-text">$ 0</strong>
+                    </div>
+                    <div class="tr-side-summary__row" id="bdRowInteres">
+                        <span>Interés (1.5%):</span>
+                        <strong id="bdInteresGenerado" class="green-text">+ $ 0</strong>
+                    </div>
+                    <div class="tr-side-summary__row" id="bdRowSobregiro">
+                        <span>Sobregiro:</span>
+                        <strong id="bdSobregiroUsado" class="blue-text">$ 0</strong>
+                    </div>
+                    <div class="tr-side-summary__row">
+                        <span>Total debitado:</span>
+                        <strong id="bdTotalDebitado">$ 0</strong>
+                    </div>
+                    <div class="tr-side-summary__row">
+                        <span>Nuevo saldo:</span>
+                        <strong id="bdNuevoSaldo" class="green-text">$ 0</strong>
+                    </div>
+                </div>
+
+                <!-- Tarjetas Informativas Inferiores -->
+                <div class="rule-box-content rule-box-divider">
+                    <div class="rule-icon-wrapper">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <div class="rule-box-text">
+                        <strong>Seguro</strong>
+                        <span>Validación estricta en tiempo real.</span>
+                    </div>
+                </div>
+
+                <div class="rule-box-content">
+                    <div class="rule-icon-wrapper">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <div class="rule-box-text">
+                        <strong>Rápido</strong>
+                        <span>En minutos, sin filas.</span>
+                    </div>
+                </div>
+
+                <div class="rule-box-content rule-box-divider rule-box-destacada">
+                    <div class="rule-icon-wrapper">
+                        <i class="fa-solid fa-circle-info"></i>
+                    </div>
+                    <div class="rule-box-text">
+                        <strong>Condiciones del producto</strong>
+                        <span id="accountRuleHint">Selecciona una cuenta para ver sus reglas y beneficios.</span>
+                    </div>
+                </div>
+
+            </aside>
+        </div>
+    </div>
+
+    <script type="module" src="../../Vanilla/Retiros.js"></script>
+</body>
+
+</html>
