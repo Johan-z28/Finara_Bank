@@ -41,11 +41,32 @@ document.addEventListener("DOMContentLoaded", async () => {
     const sidebarUserName = document.getElementById("sidebarUserName");
     if (sidebarUserName) sidebarUserName.textContent = nombreUsuario;
 
+    // Helper para sanitizar y normalizar ruta del avatar
+    const sanitizarAvatar = (avatar) => {
+        if (!avatar || typeof avatar !== 'string') return "../Style/image/profile/avatarDefault.png";
+        if (avatar.startsWith("data:") || avatar.startsWith("http://") || avatar.startsWith("https://")) return avatar;
+        if (avatar.includes("avatar-maria") || avatar.includes("../../") || avatar.toLowerCase().startsWith("style/") || avatar.toLowerCase().startsWith("/style/")) {
+            return "../Style/image/profile/avatarDefault.png";
+        }
+        return avatar;
+    };
+
     // Sincronizar Avatar en el Navbar
-    const avatarSrc = usuarioActivo?.avatar || (localStorage.getItem('userProfile') ? JSON.parse(localStorage.getItem('userProfile')).avatar : "../Style/image/profile/avatar-maria.png");
+    const avatarSrc = sanitizarAvatar(usuarioActivo?.avatar || (localStorage.getItem('userProfile') ? JSON.parse(localStorage.getItem('userProfile')).avatar : null));
     const navbarAvatarImg = document.getElementById("navbarAvatarImg");
-    if (navbarAvatarImg && avatarSrc) {
+    if (navbarAvatarImg) {
         navbarAvatarImg.src = avatarSrc;
+        navbarAvatarImg.onerror = () => {
+            navbarAvatarImg.onerror = null;
+            navbarAvatarImg.src = "../Style/image/profile/avatarDefault.png";
+        };
+    }
+
+    // Auto-reparar en localStorage si contenía una ruta rota
+    if (usuarioActivo && usuarioActivo.avatar !== avatarSrc) {
+        usuarioActivo.avatar = avatarSrc;
+        localStorage.setItem("userProfile", JSON.stringify(usuarioActivo));
+        localStorage.setItem("userAvatar", avatarSrc);
     }
 
     const mainContent = document.getElementById("mainContent");
@@ -132,8 +153,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                 urlFetch = `/Frontend/Pages/${mapaVistas[vistaMin] || `views/${nombreVista}.html`}`;
             }
 
-            const respuesta = await fetch(urlFetch);
-            if (!respuesta.ok) throw new Error(`No se encontró la vista en: ${urlFetch}`);
+            let respuesta = await fetch(urlFetch).catch(() => null);
+            if (!respuesta || !respuesta.ok) {
+                const fallbackUrl = urlFetch.startsWith("/Frontend/Pages/") ? urlFetch.replace("/Frontend/Pages/", "") : urlFetch;
+                const altResp = await fetch(fallbackUrl).catch(() => null);
+                if (altResp && altResp.ok) respuesta = altResp;
+            }
+            if (!respuesta || !respuesta.ok) throw new Error(`No se encontró la vista en: ${urlFetch}`);
 
             const htmlContenido = await respuesta.text();
             mainContent.innerHTML = htmlContenido;
@@ -159,7 +185,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     try { const m = await import('../newCard.js'); if (m.initSolicitarProductosView) await m.initSolicitarProductosView(); } catch (e) { }
                     break;
                 case "perfil":
-                    try { const m = await import('../Perfil.js'); if (m.initPerfilView) await m.initPerfilView(); } catch (e) { }
+                    try { const m = await import('../Perfil.js'); if (m.initPerfilView) await m.initPerfilView('bank'); } catch (e) { }
                     break;
                 case "movimientos":
                     try { const m = await import('../Movimientos.js'); if (m.initMovimientosView) await m.initMovimientosView(); } catch (e) { }

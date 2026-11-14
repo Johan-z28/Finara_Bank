@@ -113,7 +113,7 @@ function vincularModalesAdmin() {
             fecha: new Date().toISOString().split('T')[0], username, password,
             direccion: "Por definir", rol: "Cliente", productosActivos: 0,
             saldoDisponible: "$ 0", ultimaActividad: "Creado por Administrador",
-            avatar: "../../Style/image/profile/avatarDefault.png", verificado: true,
+            avatar: "../Style/image/profile/avatarDefault.png", verificado: true,
             tarjetasAprobadas: [], cuentas: []
         });
 

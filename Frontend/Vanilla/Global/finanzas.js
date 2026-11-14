@@ -37,11 +37,33 @@ document.addEventListener("DOMContentLoaded", async () => {
     const sidebarUserName = document.getElementById("sidebarUserName");
     if (sidebarUserName) sidebarUserName.textContent = nombreUsuario;
 
+    // Helper para sanitizar y normalizar ruta del avatar
+    const sanitizarAvatar = (avatar) => {
+        if (!avatar || typeof avatar !== 'string') return "../Style/image/profile/avatarDefault.png";
+        if (avatar.startsWith("data:") || avatar.startsWith("http://") || avatar.startsWith("https://")) return avatar;
+        if (avatar.includes("avatar-maria") || avatar.includes("../../") || avatar.toLowerCase().startsWith("style/") || avatar.toLowerCase().startsWith("/style/")) {
+            return "../Style/image/profile/avatarDefault.png";
+        }
+        return avatar;
+    };
+
     // Sincronizar Avatar en Navbar
-    const avatarSrc = usuarioActivo?.avatar || (localStorage.getItem('userProfile') ? JSON.parse(localStorage.getItem('userProfile')).avatar : "../Style/image/profile/avatarDefault.png");
+    const avatarSrc = sanitizarAvatar(usuarioActivo?.avatar || (localStorage.getItem('userProfile') ? JSON.parse(localStorage.getItem('userProfile')).avatar : null));
+
     const navbarAvatarImg = document.getElementById("navbarAvatarImg");
-    if (navbarAvatarImg && avatarSrc) {
+    if (navbarAvatarImg) {
         navbarAvatarImg.src = avatarSrc;
+        navbarAvatarImg.onerror = () => {
+            navbarAvatarImg.onerror = null;
+            navbarAvatarImg.src = "../Style/image/profile/avatarDefault.png";
+        };
+    }
+
+    // Auto-reparar en localStorage si contenía una ruta rota
+    if (usuarioActivo && usuarioActivo.avatar !== avatarSrc) {
+        usuarioActivo.avatar = avatarSrc;
+        localStorage.setItem("userProfile", JSON.stringify(usuarioActivo));
+        localStorage.setItem("userAvatar", avatarSrc);
     }
 
     // 2. REFERENCIAS A ELEMENTOS DEL DOM
@@ -70,22 +92,25 @@ document.addEventListener("DOMContentLoaded", async () => {
         try {
             const vistaMin = nombreVista.toLowerCase();
 
-            // Mapa de rutas a vistas HTML dentro de Frontend/Pages/finanzas/
             const mapaVistas = {
-                dashboard: 'views/finanzas/DashboardFinanzas.html',
+                dashboard: 'views/Finanzas/DashboardFinanzas.html',
                 fondoemergencia: 'views/Finanzas/FondoEmergencia.html',
                 presupuesto: 'views/Finanzas/Presupuesto.html',
-                seguimiento: 'views/Finanzas/Seguimiento.html',
                 suscripcionespagos: 'views/Finanzas/SuscripcionesPagos.html',
                 saludfinanciera: 'views/Finanzas/SaludFinanciera.html',
                 gestiondeudas: 'views/Finanzas/GestionDeudas.html',
-                perfil: 'views/Perfil.html' // Comparte la vista del perfil de Finara
+                perfil: 'views/Perfil.html' // Vista unificada de perfil
             };
 
             const urlFetch = `/Frontend/Pages/${mapaVistas[vistaMin] || `views/finanzas/${nombreVista}.html`}`;
 
-            const respuesta = await fetch(urlFetch);
-            if (!respuesta.ok) throw new Error(`No se encontró la vista en: ${urlFetch}`);
+            let respuesta = await fetch(urlFetch).catch(() => null);
+            if (!respuesta || !respuesta.ok) {
+                const fallbackUrl = urlFetch.startsWith("/Frontend/Pages/") ? urlFetch.replace("/Frontend/Pages/", "") : urlFetch;
+                const altResp = await fetch(fallbackUrl).catch(() => null);
+                if (altResp && altResp.ok) respuesta = altResp;
+            }
+            if (!respuesta || !respuesta.ok) throw new Error(`No se encontró la vista en: ${urlFetch}`);
 
             const htmlContenido = await respuesta.text();
             mainContent.innerHTML = htmlContenido;
@@ -101,9 +126,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 case "presupuesto":
                     try { const m = await import('../Finanzas/Presupuesto.js'); if (m.initPresupuestoView) await m.initPresupuestoView(); } catch (e) { }
                     break;
-                case "seguimiento":
-                    try { const m = await import('../Finanzas/Seguimiento.js'); if (m.initSeguimientoView) await m.initSeguimientoView(); } catch (e) { }
-                    break;
                 case "suscripcionespagos":
                     try { const m = await import('../Finanzas/SuscripcionesPagos.js'); if (m.initSuscripcionesPagosView) await m.initSuscripcionesPagosView(); } catch (e) { console.error(e); }
                     break;
@@ -114,7 +136,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     try { const m = await import('../Finanzas/GestionDeudas.js'); if (m.initGestionDeudasView) await m.initGestionDeudasView(); } catch (e) { console.error(e); }
                     break;
                 case "perfil":
-                    try { const m = await import('../Perfil.js'); if (m.initPerfilView) await m.initPerfilView(); } catch (e) { }
+                    try { const m = await import('../Perfil.js'); if (m.initPerfilView) await m.initPerfilView('finanzas'); } catch (e) { }
                     break;
             }
 
@@ -161,13 +183,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (btnCerrarSesion) {
         btnCerrarSesion.addEventListener("click", (e) => {
             e.preventDefault();
-            
+
             localStorage.removeItem("userProfile");
             localStorage.removeItem("emailSesion");
             localStorage.removeItem("usuarioLogueado");
-            
+
             sessionStorage.clear();
-            
+
             window.location.href = "../index.html";
         });
     }

@@ -1,18 +1,22 @@
-@import url('global/styles.css');
+/* ==========================================================================
+   FINARA BANK & FINARA FINANZAS - ESTILOS UNIFICADOS DE PERFIL
+   Diseño responsivo y adaptativo para sesiones de Bank (Gold/Dark) y Finanzas (Emerald/Light)
+   ========================================================================== */
 
-/* =========================================
-   PERFIL - ESTILO FINARA DARK / GLASS (BLOQUES)
-   ========================================= */
+/* ==========================================================================
+   1. ESTRUCTURA Y LAYOUT GENERAL (COMPARTIDO)
+   ========================================================================== */
 
-.main-content {
-    /* Margen izquierdo adecuado para separarlo del Sidebar */
-    padding: 1.5rem 2.5rem 2.5rem 3.5rem !important;
-    color: #f5f5f5;
+.profile-container {
+    width: 100% !important;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1.5rem 2.5rem 3rem 2.5rem;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-    width: 100%;
-    box-sizing: border-box;
+    gap: 1.8rem;
+    transition: all 0.3s ease;
 }
 
 /* ENCABEZADO */
@@ -20,429 +24,329 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem;
     width: 100%;
+    margin-bottom: 0.2rem;
+    gap: 1.5rem;
 }
 
 .profile-page-header h1 {
     margin: 0;
-    font-size: 1.8rem;
+    font-size: 1.85rem;
     font-weight: 700;
-    color: var(--text-white, #ffffff);
+    letter-spacing: -0.02em;
+}
+
+.profile-page-subtitle {
+    margin: 5px 0 0 0;
+    font-size: 0.92rem;
+    font-weight: 400;
+    line-height: 1.4;
 }
 
 .btn-edit-profile {
-    background: linear-gradient(135deg, #e5a93c 0%, #c48b28 100%);
-    border: 1px solid #fce09b;
-    color: #000000;
-    padding: 10px 20px;
+    padding: 11px 22px;
     border-radius: 12px;
-    font-size: 0.88rem;
+    font-size: 0.9rem;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 4px 16px rgba(229, 169, 60, 0.25);
-    transition: all 0.2s ease;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 9px;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+    border: none;
 }
 
-.btn-edit-profile:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(229, 169, 60, 0.4);
-}
-
-
-/* =========================================
-   HERO DEL PERFIL
-========================================= */
+/* ==========================================================================
+   TARJETA HERO DEL PERFIL (AVATAR, NOMBRE, ROL, VERIFICACIÓN)
+   ========================================================================== */
 
 .profile-hero {
     position: relative;
-    min-height: 200px;
-    background: var(--bg-card-dark-glass, rgba(17, 20, 29, 0.85)) !important;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--bg-card-border, rgba(255, 255, 255, 0.08)) !important;
-    border-radius: var(--radius-card, 16px);
-    overflow: hidden;
+    border-radius: 20px;
+    padding: 2.2rem 2.6rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 2rem;
-    box-shadow: var(--shadow-card, 0 10px 30px rgba(0, 0, 0, 0.4));
+    overflow: hidden;
+    width: 100%;
     box-sizing: border-box;
+    min-height: 190px;
 }
-
-/* Decoración dorada sutil */
-.profile-hero::after {
-    content: "";
-    position: absolute;
-    width: 400px;
-    height: 180px;
-    right: -80px;
-    top: -30px;
-    border-radius: 50%;
-    border-top: 20px solid rgba(229, 169, 60, 0.35);
-    transform: rotate(-15deg);
-    opacity: 0.6;
-    pointer-events: none;
-}
-
-
-/* USUARIO */
 
 .profile-user {
     display: flex;
     align-items: center;
-    gap: 25px;
+    gap: 28px;
     position: relative;
     z-index: 2;
 }
 
 .profile-avatar {
     position: relative;
+    flex-shrink: 0;
 }
 
 .profile-avatar img {
-    width: 130px;
-    height: 130px;
+    width: 124px;
+    height: 124px;
     object-fit: cover;
     border-radius: 50%;
-    border: 4px solid var(--gold-main, #e5a93c);
-    background: #11141d;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    display: block;
+    transition: transform 0.3s ease;
 }
 
 .change-photo {
     position: absolute;
-    right: 0;
-    bottom: 5px;
+    right: 3px;
+    bottom: 3px;
     width: 38px;
     height: 38px;
     border-radius: 50%;
-    background: #11141d;
-    border: 2px solid var(--gold-main, #e5a93c);
-    color: var(--gold-main, #e5a93c);
-    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    z-index: 3;
 }
 
-.change-photo:hover {
-    background: var(--gold-main, #e5a93c);
-    color: #000000;
-}
-
-
-/* DATOS */
-
-.profile-data h2 {
-    font-size: 1.8rem;
-    margin: 0;
-    color: var(--text-white, #ffffff);
-    font-weight: 700;
+.profile-data {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .profile-name {
     display: flex;
     align-items: center;
-    gap: 12px;
     flex-wrap: wrap;
+    gap: 12px;
 }
 
-.profile-name span {
-    background: rgba(229, 169, 60, 0.12);
-    border: 1px solid rgba(229, 169, 60, 0.3);
-    color: var(--gold-main, #e5a93c);
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 0.78rem;
+.profile-name h2 {
+    margin: 0;
+    font-size: 1.75rem;
     font-weight: 700;
-    text-transform: uppercase;
+    letter-spacing: -0.01em;
 }
 
+#profileHeroRole {
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 
-/* SEGURIDAD */
+.verification-badge-container {
+    margin-top: 4px;
+}
+
+#verificationStatusBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.84rem;
+    font-weight: 600;
+}
 
 .profile-security {
+    display: flex;
+    align-items: center;
+    gap: 24px;
     position: relative;
     z-index: 2;
+}
+
+.profile-sec-deco {
     display: flex;
     align-items: center;
-    gap: 20px;
-}
-
-.gold-plant {
-    font-size: 70px;
-    color: var(--gold-main, #e5a93c);
-}
-
-.security-shield {
-    width: 85px;
-    height: 100px;
-    display: flex;
     justify-content: center;
-    align-items: center;
-    background: rgba(0, 0, 0, 0.4);
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    clip-path: polygon(
-        50% 0%,
-        90% 15%,
-        90% 60%,
-        50% 100%,
-        10% 60%,
-        10% 15%
-    );
 }
 
-.security-shield i {
-    color: var(--gold-main, #e5a93c);
-    font-size: 35px;
+.deco-plant {
+    font-size: 60px;
+    transition: transform 0.3s ease;
 }
 
+.profile-hero:hover .deco-plant {
+    transform: scale(1.08) rotate(5deg);
+}
 
-/* =========================================
-   GRID SUPERIOR (3 Columnas)
-========================================= */
+.deco-shield {
+    width: 72px;
+    height: 86px;
+    clip-path: polygon(50% 0%, 95% 15%, 95% 65%, 50% 100%, 5% 65%, 5% 15%);
+    font-size: 32px;
+}
+
+/* ==========================================================================
+   GRID PRINCIPAL (3 TARJETAS)
+   ========================================================================== */
 
 .profile-grid {
     display: grid;
-    grid-template-columns: 1.4fr 1.1fr 1fr;
-    gap: 1.5rem;
-    align-items: stretch; /* Fuerza a que todos los elementos de la fila midan lo mismo */
+    grid-template-columns: 1.35fr 1fr 1fr;
+    gap: 1.6rem;
     width: 100%;
     box-sizing: border-box;
 }
 
-
-/* TARJETAS */
-
 .profile-card {
-    background: var(--bg-card-dark-glass, rgba(17, 20, 29, 0.85)) !important;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--bg-card-border, rgba(255, 255, 255, 0.08)) !important;
-    border-radius: var(--radius-card, 16px);
+    border-radius: 18px;
     padding: 1.8rem;
-    box-shadow: var(--shadow-card, 0 10px 30px rgba(0, 0, 0, 0.4));
-    box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    height: 100%; /* Llena por completo la altura de la fila */
+    box-sizing: border-box;
+    min-height: 310px;
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .card-title {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 1.4rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    gap: 14px;
+    margin-bottom: 1.3rem;
 }
 
 .card-title h3 {
-    font-size: 1.05rem;
     margin: 0;
-    color: var(--text-white, #ffffff);
+    font-size: 1.15rem;
     font-weight: 700;
 }
 
 .card-icon {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(229, 169, 60, 0.12);
-    color: var(--gold-main, #e5a93c);
-    font-size: 0.95rem;
+    font-size: 1.15rem;
+    flex-shrink: 0;
 }
 
-
-/* =========================================
-   INFORMACIÓN PERSONAL
-========================================= */
-
+/* FILAS DE INFORMACIÓN */
 .info-row {
     display: grid;
-    grid-template-columns: 1.1fr 1.4fr 32px;
+    grid-template-columns: 1fr 1.3fr 36px;
     align-items: center;
-    padding: 12px 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
     gap: 10px;
-}
-
-.info-row:first-of-type {
-    border-top: none;
-    padding-top: 0;
+    padding: 13px 0;
 }
 
 .info-row span {
-    color: var(--text-muted, #94a3b8);
-    font-size: 0.82rem;
+    font-size: 0.88rem;
+    font-weight: 500;
 }
 
 .info-row strong {
-    color: #ffffff;
-    font-weight: 500;
-    font-size: 0.85rem;
-    word-break: break-all;
+    font-size: 0.94rem;
+    font-weight: 600;
+    word-break: break-word;
 }
 
 .info-row button {
-    border: none;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background: rgba(229, 169, 60, 0.1);
-    color: var(--gold-main, #e5a93c);
-    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
+    border: none;
     transition: all 0.2s ease;
 }
 
-.info-row button:hover {
-    background: rgba(229, 169, 60, 0.25);
-}
-
-
-/* =========================================
-   CONFIGURACIÓN
-========================================= */
-
+/* FILAS DE CONFIGURACIÓN */
 .setting-row {
     display: grid;
-    grid-template-columns: 24px 1fr 15px;
+    grid-template-columns: 28px 1fr 20px;
     align-items: center;
     gap: 12px;
-    padding: 13px 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-    color: #e5e5e7;
-    font-size: 0.85rem;
-    transition: color 0.2s ease;
+    padding: 14px 12px;
+    border-radius: 10px;
     cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 6px;
+    font-size: 0.92rem;
+    font-weight: 500;
 }
 
-.setting-row:first-of-type {
-    border-top: none;
-    padding-top: 0;
-}
-
-.setting-row:hover {
-    color: var(--gold-main, #e5a93c);
-}
-
-.setting-row > i:first-child {
-    color: var(--gold-main, #e5a93c);
-}
-
-.setting-row > i:last-child {
-    color: var(--text-muted, #94a3b8);
-    font-size: 0.75rem;
-}
-
-
-/* =========================================
-   RESUMEN
-========================================= */
-
+/* ITEMS DE RESUMEN */
 .summary-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 14px;
-    margin-bottom: 10px;
-    border-radius: 12px;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    transition: background 0.2s ease, border-color 0.2s ease;
-}
-
-.summary-item:last-child {
-    margin-bottom: 0;
+    gap: 16px;
+    padding: 16px;
+    border-radius: 14px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .summary-item > div:nth-child(2) {
     flex: 1;
 }
 
-.summary-item small {
-    display: block;
-    color: var(--text-muted, #94a3b8);
-    font-size: 0.72rem;
-    margin-bottom: 2px;
-}
-
-.summary-item strong {
-    color: white;
-    font-size: 0.95rem;
-}
-
 .summary-icon {
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(229, 169, 60, 0.12);
-    color: var(--gold-main, #e5a93c);
-    font-size: 0.95rem;
+    font-size: 1.25rem;
+    flex-shrink: 0;
 }
 
-.summary-icon.green {
-    background: rgba(52, 211, 153, 0.12);
-    color: #34d399;
+.summary-item small {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 500;
+    margin-bottom: 4px;
 }
 
-.summary-item.gold strong {
-    color: var(--gold-main, #e5a93c);
+.summary-item strong {
+    font-size: 1.25rem;
+    font-weight: 700;
 }
 
-
-/* =========================================
-   BLOQUE INFERIOR (2 Columnas)
-========================================= */
+/* ==========================================================================
+   BLOQUE INFERIOR (2 TARJETAS)
+   ========================================================================== */
 
 .profile-bottom {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-    margin-top: 0;
+    gap: 1.6rem;
     width: 100%;
     box-sizing: border-box;
 }
 
 .bottom-card {
-    background: var(--bg-card-dark-glass, rgba(17, 20, 29, 0.85)) !important;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--bg-card-border, rgba(255, 255, 255, 0.08)) !important;
-    border-radius: var(--radius-card, 16px);
+    border-radius: 18px;
     padding: 1.8rem;
-    box-shadow: var(--shadow-card, 0 10px 30px rgba(0, 0, 0, 0.4));
-    box-sizing: border-box;
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 18px;
+    box-sizing: border-box;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .bottom-icon {
-    min-width: 44px;
-    height: 44px;
-    border-radius: 50%;
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
     display: flex;
-    justify-content: center;
     align-items: center;
-    background: rgba(229, 169, 60, 0.12);
-    color: var(--gold-main, #e5a93c);
-    font-size: 1.1rem;
+    justify-content: center;
+    font-size: 1.35rem;
+    flex-shrink: 0;
 }
 
 .bottom-card div:nth-child(2) {
@@ -450,70 +354,684 @@
 }
 
 .bottom-card h3 {
-    margin: 0 0 4px;
-    font-size: 1rem;
-    color: var(--text-white, #ffffff);
+    margin: 0 0 5px 0;
+    font-size: 1.05rem;
+    font-weight: 700;
 }
 
 .bottom-card p {
-    color: var(--text-muted, #94a3b8);
     margin: 0;
-    font-size: 0.8rem;
+    font-size: 0.86rem;
     line-height: 1.4;
 }
 
 .bottom-card button {
-    background: rgba(229, 169, 60, 0.1);
-    border: 1px solid rgba(229, 169, 60, 0.3);
-    color: var(--gold-main, #e5a93c);
-    padding: 10px 16px;
+    margin-left: auto;
+    white-space: nowrap;
+    padding: 10px 18px;
     border-radius: 10px;
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: 0.86rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
-    white-space: nowrap;
 }
 
-.bottom-card button:hover {
-    background: rgba(229, 169, 60, 0.2);
-}
-
-/* Tarjeta interactiva en resumen */
-.profile-card.account-summary .summary-item:first-child {
-    cursor: pointer;
-    transition: transform 0.2s ease, border-color 0.2s ease;
-}
-.profile-card.account-summary .summary-item:first-child:hover {
-    transform: translateY(-1px);
-    border-color: rgba(229, 169, 60, 0.4);
-    background: rgba(0, 0, 0, 0.5);
+/* Input en modo edición */
+.input-edit-perfil {
+    width: 100%;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.92rem;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s ease;
 }
 
 
-/* =========================================
-   RESPONSIVE
-========================================= */
-@media (max-width: 1024px) {
+/* ==========================================================================
+   2. TEMA FINARA BANK (DARK & GOLD LUXURY)
+   Aplica en app.html (.theme-bank o por defecto)
+   ========================================================================== */
+
+.profile-container.theme-bank,
+body.theme-bank .profile-container,
+body:not(.theme-finanzas) .profile-container {
+    color: #f1f5f9;
+}
+
+/* Encabezado */
+.profile-container.theme-bank .profile-page-header h1,
+body.theme-bank .profile-page-header h1,
+body:not(.theme-finanzas) .profile-page-header h1 {
+    color: #ffffff;
+}
+
+.profile-container.theme-bank .profile-page-subtitle,
+body.theme-bank .profile-page-subtitle,
+body:not(.theme-finanzas) .profile-page-subtitle {
+    color: #94a3b8;
+}
+
+.profile-container.theme-bank .btn-edit-profile,
+body.theme-bank .btn-edit-profile,
+body:not(.theme-finanzas) .btn-edit-profile {
+    background: linear-gradient(135deg, #e5a93c 0%, #c48b28 100%);
+    border: 1px solid #fce09b;
+    color: #0c0f17;
+    box-shadow: 0 4px 18px rgba(229, 169, 60, 0.25);
+}
+
+.profile-container.theme-bank .btn-edit-profile:hover,
+body.theme-bank .btn-edit-profile:hover,
+body:not(.theme-finanzas) .btn-edit-profile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(229, 169, 60, 0.4);
+}
+
+/* Hero */
+.profile-container.theme-bank .profile-hero,
+body.theme-bank .profile-hero,
+body:not(.theme-finanzas) .profile-hero {
+    background: linear-gradient(135deg, rgba(20, 25, 37, 0.96) 0%, rgba(12, 16, 24, 0.98) 100%) !important;
+    border: 1px solid rgba(229, 169, 60, 0.35) !important;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6) !important;
+}
+
+.profile-container.theme-bank .profile-hero::after,
+body.theme-bank .profile-hero::after,
+body:not(.theme-finanzas) .profile-hero::after {
+    content: "";
+    position: absolute;
+    width: 480px;
+    height: 220px;
+    right: -100px;
+    top: -50px;
+    border-radius: 50%;
+    border-top: 25px solid rgba(229, 169, 60, 0.28);
+    transform: rotate(-14deg);
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.profile-container.theme-bank .profile-avatar img,
+body.theme-bank .profile-avatar img,
+body:not(.theme-finanzas) .profile-avatar img {
+    border: 3.5px solid #e5a93c;
+    background: #0d111a;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+}
+
+.profile-container.theme-bank .change-photo,
+body.theme-bank .change-photo,
+body:not(.theme-finanzas) .change-photo {
+    background: #111520;
+    border: 2px solid #e5a93c;
+    color: #e5a93c;
+}
+
+.profile-container.theme-bank .change-photo:hover,
+body.theme-bank .change-photo:hover,
+body:not(.theme-finanzas) .change-photo:hover {
+    background: #e5a93c;
+    color: #0c0f17;
+    transform: scale(1.08);
+}
+
+.profile-container.theme-bank .profile-name h2,
+body.theme-bank .profile-name h2,
+body:not(.theme-finanzas) .profile-name h2 {
+    color: #ffffff;
+}
+
+.profile-container.theme-bank #profileHeroRole,
+body.theme-bank #profileHeroRole,
+body:not(.theme-finanzas) #profileHeroRole {
+    background: rgba(229, 169, 60, 0.15);
+    color: #f4b936;
+    border: 1px solid rgba(229, 169, 60, 0.4);
+}
+
+.profile-container.theme-bank .deco-plant,
+body.theme-bank .deco-plant,
+body:not(.theme-finanzas) .deco-plant {
+    color: #e5a93c;
+    filter: drop-shadow(0 0 18px rgba(229, 169, 60, 0.35));
+}
+
+.profile-container.theme-bank .deco-shield,
+body.theme-bank .deco-shield,
+body:not(.theme-finanzas) .deco-shield {
+    background: rgba(229, 169, 60, 0.12);
+    border: 2px solid rgba(229, 169, 60, 0.38);
+    color: #e5a93c;
+}
+
+/* Tarjetas Grid */
+.profile-container.theme-bank .profile-card,
+body.theme-bank .profile-card,
+body:not(.theme-finanzas) .profile-card {
+    background: linear-gradient(145deg, rgba(18, 23, 34, 0.95) 0%, rgba(12, 16, 24, 0.98) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+}
+
+.profile-container.theme-bank .profile-card:hover,
+body.theme-bank .profile-card:hover,
+body:not(.theme-finanzas) .profile-card:hover {
+    border-color: rgba(229, 169, 60, 0.35);
+}
+
+.profile-container.theme-bank .card-title h3,
+body.theme-bank .card-title h3,
+body:not(.theme-finanzas) .card-title h3 {
+    color: #ffffff;
+}
+
+.profile-container.theme-bank .card-icon,
+body.theme-bank .card-icon,
+body:not(.theme-finanzas) .card-icon {
+    background: rgba(229, 169, 60, 0.14);
+    color: #e5a93c;
+    border: 1px solid rgba(229, 169, 60, 0.25);
+}
+
+.profile-container.theme-bank .info-row,
+body.theme-bank .info-row,
+body:not(.theme-finanzas) .info-row {
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.profile-container.theme-bank .info-row span,
+body.theme-bank .info-row span,
+body:not(.theme-finanzas) .info-row span {
+    color: #94a3b8;
+}
+
+.profile-container.theme-bank .info-row strong,
+body.theme-bank .info-row strong,
+body:not(.theme-finanzas) .info-row strong {
+    color: #f1f5f9;
+}
+
+.profile-container.theme-bank .info-row button,
+body.theme-bank .info-row button,
+body:not(.theme-finanzas) .info-row button {
+    background: rgba(229, 169, 60, 0.12);
+    color: #e5a93c;
+    border: 1px solid rgba(229, 169, 60, 0.25);
+}
+
+.profile-container.theme-bank .info-row button:hover,
+body.theme-bank .info-row button:hover,
+body:not(.theme-finanzas) .info-row button:hover {
+    background: #e5a93c;
+    color: #0c0f17;
+}
+
+.profile-container.theme-bank .setting-row,
+body.theme-bank .setting-row,
+body:not(.theme-finanzas) .setting-row {
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    color: #e2e8f0;
+}
+
+.profile-container.theme-bank .setting-row:hover,
+body.theme-bank .setting-row:hover,
+body:not(.theme-finanzas) .setting-row:hover {
+    background: rgba(229, 169, 60, 0.08);
+}
+
+.profile-container.theme-bank .setting-row > i:first-child,
+.profile-container.theme-bank .setting-row > i:last-child,
+body.theme-bank .setting-row > i:first-child,
+body.theme-bank .setting-row > i:last-child,
+body:not(.theme-finanzas) .setting-row > i:first-child,
+body:not(.theme-finanzas) .setting-row > i:last-child {
+    color: #e5a93c;
+}
+
+.profile-container.theme-bank .summary-item,
+body.theme-bank .summary-item,
+body:not(.theme-finanzas) .summary-item {
+    background: rgba(14, 18, 28, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.profile-container.theme-bank .summary-item:hover,
+body.theme-bank .summary-item:hover,
+body:not(.theme-finanzas) .summary-item:hover {
+    border-color: rgba(229, 169, 60, 0.35);
+    transform: translateX(4px);
+}
+
+.profile-container.theme-bank .summary-item small,
+body.theme-bank .summary-item small,
+body:not(.theme-finanzas) .summary-item small {
+    color: #94a3b8;
+}
+
+.profile-container.theme-bank .summary-item strong,
+body.theme-bank .summary-item strong,
+body:not(.theme-finanzas) .summary-item strong {
+    color: #ffffff;
+}
+
+.profile-container.theme-bank .summary-icon.green,
+body.theme-bank .summary-icon.green,
+body:not(.theme-finanzas) .summary-icon.green {
+    background: rgba(16, 185, 129, 0.16);
+    color: #34d399;
+}
+
+.profile-container.theme-bank .summary-icon.gold,
+body.theme-bank .summary-icon.gold,
+body:not(.theme-finanzas) .summary-icon.gold {
+    background: rgba(229, 169, 60, 0.16);
+    color: #f4b936;
+}
+
+.profile-container.theme-bank .item-saldo strong,
+body.theme-bank .item-saldo strong,
+body:not(.theme-finanzas) .item-saldo strong {
+    color: #f4b936;
+}
+
+/* Tarjetas Inferiores */
+.profile-container.theme-bank .bottom-card,
+body.theme-bank .bottom-card,
+body:not(.theme-finanzas) .bottom-card {
+    background: linear-gradient(145deg, rgba(18, 23, 34, 0.95) 0%, rgba(12, 16, 24, 0.98) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+.profile-container.theme-bank .bottom-icon,
+body.theme-bank .bottom-icon,
+body:not(.theme-finanzas) .bottom-icon {
+    background: rgba(229, 169, 60, 0.14);
+    color: #e5a93c;
+    border: 1px solid rgba(229, 169, 60, 0.25);
+}
+
+.profile-container.theme-bank .bottom-card h3,
+body.theme-bank .bottom-card h3,
+body:not(.theme-finanzas) .bottom-card h3 {
+    color: #ffffff;
+}
+
+.profile-container.theme-bank .bottom-card p,
+body.theme-bank .bottom-card p,
+body:not(.theme-finanzas) .bottom-card p {
+    color: #94a3b8;
+}
+
+.profile-container.theme-bank .bottom-card button,
+body.theme-bank .bottom-card button,
+body:not(.theme-finanzas) .bottom-card button {
+    background: rgba(229, 169, 60, 0.15);
+    border: 1px solid rgba(229, 169, 60, 0.4);
+    color: #f4b936;
+}
+
+.profile-container.theme-bank .bottom-card button:hover,
+body.theme-bank .bottom-card button:hover,
+body:not(.theme-finanzas) .bottom-card button:hover {
+    background: #e5a93c;
+    color: #0c0f17;
+    box-shadow: 0 4px 16px rgba(229, 169, 60, 0.35);
+}
+
+.profile-container.theme-bank .input-edit-perfil,
+body.theme-bank .input-edit-perfil,
+body:not(.theme-finanzas) .input-edit-perfil {
+    background: #141824;
+    color: #ffffff;
+    border: 1px solid #e5a93c;
+}
+
+
+/* ==========================================================================
+   3. TEMA FINARA FINANZAS (CLEAN NEUTRAL & EMERALD GREEN)
+   Aplica en finanzas.html (.theme-finanzas)
+   ========================================================================== */
+
+.profile-container.theme-finanzas,
+body.theme-finanzas .profile-container {
+    color: #1e293b;
+}
+
+/* Encabezado */
+.profile-container.theme-finanzas .profile-page-header h1,
+body.theme-finanzas .profile-page-header h1 {
+    color: #0f172a;
+}
+
+.profile-container.theme-finanzas .profile-page-subtitle,
+body.theme-finanzas .profile-page-subtitle {
+    color: #64748b;
+}
+
+.profile-container.theme-finanzas .btn-edit-profile,
+body.theme-finanzas .btn-edit-profile {
+    background: #10b981;
+    border: 1px solid #059669;
+    color: #ffffff;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+}
+
+.profile-container.theme-finanzas .btn-edit-profile:hover,
+body.theme-finanzas .btn-edit-profile:hover {
+    background: #059669;
+    box-shadow: 0 6px 22px rgba(16, 185, 129, 0.45);
+    transform: translateY(-2px);
+}
+
+/* Hero Finanzas */
+.profile-container.theme-finanzas .profile-hero,
+body.theme-finanzas .profile-hero {
+    background: linear-gradient(135deg, rgba(6, 78, 59, 0.96) 0%, rgba(13, 22, 30, 0.98) 100%) !important;
+    border: 1px solid rgba(16, 185, 129, 0.45) !important;
+    box-shadow: 0 12px 35px rgba(16, 185, 129, 0.16), 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+.profile-container.theme-finanzas .profile-hero::after,
+body.theme-finanzas .profile-hero::after {
+    content: "";
+    position: absolute;
+    width: 480px;
+    height: 220px;
+    right: -100px;
+    top: -50px;
+    border-radius: 50%;
+    border-top: 25px solid rgba(16, 185, 129, 0.35);
+    transform: rotate(-14deg);
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.profile-container.theme-finanzas .profile-avatar img,
+body.theme-finanzas .profile-avatar img {
+    border: 3.5px solid #10b981;
+    background: #064e3b;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.profile-container.theme-finanzas .change-photo,
+body.theme-finanzas .change-photo {
+    background: #022c22;
+    border: 2px solid #10b981;
+    color: #34d399;
+}
+
+.profile-container.theme-finanzas .change-photo:hover,
+body.theme-finanzas .change-photo:hover {
+    background: #10b981;
+    color: #ffffff;
+    transform: scale(1.08);
+}
+
+.profile-container.theme-finanzas .profile-name h2,
+body.theme-finanzas .profile-name h2 {
+    color: #ffffff;
+}
+
+.profile-container.theme-finanzas #profileHeroRole,
+body.theme-finanzas #profileHeroRole {
+    background: rgba(16, 185, 129, 0.22);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.45);
+}
+
+.profile-container.theme-finanzas #verificationStatusBadge,
+body.theme-finanzas #verificationStatusBadge {
+    background: rgba(16, 185, 129, 0.25) !important;
+    border: 1px solid #10b981 !important;
+    color: #a7f3d0 !important;
+}
+
+.profile-container.theme-finanzas .deco-plant,
+body.theme-finanzas .deco-plant {
+    color: #34d399;
+    filter: drop-shadow(0 0 18px rgba(16, 185, 129, 0.4));
+}
+
+.profile-container.theme-finanzas .deco-shield,
+body.theme-finanzas .deco-shield {
+    background: rgba(16, 185, 129, 0.16);
+    border: 2px solid rgba(16, 185, 129, 0.45);
+    color: #34d399;
+}
+
+/* Tarjetas Grid Finanzas (Blancas, modernas y limpias) */
+.profile-container.theme-finanzas .profile-card,
+body.theme-finanzas .profile-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.profile-container.theme-finanzas .profile-card:hover,
+body.theme-finanzas .profile-card:hover {
+    border-color: rgba(16, 185, 129, 0.4);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.12);
+}
+
+.profile-container.theme-finanzas .card-title h3,
+body.theme-finanzas .card-title h3 {
+    color: #0f172a;
+}
+
+.profile-container.theme-finanzas .card-icon,
+body.theme-finanzas .card-icon {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.profile-container.theme-finanzas .info-row,
+body.theme-finanzas .info-row {
+    border-top: 1px solid #f1f5f9;
+}
+
+.profile-container.theme-finanzas .info-row span,
+body.theme-finanzas .info-row span {
+    color: #64748b;
+}
+
+.profile-container.theme-finanzas .info-row strong,
+body.theme-finanzas .info-row strong {
+    color: #0f172a;
+}
+
+.profile-container.theme-finanzas .info-row button,
+body.theme-finanzas .info-row button {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.profile-container.theme-finanzas .info-row button:hover,
+body.theme-finanzas .info-row button:hover {
+    background: #10b981;
+    color: #ffffff;
+}
+
+.profile-container.theme-finanzas .setting-row,
+body.theme-finanzas .setting-row {
+    border-top: 1px solid #f1f5f9;
+    color: #1e293b;
+}
+
+.profile-container.theme-finanzas .setting-row:hover,
+body.theme-finanzas .setting-row:hover {
+    background: rgba(16, 185, 129, 0.06);
+}
+
+.profile-container.theme-finanzas .setting-row > i:first-child,
+.profile-container.theme-finanzas .setting-row > i:last-child,
+body.theme-finanzas .setting-row > i:first-child,
+body.theme-finanzas .setting-row > i:last-child {
+    color: #10b981;
+}
+
+.profile-container.theme-finanzas .summary-item,
+body.theme-finanzas .summary-item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+
+.profile-container.theme-finanzas .summary-item:hover,
+body.theme-finanzas .summary-item:hover {
+    border-color: rgba(16, 185, 129, 0.4);
+    transform: translateX(4px);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.08);
+}
+
+.profile-container.theme-finanzas .summary-item small,
+body.theme-finanzas .summary-item small {
+    color: #64748b;
+}
+
+.profile-container.theme-finanzas .summary-item strong,
+body.theme-finanzas .summary-item strong {
+    color: #0f172a;
+}
+
+.profile-container.theme-finanzas .summary-icon.green,
+.profile-container.theme-finanzas .summary-icon.gold,
+body.theme-finanzas .summary-icon.green,
+body.theme-finanzas .summary-icon.gold {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.profile-container.theme-finanzas .item-saldo strong,
+body.theme-finanzas .item-saldo strong {
+    color: #047857;
+}
+
+/* Tarjetas Inferiores Finanzas */
+.profile-container.theme-finanzas .bottom-card,
+body.theme-finanzas .bottom-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.profile-container.theme-finanzas .bottom-card:hover,
+body.theme-finanzas .bottom-card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.profile-container.theme-finanzas .bottom-icon,
+body.theme-finanzas .bottom-icon {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.profile-container.theme-finanzas .bottom-card h3,
+body.theme-finanzas .bottom-card h3 {
+    color: #0f172a;
+}
+
+.profile-container.theme-finanzas .bottom-card p,
+body.theme-finanzas .bottom-card p {
+    color: #64748b;
+}
+
+.profile-container.theme-finanzas .bottom-card button,
+body.theme-finanzas .bottom-card button {
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    color: #047857;
+}
+
+.profile-container.theme-finanzas .bottom-card button:hover,
+body.theme-finanzas .bottom-card button:hover {
+    background: #10b981;
+    color: #ffffff;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.25);
+}
+
+.profile-container.theme-finanzas .input-edit-perfil,
+body.theme-finanzas .input-edit-perfil {
+    background: #ffffff;
+    color: #0f172a;
+    border: 1.5px solid #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
+}
+
+
+/* ==========================================================================
+   4. RESPONSIVIDAD Y ADAPTACIÓN EN DISPOSITIVOS MÓVILES
+   ========================================================================== */
+
+@media (max-width: 1100px) {
     .profile-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
     }
-    .profile-bottom {
-        grid-template-columns: 1fr;
+    .profile-card.account-summary {
+        grid-column: span 2;
     }
 }
 
 @media (max-width: 768px) {
-    .main-content {
-        padding: 1rem 1.5rem 1.5rem 1.5rem !important;
+    .profile-container {
+        padding: 1rem 1rem 2.5rem 1rem !important;
+        gap: 1.25rem;
     }
-    .profile-hero {
+
+    .profile-page-header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 20px;
-        padding: 1.5rem;
+        gap: 1rem;
     }
+
+    .btn-edit-profile {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .profile-hero {
+        padding: 1.6rem 1.4rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+    }
+
     .profile-security {
         display: none;
+    }
+
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-card.account-summary {
+        grid-column: span 1;
+    }
+
+    .profile-bottom {
+        grid-template-columns: 1fr;
+    }
+
+    .bottom-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .bottom-card button {
+        margin-left: 0;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .info-row {
+        grid-template-columns: 1fr 1fr 34px;
+        font-size: 0.85rem;
     }
 }

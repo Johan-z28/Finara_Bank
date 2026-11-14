@@ -118,8 +118,16 @@ function configurarVistaSolicitud() {
     if (usuarioActivo) {
         if (greetingName) greetingName.textContent = usuarioActivo.nombre || "Usuario";
         if (dropdownUserName) dropdownUserName.textContent = usuarioActivo.nombre || "Usuario";
-        if (usuarioActivo.avatar && userAvatarImg) {
-            userAvatarImg.src = usuarioActivo.avatar;
+        if (userAvatarImg) {
+            const rawAvatar = usuarioActivo.avatar;
+            const src = (!rawAvatar || rawAvatar.includes("avatar-maria") || rawAvatar.includes("../../")) 
+                ? "../Style/image/profile/avatarDefault.png" 
+                : rawAvatar;
+            userAvatarImg.src = src;
+            userAvatarImg.onerror = () => {
+                userAvatarImg.onerror = null;
+                userAvatarImg.src = "../Style/image/profile/avatarDefault.png";
+            };
             userAvatarImg.classList.remove("hidden");
             if (userAvatarIcon) userAvatarIcon.classList.add("hidden");
         }

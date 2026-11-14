@@ -62,10 +62,10 @@ async function cargarLogoPNGReal() {
             }
         };
         img.onerror = () => {
-            console.error("ERROR CRÍTICO: No se encontró la imagen en '../Style/image/logo_finara.png'");
+            console.error("ERROR CRÍTICO: No se encontró la imagen en '../Style/image/Logo_finara.png'");
             resolve(null);
         };
-        img.src = '../Style/image/logo_finara.png';
+        img.src = '../Style/image/Logo_finara.png';
     });
 }
 

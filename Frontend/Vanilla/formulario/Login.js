@@ -213,7 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     correo: "admin@finarabank.com",
                     rol: "admin",
                     verificado: true,
-                    avatar: "../../Style/image/profile/avatarDefault.png"
+                    avatar: "../Style/image/profile/avatarDefault.png"
                 };
 
                 guardarJSON(CLAVE_SESION, adminUser);
